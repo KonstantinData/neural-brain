@@ -1,0 +1,4 @@
+title = "Neural Brain secret scanning policy"
+
+[extend]
+useDefault = true
