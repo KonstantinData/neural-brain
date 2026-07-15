@@ -7,10 +7,11 @@ attention, maintain working memory, pursue goals, plan, execute tools, verify
 outcomes independently, retain long-term memory, learn under explicit controls,
 reflect, and operate with bounded autonomy.
 
-The project is currently in its **Foundation phase**. It does not yet provide a
-runnable agent runtime, a stable API, or a production-ready deployment. This
-README describes the intended platform and the repository contract without
-claiming that later-stage capabilities already exist.
+The project is currently in its **Foundation phase**. Its pinned Python runtime
+and engineering quality environment are reproducible, but it does not yet
+provide a runnable agent runtime, a stable API, or a production-ready
+deployment. This README describes the intended platform and the repository
+contract without claiming that later-stage capabilities already exist.
 
 ## Who This Is For
 
@@ -103,6 +104,9 @@ docs/traceability/      Requirement-to-code-to-test evidence conventions
 migrations/             Ordered and reproducible PostgreSQL migrations
 tests/                  Automated acceptance and safety evidence
 tools/                  Guarded development and verification commands
+pyproject.toml          Runtime, dependencies, and quality-tool configuration
+uv.lock                 Exact cross-platform dependency resolution
+.python-version         Exact GIL-enabled CPython runtime request
 ```
 
 Directories and commands are added by their owning Foundation tasks. Their
@@ -118,22 +122,51 @@ not implementation authorization.
 
 ## Quick Start
 
-There is no application or database stack to start yet. To orient yourself at
-the current maturity level:
+There is no application runtime to start yet. The Foundation quality environment
+is executable and locked.
+
+Prerequisite: uv 0.11.28. From any existing uv installation, the repository can
+bootstrap and use the exact required uv release without changing the global uv
+installation:
+
+```powershell
+uvx --from uv==0.11.28 uv sync --locked
+uvx --from uv==0.11.28 uv run --locked python tools/quality.py
+```
+
+The first command installs the exact CPython and dependency environment declared
+by `.python-version`, `pyproject.toml`, and `uv.lock`. The second command runs
+format checking, linting, strict static typing, the controlled type-exception
+audit, and the test suite.
+
+To orient yourself at the current maturity level:
 
 1. Clone the repository and work from a task branch based on the current default
    branch.
 2. Read `AGENTS.md` before making changes; it defines scope, source precedence,
    safety invariants, and delivery rules.
 3. Read this README for the platform boundary and staged delivery model.
-4. Consult versioned architecture documents, ADRs, tests, migrations, and tools
-   as they are introduced by subsequent Foundation tasks.
-5. Treat setup, quality, migration, and test commands as available only when the
-   corresponding checked-in configuration and documentation exist.
+4. Read [ADR-013](docs/adr/ADR-013-python-runtime-and-toolchain.md) for the
+   accepted runtime, trust-boundary, typing, and transaction contracts.
+5. Run the locked quality gate before and after every implementation change.
 
-PostgreSQL is the planned authoritative transactional ledger. Reproducible local
-setup, locked dependencies, guarded test-data reset, and executable quality
-commands will be documented when their Foundation baselines are implemented.
+PostgreSQL is the planned authoritative transactional ledger. The isolated local
+development and test database environment, including the guarded test-data reset,
+is introduced by FND-01.6.
+
+## Accepted Foundation Toolchain
+
+- CPython 3.14.6, standard GIL-enabled build
+- uv 0.11.28 with an exact lockfile
+- Ruff for formatting and linting
+- mypy strict mode plus a zero-default type-exception allowlist
+- pytest and Hypothesis for deterministic, property-based, and state-machine tests
+- Pydantic v2 for runtime validation at untrusted boundaries
+- synchronous Psycopg 3 with autocommit connections and explicit transactions
+
+This toolchain does not select an inference provider. Model inference requires a
+separate accepted ADR defining local Ollama and prohibiting OpenAI and automatic
+cloud fallback.
 
 ## Safety Baseline
 
