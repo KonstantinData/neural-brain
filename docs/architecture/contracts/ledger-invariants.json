@@ -1,0 +1,118 @@
+{
+  "document_type": "ledger_invariant_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.ledger-invariants",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "work_item": "FND-02.3/FND-02.4",
+  "sources": [
+    "docs/architecture/architecture-directive-v1.1.md",
+    "docs/architecture/contracts/quiescence.json",
+    "docs/adr/ADR-003-postgresql-authoritative-transactional-ledger.md",
+    "docs/adr/ADR-004-transition-gates-own-protected-state.md",
+    "docs/adr/ADR-008-atomic-action-preparation-and-commit.md",
+    "docs/adr/ADR-009-stage-1-dispatch-journal.md"
+  ],
+  "transition_record": {
+    "required_immutable_fields": [
+      "tenant_id",
+      "area_id",
+      "project_id",
+      "session_id",
+      "goal_id",
+      "aggregate_id",
+      "contract_id",
+      "contract_version",
+      "transition_id",
+      "transition_request_id",
+      "source_state",
+      "target_state",
+      "expected_state_version",
+      "new_state_version",
+      "request_actor_principal_id",
+      "writer_component_id",
+      "correlation_id",
+      "causation_id",
+      "audit_event_type"
+    ],
+    "conditional_references": [
+      "intent_purpose",
+      "authority_snapshot_id",
+      "policy_decision_id",
+      "approval_claim_ids",
+      "budget_reservation_id",
+      "resource_claim_ids",
+      "resource_lock_ids",
+      "local_runtime_fence_id",
+      "evidence_ids",
+      "deadline",
+      "dispatch_journal_id",
+      "execution_grant_id",
+      "execution_attempt_id",
+      "reconciliation_strategy_id",
+      "effect_disposition",
+      "resolution_disposition"
+    ],
+    "writer_rule": "Only the owning transition gate database role writes protected state; the authenticated request actor is recorded separately as cause and never becomes the database writer.",
+    "atomicity": "Protected state, ledger side effects, state version increment, and audit event commit in one PostgreSQL transaction or all roll back.",
+    "replay_key": "transition_request_id is unique within immutable scope and aggregate",
+    "concurrency": "expected_state_version must match and exactly one monotone new_state_version is committed"
+  },
+  "status_registries": {
+    "execution_attempt": {
+      "blocking": ["created", "dispatching", "running", "cancel_requested", "timed_out", "reconciliation_required"],
+      "terminal": ["completed", "failed_no_effect", "cancelled_no_effect", "reconciled"]
+    },
+    "approval_claim": {
+      "blocking": ["requested", "granted", "claimed", "consumption_pending"],
+      "terminal": ["denied", "expired", "consumed", "revoked"]
+    },
+    "budget_reservation": {
+      "blocking": ["requested", "reserved", "debit_pending", "release_pending", "reversal_pending", "indeterminate_hold"],
+      "terminal": ["debited", "released", "reversed", "expired_unreserved"]
+    },
+    "resource_ownership_record": {
+      "blocking": ["requested", "held", "renewal_pending", "release_pending", "indeterminate_hold", "owner_unknown"],
+      "terminal": ["released", "expired_no_effect", "compensated"]
+    },
+    "recovery_work_item": {
+      "blocking": ["requested", "pending", "running", "blocked", "timed_out", "indeterminate"],
+      "terminal": ["completed", "aborted_no_effect", "resolved_by_authorized_incident"]
+    },
+    "external_effect_disposition": {
+      "blocking": ["possible", "pending", "unknown", "indeterminate", "compensation_pending"],
+      "terminal": ["no_effect_confirmed", "effect_confirmed", "effect_compensated"]
+    },
+    "protected_transition_record": {
+      "blocking": ["prepared", "commit_unknown", "audit_missing", "recovery_required"],
+      "terminal": ["committed_with_audit", "rolled_back"]
+    },
+    "startup_recovery_marker": {
+      "blocking": ["stale", "orphaned", "owner_unknown", "reconciliation_required"],
+      "terminal": ["reconciled", "cleared_with_evidence"]
+    }
+  },
+  "invariants": [
+    {"id": "LI-001", "rule": "budget_non_negative", "assertion": "A reservation, debit, reversal, or release cannot produce a negative available or reserved balance."},
+    {"id": "LI-002", "rule": "approval_single_consumption", "assertion": "An approval claim is scope-, payload-, decision-, and expiry-bound and can be consumed exactly once."},
+    {"id": "LI-003", "rule": "resource_conflict_exclusion", "assertion": "Conflicting claims or locks cannot both be held for the same protected resource and scope."},
+    {"id": "LI-004", "rule": "unresolved_effect_holds_resources", "assertion": "Budget, claims, and locks remain held while an external effect is possible, unknown, indeterminate, or awaiting compensation."},
+    {"id": "LI-005", "rule": "attempt_number_monotone", "assertion": "Execution attempt numbers are unique and strictly increasing per action intent."},
+    {"id": "LI-006", "rule": "persist_before_dispatch", "assertion": "Committed intent, dispatch journal, grant, bound local runtime fence, and attempt are durable before adapter invocation."},
+    {"id": "LI-007", "rule": "audit_failure_rolls_back", "assertion": "Failure to persist the audit event rolls back the protected transition and all ledger side effects."},
+    {"id": "LI-008", "rule": "reconciliation_before_ready", "assertion": "Startup and restore remain not-ready until all blocking recovery markers have terminal evidence."},
+    {"id": "LI-009", "rule": "unknown_status_fails_closed", "assertion": "An unknown ledger status blocks quiescence and cannot authorize a transition, settlement, release, or readiness."}
+  ],
+  "fencing": {
+    "stage_1_local_runtime_fence": "A durable current local executor epoch/token gates every new external effect. The grant and attempt retain the exact bound historical fence as immutable evidence.",
+    "recovery_context": "Internal settlement, indeterminate, and reconciliation transitions require an authorized current recovery context but do not require the stale executor fence to become current.",
+    "stage_4_distributed_ownership_fence": "Deferred to Stage 4 and not enabled or implied by the Stage 1 local runtime fence."
+  },
+  "crash_rule": "After persisted dispatch preparation, an attempt record alone cannot prove that adapter contact did not occur. Without authoritative no-effect evidence or successful registered reconciliation, recovery records an indeterminate effect and prohibits automatic retry.",
+  "default_deny": {
+    "unknown_field_or_reference": "deny_and_audit",
+    "unknown_status": "treat_as_blocking",
+    "scope_mismatch": "deny_and_audit",
+    "audit_failure": "rollback_and_deny"
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "document_type": "quiescence_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.quiescence",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "work_item": "FND-02.4",
+  "sources": [
+    "docs/architecture/architecture-directive-v1.1.md",
+    "docs/adr/ADR-007-normative-goal-and-action-state-machines.md",
+    "docs/adr/ADR-008-atomic-action-preparation-and-commit.md",
+    "docs/adr/ADR-009-stage-1-dispatch-journal.md",
+    "docs/architecture/contracts/ledger-invariants.json"
+  ],
+  "predicate": {
+    "id": "goal_is_quiescent",
+    "scope": ["tenant_id", "area_id", "project_id", "session_id", "goal_id"],
+    "result": "true only when every required clause evaluates true in one authoritative ledger transaction",
+    "required_clauses": [
+      {
+        "id": "Q-001",
+        "assertion": "Every action intent is terminal.",
+        "entity_kind": "action_intent",
+        "operator": "none_in_status_set",
+        "terminal_states": ["completed", "aborted"],
+        "open_states": ["proposed", "preparing", "prepared", "committed", "executing", "cancel_requested", "settling", "indeterminate"]
+      },
+      {
+        "id": "Q-002",
+        "assertion": "No execution attempt is pending, running, timed out without disposition, or awaiting reconciliation.",
+        "entity_kind": "execution_attempt",
+        "operator": "none_in_status_set",
+        "blocking_statuses": ["created", "dispatching", "running", "cancel_requested", "timed_out", "reconciliation_required"]
+      },
+      {
+        "id": "Q-003",
+        "assertion": "No approval claim or approval request remains open, reserved, or consumable.",
+        "entity_kind": "approval_claim",
+        "operator": "none_in_status_set",
+        "blocking_statuses": ["requested", "granted", "claimed", "consumption_pending"]
+      },
+      {
+        "id": "Q-004",
+        "assertion": "No budget reservation remains open and every debit, release, or reversal is durably settled.",
+        "entity_kind": "budget_reservation",
+        "operator": "none_in_status_set",
+        "blocking_statuses": ["requested", "reserved", "debit_pending", "release_pending", "reversal_pending", "indeterminate_hold"]
+      },
+      {
+        "id": "Q-005",
+        "assertion": "No resource claim, lease, or lock remains held or ambiguously owned.",
+        "entity_kind": "resource_ownership_record",
+        "included_kinds": ["resource_claim", "lease", "local_runtime_lock"],
+        "operator": "none_in_status_set",
+        "blocking_statuses": ["requested", "held", "renewal_pending", "release_pending", "indeterminate_hold", "owner_unknown"]
+      },
+      {
+        "id": "Q-006",
+        "assertion": "No cancellation, compensation, settlement, or reconciliation work remains open.",
+        "entity_kind": "recovery_work_item",
+        "included_kinds": ["cancellation", "compensation", "settlement", "reconciliation"],
+        "operator": "none_in_status_set",
+        "blocking_statuses": ["requested", "pending", "running", "blocked", "timed_out", "indeterminate"]
+      },
+      {
+        "id": "Q-007",
+        "assertion": "No external effect is possible, pending, or unresolved; every effect has an evidence-backed terminal disposition.",
+        "entity_kind": "external_effect_disposition",
+        "operator": "none_in_status_set",
+        "blocking_statuses": ["possible", "pending", "unknown", "indeterminate", "compensation_pending"]
+      },
+      {
+        "id": "Q-008",
+        "assertion": "No protected transition is partially committed, and every committed protected transition has its atomic audit event.",
+        "entity_kind": "protected_transition_record",
+        "operator": "none_in_status_set",
+        "blocking_statuses": ["prepared", "commit_unknown", "audit_missing", "recovery_required"]
+      },
+      {
+        "id": "Q-009",
+        "assertion": "No stale fencing token, orphaned claim, or recovery marker requires startup reconciliation.",
+        "entity_kind": "startup_recovery_marker",
+        "included_kinds": ["local_runtime_fence", "orphaned_claim", "recovery_marker"],
+        "operator": "none_in_status_set",
+        "blocking_statuses": ["stale", "orphaned", "owner_unknown", "reconciliation_required"]
+      }
+    ]
+  },
+  "required_for_goal_targets": ["suspended", "achieved", "failed", "discarded"],
+  "evaluation": {
+    "authority": "goal_transition_gate",
+    "consistency": "single PostgreSQL transaction over authoritative scoped state",
+    "unknown_or_unavailable_clause": "false",
+    "scope_mismatch": "deny_and_audit",
+    "audit_failure": "rollback_and_deny",
+    "cache_use": "prohibited",
+    "model_or_tool_inference": "prohibited"
+  },
+  "indeterminate_rule": "An indeterminate action is open, keeps its associated budget and resource claims, and makes quiescence false until an authorized resolution is atomically recorded.",
+  "cancellation_rule": "A cancellation request does not establish quiescence. Cancellation is complete only after all possible effects are dispositioned and all claims are durably settled.",
+  "inactive_memory_candidate_rule": {
+    "operator": "does_not_block_when",
+    "entity_kind": "memory_candidate",
+    "conditions": {"status": "inactive", "persistence_status": "complete", "transition_status": "committed"},
+    "reason": "A completely persisted inactive Stage-1 candidate has no active promotion path and does not keep its producing goal open. Open candidate-producing intents, partial Memory Gate transitions, or related claims remain blockers through Q-001, Q-005, and Q-008."
+  },
+  "default_deny": {
+    "unknown_state": "deny",
+    "unknown_claim_status": "treat_as_open",
+    "unknown_effect_status": "treat_as_possible",
+    "missing_evidence": "false",
+    "read_or_audit_failure": "false"
+  }
+}
