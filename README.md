@@ -150,9 +150,18 @@ To orient yourself at the current maturity level:
    accepted runtime, trust-boundary, typing, and transaction contracts.
 5. Run the locked quality gate before and after every implementation change.
 
-PostgreSQL is the planned authoritative transactional ledger. The isolated local
-development and test database environment, including the guarded test-data reset,
-is introduced by FND-01.6.
+PostgreSQL is the planned authoritative transactional ledger. Start the isolated
+local development and test databases with:
+
+```powershell
+.\tools\dev.ps1 up
+```
+
+Verify both connections and the ADR-013 autocommit contract with
+`.\tools\dev.ps1 verify`. Reset only disposable test data with
+`.\tools\dev.ps1 reset-test`. See the
+[local development runbook](docs/runbooks/local-development.md) for ports,
+credential handling, reset safety, and shutdown commands.
 
 ## Accepted Foundation Toolchain
 
