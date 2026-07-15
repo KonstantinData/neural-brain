@@ -131,7 +131,21 @@ def test_repository_artifacts_expose_required_review_contract() -> None:
     template = (ROOT / ".github" / "pull_request_template.md").read_text(encoding="utf-8")
     contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
 
-    assert "* @KonstantinData" in codeowners
+    assert "* @KonstantinData @KonstantinCondata" in codeowners
+    sensitive_patterns = (
+        "/docs/architecture/**",
+        "/docs/adr/**",
+        "/docs/governance/**",
+        "/migrations/**",
+        "/src/**",
+        "/tools/**",
+        "/.github/**",
+    )
+    for pattern in sensitive_patterns:
+        assert f"{pattern} @KonstantinData @KonstantinCondata" in codeowners
+    governance = (ROOT / "docs" / "governance" / "README.md").read_text(encoding="utf-8")
+    assert "pending invitation" in governance
+    assert "read-only access" in governance
     for heading in load_policy()["pull_requests"]["required_template_sections"]:
         assert f"## {heading}" in template
     assert "codex/" in contributing

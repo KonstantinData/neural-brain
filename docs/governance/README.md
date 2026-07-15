@@ -9,6 +9,12 @@ headers, pull-request review, blocking quality checks, CODEOWNERS review, and
 additional independence evidence for separation-of-duties-sensitive changes.
 Unknown or unverifiable governance state fails closed.
 
+`@KonstantinData` and `@KonstantinCondata` are the declared code owners. Each
+account must retain accepted repository write access. A pending invitation or
+read-only access does not establish CODEOWNER eligibility. For any change, the
+approval must come from an eligible owner who is distinct from the author and
+latest pusher.
+
 ## External enforcement boundary
 
 Repository files define the desired state; GitHub enforces it externally. The

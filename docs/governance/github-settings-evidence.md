@@ -25,6 +25,13 @@
 - Administrator enforcement enabled
 - Force pushes and deletion of `main` disabled
 
+## CODEOWNER eligibility
+
+The versioned owner set is `@KonstantinData` and `@KonstantinCondata`. GitHub
+only recognizes an owner for protected review when that account has accepted
+repository write access. Read-only access or a pending write invitation fails
+closed and cannot satisfy the required approval.
+
 ## Re-verification contract
 
 Capture timestamped ruleset or branch-protection API output and verify all of
@@ -40,6 +47,8 @@ the following against `repository-policy.json`:
 6. A deliberately non-compliant pull request is reported as non-mergeable.
 7. The captured evidence identifies the repository, branch, ruleset revision,
    actor, and exact verification time without exposing credentials or tokens.
+8. Every declared CODEOWNER has accepted write access before their approval is
+   treated as valid evidence.
 
 Re-run this verification after any governance or required-check change. Do not
 store authenticated API responses containing tokens, private repository
