@@ -1,0 +1,39 @@
+# ADR-010: Staged Memory Capabilities
+
+- Status: Accepted
+- Date: 2026-07-15
+- Notion source: https://app.notion.com/p/39d1c1ac5ec081b7953ec18893f35c35
+- Notion page ID: `39d1c1ac-5ec0-81b7-953e-c18893f35c35`
+
+## Context
+
+Memory types have different truth, safety, and lifecycle requirements. Enabling
+them without stage boundaries would combine temporary context, durable
+knowledge, and learned procedure prematurely.
+
+## Decision
+
+Stage 1 contains working memory, checkpoints, observations, and inactive memory
+candidates. Stage 2 introduces episodic and semantic storage and retrieval.
+Stage 3 introduces controlled promotion and procedural learning.
+
+## Invariants and Constraints
+
+- Stage 1 memory candidates remain inactive.
+- Stage 1 schemas cannot represent promoted candidates.
+- Episodic and semantic storage and retrieval are Stage 2 capabilities.
+- Controlled promotion and procedural learning are Stage 3 capabilities.
+- Later-stage memory capabilities require explicit migrations and cannot be
+  enabled through Stage 1 configuration.
+
+## Consequences
+
+Each later memory capability requires an explicit migration and its owning
+delivery stage. Stage 1 cannot accidentally persist or activate promoted memory
+candidates.
+
+## Relationship to the Architecture Directive
+
+This decision specializes the architecture directive's staged memory model. It
+keeps the directive's Stage 1, Stage 2, and Stage 3 capability boundaries
+explicit in schemas and runtime activation.
