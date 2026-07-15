@@ -14,6 +14,15 @@ that have not been accepted remain outside the normative architecture baseline.
   backlog tasks. A contract is not authorized merely because a later-stage
   operation appears in a schema.
 
+Current machine-readable contracts:
+
+- [`contracts/envelopes.json`](contracts/envelopes.json) defines the canonical
+  persistent Evidence and Artifact envelope boundary, including immutable
+  authenticated scope, actor, and trace context.
+- [`contracts/stage-capabilities.json`](contracts/stage-capabilities.json)
+  defines cumulative delivery-stage capabilities and fail-closed rejection of
+  unavailable operations.
+
 The exact Goal and Action transitions, intent-purpose guards, quiescence
 statuses, threat model, and unresolved regulatory schemas remain unavailable
 until their recorded dependencies and architecture decisions are resolved.
