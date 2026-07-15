@@ -1,0 +1,105 @@
+name: Security
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    name: Secret history scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out complete history without credentials
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Install immutable Gitleaks revision
+        shell: bash
+        run: go install github.com/zricethezav/gitleaks/v8@83d9cd684c87d95d656c1458ef04895a7f1cbd8e
+
+      - name: Reject detected credentials in Git history
+        shell: bash
+        run: >-
+          "$(go env GOPATH)/bin/gitleaks" git
+          --config .github/gitleaks.toml
+          --exit-code 1
+          --log-opts="--all"
+          --no-banner
+          --redact=100
+          .
+
+  dependencies:
+    name: Dependency, license, and workflow policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out without credentials
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install repository-pinned uv and CPython
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+        with:
+          version: "0.11.28"
+          python-version: "3.14"
+          enable-cache: false
+
+      - name: Verify lock integrity
+        run: uv lock --check
+
+      - name: Reproduce the locked environment
+        run: uv sync --frozen --all-groups --no-editable
+
+      - name: Export the complete locked dependency graph
+        run: >-
+          uv export
+          --frozen
+          --all-groups
+          --no-emit-project
+          --format requirements-txt
+          --output-file "${RUNNER_TEMP}/security-requirements.txt"
+
+      - name: Reject known dependency vulnerabilities
+        run: >-
+          uvx --from pip-audit==2.10.1 pip-audit
+          --requirement "${RUNNER_TEMP}/security-requirements.txt"
+          --require-hashes
+          --no-deps
+          --disable-pip
+          --strict
+          --progress-spinner off
+
+      - name: Produce the license inventory
+        run: >-
+          uvx --from pip-licenses==5.5.5 pip-licenses
+          --python=.venv/bin/python
+          --from=mixed
+          --format=json
+          --output-file="${RUNNER_TEMP}/licenses.json"
+
+      - name: Enforce the reviewed license allowlist
+        run: >-
+          uv run --frozen python tools/security_policy.py licenses
+          --inventory "${RUNNER_TEMP}/licenses.json"
+          --policy .github/security-policy.json
+
+      - name: Enforce immutable Actions and least privilege
+        run: >-
+          uv run --frozen python tools/security_policy.py workflow
+          --workflow .github/workflows/security.yml
+          --policy .github/security-policy.json

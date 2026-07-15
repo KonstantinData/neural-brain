@@ -1,0 +1,13 @@
+# Default ownership. Repository rules must require CODEOWNERS review.
+# Both owners must retain accepted write access so either account can review a
+# change authored and pushed by the other account.
+* @KonstantinData @KonstantinCondata
+
+# Security-, architecture-, state-, execution-, memory-, and governance-sensitive paths.
+/docs/architecture/** @KonstantinData @KonstantinCondata
+/docs/adr/** @KonstantinData @KonstantinCondata
+/docs/governance/** @KonstantinData @KonstantinCondata
+/migrations/** @KonstantinData @KonstantinCondata
+/src/** @KonstantinData @KonstantinCondata
+/tools/** @KonstantinData @KonstantinCondata
+/.github/** @KonstantinData @KonstantinCondata
