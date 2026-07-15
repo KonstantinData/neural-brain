@@ -2,7 +2,9 @@
 param(
     [Parameter(Position = 0)]
     [ValidateSet("up", "down", "status", "verify", "reset-test")]
-    [string]$Command = "status"
+    [string]$Command = "status",
+    [string]$DockerCommand = "docker",
+    [string]$LocalEnvironmentFile = ""
 )
 
 Set-StrictMode -Version Latest
@@ -11,7 +13,12 @@ $ErrorActionPreference = "Stop"
 $Root = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $ComposeFile = Join-Path $Root "compose.yaml"
 $LocalDirectory = Join-Path $Root ".local"
-$EnvironmentFile = Join-Path $LocalDirectory "dev.env"
+$EnvironmentFile = if ([string]::IsNullOrWhiteSpace($LocalEnvironmentFile)) {
+    Join-Path $LocalDirectory "dev.env"
+}
+else {
+    [System.IO.Path]::GetFullPath($LocalEnvironmentFile)
+}
 $TestVolume = "neural-brain-postgres-test-data"
 
 function New-RandomSecret {
@@ -60,11 +67,11 @@ function Protect-LocalSecretFile {
 }
 
 function Assert-DockerAvailable {
-    if ($null -eq (Get-Command docker -ErrorAction SilentlyContinue)) {
+    if ($null -eq (Get-Command $DockerCommand -ErrorAction SilentlyContinue)) {
         throw "Docker is required for the local PostgreSQL environment."
     }
 
-    & docker info --format "{{.ServerVersion}}" | Out-Null
+    & $DockerCommand info --format "{{.ServerVersion}}" | Out-Null
     if ($LASTEXITCODE -ne 0) {
         throw "Docker is installed but the daemon is not ready."
     }
@@ -111,7 +118,7 @@ function Get-LocalValue {
 function Invoke-Compose {
     param([Parameter(Mandatory)][string[]]$Arguments)
 
-    & docker compose `
+    & $DockerCommand compose `
         --project-directory $Root `
         --env-file $EnvironmentFile `
         --file $ComposeFile `
@@ -164,13 +171,15 @@ switch ($Command) {
         Invoke-Compose -Arguments @("stop", "postgres-test")
         Invoke-Compose -Arguments @("rm", "--force", "postgres-test")
 
-        $existingVolumes = @(& docker volume ls --quiet --filter "name=^$TestVolume$")
+        $existingVolumes = @(
+            & $DockerCommand volume ls --quiet --filter "name=^$TestVolume$"
+        )
         if ($LASTEXITCODE -ne 0) {
             throw "Cannot determine whether the isolated test volume exists."
         }
 
         if ($existingVolumes -contains $TestVolume) {
-            $volumeJson = & docker volume inspect $TestVolume
+            $volumeJson = & $DockerCommand volume inspect $TestVolume
             if ($LASTEXITCODE -ne 0) {
                 throw "Cannot verify the isolated test volume ownership."
             }
@@ -182,7 +191,7 @@ switch ($Command) {
                 throw "Refusing reset because the test volume ownership labels do not match."
             }
 
-            & docker volume rm $TestVolume | Out-Null
+            & $DockerCommand volume rm $TestVolume | Out-Null
             if ($LASTEXITCODE -ne 0) {
                 throw "Failed to remove the isolated test volume."
             }

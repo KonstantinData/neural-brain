@@ -41,5 +41,5 @@ def test_reset_command_is_fail_closed_and_targets_only_test_storage() -> None:
     assert '"com.docker.compose.project" -ne "neural-brain"' in reset_block
     assert '"com.docker.compose.volume" -ne "postgres_test_data"' in reset_block
     assert "if ($LASTEXITCODE -ne 0)" in reset_block
-    assert "docker volume rm $TestVolume" in reset_block
+    assert "$DockerCommand volume rm $TestVolume" in reset_block
     assert "neural-brain-postgres-dev-data" not in reset_block
