@@ -1,9 +1,16 @@
 # ADR-009: Stage 1 Dispatch Journal and External-Effect Reconciliation
 
-- Status: Accepted
+- Status: Superseded by ADR-015
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec08190bb81ed5337cd1eba
 - Notion page ID: `39d1c1ac-5ec0-8190-bb81-ed5337cd1eba`
+
+## Supersession
+
+ADR-015 prohibits Neural Brain from dispatching tools or producing external
+effects. Dispatch journals, execution attempts, and effect reconciliation are
+external-consumer responsibilities. Memory indexing and lifecycle work require
+memory-specific recovery contracts, not this agent dispatch contract.
 
 ## Context
 

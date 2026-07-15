@@ -1,9 +1,15 @@
 # ADR-011: Independent Verification Completion Gate
 
-- Status: Accepted
+- Status: Superseded by ADR-015
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec0817b97d2dacdbedbd1d9
 - Notion page ID: `39d1c1ac-5ec0-817b-97d2-dacdbedbd1d9`
+
+## Supersession
+
+ADR-015 makes consumer goal completion explicitly external to Neural Brain.
+The memory system verifies memory transitions and evidence but never decides
+that a consumer goal is achieved. This completion-gate decision is historical.
 
 ## Context
 

@@ -1,16 +1,17 @@
 # Migrations
 
 This directory contains ordered, reproducible PostgreSQL schema and data
-migrations for the authoritative transactional ledger.
+migrations for the authoritative transactional memory ledger.
 
-Each migration must preserve scope isolation, protected-state ownership, and
-safe upgrade and recovery paths. Migration files are added with the feature that
+Each migration must preserve scope isolation, source provenance, protected
+memory-state ownership, retention and deletion semantics, and safe upgrade and
+recovery paths. Migration files are added with the memory capability that
 requires them.
 
 ## Foundation contract
 
 FND-03 establishes the migration validation mechanism but deliberately does not
-introduce the Stage 1 domain schema. Until the first authorized schema slice is
+introduce the Stage 1 memory schema. Until the first authorized schema slice is
 implemented, this directory contains no SQL migration and validation requires
 the explicit `--allow-empty` flag.
 

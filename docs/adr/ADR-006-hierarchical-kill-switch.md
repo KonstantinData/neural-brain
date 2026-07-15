@@ -1,9 +1,16 @@
 # ADR-006: Hierarchical Kill Switch
 
-- Status: Accepted
+- Status: Superseded by ADR-015
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081aa8bcad2746d30fac2
 - Notion page ID: `39d1c1ac-5ec0-81aa-8bca-d2746d30fac2`
+
+## Supersession
+
+ADR-015 places goals, tools, action dispatch, and autonomous execution outside
+Neural Brain. Their hierarchical kill switches belong to external consumers.
+Memory availability and administrative safety controls require separate
+memory-specific contracts; this agent-execution decision is historical.
 
 ## Context
 

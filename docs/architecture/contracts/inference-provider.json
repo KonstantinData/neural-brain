@@ -1,28 +1,38 @@
 {
-  "document_type": "inference_provider_contract",
+  "document_type": "memory_inference_provider_contract",
   "format_version": 1,
-  "contract_id": "neural-brain.inference-provider",
+  "contract_id": "neural-brain.memory-inference-provider",
   "contract_version": "1.0.0",
   "status": "normative",
-  "decision": "ADR-014",
-  "title": "Neural Brain local Ollama-only inference provider contract",
+  "decisions": [
+    "ADR-014",
+    "ADR-015"
+  ],
   "internal_port": {
-    "id": "InferencePort",
+    "id": "MemoryInferencePort",
     "provider_neutral": true,
-    "rules": [
-      "Domain and cognitive runtime components depend only on the typed InferencePort.",
-      "Provider SDKs and provider-specific transport types do not cross the port boundary.",
-      "A provider-neutral port does not authorize a provider; only an accepted adapter listed by this contract may serve it.",
-      "Inference output is untrusted input and requires runtime schema validation before conversion into a typed domain object.",
-      "Inference output cannot define or change scope, actor identity, roles, authority, policy, approvals, kill switches, protected state, tool authorization, or goal achievement."
+    "allowed_functions": [
+      "memory content classification proposal",
+      "memory candidate extraction",
+      "retrieval query expansion",
+      "semantic similarity support",
+      "candidate assessment support",
+      "memory summarization with provenance references"
     ],
-    "failure_outcomes": [
-      "denied",
-      "unavailable",
-      "timeout",
-      "budget_exhausted",
-      "invalid_response"
-    ]
+    "non_functions": [
+      "goal creation or lifecycle management",
+      "planning",
+      "tool or adapter execution",
+      "external effects",
+      "action-intent creation or lifecycle management",
+      "authorization or approval",
+      "direct memory retrieval",
+      "direct protected memory mutation",
+      "independent candidate promotion",
+      "consumer task-success determination"
+    ],
+    "output_trust": "untrusted",
+    "output_rule": "Every output requires strict runtime schema validation, authenticated scope binding, provenance, policy evaluation, and the applicable Memory Gate path before persistence or use."
   },
   "approved_adapters": [
     {
@@ -35,201 +45,82 @@
   "deployment_configuration": {
     "trust_source": "trusted_deployment_configuration_and_authoritative_runtime_state",
     "request_override": "denied",
-    "required_fields": {
-      "adapter_id": {
-        "required": true,
-        "approved_value": "ollama_local"
-      },
-      "endpoint": {
-        "required": true,
-        "value_status": "deployment_bound_approval_required",
-        "constraints": [
-          "The endpoint is exact, explicitly allowlisted, local, and non-public.",
-          "The endpoint is not accepted from a request, prompt, model response, tool output, or other untrusted payload.",
-          "Redirects, proxies, DNS changes, or routing outside the approved local boundary are denied."
-        ]
-      },
-      "model_id": {
-        "required": true,
-        "value_status": "deployment_bound_approval_required",
-        "placeholder_or_latest_selector_allowed": false
-      },
-      "model_version": {
-        "required": true,
-        "value_status": "deployment_bound_approval_required",
-        "placeholder_or_latest_selector_allowed": false
-      },
-      "model_digest": {
-        "required": true,
-        "value_status": "deployment_bound_approval_required",
-        "exact_match_required": true
-      },
-      "request_timeout_ms": {
-        "required": true,
-        "type": "positive_integer",
-        "maximum_source": "approved_deployment_policy"
-      },
-      "inference_budget_ref": {
-        "required": true,
-        "value_status": "authoritative_budget_reference_required",
-        "reservation_and_enforcement_required": true
-      },
-      "logging_policy_ref": {
-        "required": true,
-        "value_status": "approved_payload_minimized_policy_required"
-      }
-    },
-    "forbidden_fields_and_configuration": [
-      "openai_api_key",
-      "openai_base_url",
-      "openai_model",
-      "cloud_provider_credentials",
-      "fallback_provider",
-      "fallback_model",
-      "automatic_cloud_fallback",
-      "public_inference_endpoint"
+    "required": [
+      "exact approved local endpoint",
+      "exact model identity and digest",
+      "positive bounded timeout",
+      "approved inference budget",
+      "payload-minimized logging",
+      "active egress controls"
     ],
-    "model_identity_rule": "The deployed model must simultaneously match the approved model_id, model_version, and model_digest. A name, tag, alias, latest selector, or HTTP success without an exact digest match is insufficient.",
-    "concrete_values_selected_by_this_contract": false
-  },
-  "egress_control": {
-    "default": "deny",
-    "allowed_destination": "exact_approved_local_ollama_endpoint_only",
-    "public_network_egress": "denied",
-    "external_provider_egress": "denied",
-    "redirect_outside_approved_boundary": "denied",
-    "control_failure": "fail_closed"
-  },
-  "credential_boundary": {
-    "inference_api_key_required": false,
-    "cloud_provider_credentials": "denied",
-    "provider_fallback_credentials": "configuration_error",
-    "rules": [
-      "The adapter must not read, accept, or transmit OpenAI or other cloud-provider credentials.",
-      "The presence of an external-provider credential or fallback configuration does not authorize another execution path."
+    "forbidden": [
+      "OpenAI or other cloud-provider credentials",
+      "public inference endpoint",
+      "provider fallback",
+      "model fallback",
+      "automatic cloud fallback",
+      "request-selected provider, endpoint, model, timeout, budget, or logging policy"
     ]
+  },
+  "request_controls": {
+    "scope_source": "authenticated_runtime_context_only",
+    "cross_area_context": "denied",
+    "data_minimization": "required",
+    "secrets_and_credentials": "denied",
+    "server_side_conversation_reuse": "denied",
+    "cross_scope_batching_or_cache": "denied",
+    "missing_budget_or_timeout": "deny_before_invocation"
+  },
+  "memory_boundary": {
+    "adapter_initiated_retrieval": "denied",
+    "adapter_direct_memory_write": "denied",
+    "adapter_direct_candidate_promotion": "denied",
+    "model_output_may_define_scope_actor_or_governance": false,
+    "stage_1_persistent_output": "inactive_non_retrievable_candidate_only"
   },
   "readiness_gate": {
     "default": "not_ready",
     "all_required": [
-      "approved_adapter_identity_matches",
-      "approved_local_endpoint_matches",
-      "service_is_reachable",
-      "model_id_matches",
-      "model_version_matches",
-      "model_digest_matches",
-      "timeout_is_valid",
-      "budget_enforcement_is_available",
-      "payload_minimized_logging_is_active",
-      "egress_controls_are_active",
-      "external_provider_configuration_is_absent"
+      "approved adapter and local endpoint match",
+      "model identity and digest match",
+      "timeout and budget enforcement are active",
+      "payload-minimized logging is active",
+      "egress controls are active",
+      "external provider and fallback configuration are absent"
     ],
     "insufficient_evidence": [
-      "process_alive",
-      "port_open",
-      "http_success",
-      "model_name_or_tag_without_verified_digest"
-    ]
-  },
-  "request_controls": {
-    "data_minimization": "Only data necessary for the declared authorized purpose and immutable current scope is admitted.",
-    "cross_area_context": "denied",
-    "prompt_assembly": "request_scoped",
-    "server_side_conversation_reuse": "denied",
-    "cross_scope_batching": "denied",
-    "cross_scope_prompt_or_response_cache": "denied",
-    "raw_working_memory_cross_area": "denied",
-    "secrets_and_credentials": "denied",
-    "budget": {
-      "missing_or_unverifiable": "deny_before_adapter_invocation",
-      "exhausted": "deny_before_adapter_invocation",
-      "usage_accounting": "required"
-    },
-    "timeout": {
-      "missing_or_invalid": "deny_before_adapter_invocation",
-      "expired": "terminate_call_and_return_typed_timeout_without_fallback"
-    }
-  },
-  "memory_boundary": {
-    "adapter_initiated_retrieval": "denied",
-    "adapter_direct_memory_gate_write": "denied",
-    "model_output_trust": "untrusted",
-    "typed_memory_request_requires": [
-      "strict_runtime_schema_validation",
-      "authenticated_scope",
-      "provenance",
-      "producer_identity",
-      "memory_transition_gate"
-    ],
-    "stage_1_persistent_result": "inactive_non_retrievable_memory_candidate_only",
-    "candidate_activation_or_promotion": "denied"
-  },
-  "logging": {
-    "mode": "payload_minimized",
-    "allowed_by_default": [
-      "trusted_trace_reference",
-      "approved_model_identity_reference",
-      "timing",
-      "token_or_resource_usage",
-      "typed_outcome"
-    ],
-    "excluded_by_default": [
-      "prompt_body",
-      "response_body",
-      "raw_working_memory",
-      "raw_audit_payload"
-    ],
-    "always_denied": [
-      "secrets",
-      "credentials",
-      "api_keys"
-    ],
-    "content_capture_requires": [
-      "explicit_architecture_authorization",
-      "data_classification",
-      "declared_purpose",
-      "retention_rule",
-      "access_control"
+      "process alive",
+      "port open",
+      "HTTP success",
+      "model name or tag without verified digest"
     ]
   },
   "failure_behavior": {
     "default": "fail_closed",
-    "conditions": [
-      "service_unavailable",
-      "unapproved_endpoint",
-      "model_missing",
-      "model_identity_missing",
-      "model_identity_mismatch",
-      "model_digest_unverifiable",
-      "timeout_invalid_or_expired",
-      "budget_missing_unverifiable_or_exhausted",
-      "egress_control_unavailable",
-      "logging_control_unavailable",
-      "external_provider_or_fallback_configuration_present"
-    ],
     "automatic_provider_switch": "denied",
     "automatic_model_switch": "denied",
     "automatic_cloud_fallback": "denied",
-    "api_key_fallback": "denied",
-    "retry": "This contract grants no automatic retry. Any separately authorized bounded retry targets the same approved local endpoint and exact model identity under the same policy and budget controls."
+    "retry": "No automatic retry is granted. Any separately authorized bounded retry uses the same approved local endpoint and exact model identity under the same scope, policy, timeout, and budget."
   },
-  "absolute_prohibitions": [
-    "OpenAI APIs, SDKs, endpoints, models, credentials, and compatibility modes are not permitted.",
-    "External or cloud-hosted inference providers and models are not permitted.",
-    "Requests, prompts, model responses, tools, and untrusted payloads cannot select an endpoint, provider, model, timeout, budget, or logging policy.",
-    "Automatic cloud fallback, provider switching, model switching, and API-key fallback are not permitted.",
-    "The inference adapter cannot execute tools or mutate protected state.",
-    "Model output cannot be treated as authenticated context, authorization, approval, policy, verified evidence, or goal completion."
-  ],
-  "future_provider_rule": {
-    "configuration_only_enablement": "denied",
-    "required_before_support": [
-      "separate_accepted_adr",
-      "explicitly_approved_adapter",
-      "updated_egress_policy",
-      "threat_and_privacy_assessment",
-      "updated_normative_contract",
-      "automated_safety_and_acceptance_tests"
+  "logging": {
+    "mode": "payload_minimized",
+    "allowed_by_default": [
+      "trusted trace reference",
+      "approved model identity reference",
+      "timing and resource usage",
+      "typed outcome"
+    ],
+    "excluded_by_default": [
+      "prompt body",
+      "response body",
+      "raw memory content",
+      "raw audit payload"
+    ],
+    "always_denied": [
+      "secrets",
+      "credentials",
+      "API keys"
     ]
-  }
+  },
+  "future_provider_rule": "A new provider requires a separate accepted ADR, explicit adapter approval, egress and privacy assessment, updated contract, and automated safety tests. Configuration alone cannot enable it."
 }

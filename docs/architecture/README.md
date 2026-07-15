@@ -8,33 +8,38 @@ that have not been accepted remain outside the normative architecture baseline.
 
 ## Normative baseline
 
+- [`architecture-directive-v2.0.md`](architecture-directive-v2.0.md) is the
+  current normative memory-system directive governed by ADR-015.
 - [`architecture-directive-v1.1.md`](architecture-directive-v1.1.md) is the
-  consolidated Foundation directive.
+  superseded agent-system baseline retained as historical evidence.
 - `contracts/` contains machine-readable contracts produced by their owning
   backlog tasks. A contract is not authorized merely because a later-stage
   operation appears in a schema.
 
 Current machine-readable contracts:
 
-- [`contracts/envelopes.json`](contracts/envelopes.json) defines the canonical
-  persistent Evidence and Artifact envelope boundary, including immutable
-  authenticated scope, actor, and trace context.
+- [`contracts/system-boundary.json`](contracts/system-boundary.json) defines
+  Neural Brain's memory-only capability boundary and excludes agent-runtime
+  responsibilities.
+- [`contracts/envelopes.json`](contracts/envelopes.json) defines validated,
+  provenance-bearing memory request and result envelopes with immutable
+  authenticated scope.
+- [`contracts/memory-lifecycle.json`](contracts/memory-lifecycle.json) defines
+  protected memory lifecycle transitions and their fail-closed guards.
 - [`contracts/stage-capabilities.json`](contracts/stage-capabilities.json)
-  defines cumulative delivery-stage capabilities and fail-closed rejection of
-  unavailable operations.
-- [`contracts/goal-state-machine.json`](contracts/goal-state-machine.json) and
-  [`contracts/action-intent-state-machine.json`](contracts/action-intent-state-machine.json)
-  define the protected state graphs and typed transition rules.
-- [`contracts/intent-purpose-guards.json`](contracts/intent-purpose-guards.json)
-  defines the Goal-state/Intent-purpose matrix and cross-contract guards.
-- [`contracts/quiescence.json`](contracts/quiescence.json) and
-  [`contracts/ledger-invariants.json`](contracts/ledger-invariants.json) define
-  the reusable scoped quiescence predicate, authoritative blocker statuses, and
-  transactional ledger invariants.
+  defines cumulative memory delivery-stage capabilities and rejects unavailable
+  or agent-runtime operations.
+- [`contracts/ledger-invariants.json`](contracts/ledger-invariants.json) defines
+  transactional memory, provenance, audit, retention, and deletion invariants.
 - [`contracts/inference-provider.json`](contracts/inference-provider.json)
-  defines the local Ollama-only, no-cloud-fallback inference boundary.
+  defines the bounded local Ollama-only, no-cloud-fallback memory-processing
+  boundary.
 - [`contracts/release-stops.json`](contracts/release-stops.json) is the
-  machine-readable release-stop set.
+  machine-readable memory-system release-stop set.
+
+The superseded Goal, Action Intent, intent-purpose, and quiescence contracts
+were removed from the active tree. Their Git history and superseded ADRs remain
+historical evidence; they are not implementation authority.
 
 [`threat-model.md`](threat-model.md) contains the initial Foundation technical
 threat model and trust-boundary diagram. Deployment- and use-case-specific

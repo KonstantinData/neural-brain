@@ -1,6 +1,6 @@
 {
   "document_type": "repository_governance_policy",
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "status": "normative_desired_state",
   "work_item": "FND-03.4",
   "repository": "KonstantinData/neural-brain",
@@ -18,7 +18,7 @@
     "forbidden_task_branches": ["main", "master"],
     "examples_allowed": [
       "codex/fnd-03-quality-ci-baseline",
-      "codex/s1-goal-transition-gate",
+      "codex/s1-memory-transition-gate",
       "codex/adr-015-policy-boundary"
     ],
     "examples_denied": [
@@ -130,8 +130,9 @@
       "src/**/security/**",
       "src/**/policy/**",
       "src/**/transition_gate/**",
-      "src/**/executor/**",
-      "src/**/verification/**",
+      "src/**/ingestion/**",
+      "src/**/retrieval/**",
+      "src/**/consolidation/**",
       "src/**/memory/**",
       "tools/**",
       ".github/**"
@@ -142,14 +143,14 @@
       "at least one reviewer distinct from the change author and last pusher",
       "the independent verification reviewer did not implement the evidence under review",
       "policy activation is not approved solely by the policy author",
-      "runtime separation boundaries are explicitly assessed when affected"
+      "memory runtime separation boundaries are explicitly assessed when affected"
     ],
     "runtime_boundaries": [
-      "planner_vs_executor",
-      "executor_vs_independent_verifier",
-      "requester_vs_approver_for_elevated_risk",
+      "memory_producer_vs_transition_gate",
+      "retrieval_consumer_vs_source_policy_assessor",
+      "requester_vs_approver_for_elevated_risk_memory_operation",
       "policy_author_vs_sole_policy_activator",
-      "automatic_reconciliation_vs_human_incident_resolution",
+      "automatic_memory_reconciliation_vs_human_incident_resolution",
       "memory_candidate_producer_vs_sensitive_candidate_promoter"
     ],
     "fail_closed": "A sensitive change without complete reviewer identity and independence evidence is not mergeable."
@@ -158,7 +159,7 @@
     "system": "GitHub repository ruleset or branch protection",
     "status": "live_verified",
     "mutation_authorized_by_this_contract": false,
-    "mutation_authority": "explicit autonomous Neural Brain execution instruction dated 2026-07-15",
+    "mutation_authority": "explicit Neural Brain repository implementation instruction dated 2026-07-15",
     "verified_at": "2026-07-15T10:42:23.8865025+02:00",
     "sanitized_evidence_sha256": "5aa5a7479a50c5b92e3cc10b9722eb210150308f24f2ca0ad5a383c0bb323419",
     "required_settings": [

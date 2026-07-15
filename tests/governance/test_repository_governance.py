@@ -28,8 +28,8 @@ def test_task_branch_contract_accepts_only_declared_examples() -> None:
 def test_conventional_commit_contract_is_fail_closed() -> None:
     pattern = re.compile(load_policy()["commits"]["conventional_commit_pattern"])
     allowed = (
-        "feat(runtime): add guarded checkpoint resume",
-        "fix: reject stale authority snapshot",
+        "feat(memory): add guarded checkpoint resume",
+        "fix: reject stale source assessment",
         "docs(adr): record policy boundary",
         "ci!: require governance evidence",
     )
@@ -118,12 +118,42 @@ def test_sensitive_review_requires_independent_evidence() -> None:
     assert "docs/architecture/**" in sensitive["path_patterns"]
     assert "docs/governance/**" in sensitive["path_patterns"]
     assert ".github/**" in sensitive["path_patterns"]
+    assert "src/**/ingestion/**" in sensitive["path_patterns"]
+    assert "src/**/retrieval/**" in sensitive["path_patterns"]
+    assert "src/**/consolidation/**" in sensitive["path_patterns"]
+    assert "src/**/executor/**" not in sensitive["path_patterns"]
     assert len(sensitive["runtime_boundaries"]) == 6
+    assert sensitive["runtime_boundaries"] == [
+        "memory_producer_vs_transition_gate",
+        "retrieval_consumer_vs_source_policy_assessor",
+        "requester_vs_approver_for_elevated_risk_memory_operation",
+        "policy_author_vs_sole_policy_activator",
+        "automatic_memory_reconciliation_vs_human_incident_resolution",
+        "memory_candidate_producer_vs_sensitive_candidate_promoter",
+    ]
     properties = " ".join(sensitive["required_reviewer_properties"])
     assert "CODEOWNER" in properties
     assert "distinct from the change author" in properties
     assert "did not implement the evidence" in properties
     assert "not approved solely by the policy author" in properties
+
+
+def test_repository_narrative_defines_memory_system_consumer_boundary() -> None:
+    readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+    project = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+
+    assert "Neural Brain is not an agent" in readme
+    assert "memory system" in readme
+    assert "consumer_goal_ref" in readme
+    assert "non-authoritative" in readme
+    assert "The persistent Tenant-root representation" in readme
+    assert "remains an open architecture decision" in readme
+    assert "Neural Brain itself is not an agent" in agents
+    assert "Memory Transition Gate is the only writer" in agents
+    assert "External agents may consume it" in contributing
+    assert "provenance-preserving memory system" in project
 
 
 def test_repository_artifacts_expose_required_review_contract() -> None:

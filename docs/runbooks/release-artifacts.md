@@ -5,8 +5,9 @@
 Every Neural Brain release candidate is represented by a deterministic evidence
 bundle. The bundle identifies the exact source commit, complete `uv.lock`
 dependency graph, SPDX 2.3 SBOM, validated migration plan, resulting PostgreSQL
-schema digest, and the versioned policy, architecture-contract, and ADR inputs.
-It does not authorize or package a Stage 1 runtime before that stage is accepted.
+schema digest, and the versioned policy, memory architecture-contract, and ADR
+inputs. It does not authorize or package a Stage 1 memory service before that
+stage is accepted.
 
 ## Pull-request validation
 

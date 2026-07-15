@@ -8,6 +8,14 @@
 - Notion page ID: `39e1c1ac-5ec0-8161-ad4c-d737a9375e4f`
 - Related contract: `docs/architecture/contracts/inference-provider.json`
 
+## Amendment by ADR-015
+
+Inference supports bounded memory processing only. The `InferencePort` is not a
+cognitive-agent port, and Neural Brain does not contain planners, executors,
+tools, goals, completion logic, or autonomous workflows. A model result may
+only become a validated, provenance-bearing typed memory request; it cannot
+write memory directly or confer consumer authority.
+
 ## Context
 
 Neural Brain requires model inference without allowing model integrations to
@@ -28,9 +36,8 @@ before inference can be enabled.
 ## Decision
 
 Neural Brain exposes inference only through a provider-neutral internal
-`InferencePort`. Domain components, planners, transition gates, and other
-runtime components depend on that port and never import or call a provider SDK
-directly.
+`InferencePort`. Memory components depend on that port and never import or call
+a provider SDK directly.
 
 The only approved inference adapter is the local Ollama adapter. Its trusted
 deployment configuration must bind all of the following before startup can

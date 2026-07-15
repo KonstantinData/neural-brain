@@ -1,40 +1,67 @@
 # Neural Brain
 
-Neural Brain is a product- and domain-neutral platform for building a
-biologically inspired agent system. It is intended to grow from a strictly
-controlled serial cognitive core into a system that can perceive, focus
-attention, maintain working memory, pursue goals, plan, execute tools, verify
-outcomes independently, retain long-term memory, learn under explicit controls,
-reflect, and operate with bounded autonomy.
+Neural Brain is a product- and domain-neutral **memory system**. It provides
+durable, scoped, provenance-preserving memory that external agents and other
+authorized consumers can use through explicit integration contracts.
 
-The project is currently in its **Foundation phase**. Its pinned Python runtime
+Neural Brain is not an agent. It does not pursue goals, plan work, execute tools,
+or operate autonomously. Those responsibilities remain with consuming systems.
+The Brain accepts bounded memory requests, enforces identity and scope, stores
+and retrieves evidence-backed records, and governs retention, deletion,
+consolidation, and learning.
+
+The project is being rebaselined in its Foundation phase. Its Python toolchain
 and engineering quality environment are reproducible, but it does not yet
-provide a runnable agent runtime, a stable API, or a production-ready
-deployment. This README describes the intended platform and the repository
-contract without claiming that later-stage capabilities already exist.
+provide a stable production API or production-ready deployment. Repository
+documentation describes the intended memory platform without claiming that
+later-stage capabilities already exist.
 
 ## Who This Is For
 
-This repository is for engineers, security and policy specialists, database and
-reliability engineers, architecture reviewers, and future integration teams who
-need an auditable agent platform with explicit scope, authority, state, and
-verification boundaries.
+This repository is for engineers building memory services and integrations,
+security and privacy specialists, database and reliability engineers,
+architecture reviewers, and teams whose agents need an auditable memory layer.
 
-Its value is not unrestricted agent autonomy. Its value is a foundation on which
-useful autonomy can be added incrementally while identity, authorization,
-external effects, protected state, evidence, and recovery remain governable and
-testable.
+Its value is durable context with explicit boundaries: a consumer can attach
+observations, retrieve relevant memory, and submit learning candidates without
+gaining authority to bypass scope, provenance, policy, retention, or review.
 
 ## Product Neutrality
 
-Neural Brain does not encode the domain model, policies, defaults, customer data,
-or business rules of any consuming product. Liquisto and other projects may
-integrate with Neural Brain later through explicit, scoped contracts, but they do
+Neural Brain does not encode the domain model, policies, defaults, customer
+data, or business rules of any consuming product. Liquisto and other projects
+may consume Neural Brain later through explicit, scoped contracts, but they do
 not define this platform's architecture.
 
-## Core Scope Contract
+## Brain and Consumer Boundary
 
-All runtime and persistent work follows this fixed hierarchy:
+The Brain owns memory capabilities:
+
+- authenticated, scope-bound memory ingestion;
+- observations and working context;
+- provenance-preserving episodic and semantic memory;
+- policy-controlled retrieval with freshness and data-class controls;
+- inactive learning candidates and controlled promotion;
+- retention, legal hold, deletion propagation, quarantine, and rollback;
+- auditable memory transitions and local, bounded inference where an accepted
+  contract requires it.
+
+External consumers own behavior outside memory:
+
+- goals, prioritization, and planning;
+- tool selection and execution;
+- approvals for external effects;
+- effect verification and operational reconciliation;
+- autonomous runtime loops and domain-specific decisions.
+
+An agent response, model output, tool result, or request payload is untrusted
+input. It can propose memory content but cannot define identity, scope,
+authority, policy, retention, or activation status.
+
+## Scope and Isolation
+
+Memory is isolated by authenticated ownership and context. The current logical
+hierarchy is:
 
 ```text
 Brain
@@ -42,122 +69,117 @@ Brain
     └── Area
         └── Project
             └── Session
-                └── Goal
 ```
 
-Every persistent domain object carries immutable `tenant_id` and `area_id`.
-Project-bound objects also carry immutable `project_id`. Scope and actor identity
-come only from authenticated runtime context. Prompts, model responses, tool
-outputs, and request payloads cannot define or change identity, scope, roles,
-authority, approvals, policy, or kill switches. Unknown values are denied by
-default.
+Tenant and Area are mandatory authenticated isolation dimensions for
+operational memory. Projects and sessions provide narrower provenance and
+retrieval context where applicable. The persistent Tenant-root representation
+remains an open architecture decision because a Tenant cannot naturally carry
+an `area_id` for an Area below it. No sentinel Area, nullable exception, or
+implicit root scope is authorized. Scope and actor identity come only from
+authenticated runtime context and are immutable after persistence.
+
+External identifiers such as `consumer_session_ref`, `consumer_goal_ref`, and
+`consumer_task_ref` may be stored only as non-authoritative correlation
+metadata. They are not Brain-owned scope, cannot confer authority, and cannot
+control memory transitions.
+
+Area separation does not imply uncontrolled cross-area access. A concrete
+memory remains in its origin area. Potentially reusable knowledge must pass
+through a controlled generalization flow that preserves origin provenance,
+removes or blocks restricted details, evaluates policy and privacy constraints,
+and records an auditable promotion decision. Unknown or ambiguous scope and
+promotion conditions are denied by default.
 
 ## Delivery Model
 
-Delivery is intentionally staged, and each stage depends on the safety and
-verification guarantees of the previous one:
+Delivery is staged. Each stage depends on the isolation, provenance, privacy,
+and verification guarantees of the previous one:
 
-1. **Foundation (`MS-0`)** — repository governance, normative architecture and
-   contracts, engineering quality, and continuous-integration baselines.
-2. **Stage 1 (`MS-1`)** — a safe serial cognitive core with identity and scope
-   isolation, policy enforcement, PostgreSQL-backed ledgers, protected state
-   transitions, working memory, planning, controlled tool execution, independent
-   verification, privacy foundations, recovery, and operations evidence.
-3. **Stage 2 (`MS-2`)** — episodic and semantic memory, source-aware retrieval,
-   freshness handling, and deletion propagation.
-4. **Stage 3 (`MS-3`)** — controlled consolidation and re-evaluation, plus
-   procedural learning with quarantine and rollback.
-5. **Stage 4 (`MS-4`)** — multi-goal scheduling, preemption, explicit cross-area
-   handover, and distributed execution ownership and reconciliation.
+1. **Foundation (`MS-0`)** — repository governance, normative memory
+   architecture, contracts, engineering quality, and CI baselines.
+2. **Stage 1 (`MS-1`)** — a secure scoped memory kernel with authenticated
+   consumers and producers, sources and provenance, ingestion normalization and
+   salience, working/context memory, observations, checkpoints, the Memory Gate,
+   audit and RLS, retention and deletion foundations, and backup/restore.
+3. **Stage 2 (`MS-2`)** — durable episodic and semantic memory, claims and
+   assessments, ranked retrieval, and freshness handling.
+4. **Stage 3 (`MS-3`)** — controlled consolidation, re-evaluation, procedural
+   memory, quarantine, and rollback.
+5. **Stage 4 (`MS-4`)** — governed cross-area abstraction and handover plus
+   scalable distributed memory and index reconciliation.
 
 Later-stage features must not be enabled early or used to compensate for a
-missing earlier-stage control. In particular, Stage 1 uses a minimal persistent
-dispatch journal for its serial executor; a generalized distributed outbox and
-multi-consumer ownership belong to Stage 4.
+missing earlier-stage control. Local model inference is an internal bounded
+memory-processing dependency, not an autonomous agent capability. It cannot
+perform external actions or bypass deterministic gates.
 
 ## Non-Goals
 
 Neural Brain is not:
 
-- a product-specific agent or a place for consumer-specific business logic;
-- a shortcut around authenticated identity, policy, approval, budget, or audit;
-- a planner that directly executes tools or mutates protected state;
-- a system that treats tool success, an HTTP status, or an exit code as proof
-  that a goal was achieved;
-- an early implementation of distributed execution or uncontrolled learning;
+- an agent, orchestration framework, planner, executor, or tool runtime;
+- a system that owns or decides a consumer's goals;
+- a product-specific knowledge base or store for consumer business rules;
+- a shortcut around authenticated identity, scope, provenance, policy, or audit;
+- a mechanism for unrestricted cross-area access or silent data sharing;
 - a general store for secrets, credentials, live personal data, or unbounded
-  memory;
-- a prototype in which safety mechanisms are mocked out to demonstrate
-  autonomy.
+  content;
+- an uncontrolled self-learning system;
+- a cloud inference gateway or a system with automatic cloud fallback.
 
 ## Repository Orientation
 
-The repository is being established in Foundation tasks. Its durable layout is:
-
 ```text
-README.md               Project purpose, maturity, stages, and orientation
+README.md               Purpose, maturity, stages, and consumer boundary
 AGENTS.md               Repository-wide implementation and governance contract
-docs/architecture/      Normative architecture and machine-readable contracts
+docs/architecture/      Normative memory architecture and contracts
 docs/adr/               Accepted architecture decisions
 docs/runbooks/          Operational, incident, recovery, and restore procedures
 docs/traceability/      Requirement-to-code-to-test evidence conventions
 migrations/             Ordered and reproducible PostgreSQL migrations
-tests/                  Automated acceptance and safety evidence
+tests/                  Automated acceptance, isolation, and safety evidence
 tools/                  Guarded development and verification commands
 pyproject.toml          Runtime, dependencies, and quality-tool configuration
 uv.lock                 Exact cross-platform dependency resolution
 .python-version         Exact GIL-enabled CPython runtime request
 ```
 
-Directories and commands are added by their owning Foundation tasks. Their
-presence in this orientation is not a claim that their implementation is already
-complete.
-
-Repository code, tests, migrations, and executable configuration are the primary
-technical source of truth. `AGENTS.md`, versioned architecture documents, and
-ADRs define the durable engineering contract around them. Notion coordinates
-accepted decisions, tasks, issues, and implementation evidence; it does not
-replace versioned repository truth. Exchange Room discussions are proposals,
-not implementation authorization.
+Repository code, tests, migrations, and executable configuration are the
+primary technical source of truth. `AGENTS.md`, versioned architecture
+documents, and ADRs define the durable engineering contract around them. Notion
+coordinates accepted decisions, tasks, issues, and implementation evidence; it
+does not replace versioned repository truth. Exchange Room discussions are
+proposals, not implementation authorization.
 
 ## Quick Start
 
-There is no application runtime to start yet. The Foundation quality environment
-is executable and locked.
+There is no production memory service to start yet. The Foundation quality
+environment is executable and locked.
 
-Prerequisite: uv 0.11.28. From any existing uv installation, the repository can
-bootstrap and use the exact required uv release without changing the global uv
-installation:
+Prerequisite: uv 0.11.28.
 
 ```powershell
 uvx --from uv==0.11.28 uv sync --locked
-uvx --from uv==0.11.28 uv run --locked python tools/quality.py
+uvx --from uv==0.11.28 uv run --locked --all-groups python tools/quality.py --locked
 ```
 
-The first command installs the exact CPython and dependency environment declared
-by `.python-version`, `pyproject.toml`, and `uv.lock`. The second command runs
-format checking, linting, strict static typing, the controlled type-exception
-audit, and the test suite.
+The first command installs the environment declared by `.python-version`,
+`pyproject.toml`, and `uv.lock`. The second runs format checking, linting,
+strict static typing, the controlled type-exception audit, and tests.
 
-To orient yourself at the current maturity level:
+Before changing the repository, read `AGENTS.md`, the accepted ADRs relevant to
+the memory capability, and the active tracked work item. Run the locked quality
+gate before and after implementation.
 
-1. Clone the repository and work from a task branch based on the current default
-   branch.
-2. Read `AGENTS.md` before making changes; it defines scope, source precedence,
-   safety invariants, and delivery rules.
-3. Read this README for the platform boundary and staged delivery model.
-4. Read [ADR-013](docs/adr/ADR-013-python-runtime-and-toolchain.md) for the
-   accepted runtime, trust-boundary, typing, and transaction contracts.
-5. Run the locked quality gate before and after every implementation change.
-
-PostgreSQL is the planned authoritative transactional ledger. Start the isolated
+PostgreSQL is the authoritative transactional memory ledger. Start the isolated
 local development and test databases with:
 
 ```powershell
 .\tools\dev.ps1 up
 ```
 
-Verify both connections and the ADR-013 autocommit contract with
+Verify both connections and the explicit-transaction contract with
 `.\tools\dev.ps1 verify`. Reset only disposable test data with
 `.\tools\dev.ps1 reset-test`. See the
 [local development runbook](docs/runbooks/local-development.md) for ports,
@@ -173,19 +195,18 @@ credential handling, reset safety, and shutdown commands.
 - Pydantic v2 for runtime validation at untrusted boundaries
 - synchronous Psycopg 3 with autocommit connections and explicit transactions
 
-This toolchain does not select an inference provider. Model inference requires a
-separate accepted ADR defining local Ollama and prohibiting OpenAI and automatic
-cloud fallback.
+Inference is local-only through Ollama under ADR-014. There is no OpenAI use or
+automatic cloud fallback. Inference remains bounded by deterministic memory
+contracts and cannot activate candidates or mutate protected memory directly.
 
 ## Safety Baseline
 
-Planner, executor, and independent verifier are separate runtime
-responsibilities. Protected Goal, Action, and Memory state is writable only
-through its transition gate. External effects require committed intent,
-authenticated identity, immutable scope, authority and policy decisions,
-required approval, budget and resource controls, a valid runtime fence, an
-enabled kill switch, and atomic auditability. Ambiguous external effects are
-recorded as indeterminate and are not retried blindly.
+Protected memory state is writable only through its owning transition gate.
+Memory producers and retrieval consumers cannot promote their own sensitive or
+risky candidates. Scope, provenance, audit, and the protected memory mutation
+must commit atomically where the contract requires atomicity. Retention and
+deletion apply to derived records, indexes, and caches as well as source
+records. Unknown identity, scope, source, data class, policy, freshness, or
+promotion state fails closed.
 
-These constraints are architectural requirements, not optional hardening to be
-added after feature development.
+These constraints are architectural requirements, not optional hardening.

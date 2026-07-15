@@ -6,16 +6,25 @@
 - Notion record: https://app.notion.com/p/39e1c1ac5ec081049f97e82c17f6b120
 - Related task: FND-01.5
 
+## Amendment by ADR-015
+
+The selected toolchain implements a synchronous memory runtime. References in
+the original rationale to a cognitive agent loop, planner, executor, verifier,
+Goal or Action gates, tool execution, or goal completion are superseded. The
+runtime validation boundary terminates in a typed memory policy and transition
+boundary. External-agent runtime responsibilities are not part of this ADR.
+
 ## Context
 
 Neural Brain needs a reproducible greenfield runtime for the serial Stage 1
-cognitive loop, PostgreSQL transaction safety, property-based state-machine
-testing, model integration, and fail-closed validation of untrusted inputs.
+memory lifecycle, PostgreSQL transaction safety, property-based transition
+testing, model-assisted memory processing, and fail-closed validation of
+untrusted inputs.
 
-The runtime must preserve explicit planner, executor, verifier, and transition
-gate boundaries. Static typing is an engineering control, not a substitute for
-runtime validation, authenticated identity, authority, policy, or database
-constraints.
+The runtime must preserve explicit consumer, inference, memory-policy, memory
+transition, and persistence boundaries. Static typing is an engineering
+control, not a substitute for runtime validation, authenticated identity,
+authority, policy, or database constraints.
 
 ## Decision
 
@@ -70,7 +79,7 @@ Untrusted input
 -> Pydantic schema validation
 -> Trust Envelope
 -> typed domain object
--> transition gate
+-> memory policy and transition boundary
 ```
 
 Untrusted inputs include request payloads, prompts, model responses, tool
@@ -95,13 +104,13 @@ The application must:
 - make every transaction boundary visible in code;
 - commit protected state mutation and its audit event in the same transaction;
 - avoid implicit long-lived transactions and `idle in transaction` sessions;
-- never hold a database transaction across a model, tool, network, or other
+- never hold a database transaction across a model, consumer, network, or other
   unbounded external call; and
-- perform model or tool work before or after the database transaction, never
+- perform model or consumer work before or after the database transaction, never
   inside it.
 
-These rules apply to any future local Ollama adapter without selecting Ollama as
-part of this ADR.
+These rules apply to the local Ollama adapter without granting it direct memory
+write authority.
 
 ## Inference Provider Is Out of Scope
 

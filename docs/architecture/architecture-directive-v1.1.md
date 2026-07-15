@@ -1,11 +1,16 @@
 # Neural Brain Architecture Directive v1.1
 
-- Status: Normative Foundation baseline
+- Status: Superseded by Architecture Directive v2.0 and ADR-015
 - Version: 1.1
 - Effective date: 2026-07-15
 - Work item: FND-02.1 / NB-10
 - Repository: `neural-brain`
 - Related decisions: ADR-001 through ADR-013
+
+> **Historical record.** This directive is no longer implementation authority.
+> ADR-015 corrected the system boundary: Neural Brain is a memory system, not
+> an agent runtime. The current normative directive is
+> `architecture-directive-v2.0.md`.
 
 ## 1. Purpose and applicability
 

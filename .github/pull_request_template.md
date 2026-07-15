@@ -8,8 +8,8 @@
 ## Scope and invariants
 
 - Work area: Neural Brain
-- Scope hierarchy affected:
-- Protected state or external effects affected:
+- Memory scope and provenance affected:
+- Protected memory state affected:
 - Relevant ADRs and contracts:
 - Stage boundary:
 
@@ -24,8 +24,9 @@
 
 - [ ] Scope and actor come only from authenticated runtime context.
 - [ ] Unknown inputs and undeclared behavior fail closed.
-- [ ] Protected state remains writable only through its owning gate.
-- [ ] Planner/executor and executor/verifier boundaries remain intact.
+- [ ] Protected memory state remains writable only through the Memory Gate.
+- [ ] Memory producer/gate, consumer/assessor, and candidate/promoter boundaries remain intact.
+- [ ] External task or goal identifiers remain non-authoritative correlation metadata.
 - [ ] No secret, credential, token, or live personal data is included.
 - [ ] Security and privacy impact is documented, including `none` with rationale.
 

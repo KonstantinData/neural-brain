@@ -1,365 +1,51 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:neural-brain:foundation:contracts:envelopes:1.0.0",
-  "title": "Neural Brain Canonical Persistent Envelopes",
-  "description": "Normative Foundation contract for opaque identifiers, authenticated scope and actor context, correlation, causation, evidence, and artifacts.",
-  "type": "object",
+  "$id": "https://neural-brain.invalid/contracts/envelopes.schema.json",
+  "title": "Neural Brain memory envelopes",
+  "description": "Typed boundary for governed memory requests and records. Scope and actor fields are trusted server-derived context; consumer correlations are optional untrusted metadata.",
   "oneOf": [
     {
-      "$ref": "#/$defs/EvidenceEnvelope"
+      "$ref": "#/$defs/MemoryRequestEnvelope"
     },
     {
-      "$ref": "#/$defs/ArtifactEnvelope"
-    }
-  ],
-  "unevaluatedProperties": false,
-  "x-contract-status": "normative",
-  "x-contract-version": "1.0.0",
-  "x-work-item": "FND-02.2",
-  "x-related-decisions": [
-    "ADR-002",
-    "ADR-003",
-    "ADR-004",
-    "ADR-005",
-    "ADR-013"
-  ],
-  "x-trust-boundary": {
-    "ordered_stages": [
-      "untrusted_input",
-      "strict_runtime_schema_validation",
-      "authenticated_runtime_context_resolution",
-      "trusted_envelope_factory",
-      "frozen_typed_domain_object",
-      "transition_gate_or_typed_component_port"
-    ],
-    "rules": [
-      "Schema validation proves shape only and never authenticates a principal, derives scope, grants authority, supplies approval, selects policy, or changes a kill switch.",
-      "An untrusted payload must not contain scope, actor, canonical trace, role, authority, approval, policy, or kill-switch fields.",
-      "A reserved trusted field received from an untrusted source is rejected rather than ignored.",
-      "Only a trusted envelope factory may bind ActorContext, ScopeContext, and TraceContext to validated payload data."
-    ]
-  },
-  "x-normative-invariants": [
-    {
-      "id": "ENV-001",
-      "rule": "Every persistent envelope extends PersistentEnvelopeHeader and therefore carries immutable scope, actor, and trace context.",
-      "failure": "deny"
-    },
-    {
-      "id": "ENV-002",
-      "rule": "tenant_id and area_id are mandatory and immutable; project_id is additionally mandatory for every project-, session-, or goal-bound envelope.",
-      "failure": "deny"
-    },
-    {
-      "id": "ENV-003",
-      "rule": "Scope and actor originate only from authenticated runtime context and must never be accepted from a request, prompt, model response, tool output, integration payload, or untrusted persisted payload.",
-      "failure": "deny_and_audit"
-    },
-    {
-      "id": "ENV-004",
-      "rule": "Opaque identifiers are strongly branded and are not interchangeable even when their serialized representations are structurally identical.",
-      "failure": "deny"
-    },
-    {
-      "id": "ENV-005",
-      "rule": "An identifier never proves existence, ownership, scope, authority, or permission; every reference is resolved in the authoritative ledger under the complete trusted scope.",
-      "failure": "deny"
-    },
-    {
-      "id": "ENV-006",
-      "rule": "A root envelope has null causation_id; a non-root envelope has one immediate cause that exists, precedes it, shares its correlation_id, and matches every applicable scope dimension.",
-      "failure": "deny"
-    },
-    {
-      "id": "ENV-007",
-      "rule": "External correlation values are untrusted metadata and must not become canonical correlation identifiers in Stage 1.",
-      "failure": "deny_or_replace_with_trusted_local_identifier"
-    },
-    {
-      "id": "ENV-008",
-      "rule": "Unknown, missing, malformed, stale, conflicting, unregistered, extra, or unverifiable security-relevant envelope data fails closed.",
-      "failure": "deny"
-    },
-    {
-      "id": "ENV-009",
-      "rule": "Protected state mutation and the corresponding audit evidence commit atomically in PostgreSQL through the owning transition gate.",
-      "failure": "rollback_and_deny"
-    },
-    {
-      "id": "ENV-010",
-      "rule": "Evidence is input to independent verification and cannot itself assert goal achievement; tool success, HTTP status, or process exit code is insufficient proof.",
-      "failure": "deny_completion"
-    },
-    {
-      "id": "ENV-011",
-      "rule": "Artifact content must match its declared digest and byte length before admission; an artifact identifier or storage handle grants no dereference authority.",
-      "failure": "deny_and_quarantine"
-    },
-    {
-      "id": "ENV-012",
-      "rule": "Persistent envelope corrections append a new envelope linked through the applicable supersedes field; existing envelope content is not silently rewritten.",
-      "failure": "deny_mutation"
-    },
-    {
-      "id": "ENV-013",
-      "rule": "Envelope immutability remains subject to an authorized retention, lawful-deletion, or anonymization workflow; ordinary writers cannot use that exception.",
-      "failure": "deny"
-    },
-    {
-      "id": "ENV-014",
-      "rule": "Cross-tenant and cross-area references are prohibited; cross-area transfer remains unavailable until an explicit later-stage audited handover contract is accepted and implemented.",
-      "failure": "deny"
-    },
-    {
-      "id": "ENV-015",
-      "rule": "Every registry-backed identifier must resolve to an enabled entry for the exact contract version and scope; absence of a registry entry is not permission.",
-      "failure": "deny"
-    }
-  ],
-  "x-persistence-requirements": [
-    "Scope, actor, trace, kind, version, and protected-state fields must use typed relational columns rather than relying on an ungoverned JSON or EAV payload.",
-    "Identity, scope, trace, and provenance columns are immutable after insertion except through an authorized lawful-deletion or anonymization workflow.",
-    "The database clock supplies recorded_at.",
-    "General application roles must not write protected state or mutate immutable envelope context.",
-    "A database transaction must not span a model, tool, artifact-storage, network, operator, or other unbounded external call."
-  ],
-  "x-deferred-decisions": [
-    {
-      "id": "identifier_encoding_and_generation",
-      "status": "deferred_requires_accepted_adr",
-      "boundary": "Identifiers remain opaque and branded. This contract does not select UUID, UUIDv7, UUIDv4, ULID, or any other encoding or generation algorithm."
-    },
-    {
-      "id": "brain_identifier_persistence",
-      "status": "deferred_requires_accepted_adr_or_adr_002_amendment",
-      "boundary": "This contract does not require brain_id on persistent envelopes and does not expand ADR-002 beyond mandatory tenant_id, area_id, and conditional project_id."
-    },
-    {
-      "id": "digest_algorithm_and_value_encoding",
-      "status": "deferred_requires_accepted_security_adr",
-      "boundary": "Digest algorithms and digest value encodings are registry-backed but not selected here. Unknown or disabled algorithms fail closed."
-    },
-    {
-      "id": "signatures_and_canonical_bytes",
-      "status": "deferred_requires_accepted_security_adr",
-      "boundary": "This contract does not define signing, canonical byte serialization, key management, or signature verification."
-    },
-    {
-      "id": "multi_cause_trace",
-      "status": "deferred_requires_accepted_adr",
-      "boundary": "Stage 1 records one immediate causation_id. Additional provenance uses source_refs and must not be interpreted as multiple authorized causes."
-    },
-    {
-      "id": "external_and_cross_area_trace_propagation",
-      "status": "deferred_to_explicit_later_stage_handover_contract",
-      "boundary": "Foundation and Stage 1 do not trust external canonical trace context and do not propagate a trace across an area boundary."
+      "$ref": "#/$defs/MemoryRecordEnvelope"
     }
   ],
   "$defs": {
-    "OpaqueIdentifier": {
+    "OpaqueId": {
       "type": "string",
       "minLength": 1,
-      "pattern": ".*\\S.*",
-      "x-opaque": true,
-      "x-encoding": "deferred"
-    },
-    "OpaqueRegistryIdentifier": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-requires-registered-value": true
-    },
-    "TenantId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "TenantId"
-    },
-    "AreaId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "AreaId"
-    },
-    "ProjectId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "ProjectId"
-    },
-    "SessionId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "SessionId"
-    },
-    "GoalId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "GoalId"
-    },
-    "PrincipalId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "PrincipalId"
-    },
-    "ComponentId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
-        }
-      ],
-      "x-brand": "ComponentId"
-    },
-    "EnvelopeId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "EnvelopeId"
-    },
-    "CorrelationId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "CorrelationId"
-    },
-    "EvidenceId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "EvidenceId"
-    },
-    "ArtifactId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "ArtifactId"
-    },
-    "ObjectId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "ObjectId"
-    },
-    "SchemaId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
-        }
-      ],
-      "x-brand": "SchemaId"
-    },
-    "CriterionId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueIdentifier"
-        }
-      ],
-      "x-brand": "CriterionId"
-    },
-    "ClassificationId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
-        }
-      ],
-      "x-brand": "ClassificationId"
-    },
-    "PurposeId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
-        }
-      ],
-      "x-brand": "PurposeId"
-    },
-    "RetentionPolicyId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
-        }
-      ],
-      "x-brand": "RetentionPolicyId"
-    },
-    "DeletionResponsibilityId": {
-      "allOf": [
-        {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
-        }
-      ],
-      "x-brand": "DeletionResponsibilityId"
-    },
-    "UtcTimestamp": {
-      "type": "string",
-      "format": "date-time",
-      "pattern": "Z$"
+      "maxLength": 255
     },
     "ScopeContext": {
       "type": "object",
-      "description": "Immutable hierarchical scope bound only from authenticated runtime context.",
-      "properties": {
-        "scope_level": {
-          "type": "string",
-          "enum": [
-            "area",
-            "project",
-            "session",
-            "goal"
-          ],
-          "readOnly": true
-        },
-        "tenant_id": {
-          "$ref": "#/$defs/TenantId",
-          "readOnly": true
-        },
-        "area_id": {
-          "$ref": "#/$defs/AreaId",
-          "readOnly": true
-        },
-        "project_id": {
-          "$ref": "#/$defs/ProjectId",
-          "readOnly": true
-        },
-        "session_id": {
-          "$ref": "#/$defs/SessionId",
-          "readOnly": true
-        },
-        "goal_id": {
-          "$ref": "#/$defs/GoalId",
-          "readOnly": true
-        }
-      },
+      "description": "Immutable scope derived exclusively from authenticated runtime context. Goal is not a Neural Brain scope level.",
       "required": [
         "scope_level",
         "tenant_id",
         "area_id"
       ],
+      "properties": {
+        "scope_level": {
+          "enum": [
+            "area",
+            "project",
+            "session"
+          ]
+        },
+        "tenant_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "area_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "project_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "session_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
       "allOf": [
         {
           "if": {
@@ -384,11 +70,6 @@
                   "required": [
                     "session_id"
                   ]
-                },
-                {
-                  "required": [
-                    "goal_id"
-                  ]
                 }
               ]
             }
@@ -410,17 +91,8 @@
               "project_id"
             ],
             "not": {
-              "anyOf": [
-                {
-                  "required": [
-                    "session_id"
-                  ]
-                },
-                {
-                  "required": [
-                    "goal_id"
-                  ]
-                }
+              "required": [
+                "session_id"
               ]
             }
           }
@@ -440,261 +112,139 @@
             "required": [
               "project_id",
               "session_id"
-            ],
-            "not": {
-              "required": [
-                "goal_id"
-              ]
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "scope_level": {
-                "const": "goal"
-              }
-            },
-            "required": [
-              "scope_level"
-            ]
-          },
-          "then": {
-            "required": [
-              "project_id",
-              "session_id",
-              "goal_id"
             ]
           }
         }
       ],
       "additionalProperties": false,
-      "readOnly": true,
+      "x-trust-source": "authenticated_runtime_context",
       "x-immutable": true,
-      "x-trust-source": "authenticated_runtime_context"
+      "x-tenant-root-status": "open_architecture_issue_not_resolved_by_this_schema"
     },
     "ActorContext": {
       "type": "object",
-      "description": "Authenticated runtime actor. It contains no self-declared role, authority, approval, or policy assertion.",
-      "properties": {
-        "principal_id": {
-          "$ref": "#/$defs/PrincipalId",
-          "readOnly": true
-        },
-        "principal_kind": {
-          "type": "string",
-          "enum": [
-            "human",
-            "service"
-          ],
-          "readOnly": true
-        },
-        "runtime_component_id": {
-          "$ref": "#/$defs/ComponentId",
-          "readOnly": true
-        }
-      },
       "required": [
         "principal_id",
         "principal_kind",
         "runtime_component_id"
       ],
+      "properties": {
+        "principal_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "principal_kind": {
+          "enum": [
+            "human",
+            "service"
+          ]
+        },
+        "runtime_component_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
       "additionalProperties": false,
-      "readOnly": true,
-      "x-immutable": true,
-      "x-trust-source": "authenticated_runtime_context"
+      "x-trust-source": "authenticated_runtime_context",
+      "x-immutable": true
     },
     "TraceContext": {
       "type": "object",
-      "description": "Immutable trusted correlation and immediate causation context.",
-      "properties": {
-        "correlation_id": {
-          "$ref": "#/$defs/CorrelationId",
-          "readOnly": true
-        },
-        "causation_id": {
-          "oneOf": [
-            {
-              "$ref": "#/$defs/EnvelopeId"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "readOnly": true
-        }
-      },
       "required": [
         "correlation_id",
         "causation_id"
       ],
-      "additionalProperties": false,
-      "readOnly": true,
-      "x-immutable": true,
-      "x-trust-source": "trusted_ingress_or_transition_gate",
-      "x-root-rule": "causation_id is null only for a trusted root envelope",
-      "x-child-rule": "causation_id references one prior envelope with the same correlation_id and complete scope"
-    },
-    "ScopedObjectRef": {
-      "type": "object",
-      "description": "A typed reference that must be resolved under the containing envelope's complete trusted scope.",
       "properties": {
-        "object_kind_id": {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
+        "correlation_id": {
+          "$ref": "#/$defs/OpaqueId"
         },
-        "object_id": {
-          "$ref": "#/$defs/ObjectId"
+        "causation_id": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/OpaqueId"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
-      "required": [
-        "object_kind_id",
-        "object_id"
-      ],
       "additionalProperties": false,
-      "x-resolution": "authoritative_ledger_with_complete_envelope_scope",
-      "x-cross_scope": "deny"
+      "x-trust-source": "trusted_ingress_or_memory_gate",
+      "x-immutable": true
     },
-    "DataGovernanceContext": {
+    "GovernanceContext": {
       "type": "object",
-      "properties": {
-        "classification_id": {
-          "$ref": "#/$defs/ClassificationId"
-        },
-        "purpose_id": {
-          "$ref": "#/$defs/PurposeId"
-        },
-        "retention_policy_id": {
-          "$ref": "#/$defs/RetentionPolicyId"
-        },
-        "deletion_responsibility_id": {
-          "$ref": "#/$defs/DeletionResponsibilityId"
-        }
-      },
       "required": [
         "classification_id",
         "purpose_id",
         "retention_policy_id",
         "deletion_responsibility_id"
       ],
-      "additionalProperties": false,
-      "x-unknown-value": "deny",
-      "x-secret-handling": "reject"
+      "properties": {
+        "classification_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "purpose_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "retention_policy_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "deletion_responsibility_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "additionalProperties": false
     },
     "ProvenanceContext": {
       "type": "object",
+      "required": [
+        "provenance_kind_id",
+        "source_refs",
+        "captured_at"
+      ],
       "properties": {
         "provenance_kind_id": {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
+          "$ref": "#/$defs/OpaqueId"
         },
         "source_refs": {
           "type": "array",
           "items": {
-            "$ref": "#/$defs/ScopedObjectRef"
+            "$ref": "#/$defs/OpaqueId"
           },
           "uniqueItems": true
-        }
-      },
-      "required": [
-        "provenance_kind_id",
-        "source_refs"
-      ],
-      "additionalProperties": false,
-      "x-empty-source-rule": "An empty source_refs array is permitted only for a registered direct-observation provenance kind whose actor and trace establish the origin."
-    },
-    "ContentDigest": {
-      "type": "object",
-      "description": "Algorithm-agile digest binding. No algorithm or value encoding is selected by this contract.",
-      "properties": {
-        "algorithm_id": {
-          "$ref": "#/$defs/OpaqueRegistryIdentifier"
         },
-        "value": {
+        "captured_at": {
           "type": "string",
-          "minLength": 1,
-          "x-encoding": "deferred"
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
         }
       },
-      "required": [
-        "algorithm_id",
-        "value"
-      ],
-      "additionalProperties": false,
-      "x-algorithm-selection": "deferred_requires_accepted_security_adr"
+      "additionalProperties": false
     },
-    "ArtifactRef": {
+    "ConsumerCorrelation": {
       "type": "object",
-      "description": "Immutable scope-local artifact version reference bound to its expected content digest.",
+      "description": "Optional untrusted opaque consumer metadata. These values confer no scope, identity, authority, lifecycle, or referential-integrity semantics inside Neural Brain.",
       "properties": {
-        "artifact_id": {
-          "$ref": "#/$defs/ArtifactId"
+        "consumer_session_ref": {
+          "$ref": "#/$defs/OpaqueId"
         },
-        "content_digest": {
-          "$ref": "#/$defs/ContentDigest"
+        "consumer_goal_ref": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "consumer_task_ref": {
+          "$ref": "#/$defs/OpaqueId"
         }
       },
-      "required": [
-        "artifact_id",
-        "content_digest"
-      ],
+      "minProperties": 1,
       "additionalProperties": false,
-      "x-resolution": "authoritative_ledger_with_complete_envelope_scope",
-      "x-cross_scope": "deny"
+      "x-trust-source": "untrusted_consumer_metadata",
+      "x-authoritative": false
     },
-    "PersistentEnvelopeHeader": {
+    "MemoryEnvelopeHeader": {
       "type": "object",
-      "description": "Abstract immutable header required by every persistent Neural Brain envelope.",
-      "properties": {
-        "contract_version": {
-          "const": "1.0.0",
-          "readOnly": true
-        },
-        "schema_id": {
-          "$ref": "#/$defs/SchemaId",
-          "readOnly": true
-        },
-        "envelope_id": {
-          "$ref": "#/$defs/EnvelopeId",
-          "readOnly": true
-        },
-        "envelope_kind": {
-          "type": "string",
-          "enum": [
-            "evidence",
-            "artifact"
-          ],
-          "readOnly": true
-        },
-        "scope": {
-          "$ref": "#/$defs/ScopeContext",
-          "readOnly": true
-        },
-        "actor": {
-          "$ref": "#/$defs/ActorContext",
-          "readOnly": true
-        },
-        "trace": {
-          "$ref": "#/$defs/TraceContext",
-          "readOnly": true
-        },
-        "governance": {
-          "$ref": "#/$defs/DataGovernanceContext",
-          "readOnly": true
-        },
-        "provenance": {
-          "$ref": "#/$defs/ProvenanceContext",
-          "readOnly": true
-        },
-        "recorded_at": {
-          "$ref": "#/$defs/UtcTimestamp",
-          "readOnly": true,
-          "x-trust-source": "database_clock"
-        }
-      },
       "required": [
         "contract_version",
-        "schema_id",
         "envelope_id",
-        "envelope_kind",
         "scope",
         "actor",
         "trace",
@@ -702,184 +252,158 @@
         "provenance",
         "recorded_at"
       ],
-      "readOnly": true,
-      "x-abstract": true,
+      "properties": {
+        "contract_version": {
+          "const": "1.0.0"
+        },
+        "envelope_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "scope": {
+          "$ref": "#/$defs/ScopeContext"
+        },
+        "actor": {
+          "$ref": "#/$defs/ActorContext"
+        },
+        "trace": {
+          "$ref": "#/$defs/TraceContext"
+        },
+        "governance": {
+          "$ref": "#/$defs/GovernanceContext"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ProvenanceContext"
+        },
+        "consumer_correlation": {
+          "$ref": "#/$defs/ConsumerCorrelation"
+        },
+        "recorded_at": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+        }
+      },
       "x-direct-persistence": "forbidden",
-      "x-extension-rule": "Every future persistent envelope schema must extend this header and close unevaluated properties."
+      "x-transition-gate": "Memory Transition Gate"
     },
-    "EvidenceEnvelope": {
-      "title": "Evidence Envelope",
-      "description": "Immutable evidence metadata and artifact bindings for later independent verification. It is not a verification decision.",
+    "MemoryRequestEnvelope": {
       "allOf": [
         {
-          "$ref": "#/$defs/PersistentEnvelopeHeader"
+          "$ref": "#/$defs/MemoryEnvelopeHeader"
         },
         {
           "type": "object",
+          "required": [
+            "envelope_kind",
+            "operation_id",
+            "payload_schema_id",
+            "payload_digest"
+          ],
           "properties": {
             "envelope_kind": {
-              "const": "evidence"
+              "const": "memory_request"
             },
-            "evidence_id": {
-              "$ref": "#/$defs/EvidenceId",
-              "readOnly": true
+            "operation_id": {
+              "enum": [
+                "memory.observe",
+                "memory.checkpoint",
+                "memory.propose_candidate",
+                "memory.persist_episode_or_claim",
+                "memory.retrieve",
+                "memory.promote_candidate",
+                "memory.quarantine_or_rollback",
+                "memory.delete_or_anonymize"
+              ]
             },
-            "evidence_type_id": {
-              "$ref": "#/$defs/OpaqueRegistryIdentifier",
-              "readOnly": true
+            "payload_schema_id": {
+              "$ref": "#/$defs/OpaqueId"
             },
-            "subject_ref": {
-              "$ref": "#/$defs/ScopedObjectRef",
-              "readOnly": true
-            },
-            "criterion_ids": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/CriterionId"
-              },
-              "minItems": 1,
-              "uniqueItems": true,
-              "readOnly": true
-            },
-            "artifact_refs": {
-              "type": "array",
-              "items": {
-                "$ref": "#/$defs/ArtifactRef"
-              },
-              "minItems": 1,
-              "uniqueItems": true,
-              "readOnly": true
-            },
-            "captured_at": {
-              "$ref": "#/$defs/UtcTimestamp",
-              "readOnly": true
-            },
-            "supersedes_evidence_id": {
-              "oneOf": [
-                {
-                  "$ref": "#/$defs/EvidenceId"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "readOnly": true
+            "payload_digest": {
+              "$ref": "#/$defs/OpaqueId"
             }
-          },
-          "required": [
-            "evidence_id",
-            "evidence_type_id",
-            "subject_ref",
-            "criterion_ids",
-            "artifact_refs",
-            "captured_at",
-            "supersedes_evidence_id"
-          ]
+          }
         }
       ],
-      "unevaluatedProperties": false,
-      "readOnly": true,
-      "x-immutable": "until_authorized_retention_lawful_deletion_or_anonymization",
-      "x-verification-semantics": [
-        "Evidence does not contain an achieved, success, satisfied, or verification-disposition field.",
-        "The independent verifier evaluates registered criteria against complete evidence packages.",
-        "Executor or tool status may be represented by an artifact but is never sufficient completion evidence by itself.",
-        "Producer identity and independence are evaluated from authenticated actor context and authoritative role bindings, never from a self-declared evidence field."
-      ]
+      "unevaluatedProperties": false
     },
-    "ArtifactEnvelope": {
-      "title": "Artifact Envelope",
-      "description": "Immutable scope-local metadata for one exact artifact version. Content remains outside this metadata envelope and is addressed through an opaque storage handle.",
+    "MemoryRecordEnvelope": {
       "allOf": [
         {
-          "$ref": "#/$defs/PersistentEnvelopeHeader"
+          "$ref": "#/$defs/MemoryEnvelopeHeader"
         },
         {
           "type": "object",
+          "required": [
+            "envelope_kind",
+            "memory_record_id",
+            "memory_kind",
+            "lifecycle_state",
+            "freshness",
+            "content_schema_id",
+            "content_digest"
+          ],
           "properties": {
             "envelope_kind": {
-              "const": "artifact"
+              "const": "memory_record"
             },
-            "artifact_id": {
-              "$ref": "#/$defs/ArtifactId",
-              "readOnly": true
+            "memory_record_id": {
+              "$ref": "#/$defs/OpaqueId"
             },
-            "artifact_type_id": {
-              "$ref": "#/$defs/OpaqueRegistryIdentifier",
-              "readOnly": true
+            "memory_kind": {
+              "enum": [
+                "working_context",
+                "checkpoint",
+                "observation",
+                "candidate",
+                "episode",
+                "semantic_claim",
+                "procedural_memory"
+              ]
             },
-            "media_type_id": {
-              "$ref": "#/$defs/OpaqueRegistryIdentifier",
-              "readOnly": true
+            "lifecycle_state": {
+              "enum": [
+                "inactive",
+                "under_assessment",
+                "active",
+                "superseded",
+                "rejected",
+                "quarantined",
+                "deleted",
+                "anonymized"
+              ]
             },
-            "structured_schema_id": {
-              "oneOf": [
-                {
-                  "$ref": "#/$defs/SchemaId"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "readOnly": true
+            "freshness": {
+              "enum": [
+                "current",
+                "stale",
+                "expired",
+                "unknown"
+              ]
+            },
+            "content_schema_id": {
+              "$ref": "#/$defs/OpaqueId"
             },
             "content_digest": {
-              "$ref": "#/$defs/ContentDigest",
-              "readOnly": true
-            },
-            "byte_length": {
-              "type": "integer",
-              "minimum": 0,
-              "readOnly": true
-            },
-            "storage_handle": {
-              "type": "string",
-              "minLength": 1,
-              "readOnly": true,
-              "x-opaque": true,
-              "x-uri_semantics": "none",
-              "x-authority_semantics": "none"
-            },
-            "captured_at": {
-              "$ref": "#/$defs/UtcTimestamp",
-              "readOnly": true
-            },
-            "supersedes_artifact_id": {
-              "oneOf": [
-                {
-                  "$ref": "#/$defs/ArtifactId"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "readOnly": true
+              "$ref": "#/$defs/OpaqueId"
             }
-          },
-          "required": [
-            "artifact_id",
-            "artifact_type_id",
-            "media_type_id",
-            "structured_schema_id",
-            "content_digest",
-            "byte_length",
-            "storage_handle",
-            "captured_at",
-            "supersedes_artifact_id"
-          ]
+          }
         }
       ],
-      "unevaluatedProperties": false,
-      "readOnly": true,
-      "x-immutable": "until_authorized_retention_lawful_deletion_or_anonymization",
-      "x-artifact-semantics": [
-        "artifact_id is scope-local and must not be derived from content_digest for cross-scope deduplication.",
-        "storage_handle is an opaque internal locator and never grants read, write, execution, network, or tool authority.",
-        "Content is admitted only after its byte length and registered digest verification succeed.",
-        "A structured artifact requires a registered structured_schema_id; null is valid only for a registered unstructured artifact type.",
-        "Secrets and credentials are rejected rather than admitted as artifacts.",
-        "Corrections create a new immutable artifact version and set supersedes_artifact_id."
-      ]
+      "unevaluatedProperties": false
     }
-  }
+  },
+  "x-deferred-decisions": [
+    {
+      "id": "identifier_encoding_and_generation",
+      "status": "deferred_requires_accepted_adr"
+    },
+    {
+      "id": "digest_algorithm_and_value_encoding",
+      "status": "deferred_requires_accepted_security_adr"
+    },
+    {
+      "id": "tenant_root_scope_representation",
+      "status": "open_architecture_issue"
+    }
+  ]
 }

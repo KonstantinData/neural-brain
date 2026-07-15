@@ -6,7 +6,8 @@ Neural Brain. The normative contract is
 
 The contract requires task branches under `codex/`, Conventional Commit
 headers, pull-request review, blocking quality checks, CODEOWNERS review, and
-additional independence evidence for separation-of-duties-sensitive changes.
+additional independence evidence for memory separation-of-duties-sensitive
+changes.
 Unknown or unverifiable governance state fails closed.
 
 `@KonstantinData` and `@KonstantinCondata` are the declared code owners. Each
@@ -25,4 +26,6 @@ conditions are recorded in
 drifted live setting is a fail-closed merge condition.
 
 Changes to this directory are themselves separation-of-duties-sensitive and
-require the review defined by the policy.
+require the review defined by the policy. The policy protects Brain-owned memory
+boundaries; it does not assign goals, planning, tool execution, or autonomous
+behavior to Neural Brain.

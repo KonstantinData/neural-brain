@@ -5,6 +5,17 @@
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081b7953ec18893f35c35
 - Notion page ID: `39d1c1ac-5ec0-81b7-953e-c18893f35c35`
 
+## Amendment by ADR-015
+
+All stages are memory-only. Stage 1 adds governed intake, observations, Working
+Memory, checkpoints, inactive candidates, and their safety foundations. Stage 2
+adds sources, episodic and semantic memory, retrieval, freshness, and
+dependency-aware deletion. Stage 3 adds controlled consolidation,
+re-evaluation, procedural memory, quarantine, authorized promotion, and
+rollback. Stage 4 may add explicit audited cross-area knowledge transfer and
+scalable memory coordination. No stage adds agent goals, planning, tools,
+execution, completion, or autonomy.
+
 ## Context
 
 Memory types have different truth, safety, and lifecycle requirements. Enabling

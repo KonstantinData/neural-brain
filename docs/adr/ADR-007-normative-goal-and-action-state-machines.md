@@ -1,9 +1,16 @@
 # ADR-007: Normative Goal and Action State Machines
 
-- Status: Accepted
+- Status: Superseded by ADR-015
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec08172af9bebb3791c34cf
 - Notion page ID: `39d1c1ac-5ec0-8172-af9b-ebb3791c34cf`
+
+## Supersession
+
+ADR-015 assigns Goal and Action state machines to external consumers. Neural
+Brain neither owns nor interprets consumer completion or execution state. The
+contracts named below were removed from the active tree. Their Git history
+remains historical evidence and is not current memory architecture authority.
 
 ## Context
 
@@ -24,12 +31,9 @@ Action Intent states are `proposed`, `preparing`, `prepared`, `committed`,
 `aborted`. The only canonical Action Intent purposes are `execution`,
 `verification`, `cancellation`, `reconciliation`, and `compensation`.
 
-The normative machine-readable contracts are:
-
-- `docs/architecture/contracts/goal-state-machine.json`;
-- `docs/architecture/contracts/action-intent-state-machine.json`;
-- `docs/architecture/contracts/intent-purpose-guards.json`; and
-- `docs/architecture/contracts/quiescence.json`.
+The superseded Goal, Action Intent, intent-purpose, and quiescence contracts
+were removed from the active tree. Their exact former paths and contents remain
+available through Git history only.
 
 Each declared transition specifies its source and target, request actors,
 purpose relationship, authority, policy and approval requirements, guards,
