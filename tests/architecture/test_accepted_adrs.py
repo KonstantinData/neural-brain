@@ -13,7 +13,14 @@ def _accepted_adr_paths() -> list[Path]:
 def test_repository_contains_current_accepted_adr_sequence() -> None:
     paths = _accepted_adr_paths()
     identifiers = [path.name[:7] for path in paths]
+    assert identifiers == [f"ADR-{number:03d}" for number in range(1, 15)]
+
+
+def test_fnd_02_7_foundation_baseline_is_adr_001_through_adr_013() -> None:
+    paths = _accepted_adr_paths()
+    identifiers = [path.name[:7] for path in paths[:13]]
     assert identifiers == [f"ADR-{number:03d}" for number in range(1, 14)]
+    assert paths[13].name.startswith("ADR-014-local-ollama-only-inference")
 
 
 @pytest.mark.parametrize("adr_path", _accepted_adr_paths(), ids=lambda path: path.name[:7])
@@ -28,9 +35,8 @@ def test_accepted_adr_has_traceable_decision_record(adr_path: Path) -> None:
     assert "## Consequences" in text
 
 
-def test_adr_index_records_count_conflict_without_discarding_decision() -> None:
+def test_adr_index_records_complete_continuous_sequence() -> None:
     index = (ADR_DIRECTORY / "README.md").read_text(encoding="utf-8")
-    for number in range(1, 14):
+    for number in range(1, 15):
         assert f"[ADR-{number:03d}]" in index
-    assert "currently contains thirteen accepted records" in index
-    assert "FND-02.7 remains\nblocked" in index
+    assert "continuous from ADR-001 through ADR-014" in index

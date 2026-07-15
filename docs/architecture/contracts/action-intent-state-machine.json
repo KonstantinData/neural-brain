@@ -1,0 +1,3169 @@
+{
+  "document_type": "action_intent_state_machine_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.action-intent-state-machine",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "work_item": "FND-02.3",
+  "sources": [
+    "docs/architecture/architecture-directive-v1.1.md",
+    "docs/adr/ADR-004-transition-gates-own-protected-state.md",
+    "docs/adr/ADR-007-normative-goal-and-action-state-machines.md",
+    "docs/adr/ADR-008-atomic-action-preparation-and-commit.md",
+    "docs/adr/ADR-009-stage-1-dispatch-journal.md",
+    "docs/architecture/contracts/intent-purpose-guards.json"
+  ],
+  "owner": "action_transition_gate",
+  "writer_component": "action_transition_gate",
+  "audit_causation": "Every transition audit event references the authenticated request_envelope_id; the writer component is never treated as the requester.",
+  "states": [
+    "proposed",
+    "preparing",
+    "prepared",
+    "committed",
+    "executing",
+    "cancel_requested",
+    "settling",
+    "indeterminate",
+    "completed",
+    "aborted"
+  ],
+  "purposes": [
+    "execution",
+    "verification",
+    "cancellation",
+    "reconciliation",
+    "compensation"
+  ],
+  "initial_state": "proposed",
+  "terminal_states": [
+    "completed",
+    "aborted"
+  ],
+  "purpose_rule": "purpose is immutable from proposal through the terminal state",
+  "local_runtime_fence": {
+    "durable_current_reference": "runtime_fence.current_epoch_token",
+    "grant_binding": "execution_grant.local_runtime_fence_token",
+    "attempt_binding": "execution_attempt.local_runtime_fence_token",
+    "new_external_effect_rule": "current token must match both grant and attempt bindings immediately before adapter contact",
+    "recovery_rule": "internal fail-closed transitions and evidence admission use a fresh authorized recovery_context and preserve the historical token; a stale historical token never blocks marking indeterminate or settling known evidence",
+    "stage_boundary": "This is the Stage-1 serial coordinator fence and does not authorize Stage-4 distributed ownership or distributed fencing."
+  },
+  "state_invariants": {
+    "proposed": [
+      "typed bounded operation exists",
+      "no claim, dispatch entry, attempt, or external effect exists"
+    ],
+    "preparing": [
+      "preparation evaluates authority, policy, approval, budget, resource, scope, deadline, registry, kill-switch, and local runtime fence together",
+      "no external effect is permitted"
+    ],
+    "prepared": [
+      "preparation result is complete but has no durable execution authority",
+      "commit must revalidate every input"
+    ],
+    "committed": [
+      "authority snapshot, policy decision, approval claims, budget reservation, resource claims, local runtime fence, execution grant, and dispatch journal entry were atomically persisted",
+      "only the serial executor may dispatch"
+    ],
+    "executing": [
+      "a monotonic execution attempt exists",
+      "claims remain held",
+      "adapter invocation is bounded by the operation contract"
+    ],
+    "cancel_requested": [
+      "claims remain held until effect disposition is known",
+      "cancellation does not imply success"
+    ],
+    "settling": [
+      "effect disposition is known",
+      "ledger settlement and evidence validation are pending"
+    ],
+    "indeterminate": [
+      "effect may exist",
+      "automatic retry is prohibited",
+      "budget, resource claims, locks, and evidence are retained"
+    ],
+    "completed": [
+      "required effect and settlement are proven complete",
+      "terminal audit and evidence references exist"
+    ],
+    "aborted": [
+      "no uncompensated effect exists",
+      "claims are safely released or settled",
+      "terminal audit and evidence references exist"
+    ]
+  },
+  "actors": [
+    "planner",
+    "independent_verifier",
+    "goal_requester",
+    "authorized_operator",
+    "guardian",
+    "runtime_coordinator",
+    "action_transition_gate",
+    "serial_executor",
+    "reconciliation_adapter",
+    "human_incident_resolver"
+  ],
+  "successors_by_state": {
+    "proposed": [
+      "preparing",
+      "aborted"
+    ],
+    "preparing": [
+      "prepared",
+      "aborted"
+    ],
+    "prepared": [
+      "committed",
+      "aborted"
+    ],
+    "committed": [
+      "executing",
+      "cancel_requested"
+    ],
+    "executing": [
+      "cancel_requested",
+      "settling",
+      "indeterminate"
+    ],
+    "cancel_requested": [
+      "settling",
+      "indeterminate",
+      "aborted"
+    ],
+    "settling": [
+      "completed",
+      "aborted",
+      "indeterminate"
+    ],
+    "indeterminate": [
+      "settling",
+      "aborted"
+    ],
+    "completed": [],
+    "aborted": []
+  },
+  "common_transition_guards": [
+    "expected source state and expected aggregate version match under row lock",
+    "immutable tenant_id, area_id, project_id, session_id, goal_id, action_intent_id, and purpose match",
+    "authenticated actor comes from trusted runtime context and is declared for the transition",
+    "the fence requirement declared by the transition class is satisfied; only new external effects require the durable current local runtime fence",
+    "the transition deadline is present and current",
+    "the Action Transition Gate performs the mutation and audit atomically"
+  ],
+  "fence_requirement_by_transition_class": {
+    "new_external_effect": {
+      "operator": "current_token_matches",
+      "required_references": [
+        "runtime_fence.current_epoch_token",
+        "execution_grant.local_runtime_fence_token",
+        "execution_attempt.local_runtime_fence_token"
+      ]
+    },
+    "internal_protected_transition": {
+      "operator": "authorized_recovery_context",
+      "required_references": [
+        "recovery_context.principal_or_component_id",
+        "recovery_context.scope",
+        "recovery_context.authority_snapshot"
+      ],
+      "preserve_historical_fence": true
+    },
+    "evidence_admission_or_settlement": {
+      "operator": "authorized_recovery_context",
+      "preserve_historical_fence": true,
+      "forbid_new_external_effect": true
+    }
+  },
+  "creation": {
+    "transition_id": "action.create_proposed",
+    "contract_version": "1.0.0",
+    "source": "absent",
+    "target": "proposed",
+    "writer_component": "action_transition_gate",
+    "permitted_request_actors_ref": "intent-purpose-guards.json#purpose_profiles.{purpose}.permitted_request_actors",
+    "required_fields": [
+      "action_intent_id",
+      "tenant_id",
+      "area_id",
+      "project_id",
+      "session_id",
+      "goal_id",
+      "purpose",
+      "operation_contract_id",
+      "request_envelope_id",
+      "deadline",
+      "expected_initial_version"
+    ],
+    "authority": ["purpose-specific proposal authority from authoritative snapshot"],
+    "policy": ["security_floor_allow", "goal-state/purpose matrix allow", "operation registered"],
+    "approval": {"rule_id": "action.create_proposed.approval.v1", "operator": "identify_without_consuming_approval_requirement", "mode": "conditional", "condition_sources": ["operation_contract", "risk_policy", "security_floor"], "unknown": "deny"},
+    "guards": {"operator": "all_true", "rules": [
+      {"rule_id": "action.create_proposed.guard.01.v1", "operator": "registered_boolean_predicate", "unknown": "false", "description": "authenticated scope and request causation match"},
+      {"rule_id": "action.create_proposed.guard.02.v1", "operator": "registered_boolean_predicate", "unknown": "false", "description": "purpose is canonical and allowed by goal_state_matrix"},
+      {"rule_id": "action.create_proposed.guard.03.v1", "operator": "registered_boolean_predicate", "unknown": "false", "description": "proposal authority and role bindings resolve from authoritative stores"},
+      {"rule_id": "action.create_proposed.guard.04.v1", "operator": "registered_boolean_predicate", "unknown": "false", "description": "operation is registered"},
+      {"rule_id": "action.create_proposed.guard.05.v1", "operator": "registered_boolean_predicate", "unknown": "false", "description": "no row with action_intent_id exists"}
+    ], "unknown_rule": "deny_and_audit"},
+    "quiescence": {"rule_id": "action.create_proposed.quiescence.v1", "required": false, "predicate_ref": null, "unknown": "false"},
+    "evidence": ["authenticated_actor_context", "immutable_scope_context", "purpose_profile", "proposal_authority_snapshot", "operation_contract", "request_envelope"],
+    "atomic_side_effects": {
+      "operator": "all_or_none",
+      "protected_state": [{"operation_id": "action.create_proposed.protected_state.01.v1", "transaction": "same_as_state_and_audit", "description": "insert state proposed with aggregate_version 1 and immutable purpose"}],
+      "audit": [{"operation_id": "action.create_proposed.audit.01.v1", "transaction": "same_as_state_and_audit", "description": "append action.proposed with request_envelope_id causation"}]
+    },
+    "audit_event": "action.proposed",
+    "deadline": {"rule_id": "action.create_proposed.deadline.v1", "operator": "deadline_contract_satisfied", "unknown": "deny"},
+    "timeout": {"rule_id": "action.create_proposed.timeout.v1", "operator": "deny_without_insert", "unknown": "deny"},
+    "cancellation": {"rule_id": "action.create_proposed.cancellation.v1", "operator": "no_record_exists_before_commit", "unknown": "deny"},
+    "crash_recovery": {"rule_id": "action.create_proposed.crash_recovery.v1", "operator": "recover_from_authoritative_commit_boundary", "before_commit": "rollback", "after_commit": "recover_from_durable_state_and_audit", "unknown": "deny"},
+    "reconciliation": {"rule_id": "action.create_proposed.reconciliation.v1", "operator": "deduplicate_by_request_envelope_and_action_intent_id", "unknown": "deny"},
+    "allowed_successors": ["preparing", "aborted"],
+    "default_failure": "rollback_and_deny"
+  },
+  "transitions": [
+    {
+      "transition_id": "action.begin_preparation",
+      "contract_version": "1.0.0",
+      "source": "proposed",
+      "target": "preparing",
+      "permitted_request_actors": [
+        "planner",
+        "independent_verifier",
+        "goal_requester",
+        "authorized_operator",
+        "guardian",
+        "runtime_coordinator",
+        "reconciliation_adapter"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "purpose-specific proposal authority only"
+      ],
+      "policy": [
+        "security_floor_precheck",
+        "goal-state/purpose matrix allow"
+      ],
+      "approval": {
+        "rule_id": "action.begin_preparation.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not consumed; required approval class is only identified"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.begin_preparation.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "typed request matches a registered operation"
+          },
+          {
+            "rule_id": "action.begin_preparation.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "request actor is permitted by the immutable purpose profile"
+          },
+          {
+            "rule_id": "action.begin_preparation.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no claim or dispatch entry exists"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.begin_preparation.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required; this transition makes the goal non-quiescent"
+      },
+      "evidence": [
+        "typed_intent_request",
+        "authenticated_actor_context",
+        "immutable_scope_context"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.begin_preparation.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state preparing"
+          },
+          {
+            "operation_id": "action.begin_preparation.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [],
+        "audit": [
+          {
+            "operation_id": "action.begin_preparation.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.preparation_started"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.preparation_started",
+      "deadline": {
+        "rule_id": "action.begin_preparation.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "preparation deadline is bounded by operation and goal deadlines"
+      },
+      "timeout": {
+        "rule_id": "action.begin_preparation.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "transition to aborted through action.abort_preparation with timeout evidence"
+      },
+      "cancellation": {
+        "rule_id": "action.begin_preparation.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "cancel before preparation completes through action.abort_preparation"
+      },
+      "crash_recovery": {
+        "rule_id": "action.begin_preparation.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "rollback before commit; a committed preparing state is deterministically re-evaluated without external dispatch",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.begin_preparation.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "stale preparing work is safely abortable because no external effect or durable claim exists"
+      },
+      "allowed_successors": [
+        "prepared",
+        "aborted"
+      ]
+    },
+    {
+      "transition_id": "action.abort_proposed",
+      "contract_version": "1.0.0",
+      "source": "proposed",
+      "target": "aborted",
+      "permitted_request_actors": [
+        "goal_requester",
+        "authorized_operator",
+        "guardian",
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.cancel"
+      ],
+      "policy": [
+        "security_floor_allow",
+        "cancellation_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.abort_proposed.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not required because no authority, claim, or effect exists"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.abort_proposed.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no preparation, claim, dispatch entry, attempt, or possible effect exists"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.abort_proposed.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required; target is terminal for the intent"
+      },
+      "evidence": [
+        "abort_reason",
+        "absence_of_claims_and_effects"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.abort_proposed.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state aborted"
+          },
+          {
+            "operation_id": "action.abort_proposed.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [],
+        "audit": [
+          {
+            "operation_id": "action.abort_proposed.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.aborted"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.aborted",
+      "deadline": {
+        "rule_id": "action.abort_proposed.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "bounded transition deadline"
+      },
+      "timeout": {
+        "rule_id": "action.abort_proposed.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain proposed"
+      },
+      "cancellation": {
+        "rule_id": "action.abort_proposed.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "this is the pre-preparation cancellation path"
+      },
+      "crash_recovery": {
+        "rule_id": "action.abort_proposed.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "terminal state and audit commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.abort_proposed.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "no external reconciliation is required"
+      },
+      "allowed_successors": []
+    },
+    {
+      "transition_id": "action.complete_preparation",
+      "contract_version": "1.0.0",
+      "source": "preparing",
+      "target": "prepared",
+      "permitted_request_actors": [
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "valid purpose-specific requester authority",
+        "candidate operation authority is satisfiable"
+      ],
+      "policy": [
+        "security_floor_allow",
+        "operation_policy_allow",
+        "risk_classified",
+        "kill_switch_permissive"
+      ],
+      "approval": {
+        "rule_id": "action.complete_preparation.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "declared",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "required approval class is present and potentially claimable; no claim is consumed yet"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.complete_preparation.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "scope and actor are authenticated"
+          },
+          {
+            "rule_id": "action.complete_preparation.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "tool and operation are enabled"
+          },
+          {
+            "rule_id": "action.complete_preparation.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "budget and resource capacity are available"
+          },
+          {
+            "rule_id": "action.complete_preparation.guard.04.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "fresh authority snapshot and policy decision can be bound"
+          },
+          {
+            "rule_id": "action.complete_preparation.guard.05.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "local runtime fence is valid"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.complete_preparation.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "preparation_evaluation",
+        "authority_candidate",
+        "policy_decision",
+        "approval_candidate",
+        "budget_quote",
+        "resource_quote"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.complete_preparation.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "persist immutable preparation digest"
+          },
+          {
+            "operation_id": "action.complete_preparation.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state prepared"
+          },
+          {
+            "operation_id": "action.complete_preparation.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [],
+        "audit": [
+          {
+            "operation_id": "action.complete_preparation.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.prepared"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.prepared",
+      "deadline": {
+        "rule_id": "action.complete_preparation.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "prepared_until is no later than the earliest dependent decision expiry"
+      },
+      "timeout": {
+        "rule_id": "action.complete_preparation.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "prepared result is invalid and action.abort_prepared is required"
+      },
+      "cancellation": {
+        "rule_id": "action.complete_preparation.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "abort through action.abort_prepared"
+      },
+      "crash_recovery": {
+        "rule_id": "action.complete_preparation.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "recompute before commit; committed prepared state contains the complete digest",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.complete_preparation.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "a stale or mismatched digest cannot be committed"
+      },
+      "allowed_successors": [
+        "committed",
+        "aborted"
+      ]
+    },
+    {
+      "transition_id": "action.abort_preparation",
+      "contract_version": "1.0.0",
+      "source": "preparing",
+      "target": "aborted",
+      "permitted_request_actors": [
+        "goal_requester",
+        "authorized_operator",
+        "guardian",
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.cancel or gate rejection authority"
+      ],
+      "policy": [
+        "security_floor_allow or mandatory security denial"
+      ],
+      "approval": {
+        "rule_id": "action.abort_preparation.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not consumed"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.abort_preparation.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "preparation failed, expired, or was cancelled"
+          },
+          {
+            "rule_id": "action.abort_preparation.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no durable claim, dispatch entry, attempt, or possible effect exists"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.abort_preparation.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "preparation_rejection_or_cancellation_reason",
+        "absence_of_claims_and_effects"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.abort_preparation.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state aborted"
+          },
+          {
+            "operation_id": "action.abort_preparation.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [],
+        "audit": [
+          {
+            "operation_id": "action.abort_preparation.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.aborted"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.aborted",
+      "deadline": {
+        "rule_id": "action.abort_preparation.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "bounded transition deadline"
+      },
+      "timeout": {
+        "rule_id": "action.abort_preparation.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "guardian retries only the protected transition, never the operation"
+      },
+      "cancellation": {
+        "rule_id": "action.abort_preparation.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "this is the preparation cancellation path"
+      },
+      "crash_recovery": {
+        "rule_id": "action.abort_preparation.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "terminal state and audit commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.abort_preparation.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "no external-effect reconciliation is required"
+      },
+      "allowed_successors": []
+    },
+    {
+      "transition_id": "action.commit",
+      "contract_version": "1.0.0",
+      "source": "prepared",
+      "target": "committed",
+      "permitted_request_actors": [
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "fresh immutable authority snapshot grants the purpose-specific operation authority",
+        "requester proposal authority remains valid"
+      ],
+      "policy": [
+        "security_floor_allow",
+        "fresh operation_policy_allow",
+        "risk classification current",
+        "kill switches permissive"
+      ],
+      "approval": {
+        "rule_id": "action.commit.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "declared",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "every required scoped approval is current, independent where required, replay-protected, and atomically consumed or claimed"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.commit.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "preparation digest matches"
+          },
+          {
+            "rule_id": "action.commit.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "scope, deadline, tool registry, operation contract, policy, authority, approvals, budget, resources, and local runtime fence are revalidated"
+          },
+          {
+            "rule_id": "action.commit.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no prior execution grant or dispatch entry exists"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.commit.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "authority_snapshot",
+        "policy_decision",
+        "approval_claims",
+        "budget_reservation",
+        "resource_claims",
+        "local_runtime_fence",
+        "operation_contract_digest"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.commit.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state committed"
+          },
+          {
+            "operation_id": "action.commit.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          },
+          {
+            "operation_id": "action.commit.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "create execution grant"
+          },
+          {
+            "operation_id": "action.commit.protected_state.04.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "create minimal Stage-1 dispatch journal entry"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.commit.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "consume approval claims"
+          },
+          {
+            "operation_id": "action.commit.claims.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "create budget reservation"
+          },
+          {
+            "operation_id": "action.commit.claims.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "create resource claims and local locks"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.commit.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.committed"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.committed",
+      "deadline": {
+        "rule_id": "action.commit.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "all dependent expiries outlive the bounded dispatch window"
+      },
+      "timeout": {
+        "rule_id": "action.commit.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "commit rolls back completely; create no partial claim"
+      },
+      "cancellation": {
+        "rule_id": "action.commit.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "after commit use action.request_cancel_committed and retain all claims"
+      },
+      "crash_recovery": {
+        "rule_id": "action.commit.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "before commit no claim exists; after commit dispatch journal and grant make the action discoverable without repeating commit",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.commit.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "startup finds every committed undispatched intent and either dispatches once under the valid local fence or requests cancellation"
+      },
+      "allowed_successors": [
+        "executing",
+        "cancel_requested"
+      ]
+    },
+    {
+      "transition_id": "action.abort_prepared",
+      "contract_version": "1.0.0",
+      "source": "prepared",
+      "target": "aborted",
+      "permitted_request_actors": [
+        "goal_requester",
+        "authorized_operator",
+        "guardian",
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.cancel or gate rejection authority"
+      ],
+      "policy": [
+        "cancellation_policy_allow or mandatory denial"
+      ],
+      "approval": {
+        "rule_id": "action.abort_prepared.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not consumed"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.abort_prepared.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "commit has not occurred"
+          },
+          {
+            "rule_id": "action.abort_prepared.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no durable claim, dispatch entry, attempt, or possible effect exists"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.abort_prepared.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "abort_reason",
+        "absence_of_commit_artifacts"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.abort_prepared.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "invalidate preparation digest"
+          },
+          {
+            "operation_id": "action.abort_prepared.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state aborted"
+          },
+          {
+            "operation_id": "action.abort_prepared.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [],
+        "audit": [
+          {
+            "operation_id": "action.abort_prepared.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.aborted"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.aborted",
+      "deadline": {
+        "rule_id": "action.abort_prepared.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "bounded transition deadline"
+      },
+      "timeout": {
+        "rule_id": "action.abort_prepared.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain prepared but ineligible for commit after prepared_until"
+      },
+      "cancellation": {
+        "rule_id": "action.abort_prepared.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "this is the prepared cancellation path"
+      },
+      "crash_recovery": {
+        "rule_id": "action.abort_prepared.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "terminal state and audit commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.abort_prepared.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "expired prepared intents are aborted without adapter contact"
+      },
+      "allowed_successors": []
+    },
+    {
+      "transition_id": "action.dispatch",
+      "contract_version": "1.0.0",
+      "source": "committed",
+      "target": "executing",
+      "permitted_request_actors": [
+        "serial_executor"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "valid execution grant bound to the immutable authority snapshot"
+      ],
+      "policy": [
+        "security floor, policy decision, tool status, and kill switches rechecked immediately before dispatch"
+      ],
+      "approval": {
+        "rule_id": "action.dispatch.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "declared",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "consumed approval claims remain valid and bound; no replay or substitution"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.dispatch.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "dispatch journal entry is pending"
+          },
+          {
+            "rule_id": "action.dispatch.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no attempt with the next monotonic number exists"
+          },
+          {
+            "rule_id": "action.dispatch.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "budget and resource claims remain held"
+          },
+          {
+            "rule_id": "action.dispatch.guard.04.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "local runtime fence is current"
+          },
+          {
+            "rule_id": "action.dispatch.guard.05.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "adapter contract matches"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.dispatch.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "execution_grant",
+        "dispatch_journal_entry",
+        "local_runtime_fence",
+        "adapter_contract_digest"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.dispatch.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "create monotonic execution attempt"
+          },
+          {
+            "operation_id": "action.dispatch.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "mark dispatch journal dispatched"
+          },
+          {
+            "operation_id": "action.dispatch.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state executing"
+          },
+          {
+            "operation_id": "action.dispatch.protected_state.04.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.dispatch.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "retain budget reservation, resource claims, and locks"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.dispatch.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.dispatch_started"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.dispatch_started",
+      "deadline": {
+        "rule_id": "action.dispatch.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "adapter invocation deadline is bounded by operation, grant, and goal deadlines"
+      },
+      "timeout": {
+        "rule_id": "action.dispatch.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "if absence of effect cannot be proven, use action.mark_indeterminate_executing; otherwise settle as aborted"
+      },
+      "cancellation": {
+        "rule_id": "action.dispatch.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "after adapter invocation begins use action.request_cancel_executing"
+      },
+      "crash_recovery": {
+        "rule_id": "action.dispatch.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "an attempt record alone cannot distinguish pre-contact from possible contact; registered reconciliation or authoritative no-effect proof is required, otherwise the action becomes indeterminate and is never automatically retried",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.dispatch.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "serial executor uses attempt id and registered reconciliation strategy; no blind retry"
+      },
+      "allowed_successors": [
+        "cancel_requested",
+        "settling",
+        "indeterminate"
+      ]
+    },
+    {
+      "transition_id": "action.request_cancel_committed",
+      "contract_version": "1.0.0",
+      "source": "committed",
+      "target": "cancel_requested",
+      "permitted_request_actors": [
+        "goal_requester",
+        "authorized_operator",
+        "guardian",
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.cancel"
+      ],
+      "policy": [
+        "cancellation_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.request_cancel_committed.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not required to prevent dispatch; compensating effects require separate authority and approval"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.request_cancel_committed.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "dispatch has not started or concurrent dispatch is serialized by expected version and local fence"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.request_cancel_committed.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "cancellation_request",
+        "dispatch_journal_state"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.request_cancel_committed.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state cancel_requested"
+          },
+          {
+            "operation_id": "action.request_cancel_committed.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "mark journal do_not_dispatch"
+          },
+          {
+            "operation_id": "action.request_cancel_committed.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.request_cancel_committed.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "retain all claims pending proof of no effect"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.request_cancel_committed.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.cancellation_requested"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.cancellation_requested",
+      "deadline": {
+        "rule_id": "action.request_cancel_committed.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "cancellation deadline is explicit"
+      },
+      "timeout": {
+        "rule_id": "action.request_cancel_committed.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain cancel_requested and escalate"
+      },
+      "cancellation": {
+        "rule_id": "action.request_cancel_committed.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "this records cancellation; it does not complete it"
+      },
+      "crash_recovery": {
+        "rule_id": "action.request_cancel_committed.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "journal cancellation marker and state commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.request_cancel_committed.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "prove no adapter contact before action.abort_cancelled_before_dispatch"
+      },
+      "allowed_successors": [
+        "settling",
+        "indeterminate",
+        "aborted"
+      ]
+    },
+    {
+      "transition_id": "action.record_execution_outcome",
+      "contract_version": "1.0.0",
+      "source": "executing",
+      "target": "settling",
+      "permitted_request_actors": [
+        "serial_executor"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "execution grant for the exact attempt"
+      ],
+      "policy": [
+        "result admission and evidence policy allow"
+      ],
+      "approval": {
+        "rule_id": "action.record_execution_outcome.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "no new approval; original claims remain bound"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.record_execution_outcome.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "attempt result proves effect_confirmed or no_effect_confirmed"
+          },
+          {
+            "rule_id": "action.record_execution_outcome.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "result schema, provenance, digest, scope, and attempt id validate"
+          },
+          {
+            "rule_id": "action.record_execution_outcome.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "HTTP status or exit code alone is insufficient"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.record_execution_outcome.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "adapter_result",
+        "effect_evidence",
+        "attempt_timing",
+        "result_validation"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.record_execution_outcome.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record effect disposition"
+          },
+          {
+            "operation_id": "action.record_execution_outcome.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set settlement_disposition completed or aborted"
+          },
+          {
+            "operation_id": "action.record_execution_outcome.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state settling"
+          },
+          {
+            "operation_id": "action.record_execution_outcome.protected_state.04.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.record_execution_outcome.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "retain claims until settlement commits"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.record_execution_outcome.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.outcome_recorded"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.outcome_recorded",
+      "deadline": {
+        "rule_id": "action.record_execution_outcome.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "result is admitted before attempt expiry or through reconciliation"
+      },
+      "timeout": {
+        "rule_id": "action.record_execution_outcome.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "unknown effect uses action.mark_indeterminate_executing"
+      },
+      "cancellation": {
+        "rule_id": "action.record_execution_outcome.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "a concurrent cancellation is serialized; known outcome proceeds to settlement"
+      },
+      "crash_recovery": {
+        "rule_id": "action.record_execution_outcome.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "durable attempt plus evidence id makes outcome admission idempotent",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.record_execution_outcome.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "duplicate or conflicting result is denied and escalated"
+      },
+      "allowed_successors": [
+        "completed",
+        "aborted",
+        "indeterminate"
+      ]
+    },
+    {
+      "transition_id": "action.request_cancel_executing",
+      "contract_version": "1.0.0",
+      "source": "executing",
+      "target": "cancel_requested",
+      "permitted_request_actors": [
+        "goal_requester",
+        "authorized_operator",
+        "guardian",
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.cancel"
+      ],
+      "policy": [
+        "cancellation_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.request_cancel_executing.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not required to request stop; a new compensating effect is separately approved"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.request_cancel_executing.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "registered adapter cancellation capability is known"
+          },
+          {
+            "rule_id": "action.request_cancel_executing.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "request does not assert effect disposition"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.request_cancel_executing.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "cancellation_request",
+        "current_attempt"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.request_cancel_executing.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state cancel_requested"
+          },
+          {
+            "operation_id": "action.request_cancel_executing.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record cancellation request"
+          },
+          {
+            "operation_id": "action.request_cancel_executing.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.request_cancel_executing.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "retain all claims and locks"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.request_cancel_executing.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.cancellation_requested"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.cancellation_requested",
+      "deadline": {
+        "rule_id": "action.request_cancel_executing.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "bounded cancellation deadline"
+      },
+      "timeout": {
+        "rule_id": "action.request_cancel_executing.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "use action.mark_indeterminate_cancel when effect remains possible"
+      },
+      "cancellation": {
+        "rule_id": "action.request_cancel_executing.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "any adapter cancellation is a distinct committed purpose=cancellation intent referencing this target, with its own dispatch journal, execution grant, monotonic attempt, authority, policy, budget, claims, and evidence; this target transition invokes no adapter"
+      },
+      "crash_recovery": {
+        "rule_id": "action.request_cancel_executing.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "request is durable before cancellation adapter contact",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.request_cancel_executing.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "reconcile both original effect and cancellation effect"
+      },
+      "allowed_successors": [
+        "settling",
+        "indeterminate",
+        "aborted"
+      ]
+    },
+    {
+      "transition_id": "action.mark_indeterminate_executing",
+      "contract_version": "1.0.0",
+      "source": "executing",
+      "target": "indeterminate",
+      "permitted_request_actors": [
+        "serial_executor",
+        "guardian",
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.mark_indeterminate"
+      ],
+      "policy": [
+        "ambiguity_policy_requires_indeterminate"
+      ],
+      "approval": {
+        "rule_id": "action.mark_indeterminate_executing.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not required to fail closed"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.mark_indeterminate_executing.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "external effect cannot be proven absent or complete"
+          },
+          {
+            "rule_id": "action.mark_indeterminate_executing.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "attempt evidence is persisted"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.mark_indeterminate_executing.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "false by definition"
+      },
+      "evidence": [
+        "ambiguity_reason",
+        "last_known_attempt_state",
+        "possible_effect_scope"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.mark_indeterminate_executing.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state indeterminate"
+          },
+          {
+            "operation_id": "action.mark_indeterminate_executing.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record unresolved effect"
+          },
+          {
+            "operation_id": "action.mark_indeterminate_executing.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.mark_indeterminate_executing.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "hold budget reservation, resource claims, locks, and approval evidence"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.mark_indeterminate_executing.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.indeterminate"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.indeterminate",
+      "deadline": {
+        "rule_id": "action.mark_indeterminate_executing.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution deadline and escalation deadline are explicit"
+      },
+      "timeout": {
+        "rule_id": "action.mark_indeterminate_executing.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain indeterminate and escalate to authorized human incident resolution"
+      },
+      "cancellation": {
+        "rule_id": "action.mark_indeterminate_executing.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "cancellation cannot assert absence of effect"
+      },
+      "crash_recovery": {
+        "rule_id": "action.mark_indeterminate_executing.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "indeterminate is durable and never auto-retried",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.mark_indeterminate_executing.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "only registered read-only reconciliation or authorized human resolution may supply a resolution outcome"
+      },
+      "allowed_successors": [
+        "settling",
+        "aborted"
+      ]
+    },
+    {
+      "transition_id": "action.abort_cancelled_before_dispatch",
+      "contract_version": "1.0.0",
+      "source": "cancel_requested",
+      "target": "aborted",
+      "permitted_request_actors": [
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.complete_cancellation"
+      ],
+      "policy": [
+        "cancellation_policy_allow",
+        "settlement_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.abort_cancelled_before_dispatch.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "no new approval"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.abort_cancelled_before_dispatch.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "dispatch journal and attempt ledger prove no adapter contact and no possible effect"
+          },
+          {
+            "rule_id": "action.abort_cancelled_before_dispatch.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "all claims are releasable"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.abort_cancelled_before_dispatch.quiescence.v1",
+        "required": true,
+        "predicate_ref": "neural-brain.quiescence#goal_is_quiescent",
+        "unknown": "false",
+        "description": "intent becomes terminal only after atomic claim release"
+      },
+      "evidence": [
+        "no_dispatch_proof",
+        "no_effect_confirmed",
+        "claim_settlement_plan"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.abort_cancelled_before_dispatch.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set effect disposition no_effect_confirmed"
+          },
+          {
+            "operation_id": "action.abort_cancelled_before_dispatch.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state aborted"
+          },
+          {
+            "operation_id": "action.abort_cancelled_before_dispatch.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.abort_cancelled_before_dispatch.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "release budget reservation, resource claims, and local locks"
+          },
+          {
+            "operation_id": "action.abort_cancelled_before_dispatch.claims.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "consume or expire cancellation claim"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.abort_cancelled_before_dispatch.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.aborted"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.aborted",
+      "deadline": {
+        "rule_id": "action.abort_cancelled_before_dispatch.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "bounded cancellation settlement deadline"
+      },
+      "timeout": {
+        "rule_id": "action.abort_cancelled_before_dispatch.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain cancel_requested; do not release claims"
+      },
+      "cancellation": {
+        "rule_id": "action.abort_cancelled_before_dispatch.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "cancellation completes here only with no-effect proof"
+      },
+      "crash_recovery": {
+        "rule_id": "action.abort_cancelled_before_dispatch.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "terminal state, claim release, and audit commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.abort_cancelled_before_dispatch.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "missing no-contact evidence requires indeterminate, not this transition"
+      },
+      "allowed_successors": []
+    },
+    {
+      "transition_id": "action.record_cancellation_outcome",
+      "contract_version": "1.0.0",
+      "source": "cancel_requested",
+      "target": "settling",
+      "permitted_request_actors": [
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.complete_cancellation"
+      ],
+      "policy": [
+        "cancellation_policy_allow",
+        "result_admission_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.record_cancellation_outcome.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "no new approval unless a separate compensation intent was required"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.record_cancellation_outcome.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "a distinct purpose=cancellation intent referencing this target is completed, or authoritative local-ledger evidence proves no adapter contact"
+          },
+          {
+            "rule_id": "action.record_cancellation_outcome.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "cancellation result proves no_effect_confirmed, effect_confirmed, or effect_compensated"
+          },
+          {
+            "rule_id": "action.record_cancellation_outcome.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "evidence validates independently of transport status"
+          },
+          {
+            "rule_id": "action.record_cancellation_outcome.guard.04.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "when the outcome is effect_compensated, a separate completed purpose=compensation intent referencing the confirmed original effect is required"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.record_cancellation_outcome.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "completed_cancellation_intent_or_authoritative_local_no_contact_evidence",
+        "cancellation_result",
+        "effect_disposition_evidence",
+        "attempt_history",
+        "completed_compensation_intent_required_when_effect_compensated"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.record_cancellation_outcome.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record effect and settlement disposition"
+          },
+          {
+            "operation_id": "action.record_cancellation_outcome.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state settling"
+          },
+          {
+            "operation_id": "action.record_cancellation_outcome.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.record_cancellation_outcome.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "retain claims pending settlement"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.record_cancellation_outcome.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.cancellation_outcome_recorded"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.cancellation_outcome_recorded",
+      "deadline": {
+        "rule_id": "action.record_cancellation_outcome.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "outcome admission deadline is explicit"
+      },
+      "timeout": {
+        "rule_id": "action.record_cancellation_outcome.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "use action.mark_indeterminate_cancel"
+      },
+      "cancellation": {
+        "rule_id": "action.record_cancellation_outcome.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "no nested cancellation transition is allowed"
+      },
+      "crash_recovery": {
+        "rule_id": "action.record_cancellation_outcome.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "outcome admission is idempotent by attempt and evidence id",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.record_cancellation_outcome.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "conflicting outcomes require human incident resolution"
+      },
+      "allowed_successors": [
+        "completed",
+        "aborted",
+        "indeterminate"
+      ]
+    },
+    {
+      "transition_id": "action.mark_indeterminate_cancel",
+      "contract_version": "1.0.0",
+      "source": "cancel_requested",
+      "target": "indeterminate",
+      "permitted_request_actors": [
+        "serial_executor",
+        "guardian",
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.mark_indeterminate"
+      ],
+      "policy": [
+        "ambiguity_policy_requires_indeterminate"
+      ],
+      "approval": {
+        "rule_id": "action.mark_indeterminate_cancel.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not required to fail closed"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.mark_indeterminate_cancel.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "original or cancellation effect remains possible"
+          },
+          {
+            "rule_id": "action.mark_indeterminate_cancel.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "available attempt evidence is persisted"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.mark_indeterminate_cancel.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "false by definition"
+      },
+      "evidence": [
+        "ambiguity_reason",
+        "original_attempt_state",
+        "cancellation_attempt_state"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.mark_indeterminate_cancel.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state indeterminate"
+          },
+          {
+            "operation_id": "action.mark_indeterminate_cancel.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record unresolved original and cancellation effects"
+          },
+          {
+            "operation_id": "action.mark_indeterminate_cancel.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.mark_indeterminate_cancel.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "hold budget reservation, resource claims, local locks, and evidence"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.mark_indeterminate_cancel.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.indeterminate"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.indeterminate",
+      "deadline": {
+        "rule_id": "action.mark_indeterminate_cancel.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution and escalation deadlines are explicit"
+      },
+      "timeout": {
+        "rule_id": "action.mark_indeterminate_cancel.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain indeterminate and escalate"
+      },
+      "cancellation": {
+        "rule_id": "action.mark_indeterminate_cancel.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "no automatic repeat of cancellation or original effect"
+      },
+      "crash_recovery": {
+        "rule_id": "action.mark_indeterminate_cancel.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "indeterminate is durable",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.mark_indeterminate_cancel.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "registered observation or human resolution only"
+      },
+      "allowed_successors": [
+        "settling",
+        "aborted"
+      ]
+    },
+    {
+      "transition_id": "action.complete_settlement",
+      "contract_version": "1.0.0",
+      "source": "settling",
+      "target": "completed",
+      "permitted_request_actors": [
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.settle"
+      ],
+      "policy": [
+        "settlement_policy_allow",
+        "evidence_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.complete_settlement.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "no new approval; all approval claims have final disposition"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.complete_settlement.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "settlement_disposition equals completed"
+          },
+          {
+            "rule_id": "action.complete_settlement.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "required effect is confirmed"
+          },
+          {
+            "rule_id": "action.complete_settlement.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "budget debit and resource release plan balance"
+          },
+          {
+            "rule_id": "action.complete_settlement.guard.04.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "evidence package is complete"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.complete_settlement.quiescence.v1",
+        "required": true,
+        "predicate_ref": "neural-brain.quiescence#goal_is_quiescent",
+        "unknown": "false",
+        "description": "intent becomes terminal only in the same transaction as settlement"
+      },
+      "evidence": [
+        "effect_confirmed",
+        "settlement_ledger_entries",
+        "result_evidence_package"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.complete_settlement.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state completed"
+          },
+          {
+            "operation_id": "action.complete_settlement.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          },
+          {
+            "operation_id": "action.complete_settlement.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "seal result evidence references"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.complete_settlement.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "settle budget debit"
+          },
+          {
+            "operation_id": "action.complete_settlement.claims.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "release resource claims and local locks"
+          },
+          {
+            "operation_id": "action.complete_settlement.claims.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "finalize approval claims"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.complete_settlement.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.completed"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.completed",
+      "deadline": {
+        "rule_id": "action.complete_settlement.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "bounded settlement deadline"
+      },
+      "timeout": {
+        "rule_id": "action.complete_settlement.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain settling; if disposition becomes uncertain use action.mark_indeterminate_settling"
+      },
+      "cancellation": {
+        "rule_id": "action.complete_settlement.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "not allowed after a known completed effect; compensation requires a separate intent"
+      },
+      "crash_recovery": {
+        "rule_id": "action.complete_settlement.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "state, ledgers, releases, evidence, and audit commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.complete_settlement.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "ledger imbalance or missing evidence blocks completion"
+      },
+      "allowed_successors": []
+    },
+    {
+      "transition_id": "action.abort_settlement",
+      "contract_version": "1.0.0",
+      "source": "settling",
+      "target": "aborted",
+      "permitted_request_actors": [
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.settle"
+      ],
+      "policy": [
+        "settlement_policy_allow",
+        "evidence_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.abort_settlement.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "no new approval; all approval claims have final disposition"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.abort_settlement.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "settlement_disposition equals aborted"
+          },
+          {
+            "rule_id": "action.abort_settlement.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no_effect_confirmed or effect_compensated is proven"
+          },
+          {
+            "rule_id": "action.abort_settlement.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "budget and resource release plan balances"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.abort_settlement.quiescence.v1",
+        "required": true,
+        "predicate_ref": "neural-brain.quiescence#goal_is_quiescent",
+        "unknown": "false",
+        "description": "intent becomes terminal only in the same transaction as settlement"
+      },
+      "evidence": [
+        "no_effect_confirmed_or_effect_compensated",
+        "settlement_ledger_entries",
+        "terminal_evidence_package"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.abort_settlement.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state aborted"
+          },
+          {
+            "operation_id": "action.abort_settlement.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          },
+          {
+            "operation_id": "action.abort_settlement.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "seal terminal evidence references"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.abort_settlement.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "release or settle budget reservation"
+          },
+          {
+            "operation_id": "action.abort_settlement.claims.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "release resource claims and local locks"
+          },
+          {
+            "operation_id": "action.abort_settlement.claims.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "finalize approval claims"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.abort_settlement.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.aborted"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.aborted",
+      "deadline": {
+        "rule_id": "action.abort_settlement.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "bounded settlement deadline"
+      },
+      "timeout": {
+        "rule_id": "action.abort_settlement.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain settling; if disposition becomes uncertain use action.mark_indeterminate_settling"
+      },
+      "cancellation": {
+        "rule_id": "action.abort_settlement.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "already incorporated in terminal disposition"
+      },
+      "crash_recovery": {
+        "rule_id": "action.abort_settlement.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "state, ledgers, releases, evidence, and audit commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.abort_settlement.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "possible uncompensated effect blocks abort"
+      },
+      "allowed_successors": []
+    },
+    {
+      "transition_id": "action.mark_indeterminate_settling",
+      "contract_version": "1.0.0",
+      "source": "settling",
+      "target": "indeterminate",
+      "permitted_request_actors": [
+        "guardian",
+        "runtime_coordinator"
+      ],
+      "intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "authority": [
+        "action.mark_indeterminate"
+      ],
+      "policy": [
+        "ambiguity_policy_requires_indeterminate"
+      ],
+      "approval": {
+        "rule_id": "action.mark_indeterminate_settling.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "not_required_or_previously_bound",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "not required to fail closed"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.mark_indeterminate_settling.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "effect or settlement disposition is no longer provable"
+          },
+          {
+            "rule_id": "action.mark_indeterminate_settling.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "conflict evidence is recorded"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.mark_indeterminate_settling.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "false by definition"
+      },
+      "evidence": [
+        "settlement_ambiguity_reason",
+        "conflicting_or_missing_ledger_evidence"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.mark_indeterminate_settling.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state indeterminate"
+          },
+          {
+            "operation_id": "action.mark_indeterminate_settling.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record unresolved disposition"
+          },
+          {
+            "operation_id": "action.mark_indeterminate_settling.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.mark_indeterminate_settling.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "hold budget reservation, resource claims, local locks, and evidence"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.mark_indeterminate_settling.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.indeterminate"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.indeterminate",
+      "deadline": {
+        "rule_id": "action.mark_indeterminate_settling.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution and escalation deadlines are explicit"
+      },
+      "timeout": {
+        "rule_id": "action.mark_indeterminate_settling.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain indeterminate and escalate"
+      },
+      "cancellation": {
+        "rule_id": "action.mark_indeterminate_settling.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "cannot resolve settlement ambiguity"
+      },
+      "crash_recovery": {
+        "rule_id": "action.mark_indeterminate_settling.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "indeterminate is durable and no claim is released",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.mark_indeterminate_settling.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "rebuild disposition only from authoritative ledger and external evidence"
+      },
+      "allowed_successors": [
+        "settling",
+        "aborted"
+      ]
+    },
+    {
+      "transition_id": "action.resolve_effect_confirmed",
+      "contract_version": "1.0.0",
+      "source": "indeterminate",
+      "target": "settling",
+      "permitted_request_actors": [
+        "runtime_coordinator",
+        "human_incident_resolver"
+      ],
+      "subject_intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "resolution_request_purposes": [
+        "reconciliation"
+      ],
+      "authority": [
+        "action.resolve_indeterminate"
+      ],
+      "policy": [
+        "resolution_policy_allow",
+        "evidence_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.resolve_effect_confirmed.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "conditional",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "human accountable approval is required when automatic reconciliation is not explicitly safe and authorized"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.resolve_effect_confirmed.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "a completed purpose=reconciliation intent referencing this subject, authoritative local-ledger evidence, or authorized human decision proves effect_confirmed"
+          },
+          {
+            "rule_id": "action.resolve_effect_confirmed.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no adapter is called by this transition"
+          },
+          {
+            "rule_id": "action.resolve_effect_confirmed.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "resolver is not the automatic adapter when human incident resolution is required"
+          },
+          {
+            "rule_id": "action.resolve_effect_confirmed.guard.04.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no conflicting evidence exists"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.resolve_effect_confirmed.quiescence.v1",
+        "required": false,
+        "predicate_ref": null,
+        "unknown": "false",
+        "description": "not_required"
+      },
+      "evidence": [
+        "effect_confirmed",
+        "resolution_provenance",
+        "resolver_identity",
+        "resolution_decision"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.resolve_effect_confirmed.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record resolution outcome effect_confirmed"
+          },
+          {
+            "operation_id": "action.resolve_effect_confirmed.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set settlement_disposition completed"
+          },
+          {
+            "operation_id": "action.resolve_effect_confirmed.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state settling"
+          },
+          {
+            "operation_id": "action.resolve_effect_confirmed.protected_state.04.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.resolve_effect_confirmed.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "retain all claims until settlement"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.resolve_effect_confirmed.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.indeterminate_resolved"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.indeterminate_resolved",
+      "deadline": {
+        "rule_id": "action.resolve_effect_confirmed.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution decision is current and within its validity window"
+      },
+      "timeout": {
+        "rule_id": "action.resolve_effect_confirmed.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain indeterminate"
+      },
+      "cancellation": {
+        "rule_id": "action.resolve_effect_confirmed.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "does not rewrite confirmed effect; any reversal requires a separate compensation intent"
+      },
+      "crash_recovery": {
+        "rule_id": "action.resolve_effect_confirmed.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution decision and state commit atomically and idempotently",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.resolve_effect_confirmed.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "duplicate identical resolution is idempotent; conflicting resolution is denied and escalated"
+      },
+      "allowed_successors": [
+        "completed",
+        "aborted",
+        "indeterminate"
+      ]
+    },
+    {
+      "transition_id": "action.resolve_no_effect_confirmed",
+      "contract_version": "1.0.0",
+      "source": "indeterminate",
+      "target": "aborted",
+      "permitted_request_actors": [
+        "runtime_coordinator",
+        "human_incident_resolver"
+      ],
+      "subject_intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "resolution_request_purposes": [
+        "reconciliation"
+      ],
+      "authority": [
+        "action.resolve_indeterminate",
+        "action.settle"
+      ],
+      "policy": [
+        "resolution_policy_allow",
+        "settlement_policy_allow",
+        "evidence_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.resolve_no_effect_confirmed.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "conditional",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "human accountable approval is required when automatic reconciliation is not explicitly safe and authorized"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.resolve_no_effect_confirmed.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "a completed purpose=reconciliation intent referencing this subject, authoritative local-ledger evidence, or authorized human decision proves no_effect_confirmed"
+          },
+          {
+            "rule_id": "action.resolve_no_effect_confirmed.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no adapter is called by this transition"
+          },
+          {
+            "rule_id": "action.resolve_no_effect_confirmed.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no conflicting evidence exists"
+          },
+          {
+            "rule_id": "action.resolve_no_effect_confirmed.guard.04.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "all claims can be atomically released"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.resolve_no_effect_confirmed.quiescence.v1",
+        "required": true,
+        "predicate_ref": "neural-brain.quiescence#goal_is_quiescent",
+        "unknown": "false",
+        "description": "intent becomes terminal only with atomic settlement"
+      },
+      "evidence": [
+        "no_effect_confirmed",
+        "resolution_provenance",
+        "resolver_identity",
+        "settlement_ledger_entries"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.resolve_no_effect_confirmed.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record resolution outcome no_effect_confirmed"
+          },
+          {
+            "operation_id": "action.resolve_no_effect_confirmed.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state aborted"
+          },
+          {
+            "operation_id": "action.resolve_no_effect_confirmed.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.resolve_no_effect_confirmed.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "release budget reservation, resource claims, and local locks"
+          },
+          {
+            "operation_id": "action.resolve_no_effect_confirmed.claims.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "finalize approval claims"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.resolve_no_effect_confirmed.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.indeterminate_resolved"
+          },
+          {
+            "operation_id": "action.resolve_no_effect_confirmed.audit.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.aborted"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.indeterminate_resolved",
+      "deadline": {
+        "rule_id": "action.resolve_no_effect_confirmed.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution decision is current and within its validity window"
+      },
+      "timeout": {
+        "rule_id": "action.resolve_no_effect_confirmed.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain indeterminate and release nothing"
+      },
+      "cancellation": {
+        "rule_id": "action.resolve_no_effect_confirmed.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "resolved as no effect; no retry is implied"
+      },
+      "crash_recovery": {
+        "rule_id": "action.resolve_no_effect_confirmed.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution, releases, state, and audit commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.resolve_no_effect_confirmed.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "duplicate identical resolution is idempotent; conflict is denied"
+      },
+      "allowed_successors": []
+    },
+    {
+      "transition_id": "action.resolve_effect_compensated",
+      "contract_version": "1.0.0",
+      "source": "indeterminate",
+      "target": "aborted",
+      "permitted_request_actors": [
+        "human_incident_resolver"
+      ],
+      "subject_intent_purposes": [
+        "execution",
+        "verification",
+        "cancellation",
+        "reconciliation",
+        "compensation"
+      ],
+      "resolution_request_purposes": [
+        "reconciliation"
+      ],
+      "required_related_intent_purpose": "compensation",
+      "authority": [
+        "action.resolve_indeterminate",
+        "action.settle"
+      ],
+      "policy": [
+        "resolution_policy_allow",
+        "compensation_policy_allow",
+        "settlement_policy_allow",
+        "evidence_policy_allow"
+      ],
+      "approval": {
+        "rule_id": "action.resolve_effect_compensated.approval.v1",
+        "operator": "evaluate_approval_requirement",
+        "mode": "declared",
+        "condition_sources": [
+          "operation_contract",
+          "risk_policy",
+          "security_floor"
+        ],
+        "unknown": "deny",
+        "description": "accountable approval and a separately committed compensation intent are required for the compensating effect"
+      },
+      "guards": {
+        "operator": "all_true",
+        "rules": [
+          {
+            "rule_id": "action.resolve_effect_compensated.guard.01.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "separate purpose=compensation intent referencing the confirmed original effect completed"
+          },
+          {
+            "rule_id": "action.resolve_effect_compensated.guard.02.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "a completed purpose=reconciliation intent or authorized human decision binds that evidence to this subject"
+          },
+          {
+            "rule_id": "action.resolve_effect_compensated.guard.03.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no adapter is called by this transition"
+          },
+          {
+            "rule_id": "action.resolve_effect_compensated.guard.04.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "evidence proves effect_compensated"
+          },
+          {
+            "rule_id": "action.resolve_effect_compensated.guard.05.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "no residual effect or obligation remains"
+          },
+          {
+            "rule_id": "action.resolve_effect_compensated.guard.06.v1",
+            "operator": "registered_boolean_predicate",
+            "unknown": "false",
+            "description": "all claims can be settled atomically"
+          }
+        ],
+        "unknown_rule": "deny_and_audit"
+      },
+      "quiescence": {
+        "rule_id": "action.resolve_effect_compensated.quiescence.v1",
+        "required": true,
+        "predicate_ref": "neural-brain.quiescence#goal_is_quiescent",
+        "unknown": "false",
+        "description": "intent becomes terminal only with atomic settlement; the compensation intent must already be terminal"
+      },
+      "evidence": [
+        "effect_confirmed",
+        "compensation_intent",
+        "effect_compensated",
+        "human_resolution_decision",
+        "settlement_ledger_entries"
+      ],
+      "atomic_side_effects": {
+        "protected_state": [
+          {
+            "operation_id": "action.resolve_effect_compensated.protected_state.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "record resolution outcome effect_compensated"
+          },
+          {
+            "operation_id": "action.resolve_effect_compensated.protected_state.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "set state aborted"
+          },
+          {
+            "operation_id": "action.resolve_effect_compensated.protected_state.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "increment aggregate version"
+          }
+        ],
+        "claims": [
+          {
+            "operation_id": "action.resolve_effect_compensated.claims.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "settle or release budget reservation"
+          },
+          {
+            "operation_id": "action.resolve_effect_compensated.claims.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "release resource claims and local locks"
+          },
+          {
+            "operation_id": "action.resolve_effect_compensated.claims.03.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "finalize approval claims"
+          }
+        ],
+        "audit": [
+          {
+            "operation_id": "action.resolve_effect_compensated.audit.01.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.indeterminate_resolved"
+          },
+          {
+            "operation_id": "action.resolve_effect_compensated.audit.02.v1",
+            "transaction": "same_as_state_and_audit",
+            "description": "append action.aborted"
+          }
+        ],
+        "operator": "all_or_none"
+      },
+      "audit_event": "action.indeterminate_resolved",
+      "deadline": {
+        "rule_id": "action.resolve_effect_compensated.deadline.v1",
+        "operator": "deadline_contract_satisfied",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution and compensation evidence are current"
+      },
+      "timeout": {
+        "rule_id": "action.resolve_effect_compensated.timeout.v1",
+        "operator": "declared_timeout_action",
+        "unknown": "deny_or_remain_source",
+        "description": "remain indeterminate and release nothing"
+      },
+      "cancellation": {
+        "rule_id": "action.resolve_effect_compensated.cancellation.v1",
+        "operator": "declared_cancellation_path",
+        "unknown": "deny_or_remain_source",
+        "description": "compensation is never implicit cancellation and must not reuse the original intent"
+      },
+      "crash_recovery": {
+        "rule_id": "action.resolve_effect_compensated.crash_recovery.v1",
+        "operator": "recover_from_authoritative_commit_boundary",
+        "unknown": "deny_or_remain_source",
+        "description": "resolution, settlement, state, and audit commit atomically",
+        "before_commit": "rollback",
+        "after_commit": "recover_from_durable_state_and_audit"
+      },
+      "reconciliation": {
+        "rule_id": "action.resolve_effect_compensated.reconciliation.v1",
+        "operator": "registered_reconciliation_strategy",
+        "unknown": "deny_or_remain_source",
+        "description": "compensation evidence is checked against the original effect and separate intent"
+      },
+      "allowed_successors": []
+    }
+  ],
+  "indeterminate_resolution": {
+    "subject_purpose_immutable": true,
+    "subject_purposes": [
+      "execution",
+      "verification",
+      "cancellation",
+      "reconciliation",
+      "compensation"
+    ],
+    "resolution_request_purpose": "reconciliation",
+    "allowed_outcomes": {
+      "effect_confirmed": "settling",
+      "no_effect_confirmed": "aborted",
+      "effect_compensated": "aborted"
+    },
+    "forbidden": [
+      "automatic retry",
+      "claim release before resolution",
+      "purpose mutation",
+      "resolution from model inference, transport status, or logs alone"
+    ],
+    "non_reconcilable_path": "authorized human_incident_resolver with accountable evidence-backed decision"
+  },
+  "default_deny": {
+    "unknown_state": "deny_and_audit",
+    "unknown_actor": "deny_and_audit",
+    "unknown_purpose": "deny_and_audit",
+    "undeclared_transition": "deny_and_audit",
+    "missing_or_stale_guard_input": "deny",
+    "scope_mismatch": "deny_and_audit",
+    "stale_expected_version": "deny_and_require_fresh_request",
+    "stale_local_runtime_fence": "deny_and_reconcile",
+    "audit_failure": "rollback_and_deny",
+    "possible_effect": "indeterminate"
+  }
+}

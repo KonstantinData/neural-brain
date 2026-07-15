@@ -470,17 +470,23 @@ Implementation or release MUST stop when any of the following is true:
 These criteria are cumulative. A later approval, policy, stage, or operational
 workaround MUST NOT waive one.
 
-## 24. Engineering runtime and inference hold
+## 24. Engineering runtime and inference boundary
 
 ADR-013 defines CPython 3.14 with the standard GIL-enabled runtime, uv, Ruff,
 strict mypy, pytest, Hypothesis, Pydantic v2, and synchronous Psycopg 3. Its
 runtime validation and explicit transaction rules are part of this directive.
 
-ADR-013 does not select an inference provider. Model inference integration MUST
-remain absent or disabled until a separate accepted ADR defines the provider and
-the local-only boundary, prohibits OpenAI use and automatic cloud fallback, and
-is synchronized to the repository. This directive does not implement or
-authorize an inference adapter.
+ADR-014 selects local Ollama as the only approved inference provider behind the
+provider-neutral internal `InferencePort`. OpenAI APIs and SDKs, external model
+APIs, provider or model switching, API-key fallback, and automatic cloud
+fallback are prohibited. Inference fails closed unless the exact approved local
+endpoint, model identifier, version, digest, timeout, budget, minimized-logging
+policy, and egress controls are present and verified.
+
+ADR-014 authorizes only that architectural adapter boundary. Foundation does
+not implement or enable a runtime adapter, select concrete deployment values,
+or prove inference readiness. Those capabilities require their owning Stage 1
+implementation tasks and tests.
 
 ## 25. Traceability and completion
 
@@ -516,6 +522,7 @@ documentation update, release stop, or known critical deviation remains open.
 | ADR-011 — Independent verification before goal completion | Section 10 |
 | ADR-012 — Immutable until lawful deletion | Section 16 |
 | ADR-013 — CPython 3.14 GIL runtime and engineering toolchain | Sections 7, 13, 24 |
+| ADR-014 — Local Ollama-only inference | Sections 7, 15, 24 |
 
 ## Appendix B: Follow-on contract ownership
 
@@ -527,10 +534,11 @@ owning tasks:
 - FND-02.3: Goal and Action states and default-deny transition tables;
 - FND-02.4: Goal-State/Intent-Purpose guards and normative quiescence;
 - FND-02.5: Stage Capability Matrix;
-- FND-02.6: threat model and trust-boundary diagram, subject to resolution of
-  its recorded dependencies;
-- FND-02.7: repository synchronization of accepted ADRs, subject to resolution
-  of the accepted-decision-count conflict; and
+- FND-02.6: threat model and trust-boundary diagram, materialized in
+  `docs/architecture/threat-model.md`;
+- FND-02.7: repository synchronization of accepted ADRs, with ADR-001 through
+  ADR-013 as the historical FND-02 baseline and ADR-014 as an additional
+  accepted decision; and
 - follow-on regulatory governance tasks: intended-purpose schemas, prohibited-
   and unsupported-use catalog, applicability and role records, compliance
   release, accountable review, and reassessment mechanisms.

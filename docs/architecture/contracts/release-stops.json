@@ -1,0 +1,33 @@
+{
+  "document_type": "release_stop_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.release-stops",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "source": "docs/architecture/architecture-directive-v1.1.md#23-release-stop-criteria",
+  "default_behavior": "stop_implementation_and_release",
+  "waiver": "prohibited",
+  "criteria": [
+    {"id": "RS-01", "condition": "A forbidden transition is possible."},
+    {"id": "RS-02", "condition": "Protected state can be mutated outside its transition gate."},
+    {"id": "RS-03", "condition": "Scope or principal can be taken from untrusted input."},
+    {"id": "RS-04", "condition": "Achieved is reachable without independent evidence."},
+    {"id": "RS-05", "condition": "An external action can execute without complete authorization."},
+    {"id": "RS-06", "condition": "Approval replay is possible."},
+    {"id": "RS-07", "condition": "Budget can be charged twice or become negative."},
+    {"id": "RS-08", "condition": "Locks can be released while an external effect may remain unresolved."},
+    {"id": "RS-09", "condition": "A non-idempotent ambiguous action can be retried automatically."},
+    {"id": "RS-10", "condition": "Audit and the protected domain transition are not atomic."},
+    {"id": "RS-11", "condition": "Startup or restore can report ready=true before reconciliation."},
+    {"id": "RS-12", "condition": "A kill switch can be bypassed."},
+    {"id": "RS-13", "condition": "A critical runbook is missing."},
+    {"id": "RS-14", "condition": "Backup or restore has not been proven."},
+    {"id": "RS-15", "condition": "A stage gate is incomplete."}
+  ],
+  "rules": [
+    "Every criterion is cumulative.",
+    "Unknown evaluation state is treated as a triggered release stop.",
+    "Policy, approval, a later delivery stage, or an operational workaround cannot waive a criterion.",
+    "A triggered criterion blocks the affected implementation and every dependent release gate until objective evidence proves it false."
+  ]
+}

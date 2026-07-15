@@ -9,7 +9,9 @@
   "sources": [
     "docs/architecture/architecture-directive-v1.1.md",
     "docs/adr/ADR-009-stage-1-dispatch-journal.md",
-    "docs/adr/ADR-010-staged-memory-capabilities.md"
+    "docs/adr/ADR-010-staged-memory-capabilities.md",
+    "docs/adr/ADR-014-local-ollama-only-inference.md",
+    "docs/architecture/contracts/inference-provider.json"
   ],
   "semantics": {
     "cumulative": true,
@@ -101,6 +103,29 @@
         "The required records exist before adapter invocation.",
         "An ambiguous external effect becomes indeterminate and is not blindly retried.",
         "The Stage 1 implementation is local and serial, not a generalized distributed outbox."
+      ]
+    },
+    {
+      "id": "runtime.local_model_inference",
+      "domain": "runtime",
+      "minimum_stage": "stage_1",
+      "availability": {
+        "stage_1": "allowed",
+        "stage_2": "allowed",
+        "stage_3": "allowed",
+        "stage_4": "allowed"
+      },
+      "scope": [
+        "provider-neutral internal InferencePort",
+        "approved local Ollama adapter boundary",
+        "request-scoped same-area prompt assembly",
+        "typed fail-closed inference outcomes"
+      ],
+      "constraints": [
+        "Stage acceptance is necessary but insufficient; inference remains unavailable until ADR-014 readiness, exact model identity and digest, budget, timeout, minimized logging, and egress controls pass.",
+        "No external provider, cloud fallback, API-key fallback, provider switch, model switch, cross-scope cache, or cross-area Working Memory is authorized.",
+        "The adapter cannot execute tools, retrieve memory, write protected state, or determine goal achievement.",
+        "If a model response is submitted to the Memory Transition Gate, its Stage 1 durable result can only be an inactive, non-retrievable candidate after schema, scope, provenance, and producer-identity validation."
       ]
     },
     {

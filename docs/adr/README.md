@@ -23,7 +23,8 @@ implementation change.
 | [ADR-011](ADR-011-independent-verification-completion-gate.md) | Independent verification completion gate |
 | [ADR-012](ADR-012-retention-aware-evidence-immutability.md) | Retention-aware evidence immutability |
 | [ADR-013](ADR-013-python-runtime-and-toolchain.md) | Python runtime and toolchain |
+| [ADR-014](ADR-014-local-ollama-only-inference.md) | Local Ollama-only inference |
 
-The repository currently contains thirteen accepted records. FND-02.7 remains
-blocked because its acceptance criterion states twelve; the repository does not
-silently discard or renumber an accepted decision to satisfy that mismatch.
+The repository contains the thirteen Foundation decisions covered by FND-02.7
+and the separately accepted inference decision ADR-014. The complete accepted
+sequence is continuous from ADR-001 through ADR-014.

@@ -31,7 +31,7 @@ def test_directive_declares_its_normative_identity(directive_text: str) -> None:
         "## 19. Regulatory applicability and role contract",
         "## 20. Per-scope compliance-release contract",
         "## 23. Release-stop criteria",
-        "## 24. Engineering runtime and inference hold",
+        "## 24. Engineering runtime and inference boundary",
     ],
 )
 def test_directive_contains_required_contract_sections(
@@ -41,7 +41,7 @@ def test_directive_contains_required_contract_sections(
 
 
 def test_directive_maps_every_current_accepted_adr(directive_text: str) -> None:
-    for number in range(1, 14):
+    for number in range(1, 15):
         assert f"| ADR-{number:03d} " in directive_text
 
 
@@ -78,5 +78,6 @@ def test_directive_contains_release_stops(directive_text: str, release_stop: str
 
 def test_directive_keeps_inference_disabled_without_separate_adr(directive_text: str) -> None:
     normalized = " ".join(directive_text.split())
-    assert "prohibits OpenAI use and automatic cloud fallback" in normalized
-    assert "does not implement or authorize an inference adapter" in normalized
+    assert "OpenAI APIs and SDKs" in normalized
+    assert "automatic cloud fallback are prohibited" in normalized
+    assert "Foundation does not implement or enable a runtime adapter" in normalized

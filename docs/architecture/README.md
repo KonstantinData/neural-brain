@@ -22,7 +22,21 @@ Current machine-readable contracts:
 - [`contracts/stage-capabilities.json`](contracts/stage-capabilities.json)
   defines cumulative delivery-stage capabilities and fail-closed rejection of
   unavailable operations.
+- [`contracts/goal-state-machine.json`](contracts/goal-state-machine.json) and
+  [`contracts/action-intent-state-machine.json`](contracts/action-intent-state-machine.json)
+  define the protected state graphs and typed transition rules.
+- [`contracts/intent-purpose-guards.json`](contracts/intent-purpose-guards.json)
+  defines the Goal-state/Intent-purpose matrix and cross-contract guards.
+- [`contracts/quiescence.json`](contracts/quiescence.json) and
+  [`contracts/ledger-invariants.json`](contracts/ledger-invariants.json) define
+  the reusable scoped quiescence predicate, authoritative blocker statuses, and
+  transactional ledger invariants.
+- [`contracts/inference-provider.json`](contracts/inference-provider.json)
+  defines the local Ollama-only, no-cloud-fallback inference boundary.
+- [`contracts/release-stops.json`](contracts/release-stops.json) is the
+  machine-readable release-stop set.
 
-The exact Goal and Action transitions, intent-purpose guards, quiescence
-statuses, threat model, and unresolved regulatory schemas remain unavailable
-until their recorded dependencies and architecture decisions are resolved.
+[`threat-model.md`](threat-model.md) contains the initial Foundation technical
+threat model and trust-boundary diagram. Deployment- and use-case-specific
+regulatory roles, classifications, prohibited-use determinations,
+fundamental-rights assessments, and DPIA evidence remain assigned to FND-04.
