@@ -1,33 +1,89 @@
 {
-  "document_type": "release_stop_contract",
+  "document_type": "memory_release_stop_contract",
   "format_version": 1,
-  "contract_id": "neural-brain.release-stops",
+  "contract_id": "neural-brain.memory-release-stops",
   "contract_version": "1.0.0",
   "status": "normative",
-  "source": "docs/architecture/architecture-directive-v1.1.md#23-release-stop-criteria",
+  "decision": "ADR-015",
   "default_behavior": "stop_implementation_and_release",
   "waiver": "prohibited",
   "criteria": [
-    {"id": "RS-01", "condition": "A forbidden transition is possible."},
-    {"id": "RS-02", "condition": "Protected state can be mutated outside its transition gate."},
-    {"id": "RS-03", "condition": "Scope or principal can be taken from untrusted input."},
-    {"id": "RS-04", "condition": "Achieved is reachable without independent evidence."},
-    {"id": "RS-05", "condition": "An external action can execute without complete authorization."},
-    {"id": "RS-06", "condition": "Approval replay is possible."},
-    {"id": "RS-07", "condition": "Budget can be charged twice or become negative."},
-    {"id": "RS-08", "condition": "Locks can be released while an external effect may remain unresolved."},
-    {"id": "RS-09", "condition": "A non-idempotent ambiguous action can be retried automatically."},
-    {"id": "RS-10", "condition": "Audit and the protected domain transition are not atomic."},
-    {"id": "RS-11", "condition": "Startup or restore can report ready=true before reconciliation."},
-    {"id": "RS-12", "condition": "A kill switch can be bypassed."},
-    {"id": "RS-13", "condition": "A critical runbook is missing."},
-    {"id": "RS-14", "condition": "Backup or restore has not been proven."},
-    {"id": "RS-15", "condition": "A stage gate is incomplete."}
+    {
+      "id": "MRS-01",
+      "condition": "Neural Brain owns goals, plans, tools, action intents, external effects, or consumer task-success decisions."
+    },
+    {
+      "id": "MRS-02",
+      "condition": "Scope or principal identity can be supplied or changed by untrusted content or consumer correlation metadata."
+    },
+    {
+      "id": "MRS-03",
+      "condition": "A protected memory lifecycle state can be changed outside the Memory Transition Gate."
+    },
+    {
+      "id": "MRS-04",
+      "condition": "A protected memory transition and its audit record are not atomic."
+    },
+    {
+      "id": "MRS-05",
+      "condition": "A cross-tenant or cross-area read, write, cache, index, or inference context is possible without an accepted explicit contract."
+    },
+    {
+      "id": "MRS-06",
+      "condition": "A memory record can exist without required classification, purpose, retention, deletion responsibility, or provenance."
+    },
+    {
+      "id": "MRS-07",
+      "condition": "An inactive, rejected, quarantined, deleted, or anonymized record can appear in normal active-memory retrieval."
+    },
+    {
+      "id": "MRS-08",
+      "condition": "Stale, expired, or unknown-freshness content can be represented as current fact."
+    },
+    {
+      "id": "MRS-09",
+      "condition": "A model, consumer, or inference adapter can directly promote, activate, delete, anonymize, or quarantine memory."
+    },
+    {
+      "id": "MRS-10",
+      "condition": "Sensitive or risky candidate promotion can be completed solely by its producer."
+    },
+    {
+      "id": "MRS-11",
+      "condition": "Deletion or anonymization can leave governed derivations, indexes, caches, or retrieval projections accessible without a documented legal hold."
+    },
+    {
+      "id": "MRS-12",
+      "condition": "Startup or restore can report ready=true before memory-ledger, deletion, projection, and audit reconciliation completes."
+    },
+    {
+      "id": "MRS-13",
+      "condition": "A non-idempotent memory transition with unknown commit outcome can be retried without authoritative reconciliation."
+    },
+    {
+      "id": "MRS-14",
+      "condition": "A later-stage memory capability can be enabled before its accepted stage."
+    },
+    {
+      "id": "MRS-15",
+      "condition": "Secrets or credentials can be persisted in memory content, prompts, logs, audit payloads, examples, or inference configuration."
+    },
+    {
+      "id": "MRS-16",
+      "condition": "Implementation of persistent Tenant scope proceeds by inventing a root exception or sentinel Area before the open invariant is resolved."
+    },
+    {
+      "id": "MRS-17",
+      "condition": "Backup or restore of authoritative memory and audit state has not been proven."
+    },
+    {
+      "id": "MRS-18",
+      "condition": "A memory delivery-stage gate is incomplete."
+    }
   ],
   "rules": [
-    "Every criterion is cumulative.",
     "Unknown evaluation state is treated as a triggered release stop.",
-    "Policy, approval, a later delivery stage, or an operational workaround cannot waive a criterion.",
-    "A triggered criterion blocks the affected implementation and every dependent release gate until objective evidence proves it false."
+    "A configurable policy, approval, consumer request, or model response cannot waive a release stop.",
+    "Every triggered criterion blocks implementation of the affected capability and blocks release of the affected stage."
   ]
 }

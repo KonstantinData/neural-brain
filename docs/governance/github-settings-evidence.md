@@ -6,7 +6,7 @@
 - Protected branch: `main`
 - Live configuration verified: **Yes**
 - Verified at: `2026-07-15T10:42:23.8865025+02:00`
-- Authority: explicit autonomous Neural Brain execution instruction dated
+- Authority: explicit Neural Brain repository implementation instruction dated
   2026-07-15
 - Sanitized evidence SHA-256:
   `5aa5a7479a50c5b92e3cc10b9722eb210150308f24f2ca0ad5a383c0bb323419`

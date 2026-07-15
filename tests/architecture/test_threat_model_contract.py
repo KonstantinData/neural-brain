@@ -35,45 +35,58 @@ def _ids(rows: dict[str, str], prefix: str) -> set[str]:
 def test_catalog_identifiers_are_unique_and_complete(
     catalog_rows: dict[str, str],
 ) -> None:
-    assert _ids(catalog_rows, "A-") == {f"A-{number:02d}" for number in range(1, 17)}
+    assert _ids(catalog_rows, "A-") == {f"A-{number:02d}" for number in range(1, 16)}
     assert _ids(catalog_rows, "TB-") == {f"TB-{number:02d}" for number in range(1, 13)}
-    assert _ids(catalog_rows, "T-") == {f"T-{number:02d}" for number in range(1, 28)}
-    assert _ids(catalog_rows, "M-") == {f"M-{number:02d}" for number in range(1, 17)}
+    assert _ids(catalog_rows, "T-") == {f"T-{number:02d}" for number in range(1, 22)}
+    assert _ids(catalog_rows, "M-") == {f"M-{number:02d}" for number in range(1, 16)}
     assert _ids(catalog_rows, "V-") == {f"V-{number:02d}" for number in range(1, 16)}
 
 
-def test_every_threat_reference_resolves_to_a_catalog_entry(
+def test_every_threat_has_asset_mitigation_and_verification_references(
     catalog_rows: dict[str, str],
 ) -> None:
     for threat_id in sorted(_ids(catalog_rows, "T-")):
         references = set(REFERENCE.findall(catalog_rows[threat_id]))
-        asset_refs = {reference for reference in references if reference.startswith("A-")}
-        mitigation_refs = {reference for reference in references if reference.startswith("M-")}
-        verification_refs = {reference for reference in references if reference.startswith("V-")}
-        assert asset_refs, f"{threat_id} has no protected asset reference"
-        assert mitigation_refs, f"{threat_id} has no mitigation reference"
-        assert verification_refs, f"{threat_id} has no verification reference"
-        assert references <= set(catalog_rows), f"{threat_id} contains an unknown reference"
+        assert any(reference.startswith("A-") for reference in references), threat_id
+        assert any(reference.startswith("M-") for reference in references), threat_id
+        assert any(reference.startswith("V-") for reference in references), threat_id
+        assert references <= set(catalog_rows), f"{threat_id} has an unknown reference"
+
+
+def test_product_boundary_is_memory_only(threat_model_text: str) -> None:
+    normalized = " ".join(threat_model_text.split())
+    assert "Neural Brain is a memory system." in normalized
+    assert (
+        "It does not pursue goals, create plans, execute tools, dispatch actions, verify task "
+        "completion, schedule agents, or operate autonomously."
+    ) in normalized
+    assert (
+        "External consumers, local inference, retrieval, indexers, and background workers cannot mutate protected memory directly."
+        in normalized
+    )
+    assert (
+        "A memory result is context, not a command, approval, factual guarantee, plan, tool instruction, or proof of downstream task completion."
+        in normalized
+    )
 
 
 @pytest.mark.parametrize(
     ("threat_id", "required_terms"),
     [
-        ("T-02", ("Prompt injection", "model", "policy")),
-        ("T-05", ("tool", "forged scope", "false success")),
-        ("T-13", ("maintenance tool", "protected tables", "audit event")),
-        ("T-01", ("principal", "tenant_id", "another scope")),
-        ("T-06", ("planner", "Action Gate", "protected state")),
-        ("T-16", ("memory candidates", "cross scopes", "Stage 2")),
-        ("T-20", ("integration message", "crosses scope", "repeated processing")),
-        ("T-11", ("external call", "dispatches twice", "blind retry")),
-        ("T-21", ("manipulates", "approver", "unsafe decision")),
-        ("T-22", ("Automation bias", "independent evidence", "review")),
-        ("T-18", ("sensitive data", "secrets", "telemetry")),
-        ("T-19", ("deletion", "derived artifacts", "backups")),
+        ("T-01", ("tenant", "Area identifier", "scope")),
+        ("T-02", ("prompt injection", "poisoning", "model output")),
+        ("T-03", ("source metadata", "provenance", "transformations")),
+        ("T-04", ("crosses Areas", "caching", "conversation reuse")),
+        ("T-06", ("self-promotes", "candidate", "rollback")),
+        ("T-08", ("stale evidence", "freshness", "consumer")),
+        ("T-09", ("deletion", "embeddings", "backups")),
+        ("T-10", ("Index", "PostgreSQL", "alternate truth")),
+        ("T-12", ("OpenAI", "cloud API", "automatic fallback")),
+        ("T-14", ("restore", "ready", "reconciled")),
+        ("T-16", ("command", "plan", "task completion")),
     ],
 )
-def test_required_foundation_threat_category_is_explicit(
+def test_required_memory_threat_is_explicit(
     catalog_rows: dict[str, str],
     threat_id: str,
     required_terms: tuple[str, ...],
@@ -83,76 +96,57 @@ def test_required_foundation_threat_category_is_explicit(
         assert term.lower() in story
 
 
-def test_t27_covers_cross_scope_cache_batch_and_conversation_reuse(
+def test_trust_boundaries_cover_memory_service_components(
     catalog_rows: dict[str, str],
 ) -> None:
-    story = catalog_rows["T-27"].lower()
+    boundary_text = " ".join(
+        body for identifier, body in catalog_rows.items() if identifier.startswith("TB-")
+    ).lower()
     for term in (
-        "conversation reuse",
-        "caching",
-        "batching",
-        "working memory",
-        "tenant",
-        "area",
-        "project",
-        "session",
-        "goal",
+        "authenticated memory port",
+        "source registry",
+        "memory gate",
+        "promotion authority",
+        "retrieval result",
+        "derived indexes",
+        "local inference",
+        "postgresql",
+        "retention or deletion",
+        "another area",
+        "backup or restore",
     ):
-        assert term in story
-    references = set(REFERENCE.findall(catalog_rows["T-27"]))
-    assert {"A-02", "A-09", "A-13", "A-14"} <= references
-    assert {"M-01", "M-03", "M-08", "M-12"} <= references
-    assert {"V-02", "V-08", "V-10"} <= references
+        assert term in boundary_text
 
 
-def test_inference_threat_requires_local_ollama_and_no_cloud_fallback(
-    catalog_rows: dict[str, str],
-) -> None:
-    inference_threat = catalog_rows["T-04"].lower()
-    assert "openai" in inference_threat
-    assert "cloud api" in inference_threat
-    assert "public endpoint" in inference_threat
-    assert "automatic fallback" in inference_threat
-    assert {"M-03", "M-12", "V-08", "V-15"} <= set(REFERENCE.findall(catalog_rows["T-04"]))
+def test_release_stops_cover_memory_specific_failures(threat_model_text: str) -> None:
+    release_stops = threat_model_text.split("## Release Stops", maxsplit=1)[1].split(
+        "## Severity Calibration", maxsplit=1
+    )[0]
+    normalized = " ".join(release_stops.split()).lower()
+    for term in (
+        "cross-tenant or cross-area",
+        "outside the memory gate",
+        "candidate can become active",
+        "openai",
+        "correction, retention, legal hold, anonymization, or deletion",
+        "index or cache",
+        "startup or restore",
+        "planner, goal owner, action dispatcher",
+    ):
+        assert term in normalized
 
 
-def test_fnd04_boundary_defers_use_case_and_regulatory_determinations(
+def test_tenant_root_conflict_is_not_silently_resolved(threat_model_text: str) -> None:
+    normalized = " ".join(threat_model_text.split())
+    assert "remains a separate unresolved architecture question" in normalized
+    assert "neither creates a sentinel Area nor introduces an exception" in normalized
+
+
+def test_model_is_a_required_control_baseline_not_implementation_claim(
     threat_model_text: str,
 ) -> None:
     normalized = " ".join(threat_model_text.split())
-    assert (
-        "FND-04 MUST extend this model for each concrete deployment and intended use." in normalized
-    )
-    assert (
-        "This Foundation model makes no legal applicability or regulatory-role determination."
-        in normalized
-    )
-    assert (
-        "productive tenants, areas, personal-data processing, and real mutating tools remain disabled"
-        in normalized
-    )
-    assert "## FND-04 Extension Requirements" in threat_model_text
-    assert "Missing or inconclusive applicability evidence is a denial condition" in normalized
-
-
-def test_model_declares_contract_evidence_not_implemented_control(
-    threat_model_text: str,
-) -> None:
-    normalized = " ".join(threat_model_text.split())
-    assert "does not claim that the controls are already implemented" in normalized
-    assert "does not authorize productive processing" in normalized
-    assert "is not a security certification" in normalized
-
-
-def test_release_stops_cover_unmitigated_high_risk_and_external_inference(
-    threat_model_text: str,
-) -> None:
-    normalized = " ".join(threat_model_text.split())
-    assert (
-        "inference can reach an external provider, OpenAI, an unapproved model, or automatic fallback"
-        in normalized
-    )
-    assert (
-        "A critical or high threat in this model lacks an implemented mitigation and objective verification evidence"
-        in normalized
-    )
+    assert "does not claim those controls are implemented" in normalized
+    assert "authorize productive processing" in normalized
+    assert "security certification" in normalized
+    assert "Baseline: ADR-015 memory-system boundary" in normalized

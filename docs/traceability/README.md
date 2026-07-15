@@ -1,9 +1,9 @@
 # Implementation Traceability
 
-This directory defines how Neural Brain work is linked from an approved task to
-versioned implementation and independently reviewable evidence. Notion is the
-coordination ledger; repository artifacts remain the durable technical source
-of truth.
+This directory defines how Neural Brain memory-system work is linked from an
+approved task to versioned implementation and independently reviewable
+evidence. Notion is the coordination ledger; repository artifacts remain the
+durable technical source of truth.
 
 ## Evidence Chain
 
@@ -14,7 +14,7 @@ Notion task ID
   -> accepted requirement and acceptance criteria
   -> relevant repository ADRs and contracts
   -> branch and commit or pull request
-  -> changed code, migrations, configuration, and documentation
+  -> changed memory code, migrations, configuration, and documentation
   -> automated tests and exact verification commands
   -> recorded results, limitations, risks, and follow-ups
 ```
@@ -38,8 +38,10 @@ Use the following identifiers consistently:
   for a command that was not executed.
 
 Do not use mutable branch names as the only completion evidence. Do not copy
-secrets, credentials, personal data, or sensitive runtime payloads into an
-evidence record.
+secrets, credentials, personal data, or sensitive memory payloads into an
+evidence record. External consumer task or goal identifiers may appear only as
+non-authoritative correlation metadata and never as proof of Brain scope,
+authority, or transition state.
 
 ## Evidence Record
 
@@ -86,8 +88,8 @@ Before a pull request or final handoff:
    complete repository diff.
 2. Verify that accepted ADRs are synchronized to versioned records before their
    dependent implementation is treated as authorized.
-3. Confirm that each changed behavior, schema, operation, or safety invariant has
-   corresponding tests and durable documentation.
+3. Confirm that each changed memory behavior, schema, operation, or safety
+   invariant has corresponding tests and durable documentation.
 4. Record exact commands and results from the integrated branch, not only from
    isolated contributor work.
 5. Keep incomplete, blocked, or deferred work visible as a separate Notion issue

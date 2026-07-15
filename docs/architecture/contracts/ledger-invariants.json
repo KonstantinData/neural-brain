@@ -1,28 +1,16 @@
 {
-  "document_type": "ledger_invariant_contract",
+  "document_type": "memory_ledger_invariant_contract",
   "format_version": 1,
-  "contract_id": "neural-brain.ledger-invariants",
+  "contract_id": "neural-brain.memory-ledger-invariants",
   "contract_version": "1.0.0",
   "status": "normative",
-  "work_item": "FND-02.3/FND-02.4",
-  "sources": [
-    "docs/architecture/architecture-directive-v1.1.md",
-    "docs/architecture/contracts/quiescence.json",
-    "docs/adr/ADR-003-postgresql-authoritative-transactional-ledger.md",
-    "docs/adr/ADR-004-transition-gates-own-protected-state.md",
-    "docs/adr/ADR-008-atomic-action-preparation-and-commit.md",
-    "docs/adr/ADR-009-stage-1-dispatch-journal.md"
-  ],
+  "decision": "ADR-015",
   "transition_record": {
     "required_immutable_fields": [
       "tenant_id",
       "area_id",
-      "project_id",
-      "session_id",
-      "goal_id",
-      "aggregate_id",
-      "contract_id",
-      "contract_version",
+      "memory_record_id",
+      "memory_kind",
       "transition_id",
       "transition_request_id",
       "source_state",
@@ -33,86 +21,90 @@
       "writer_component_id",
       "correlation_id",
       "causation_id",
+      "provenance_ref",
       "audit_event_type"
     ],
-    "conditional_references": [
-      "intent_purpose",
-      "authority_snapshot_id",
-      "policy_decision_id",
-      "approval_claim_ids",
-      "budget_reservation_id",
-      "resource_claim_ids",
-      "resource_lock_ids",
-      "local_runtime_fence_id",
-      "evidence_ids",
-      "deadline",
-      "dispatch_journal_id",
-      "execution_grant_id",
-      "execution_attempt_id",
-      "reconciliation_strategy_id",
-      "effect_disposition",
-      "resolution_disposition"
-    ],
-    "writer_rule": "Only the owning transition gate database role writes protected state; the authenticated request actor is recorded separately as cause and never becomes the database writer.",
-    "atomicity": "Protected state, ledger side effects, state version increment, and audit event commit in one PostgreSQL transaction or all roll back.",
-    "replay_key": "transition_request_id is unique within immutable scope and aggregate",
-    "concurrency": "expected_state_version must match and exactly one monotone new_state_version is committed"
-  },
-  "status_registries": {
-    "execution_attempt": {
-      "blocking": ["created", "dispatching", "running", "cancel_requested", "timed_out", "reconciliation_required"],
-      "terminal": ["completed", "failed_no_effect", "cancelled_no_effect", "reconciled"]
+    "conditional_scope_fields": {
+      "project_id": "required for project-bound memory",
+      "session_id": "required for session-bound memory"
     },
-    "approval_claim": {
-      "blocking": ["requested", "granted", "claimed", "consumption_pending"],
-      "terminal": ["denied", "expired", "consumed", "revoked"]
-    },
-    "budget_reservation": {
-      "blocking": ["requested", "reserved", "debit_pending", "release_pending", "reversal_pending", "indeterminate_hold"],
-      "terminal": ["debited", "released", "reversed", "expired_unreserved"]
-    },
-    "resource_ownership_record": {
-      "blocking": ["requested", "held", "renewal_pending", "release_pending", "indeterminate_hold", "owner_unknown"],
-      "terminal": ["released", "expired_no_effect", "compensated"]
-    },
-    "recovery_work_item": {
-      "blocking": ["requested", "pending", "running", "blocked", "timed_out", "indeterminate"],
-      "terminal": ["completed", "aborted_no_effect", "resolved_by_authorized_incident"]
-    },
-    "external_effect_disposition": {
-      "blocking": ["possible", "pending", "unknown", "indeterminate", "compensation_pending"],
-      "terminal": ["no_effect_confirmed", "effect_confirmed", "effect_compensated"]
-    },
-    "protected_transition_record": {
-      "blocking": ["prepared", "commit_unknown", "audit_missing", "recovery_required"],
-      "terminal": ["committed_with_audit", "rolled_back"]
-    },
-    "startup_recovery_marker": {
-      "blocking": ["stale", "orphaned", "owner_unknown", "reconciliation_required"],
-      "terminal": ["reconciled", "cleared_with_evidence"]
-    }
+    "writer_rule": "Only the Memory Transition Gate database role may write protected memory state.",
+    "atomicity": "Protected memory state, version, indexes or projections owned by the transition, and audit evidence commit in one PostgreSQL transaction or all roll back.",
+    "replay_key": "transition_request_id is unique within immutable scope and memory_record_id",
+    "concurrency": "A successful transition consumes exactly the expected state version and creates exactly one monotone new state version."
   },
   "invariants": [
-    {"id": "LI-001", "rule": "budget_non_negative", "assertion": "A reservation, debit, reversal, or release cannot produce a negative available or reserved balance."},
-    {"id": "LI-002", "rule": "approval_single_consumption", "assertion": "An approval claim is scope-, payload-, decision-, and expiry-bound and can be consumed exactly once."},
-    {"id": "LI-003", "rule": "resource_conflict_exclusion", "assertion": "Conflicting claims or locks cannot both be held for the same protected resource and scope."},
-    {"id": "LI-004", "rule": "unresolved_effect_holds_resources", "assertion": "Budget, claims, and locks remain held while an external effect is possible, unknown, indeterminate, or awaiting compensation."},
-    {"id": "LI-005", "rule": "attempt_number_monotone", "assertion": "Execution attempt numbers are unique and strictly increasing per action intent."},
-    {"id": "LI-006", "rule": "persist_before_dispatch", "assertion": "Committed intent, dispatch journal, grant, bound local runtime fence, and attempt are durable before adapter invocation."},
-    {"id": "LI-007", "rule": "audit_failure_rolls_back", "assertion": "Failure to persist the audit event rolls back the protected transition and all ledger side effects."},
-    {"id": "LI-008", "rule": "reconciliation_before_ready", "assertion": "Startup and restore remain not-ready until all blocking recovery markers have terminal evidence."},
-    {"id": "LI-009", "rule": "unknown_status_fails_closed", "assertion": "An unknown ledger status blocks quiescence and cannot authorize a transition, settlement, release, or readiness."}
+    {
+      "id": "MLI-001",
+      "rule": "scope_immutable",
+      "assertion": "tenant_id, area_id, and applicable project_id or session_id never change across versions."
+    },
+    {
+      "id": "MLI-002",
+      "rule": "provenance_preserved",
+      "assertion": "Every memory record and derived version retains immutable provenance and source references."
+    },
+    {
+      "id": "MLI-003",
+      "rule": "gate_only_writer",
+      "assertion": "Protected memory tables cannot be changed by general application, consumer, model, or inference-adapter roles."
+    },
+    {
+      "id": "MLI-004",
+      "rule": "audit_failure_rolls_back",
+      "assertion": "An unavailable or failed audit append rolls back the protected memory transition."
+    },
+    {
+      "id": "MLI-005",
+      "rule": "inactive_candidates_not_retrievable",
+      "assertion": "An inactive, under-assessment, rejected, or quarantined candidate is excluded from normal retrieval."
+    },
+    {
+      "id": "MLI-006",
+      "rule": "promotion_creates_version",
+      "assertion": "Promotion creates a new immutable governed memory version and does not rewrite the candidate or its provenance."
+    },
+    {
+      "id": "MLI-007",
+      "rule": "freshness_visible",
+      "assertion": "Retrieval returns freshness and provenance, and never represents stale, expired, or unknown-freshness content as current fact."
+    },
+    {
+      "id": "MLI-008",
+      "rule": "deletion_cascades",
+      "assertion": "Deletion or anonymization reaches governed derivations, indexes, caches, and retrieval projections, subject only to an evaluated legal hold."
+    },
+    {
+      "id": "MLI-009",
+      "rule": "area_isolation",
+      "assertion": "Queries and writes are constrained by authenticated tenant_id and area_id before content evaluation."
+    },
+    {
+      "id": "MLI-010",
+      "rule": "reconciliation_before_ready",
+      "assertion": "Startup and restore remain not-ready until incomplete transitions, deletion cascades, projections, and audit continuity are reconciled."
+    },
+    {
+      "id": "MLI-011",
+      "rule": "unknown_state_fails_closed",
+      "assertion": "Unknown state, scope, provenance, freshness, classification, authorization, or commit outcome blocks mutation and current-fact retrieval."
+    }
   ],
-  "fencing": {
-    "stage_1_local_runtime_fence": "A durable current local executor epoch/token gates every new external effect. The grant and attempt retain the exact bound historical fence as immutable evidence.",
-    "recovery_context": "Internal settlement, indeterminate, and reconciliation transitions require an authorized current recovery context but do not require the stale executor fence to become current.",
-    "stage_4_distributed_ownership_fence": "Deferred to Stage 4 and not enabled or implied by the Stage 1 local runtime fence."
+  "consumer_metadata": {
+    "storage": "optional opaque metadata",
+    "authoritative": false,
+    "foreign_key_to_consumer_domain": false,
+    "may_affect_scope_or_actor": false
   },
-  "crash_rule": "After persisted dispatch preparation, an attempt record alone cannot prove that adapter contact did not occur. Without authoritative no-effect evidence or successful registered reconciliation, recovery records an indeterminate effect and prohibits automatic retry.",
+  "crash_rule": "Before commit, the transition and audit roll back. After commit, recovery uses the authoritative memory ledger. An unknown commit outcome is reconciled by transition_request_id and is not blindly retried.",
   "default_deny": {
     "unknown_field_or_reference": "deny_and_audit",
-    "unknown_status": "treat_as_blocking",
+    "unknown_lifecycle_state": "deny_and_audit",
+    "unknown_freshness": "exclude_from_current_fact_and_require_reassessment",
     "scope_mismatch": "deny_and_audit",
-    "audit_failure": "rollback_and_deny"
-  }
+    "provenance_missing_or_invalid": "deny_and_audit",
+    "audit_failure": "rollback_and_deny",
+    "reconciliation_incomplete": "not_ready"
+  },
+  "tenant_root_boundary": "Unresolved by this contract; no root-scope exception or sentinel value is authorized."
 }

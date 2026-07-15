@@ -1,9 +1,16 @@
 # ADR-008: Atomic Action Preparation and Commit
 
-- Status: Accepted
+- Status: Superseded by ADR-015
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081f89fb1c846ca5f942d
 - Notion page ID: `39d1c1ac-5ec0-81f8-9fb1-c846ca5f942d`
+
+## Supersession
+
+ADR-015 places action preparation, authority, approval, execution budgets, and
+resource claims outside Neural Brain. External consumers own these controls.
+Memory mutations retain their own atomic policy and audit requirements, but
+this action transaction is not part of the memory-system baseline.
 
 ## Context
 

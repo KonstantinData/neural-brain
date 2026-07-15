@@ -1,0 +1,80 @@
+{
+  "document_type": "system_boundary_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.system-boundary",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "decision": "ADR-015",
+  "system_kind": "memory_system",
+  "purpose": "Provide governed, scoped, provenance-preserving memory services to authenticated consumers.",
+  "capabilities": [
+    "validate typed memory requests",
+    "persist and retrieve governed memory records",
+    "maintain provenance, freshness, retention, and deletion state",
+    "evaluate and promote memory candidates through the Memory Gate",
+    "audit protected memory transitions atomically",
+    "support recovery and reconciliation of memory-ledger state"
+  ],
+  "non_capabilities": [
+    "goal ownership or goal lifecycle management",
+    "planning",
+    "tool or adapter execution",
+    "external side-effect execution",
+    "action-intent lifecycle management",
+    "approval or authority creation",
+    "autonomous task orchestration",
+    "independent determination of consumer task success"
+  ],
+  "consumer_boundary": {
+    "consumers": [
+      "humans",
+      "agents",
+      "applications",
+      "services"
+    ],
+    "rule": "Consumers may request memory operations through authenticated typed ports; they remain responsible for their own goals, plans, tools, effects, and success criteria.",
+    "consumer_correlations": {
+      "allowed": true,
+      "examples": [
+        "consumer_session_ref",
+        "consumer_goal_ref",
+        "consumer_task_ref"
+      ],
+      "trust": "untrusted_metadata",
+      "authority": "none",
+      "rules": [
+        "A consumer correlation cannot define or change scope, actor identity, authority, policy, retention, or lifecycle state.",
+        "A consumer correlation is never a foreign key to an aggregate owned by Neural Brain.",
+        "Missing or malformed correlation metadata does not weaken validation of authenticated scope."
+      ]
+    }
+  },
+  "protected_state": {
+    "sole_writer": "Memory Transition Gate",
+    "direct_table_mutation": "forbidden",
+    "model_or_consumer_write": "forbidden",
+    "atomicity": "A protected memory transition and its audit record commit in one PostgreSQL transaction or both roll back."
+  },
+  "trust_boundary": {
+    "trusted": [
+      "authenticated runtime principal",
+      "server-derived immutable scope",
+      "authoritative ledger state",
+      "accepted policy and governance configuration"
+    ],
+    "untrusted": [
+      "request payload",
+      "consumer correlation",
+      "prompt",
+      "model response",
+      "imported content",
+      "retrieved external content"
+    ],
+    "default": "deny"
+  },
+  "tenant_root_boundary": {
+    "status": "open_architecture_issue",
+    "rule": "This contract does not decide how a persistent Tenant root satisfies the general tenant_id and area_id persistence invariant.",
+    "implementation_effect": "No implementation may invent a sentinel Area, omit a required scope field, or encode a root exception until an accepted decision resolves the conflict."
+  }
+}

@@ -1,40 +1,49 @@
 import json
 from pathlib import Path
-from typing import Any
 
-REPOSITORY_ROOT = Path(__file__).parents[2]
-CONTRACT_PATH = REPOSITORY_ROOT / "docs" / "architecture" / "contracts" / "release-stops.json"
-DIRECTIVE_PATH = REPOSITORY_ROOT / "docs" / "architecture" / "architecture-directive-v1.1.md"
+ROOT = Path(__file__).parents[2]
+PATH = ROOT / "docs" / "architecture" / "contracts" / "release-stops.json"
 
 
-def _load_contract() -> dict[str, Any]:
-    loaded: object = json.loads(CONTRACT_PATH.read_text(encoding="utf-8"))
+def _contract() -> dict[str, object]:
+    loaded: object = json.loads(PATH.read_text(encoding="utf-8"))
     assert isinstance(loaded, dict)
     return loaded
 
 
-def test_release_stop_contract_contains_exact_continuous_set() -> None:
-    contract = _load_contract()
+def test_memory_release_stops_are_closed_and_non_waivable() -> None:
+    contract = _contract()
     criteria = contract["criteria"]
-    assert [criterion["id"] for criterion in criteria] == [
-        f"RS-{number:02d}" for number in range(1, 16)
+    assert isinstance(criteria, list)
+    assert [item["id"] for item in criteria if isinstance(item, dict)] == [
+        f"MRS-{number:02d}" for number in range(1, 19)
     ]
-    assert len({criterion["condition"] for criterion in criteria}) == 15
     assert contract["default_behavior"] == "stop_implementation_and_release"
     assert contract["waiver"] == "prohibited"
 
 
-def test_release_stop_contract_matches_directive() -> None:
-    directive = " ".join(DIRECTIVE_PATH.read_text(encoding="utf-8").split())
-    for criterion in _load_contract()["criteria"]:
-        condition = criterion["condition"]
-        if condition == "Achieved is reachable without independent evidence.":
-            condition = "`Achieved` is reachable without independent evidence."
-        if condition == "Startup or restore can report ready=true before reconciliation.":
-            condition = "Startup or restore can report `ready=true` before reconciliation."
-        assert condition in directive
+def test_release_stops_cover_memory_safety_boundaries() -> None:
+    criteria = _contract()["criteria"]
+    assert isinstance(criteria, list)
+    text = " ".join(str(item["condition"]) for item in criteria if isinstance(item, dict)).lower()
+    for expected in (
+        "goals, plans, tools",
+        "memory transition gate",
+        "cross-tenant or cross-area",
+        "provenance",
+        "freshness",
+        "candidate promotion",
+        "deletion or anonymization",
+        "ready=true",
+        "unknown commit outcome",
+        "tenant scope",
+        "backup or restore",
+        "delivery-stage gate",
+    ):
+        assert expected in text
 
 
 def test_unknown_release_stop_evaluation_fails_closed() -> None:
-    rules = _load_contract()["rules"]
+    rules = _contract()["rules"]
+    assert isinstance(rules, list)
     assert "Unknown evaluation state is treated as a triggered release stop." in rules

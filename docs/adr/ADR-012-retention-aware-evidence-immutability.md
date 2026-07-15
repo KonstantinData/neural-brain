@@ -5,6 +5,13 @@
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081fa850afe7e90516111
 - Notion page ID: `39d1c1ac-5ec0-81fa-850a-fe7e90516111`
 
+## Amendment by ADR-015
+
+This decision applies to all governed memory forms and their derivatives, not
+only episodes and audit history. Claims, assessments, procedures, summaries,
+embeddings, indexes, caches, and provenance-linked derivatives participate in
+the authorized retention, deletion, anonymization, and audit path.
+
 ## Context
 
 Append-only evidence requirements must coexist with privacy, retention, lawful

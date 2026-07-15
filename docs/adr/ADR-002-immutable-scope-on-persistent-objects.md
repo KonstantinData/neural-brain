@@ -5,6 +5,14 @@
 - Notion source: https://app.notion.com/p/39d1c1ac5ec0817cb442c04a40a6cffd
 - Notion page ID: `39d1c1ac-5ec0-817c-b442-c04a40a6cffd`
 
+## Amendment by ADR-015
+
+This decision applies to operational memory objects. Its literal application to
+the persistent Tenant root is unresolved because Area is below Tenant in the
+fixed hierarchy. ADR-015 authorizes no sentinel Area, nullable exception, or
+implicit root scope. Tenant-root persistence and dependent implementation
+remain blocked until a separate accepted decision resolves the conflict.
+
 ## Context
 
 Retrofitting scope fields is high-risk and can invalidate audit evidence.
@@ -31,5 +39,5 @@ must be ready for multiple scopes.
 ## Relationship to the Architecture Directive
 
 This decision fixes the persistent scope contract behind the architecture
-directive's Brain-to-Goal hierarchy and its authenticated-runtime-context
+directive's Brain-to-Session hierarchy and its authenticated-runtime-context
 boundary.

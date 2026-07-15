@@ -1,0 +1,162 @@
+{
+  "document_type": "memory_lifecycle_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.memory-lifecycle",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "decision": "ADR-015",
+  "operations": [
+    {
+      "id": "memory.observe",
+      "minimum_stage": "stage_1",
+      "result": "observation",
+      "requires": [
+        "authenticated principal",
+        "server-derived immutable scope",
+        "schema validation",
+        "provenance",
+        "classification and declared purpose",
+        "retention and deletion responsibility",
+        "Memory Transition Gate"
+      ]
+    },
+    {
+      "id": "memory.checkpoint",
+      "minimum_stage": "stage_1",
+      "result": "immutable versioned checkpoint",
+      "requires": [
+        "authenticated principal",
+        "server-derived immutable scope",
+        "bounded working context",
+        "provenance",
+        "Memory Transition Gate"
+      ]
+    },
+    {
+      "id": "memory.propose_candidate",
+      "minimum_stage": "stage_1",
+      "result": "inactive non-retrievable candidate",
+      "requires": [
+        "authenticated producer",
+        "server-derived immutable scope",
+        "schema validation",
+        "provenance",
+        "classification",
+        "Memory Transition Gate"
+      ]
+    },
+    {
+      "id": "memory.persist_episode_or_claim",
+      "minimum_stage": "stage_2",
+      "result": "governed episodic or semantic record",
+      "requires": [
+        "registered source",
+        "provenance",
+        "freshness metadata",
+        "retention policy",
+        "Memory Transition Gate"
+      ]
+    },
+    {
+      "id": "memory.retrieve",
+      "minimum_stage": "stage_2",
+      "result": "scope-filtered result set with provenance and freshness",
+      "requires": [
+        "authenticated principal",
+        "server-derived immutable scope",
+        "authorized purpose",
+        "classification access",
+        "freshness evaluation",
+        "retention and deletion filtering"
+      ]
+    },
+    {
+      "id": "memory.promote_candidate",
+      "minimum_stage": "stage_3",
+      "result": "active governed memory version",
+      "requires": [
+        "independent candidate assessment",
+        "current provenance and source assessment",
+        "policy authorization",
+        "producer-promoter separation when sensitive or risky",
+        "rollback target",
+        "Memory Transition Gate"
+      ]
+    },
+    {
+      "id": "memory.quarantine_or_rollback",
+      "minimum_stage": "stage_3",
+      "result": "inactive or prior governed memory version",
+      "requires": [
+        "authenticated authorized principal",
+        "evidence-backed reason",
+        "dependency assessment",
+        "Memory Transition Gate"
+      ]
+    },
+    {
+      "id": "memory.delete_or_anonymize",
+      "minimum_stage": "stage_2",
+      "result": "policy-compliant deletion or anonymization outcome",
+      "requires": [
+        "authenticated authorized principal or due retention rule",
+        "legal-hold evaluation",
+        "dependency graph evaluation",
+        "derived record, index, and cache handling",
+        "privacy-preserving audit",
+        "Memory Transition Gate"
+      ]
+    }
+  ],
+  "states": {
+    "candidate": [
+      "inactive",
+      "under_assessment",
+      "promoted",
+      "rejected",
+      "quarantined"
+    ],
+    "memory_version": [
+      "active",
+      "superseded",
+      "quarantined",
+      "deleted",
+      "anonymized"
+    ],
+    "freshness": [
+      "current",
+      "stale",
+      "expired",
+      "unknown"
+    ]
+  },
+  "transition_rules": [
+    "Only the Memory Transition Gate changes protected lifecycle state.",
+    "Unknown operation, state, scope, provenance, freshness, classification, policy, or authorization is denied and audited.",
+    "Candidates are inactive and excluded from normal retrieval until a Stage 3 promotion commits.",
+    "A promotion creates a new immutable memory version and never rewrites candidate provenance.",
+    "Sensitive or risky promotion cannot be approved solely by its producer.",
+    "Stale, expired, unknown-freshness, quarantined, deleted, or anonymized content is never returned as current fact.",
+    "Deletion or anonymization covers dependent derivations, indexes, caches, and retrieval projections unless a documented legal hold applies.",
+    "A model output cannot directly activate, promote, delete, anonymize, or quarantine memory."
+  ],
+  "cross_area": {
+    "minimum_stage": "stage_4",
+    "raw_memory_access": "denied",
+    "automatic_copy": "denied",
+    "generalization": "candidate_only_until_separately_authorized_and_promoted",
+    "required": [
+      "source provenance preserved",
+      "data minimization",
+      "source-area authorization",
+      "target-area authorization",
+      "sensitivity review",
+      "audited Memory Gate transition"
+    ]
+  },
+  "reconciliation": {
+    "ready_default": false,
+    "startup_or_restore": "Reconcile incomplete memory transitions, deletion cascades, index projections, and audit continuity before ready=true.",
+    "unknown_commit_outcome": "Do not retry a non-idempotent transition blindly; inspect the authoritative ledger and require resolution when commit outcome remains unknown."
+  }
+}

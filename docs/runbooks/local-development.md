@@ -69,7 +69,7 @@ volume.
 `down` stops the services but preserves both data volumes. No command in this
 runbook purges development data.
 
-## Transaction Safety
+## Memory Transaction Safety
 
 Application code must use the ADR-013 contract:
 
@@ -78,6 +78,7 @@ autocommit=True
 + explicit connection.transaction() blocks
 ```
 
-No database transaction may span a model, tool, network, or other unbounded
-external call. The local environment does not weaken database roles, transition
-gates, audit atomicity, or scope isolation planned for Stage 1.
+No database transaction may span local model inference, a consumer callback, a
+network request, or another unbounded external call. The local environment does
+not weaken database roles, the Memory Gate, provenance and audit atomicity,
+retention controls, or scope isolation planned for Stage 1.

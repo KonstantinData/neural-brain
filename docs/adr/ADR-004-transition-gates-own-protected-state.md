@@ -1,9 +1,16 @@
 # ADR-004: Transition Gates Own Protected State
 
-- Status: Accepted
+- Status: Superseded by ADR-015
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081679210dcd3e65beadd
 - Notion page ID: `39d1c1ac-5ec0-8167-9210-dcd3e65beadd`
+
+## Supersession
+
+ADR-015 removes Goal and Action state from the Neural Brain boundary. External
+consumers own those state machines. Memory state still requires an owning typed
+mutation boundary, but this three-gate agent-runtime decision is historical and
+is not implementation authority.
 
 ## Context
 

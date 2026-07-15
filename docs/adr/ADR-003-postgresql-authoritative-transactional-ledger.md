@@ -5,10 +5,16 @@
 - Notion source: https://app.notion.com/p/39d1c1ac5ec0813488b7e9b58c91d563
 - Notion page ID: `39d1c1ac-5ec0-8134-88b7-e9b58c91d563`
 
+## Amendment by ADR-015
+
+PostgreSQL is authoritative for transactional memory state and its audit
+evidence. Goal, action, budget, approval, lock, dispatch, and external-effect
+state belong to external consumers and are not Neural Brain domain state.
+
 ## Context
 
-Goal, action, budget, approval, lock, audit, and recovery state require atomicity
-and crash consistency.
+Memory lifecycle, provenance, audit, retention, deletion, and recovery state
+require atomicity and crash consistency.
 
 ## Decision
 

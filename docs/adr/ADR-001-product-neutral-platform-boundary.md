@@ -5,6 +5,12 @@
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081828924ca258ee85602
 - Notion page ID: `39d1c1ac-5ec0-8182-8924-ca258ee85602`
 
+## Amendment by ADR-015
+
+Neural Brain is a product- and domain-neutral **memory system**. Product
+integrations, agents, and applications are external memory consumers; they do
+not make Neural Brain an agent runtime or assign it goals, actions, or tools.
+
 ## Context
 
 Neural Brain must serve many independent topics and projects rather than one
