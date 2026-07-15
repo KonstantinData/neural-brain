@@ -1,0 +1,11 @@
+# Default ownership. Repository rules must require CODEOWNERS review.
+* @KonstantinData
+
+# Security-, architecture-, state-, execution-, memory-, and governance-sensitive paths.
+/docs/architecture/** @KonstantinData
+/docs/adr/** @KonstantinData
+/docs/governance/** @KonstantinData
+/migrations/** @KonstantinData
+/src/** @KonstantinData
+/tools/** @KonstantinData
+/.github/** @KonstantinData

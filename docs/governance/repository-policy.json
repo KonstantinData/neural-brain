@@ -1,0 +1,183 @@
+{
+  "document_type": "repository_governance_policy",
+  "contract_version": "1.0.0",
+  "status": "normative_desired_state",
+  "work_item": "FND-03.4",
+  "repository": "KonstantinData/neural-brain",
+  "default_branch": "main",
+  "principles": {
+    "reviewed_delivery_only": true,
+    "direct_push_to_default_branch": false,
+    "administrator_bypass": false,
+    "unknown_or_unverifiable_rule": "deny_merge",
+    "policy_weakening_requires_review": true
+  },
+  "branches": {
+    "task_branch_pattern": "^codex/[a-z0-9](?:[a-z0-9._/-]*[a-z0-9])?$",
+    "required_prefix": "codex/",
+    "forbidden_task_branches": ["main", "master"],
+    "examples_allowed": [
+      "codex/fnd-03-quality-ci-baseline",
+      "codex/s1-goal-transition-gate",
+      "codex/adr-015-policy-boundary"
+    ],
+    "examples_denied": [
+      "feature/fnd-03",
+      "FND-03",
+      "codex/",
+      "main"
+    ]
+  },
+  "commits": {
+    "conventional_commit_pattern": "^(?=.{1,100}$)(?:feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(?:\\([a-z0-9][a-z0-9._/-]*\\))?!?: [a-z0-9][^\\r\\n]{0,71}$",
+    "allowed_types": ["feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert"],
+    "scope_required": false,
+    "description_case": "lowercase_initial",
+    "maximum_header_length": 100,
+    "merge_commit_exception": "GitHub-generated merge commits are exempt only when the pull-request title itself passes the conventional commit pattern."
+  },
+  "pull_requests": {
+    "required": true,
+    "draft_is_mergeable": false,
+    "minimum_approvals": 1,
+    "dismiss_stale_approvals": true,
+    "require_approval_after_latest_push": true,
+    "require_code_owner_review": true,
+    "require_conversation_resolution": true,
+    "require_linear_history": false,
+    "author_may_approve_own_change": false,
+    "last_pusher_may_satisfy_required_approval": false,
+    "force_push": false,
+    "branch_deletion": false,
+    "required_template_sections": [
+      "Notion task",
+      "Scope and invariants",
+      "Security, privacy, and runtime separation",
+      "Verification evidence",
+      "Separation-of-duties review"
+    ]
+  },
+  "required_checks": [
+    {
+      "id": "quality",
+      "expected_context": "quality",
+      "workflow": ".github/workflows/quality.yml",
+      "blocking": true,
+      "aggregated_gates": [
+        "format",
+        "lint",
+        "typecheck",
+        "type_exception_audit",
+        "tests",
+        "dependency_lock",
+        "governance"
+      ]
+    },
+    {
+      "id": "migration-validation",
+      "expected_context": "PostgreSQL 18 forward migrations",
+      "workflow": ".github/workflows/migrations.yml",
+      "blocking": true,
+      "aggregated_gates": [
+        "empty_to_latest",
+        "previous_to_latest",
+        "schema_digest_consistency",
+        "guarded_cleanup"
+      ]
+    },
+    {
+      "id": "secret-history",
+      "expected_context": "Secret history scan",
+      "workflow": ".github/workflows/security.yml",
+      "blocking": true,
+      "aggregated_gates": [
+        "complete_git_history",
+        "credential_detection"
+      ]
+    },
+    {
+      "id": "dependency-license-workflow-policy",
+      "expected_context": "Dependency, license, and workflow policy",
+      "workflow": ".github/workflows/security.yml",
+      "blocking": true,
+      "aggregated_gates": [
+        "dependency_vulnerabilities",
+        "license_allowlist",
+        "immutable_actions",
+        "least_privilege"
+      ]
+    },
+    {
+      "id": "release-evidence",
+      "expected_context": "Build deterministic release evidence",
+      "workflow": ".github/workflows/release.yml",
+      "blocking": true,
+      "aggregated_gates": [
+        "locked_dependency_sbom",
+        "schema_and_migration_digest",
+        "policy_contract_adr_inventory",
+        "versioned_manifest"
+      ]
+    }
+  ],
+  "sensitive_review": {
+    "classification": "separation_of_duties_sensitive",
+    "path_patterns": [
+      "docs/architecture/**",
+      "docs/adr/**",
+      "docs/governance/**",
+      "migrations/**",
+      "src/**/security/**",
+      "src/**/policy/**",
+      "src/**/transition_gate/**",
+      "src/**/executor/**",
+      "src/**/verification/**",
+      "src/**/memory/**",
+      "tools/**",
+      ".github/**"
+    ],
+    "minimum_approvals": 1,
+    "required_reviewer_properties": [
+      "at least one valid CODEOWNER approval",
+      "at least one reviewer distinct from the change author and last pusher",
+      "the independent verification reviewer did not implement the evidence under review",
+      "policy activation is not approved solely by the policy author",
+      "runtime separation boundaries are explicitly assessed when affected"
+    ],
+    "runtime_boundaries": [
+      "planner_vs_executor",
+      "executor_vs_independent_verifier",
+      "requester_vs_approver_for_elevated_risk",
+      "policy_author_vs_sole_policy_activator",
+      "automatic_reconciliation_vs_human_incident_resolution",
+      "memory_candidate_producer_vs_sensitive_candidate_promoter"
+    ],
+    "fail_closed": "A sensitive change without complete reviewer identity and independence evidence is not mergeable."
+  },
+  "external_enforcement": {
+    "system": "GitHub repository ruleset or branch protection",
+    "status": "live_verified",
+    "mutation_authorized_by_this_contract": false,
+    "mutation_authority": "explicit autonomous Neural Brain execution instruction dated 2026-07-15",
+    "verified_at": "2026-07-15T10:42:23.8865025+02:00",
+    "sanitized_evidence_sha256": "5aa5a7479a50c5b92e3cc10b9722eb210150308f24f2ca0ad5a383c0bb323419",
+    "required_settings": [
+      "protect main from direct pushes and force pushes",
+      "require pull requests and required approvals",
+      "dismiss stale approvals and require approval after the latest push",
+      "require CODEOWNERS review and conversation resolution",
+      "require every blocking context listed in required_checks",
+      "enforce the sensitive-review approval and independence evidence contract through CODEOWNERS, the pull-request template, and fail-closed merge gates",
+      "apply restrictions to administrators without bypass",
+      "prevent deletion of main"
+    ],
+    "evidence_required_before_fnd_03_completion": [
+      "timestamped GitHub ruleset or branch-protection API output",
+      "repository and branch identity",
+      "configured required-check contexts",
+      "approval and CODEOWNERS settings",
+      "administrator-bypass, force-push, and deletion settings",
+      "verification that a non-compliant pull request cannot merge"
+    ]
+  }
+}

@@ -1,0 +1,152 @@
+name: Release evidence
+
+on:
+  pull_request:
+  push:
+    tags:
+      - "v*"
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-evidence-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    name: Build deterministic release evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: docker.io/library/postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        env:
+          POSTGRES_DB: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: release-validation-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d postgres"
+          --health-interval 2s
+          --health-timeout 3s
+          --health-retries 30
+    env:
+      MIGRATION_ADMIN_DSN: postgresql://postgres:release-validation-only@127.0.0.1:5432/postgres
+      RELEASE_TAG_NAME: ${{ github.event.release.tag_name }}
+    outputs:
+      artifact-name: ${{ steps.candidate.outputs.artifact_name }}
+    steps:
+      - name: Check out exact candidate without credentials
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install repository-pinned uv and CPython
+        uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
+        with:
+          version: "0.11.28"
+          python-version: "3.14"
+          enable-cache: false
+
+      - name: Reproduce locked environment
+        run: |
+          uv lock --check
+          uv sync --frozen --all-groups --no-editable
+
+      - name: Revalidate FND-03.3 supply-chain policy
+        run: >-
+          uv run --frozen python tools/security_policy.py workflow
+          --workflow .github/workflows/security.yml
+          --policy .github/security-policy.json
+
+      - name: Run focused release evidence tests
+        run: uv run --frozen pytest tests/release
+
+      - name: Derive immutable candidate identity
+        id: candidate
+        shell: bash
+        run: |
+          set -euo pipefail
+          source_commit="$(git rev-parse HEAD)"
+          source_timestamp="$(git show -s --format=%cI "$source_commit")"
+          case "$GITHUB_EVENT_NAME" in
+            pull_request) artifact_version="pr-${{ github.event.pull_request.number }}-${source_commit:0:12}" ;;
+            push) artifact_version="$GITHUB_REF_NAME" ;;
+            release) artifact_version="$RELEASE_TAG_NAME" ;;
+            *) exit 1 ;;
+          esac
+          printf 'source_commit=%s\n' "$source_commit" >> "$GITHUB_OUTPUT"
+          printf 'source_timestamp=%s\n' "$source_timestamp" >> "$GITHUB_OUTPUT"
+          printf 'artifact_version=%s\n' "$artifact_version" >> "$GITHUB_OUTPUT"
+          printf 'artifact_name=neural-brain-release-evidence-%s\n' "$artifact_version" >> "$GITHUB_OUTPUT"
+
+      - name: Validate migrations and capture authoritative schema digest
+        id: migrations
+        shell: bash
+        run: |
+          set -euo pipefail
+          output="$(uv run --frozen python tools/validate_migrations.py \
+            --admin-dsn "$MIGRATION_ADMIN_DSN" \
+            --migrations-dir migrations \
+            --allow-empty)"
+          printf '%s\n' "$output"
+          plan_sha256="$(printf '%s\n' "$output" | sed -n 's/^plan-sha256: //p')"
+          fresh_schema_sha256="$(printf '%s\n' "$output" | sed -n 's/^fresh-schema-sha256: //p')"
+          upgraded_schema_sha256="$(printf '%s\n' "$output" | sed -n 's/^upgraded-schema-sha256: //p')"
+          test -n "$plan_sha256"
+          test "$fresh_schema_sha256" = "$upgraded_schema_sha256"
+          printf 'plan_sha256=%s\n' "$plan_sha256" >> "$GITHUB_OUTPUT"
+          printf 'schema_sha256=%s\n' "$fresh_schema_sha256" >> "$GITHUB_OUTPUT"
+
+      - name: Build deterministic versioned evidence bundle
+        run: >-
+          uv run --frozen python tools/build_release_evidence.py
+          --root .
+          --output-dir release-evidence
+          --artifact-version "${{ steps.candidate.outputs.artifact_version }}"
+          --source-commit "${{ steps.candidate.outputs.source_commit }}"
+          --source-timestamp "${{ steps.candidate.outputs.source_timestamp }}"
+          --repository "${{ github.repository }}"
+          --migration-plan-sha256 "${{ steps.migrations.outputs.plan_sha256 }}"
+          --schema-sha256 "${{ steps.migrations.outputs.schema_sha256 }}"
+          --verify-git-head
+
+      - name: Upload immutable candidate evidence
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ${{ steps.candidate.outputs.artifact_name }}
+          path: release-evidence/
+          if-no-files-found: error
+          compression-level: 0
+          overwrite: false
+          retention-days: 90
+
+  attest:
+    name: Attest tag or release evidence
+    if: github.event_name == 'push' || github.event_name == 'release'
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+      attestations: write
+    steps:
+      - name: Download exact validated evidence
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6
+        with:
+          name: ${{ needs.validate.outputs.artifact-name }}
+          path: release-evidence
+
+      - name: Create GitHub OIDC artifact attestation
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
+        with:
+          subject-path: release-evidence/*
