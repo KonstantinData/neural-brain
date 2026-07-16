@@ -1,4 +1,4 @@
-"""Live PostgreSQL evidence for scoped Stage 1 memory and Dreaming gates."""
+"""Live PostgreSQL evidence for scoped MS-1 memory and Dreaming gates."""
 
 # ruff: noqa: SIM117
 
@@ -163,7 +163,7 @@ def test_gate_commits_observation_working_context_checkpoint_and_audit_atomicall
 
 
 def test_checkpoint_readback_is_scope_and_session_checked(database_dsn: str) -> None:
-    """Direct Stage-1 readback is deterministic and unavailable outside trusted scope."""
+    """Direct MS-1 readback is deterministic and unavailable outside trusted scope."""
 
     _call_cycle(database_dsn, AREA_A, _cycle_arguments())
 
@@ -292,67 +292,60 @@ def test_concurrent_duplicate_request_cannot_double_commit(database_dsn: str) ->
     )
 
 
-def _call_dreaming(database_dsn: str, context: Context, run_id: str) -> dict[str, object]:
-    with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
-        with connection.cursor() as cursor:
-            cursor.execute("SET LOCAL ROLE neural_brain_dreamer")
-            _set_context(cursor, context)
-            cursor.execute(
-                "SELECT memory_gate.run_dreaming_dry_run(%s, %s)",
-                (run_id, "stage1 verification"),
-            )
-            row = cursor.fetchone()
-            assert row is not None and isinstance(row[0], dict)
-            return row[0]
-
-
-def test_dreaming_skips_active_work_then_creates_only_inactive_candidates(
+def test_dreaming_execute_is_revoked_and_creates_no_state(
     database_dsn: str,
 ) -> None:
-    """Dreaming is Area-local, offline, non-activating, and audited."""
-
-    _call_cycle(database_dsn, AREA_A, _cycle_arguments())
-
-    skipped = _call_dreaming(database_dsn, AREA_A, "dream-active")
-    assert skipped["status"] == "skipped"
-    assert skipped["skip_reason"] == "active_work"
-    assert skipped["active_pointer_updated"] is False
-
-    with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
+    """The runtime role cannot execute Dreaming or create runs, candidates, or audit."""
+    with psycopg.connect(database_dsn, autocommit=True) as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                "UPDATE brain_catalog.sessions SET activity_state = 'inactive', "
-                "activity_expires_at = NULL WHERE tenant_id = 'tenant-a' AND area_id = 'area-a'"
+                "SELECT has_function_privilege(%s, %s, 'EXECUTE')",
+                (
+                    "neural_brain_dreamer",
+                    "memory_gate.run_dreaming_dry_run(text,text)",
+                ),
             )
+            assert cursor.fetchone() == (False,)
 
-    completed = _call_dreaming(database_dsn, AREA_A, "dream-complete")
-    assert completed["status"] == "completed"
-    assert completed["validation_result"] == "passed"
-    assert completed["active_pointer_updated"] is False
-    candidate_count = completed["candidate_count"]
-    assert isinstance(candidate_count, int)
-    assert candidate_count >= 1
+        with pytest.raises(psycopg.errors.InsufficientPrivilege):
+            with connection.transaction(), connection.cursor() as cursor:
+                cursor.execute("SET LOCAL ROLE neural_brain_dreamer")
+                _set_context(cursor, AREA_A)
+                cursor.execute(
+                    "SELECT memory_gate.run_dreaming_dry_run(%s, %s)",
+                    ("dream-revoked", "stage1 verification"),
+                )
 
-    with (
-        psycopg.connect(database_dsn, autocommit=True) as connection,
-        connection.cursor() as cursor,
-    ):
-        cursor.execute(
-            "SELECT DISTINCT state FROM memory_core.memory_candidates "
-            "WHERE tenant_id = 'tenant-a' AND area_id = 'area-a'"
-        )
-        assert cursor.fetchall() == [("inactive",)]
-        with pytest.raises(psycopg.errors.CheckViolation):
+        with connection.cursor() as cursor:
             cursor.execute(
-                "UPDATE memory_core.memory_candidates SET state = 'active' "
-                "WHERE tenant_id = 'tenant-a' AND area_id = 'area-a'"
+                "SELECT "
+                "(SELECT count(*) FROM memory_core.dreaming_runs), "
+                "(SELECT count(*) FROM memory_core.memory_candidates), "
+                "(SELECT count(*) FROM memory_audit.events)"
             )
+            assert cursor.fetchone() == (0, 0, 0)
 
 
-def test_dreaming_denies_cross_area_principal(database_dsn: str) -> None:
-    """Changing trusted scope without a matching principal binding fails closed."""
+def test_dreaming_function_itself_fails_closed_for_privileged_direct_call(
+    database_dsn: str,
+) -> None:
+    """Even an administrative call cannot cross the incomplete Dreaming boundary."""
+    with psycopg.connect(database_dsn, autocommit=True) as connection:
+        with pytest.raises(
+            psycopg.errors.ObjectNotInPrerequisiteState,
+            match="persistent lease, immutable snapshot, and independent validation",
+        ):
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    "SELECT memory_gate.run_dreaming_dry_run(%s, %s)",
+                    ("dream-owner", "direct verification"),
+                )
 
-    forged = dict(AREA_B)
-    forged["principal_id"] = "principal-a"
-    with pytest.raises(psycopg.errors.InsufficientPrivilege):
-        _call_dreaming(database_dsn, forged, "dream-cross-area")
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT "
+                "(SELECT count(*) FROM memory_core.dreaming_runs), "
+                "(SELECT count(*) FROM memory_core.memory_candidates), "
+                "(SELECT count(*) FROM memory_audit.events)"
+            )
+            assert cursor.fetchone() == (0, 0, 0)

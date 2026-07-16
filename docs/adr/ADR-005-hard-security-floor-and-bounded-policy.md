@@ -5,6 +5,14 @@
 - Notion source: https://app.notion.com/p/39d1c1ac5ec0810fbb65c3ca4fea2686
 - Notion page ID: `39d1c1ac-5ec0-810f-bb65-c3ca4fea2686`
 
+## Amendment by ADR-018
+
+The hard security floor governs the complete protected cognitive system,
+including identity and scope, memory, goals, actions, model promotion,
+provenance, access, classification, retention, deletion, quarantine, external
+effects, cross-area transfer, emergency controls, and shutdown. Cognitive
+capability and human approval never create missing authority.
+
 ## Amendment by ADR-015
 
 The hard security floor governs memory identity and scope, provenance, access,

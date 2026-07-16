@@ -49,6 +49,7 @@ def test_workflow_builds_versioned_traceable_evidence() -> None:
         "uv lock --check",
         "uv sync --frozen --all-groups --no-editable",
         "tools/security_policy.py workflow",
+        "tools/bootstrap_database_roles.py",
         "tools/validate_migrations.py",
         "tools/build_release_evidence.py",
         "--migration-plan-sha256",
@@ -57,3 +58,8 @@ def test_workflow_builds_versioned_traceable_evidence() -> None:
         "actions/attest-build-provenance@",
     ]
     assert all(fragment in WORKFLOW for fragment in required)
+    assert "--allow-empty" not in WORKFLOW
+    assert WORKFLOW.count("tools/bootstrap_database_roles.py") == 1
+    assert WORKFLOW.index("tools/bootstrap_database_roles.py") < WORKFLOW.index(
+        "tools/validate_migrations.py"
+    )

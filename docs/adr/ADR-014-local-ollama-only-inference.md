@@ -8,6 +8,15 @@
 - Notion page ID: `39e1c1ac-5ec0-8161-ad4c-d737a9375e4f`
 - Related contract: `docs/architecture/contracts/inference-provider.json`
 
+## Amendment by ADR-018
+
+The local-only egress boundary remains binding when Ollama inference supports
+Memory Core or Cognitive Plane processing. The `InferencePort` is not an
+authority, transition-gate, execution, or promotion port. Model output remains
+untrusted typed input: it cannot write protected state, invoke a tool, approve
+a candidate, confer authority, or prove an effect or goal outcome. Ollama or an
+LLM also cannot be the sole evidence for the neural cognitive substrate.
+
 ## Amendment by ADR-015 and ADR-017
 
 Inference supports bounded memory processing only. The `InferencePort` is not a

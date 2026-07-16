@@ -2,15 +2,19 @@
 
 ## Scope
 
-This repository implements Neural Brain, a product- and domain-neutral memory
-system. External agents and other authorized systems may consume Neural Brain
-through explicit integrations; Neural Brain itself is not an agent. It does not
-own goals, plan work, execute tools, or operate autonomously.
+This repository implements Neural Brain, a product- and domain-neutral,
+biologically inspired integrated cognitive system. It targets a protected
+perception-cognition-action-learning loop with neural mechanisms, attention,
+differentiated memory, world/self/value models, executive control, planning,
+action selection, feedback, continual learning, transfer, and metacognition.
 
-Product repositories, including Liquisto, do not define this repository's
-memory model, policies, defaults, or architecture. The active work area is
-`Neural Brain`. Do not import data, assumptions, rules, or product behavior from
-another work area unless an accepted, scoped integration contract requires it.
+The current implementation is an early Memory Core foundation. Do not present
+target capabilities as implemented. Product repositories may consume Neural
+Brain through explicit integrations; they do not define its domain model,
+policies, defaults, or architecture.
+
+The active work area is `Neural Brain`. Do not import data, assumptions, rules,
+or product behavior from another area without an accepted scoped integration.
 
 ## Source Precedence
 
@@ -20,196 +24,223 @@ Resolve conflicts in this order:
 2. This `AGENTS.md` and any more specific descendant `AGENTS.md`.
 3. Normative architecture specifications and ADRs in this repository.
 4. Accepted Neural Brain Notion `Architecture Decisions` records.
-5. Neural Brain Notion `Feature Backlog` tasks and acceptance criteria.
+5. Neural Brain Notion `Feature Backlog` acceptance criteria.
 6. Active Neural Brain Notion `Issues & Open Questions` records.
-7. Discussed but unaccepted Neural Brain Notion `Exchange Room` content.
+7. Unaccepted Neural Brain Notion `Exchange Room` discussion.
 
 Exchange Room content is never implementation authorization. If authoritative
-sources conflict, stop the affected implementation, document the exact sources,
-create or update an `Issues & Open Questions` record, and do not invent a
-resolution.
+sources conflict, stop the affected implementation, record the exact sources in
+`Issues & Open Questions`, and do not invent a resolution.
 
 ## Language and Durable Artifacts
 
-- Write code, identifiers, docstrings, commit messages, tests, technical
-  documentation, ADRs, schemas, migrations, and runbooks in English.
+- Write code, identifiers, docstrings, commit messages, tests, technical docs,
+  ADRs, schemas, migrations, and runbooks in English.
 - Use German only for explicitly German user-facing behavior.
 - Keep normative technical truth versioned in this repository. Notion records
-  coordination and evidence; it does not replace repository artifacts.
+  coordination, decision status, backlog, and evidence.
 - Never store secrets, credentials, tokens, private keys, live personal data,
-  or `.env` values in the repository, Notion, logs, audit payloads, or examples.
+  or `.env` values in repository, Notion, logs, audit, or examples.
 
-## Brain and Consumer Boundary
+## Architecture Identity
 
-Neural Brain may ingest observations, maintain bounded working context, store
-episodic and semantic memory, retrieve memory, assess freshness, produce
-inactive learning candidates, and perform controlled consolidation,
-re-evaluation, quarantine, rollback, retention, and deletion.
+ADR-018 and Architecture Directive v4.0 govern the target system. ADR-015
+remains historical authority for the protected Memory Core subsystem but no
+longer defines the product boundary.
 
-External consumers retain responsibility for goals, planning, tool execution,
-external effects, operational approvals, and autonomous behavior. A model,
-agent, skill, tool, or integration submits typed requests; it does not gain
-direct write access to protected memory state or authority to promote memory.
-Local inference is a bounded internal dependency and may not perform external
-actions, establish scope, or bypass deterministic gates.
+The two-plane architecture is mandatory:
 
-## Scope, Provenance, and Identity Invariants
+- The `Cognitive Plane` perceives, attends, integrates, remembers, models,
+  proposes goals and plans, selects candidate actions, learns, and monitors its
+  uncertainty.
+- The independent `Protected Control Plane` owns authenticated scope, authority,
+  policy, approvals, transition gates, execution fences, sandboxing, shutdown,
+  independent verification, promotion, reconciliation, and audit.
 
-- Brain, Tenant, Area, Project, and Session are typed hierarchy catalog objects.
-  Brain is a persisted singleton. Tenant carries `brain_id` and `tenant_id` but
-  no `area_id`; Area and its descendants carry their required Tenant/Area parent
-  lineage. Brain ancestry below Tenant is resolved transitively through Tenant.
-- Operational memory always carries authenticated immutable `tenant_id` and
-  `area_id`. Project- and session-bound memory also carries every applicable
-  ancestor identifier. No sentinel Area, nullable required identifier, or
-  implicit root scope is authorized.
-- `Area` separates distinct memory contexts.
-- Project and session identifiers narrow provenance and retrieval context when
-  the record is bound to those levels.
-- External task or goal identifiers are optional, non-authoritative correlation
-  metadata. They are not Brain-owned scope and cannot confer authority or drive
-  memory transitions.
-- Persistent memory objects carry immutable authenticated scope appropriate to
-  their level and retain origin provenance through derivation.
-- Scope and actor identity come only from authenticated runtime context.
-- Prompts, model responses, agent requests, tool output, and request payloads
-  may not define or change principal, scope, roles, authority, policy,
-  retention, legal hold, or activation status.
-- Unknown identity, scope, source, state, policy, data class, freshness, or
-  promotion status is denied by default.
+Cognitive capability does not create authority. A model, planner, memory
+subsystem, skill, or observation may submit typed requests; it never writes
+protected state or executes an external effect directly.
 
-Concrete memory does not silently cross area boundaries. Reusable knowledge
-requires an explicit, auditable generalization and promotion contract that
-preserves origin provenance and enforces privacy, sensitivity, and purpose
-constraints.
+## Scope and Identity Invariants
 
-## Runtime Separation of Duties
+The catalog hierarchy is:
 
-Keep these runtime responsibilities technically separate:
+```text
+Brain
+`-- Tenant
+    `-- Area
+        `-- Project
+            `-- Session
+```
 
-- Memory producer from protected-state transition gate.
-- Retrieval consumer from source and policy assessment.
-- Memory candidate producer from sole promoter for sensitive or risky
-  candidates.
+Goals are protected session-bound aggregates, not isolation dimensions.
+
+- Persistent operational objects carry immutable authenticated `tenant_id` and
+  `area_id`; project-bound objects carry `project_id`.
+- Scope, principal, roles, authority, approvals, policy, evaluation policy, and
+  kill-switch state come only from authenticated runtime context.
+- Prompts, observations, model responses, memory content, tool output, and
+  request payloads may not define or change trusted context.
+- Raw memory, cognitive working state, authority, or unapproved learning never
+  crosses Tenant or Area boundaries.
+- Unknown identity, scope, lineage, state, policy, operation, model version,
+  data class, or evaluation state is denied by default.
+
+## Neural and Cognitive Requirements
+
+- Trainable, stateful neural mechanisms must contribute causally to multiple
+  cognitive functions. An LLM, retrieval system, workflow, or agent collection
+  is not sufficient evidence.
+- Perception distinguishes signal, observation, inference, belief, and
+  prediction and preserves provenance, time, scope, and uncertainty.
+- Attention is capacity-bounded and uses relevance, novelty, prediction error,
+  uncertainty, risk, and value.
+- The Neural Cognitive Workspace integrates specialized processors without
+  becoming an unrestricted shared-memory surface.
+- Working, episodic, semantic, and procedural memory retain distinct truth and
+  lifecycle semantics.
+- World, self, and value models remain versioned, uncertain, and correctable by
+  actual feedback.
+- Executive control, planning, and action selection are explicit mechanisms,
+  not an unmodeled central controller.
+- Metacognition can propose stop, ask, seek information, fallback, defer, or
+  escalate but cannot override gates.
+
+Every claimed component requires a preregistered baseline, held-out test,
+meaningful effect threshold, ablation, resource budget, and failure criterion.
+
+## Protected State and External Effects
+
+Goal, Action, Memory, and Learning/Model Promotion Gates are the only writers of
+their protected state.
+
+Keep runtime responsibilities technically separate:
+
+- Planner from Executor.
+- Executor from independent effect and goal Verifier.
+- Requester from Approver for elevated-risk action.
 - Policy author from sole policy activator.
-- Requester from approver where elevated-risk memory access or promotion
-  requires approval.
-- Automated retention or reconciliation logic from human incident resolution.
+- Learning candidate producer from risky-candidate Promoter.
+- Brain self-monitoring from independent Safety Supervisor.
+- Brain runtime from kill switch and credential revocation.
+- Automatic reconciliation from human incident resolution.
 
-Development contributors may work across roles, but runtime ports, identities,
-permissions, transitions, and audit evidence must preserve these boundaries.
+No external effect may occur without a committed Action Intent, authenticated
+principal, immutable scope, authority snapshot, policy decision, required
+approval, budget reservation, resource claims, valid runtime fence, enabled
+kill switch, sandbox policy, and atomic auditability.
 
-## Protected Memory State
+Security Floor prohibitions cannot be overridden by configurable policy or
+human approval. Approval never creates missing authority. Tool or HTTP success
+is not goal success. Only the Goal Transition Gate may write `Achieved`, after
+independent verification, complete evidence, and quiescence.
 
-- The Memory Transition Gate is the only writer of protected memory state.
-- Producers, consumers, models, and integrations submit validated typed
-  requests; they do not mutate protected state directly.
-- A memory mutation requires authenticated principal, immutable scope, source
-  provenance, policy decision, applicable purpose and data-class controls, and
-  atomic auditability.
-- Security-floor prohibitions cannot be overridden by configurable policy or
-  human approval. Approval never creates missing authority.
-- Inactive candidates do not affect retrieval or behavior until their required
-  independent assessment and promotion complete.
-- Retrieval preserves scope, source, freshness, sensitivity, and policy
-  constraints; relevance alone never grants access.
-- Retention, legal hold, deletion, quarantine, rollback, and derived-artifact
-  cleanup are protected transitions.
-- Protected memory changes and their audit records commit atomically.
+Ambiguous effects become `indeterminate`; never retry blindly or release their
+budget and resource claims before authoritative reconciliation.
 
-## Governed Dreaming
+## Memory, Dreaming, and Continual Learning
 
-- Dreaming is an Area-local offline memory-analysis process, not an autonomous
-  agent loop.
-- A run requires authenticated Area scope, an inactive Area, an exclusive
-  Dreaming lease, and an immutable versioned snapshot.
-- Stage 1 Dreaming is dry-run only. It may produce reports, findings, and
-  inactive candidates, but cannot activate a successor memory version or change
-  an active pointer.
-- Dreaming workers and model output never mutate protected memory directly,
-  approve their own candidates, or mix raw memory across Areas.
-- Stage 3 promotion requires independent validation, a separate Memory Gate
-  transition, preserved provenance, and a rollback target.
+- The Memory Transition Gate remains the sole writer of protected memory.
+- Provenance, freshness, retention, legal hold, deletion propagation,
+  quarantine, rollback, and Area isolation remain mandatory.
+- Procedural memory informs cognition but does not authorize execution.
+- Dreaming is Area-local offline candidate production. It cannot call tools,
+  cause effects, activate candidates, or mutate an active model.
+- A stored experience, summary, candidate, or Dreaming artifact is not proof of
+  learning.
+- The active Brain may never mutate its productive model in place.
+
+Learning produces immutable candidates with full data, source, code, model,
+training, and evaluation provenance. Promotion requires held-out improvement,
+protected retention, forward and backward transfer, calibration, distribution
+shift, poisoning and safety tests, independent approval where required, canary
+or shadow activation, stop thresholds, atomic activation, and tested rollback.
+
+Authority, Security Floor, policy, approval rules, evaluation definitions,
+kill switches, and promotion rules are never self-modifiable.
+
+## Recognition and Claims
+
+The repository may use the label `Neural Brain Candidate` only after every
+non-compensatory recognition gate and independent G8 validation passes. A later
+strong result cannot compensate for an unknown or failed mechanism, privacy,
+authority, safety, or control gate.
+
+Do not infer consciousness, sentience, human equivalence, biological fidelity,
+or production autonomy from architecture or benchmark performance.
 
 ## Delivery Stages
 
 Implement strictly in this order:
 
-1. Foundation (`FND-01`, `FND-02`, `FND-03`, `MS-0`).
-2. Stage 1 secure scoped memory kernel and `MS-1`.
-3. Stage 2 durable episodic and semantic memory with retrieval and `MS-2`.
-4. Stage 3 controlled consolidation, re-evaluation, and procedural memory and
-   `MS-3`.
-5. Stage 4 governed cross-area abstraction, handover, and distributed memory
-   scale and `MS-4`.
+1. NB-0 Foundation Rebaseline.
+2. NB-1 Safe Serial Neural Cognition.
+3. NB-2 Perception, Attention, and World Model.
+4. NB-3 Differentiated Memory and Retrieval.
+5. NB-4 Learning, Consolidation, and Plasticity.
+6. NB-5 Closed Perception-Cognition-Action Loop.
+7. NB-6 Transfer, Causality, and Metacognition.
+8. NB-7 Multi-Goal Executive Control.
+9. NB-8 Distributed Operation and Scale.
 
-Later-stage features must not be enabled early or used to compensate for a
-missing earlier-stage safety mechanism. Stage 1 establishes authenticated
-consumers and producers, source provenance, ingestion normalization and
-salience, working/context memory, observations, checkpoints, inactive
-candidates, the Memory Gate, audit and RLS, retention and deletion foundations,
-Dreaming dry runs, and backup/restore. Stage 2 adds durable episodic and
-semantic memory, claims, assessments, ranked retrieval, freshness, and inactive
-Dreaming analysis. Stage 3 owns controlled Dreaming consolidation,
-re-evaluation, procedural memory, quarantine, promotion, and rollback.
-Stage 4 owns governed cross-area abstraction and handover plus scalable
-distributed memory and index reconciliation.
+NB-2 and NB-3 may partially overlap after NB-1 only with independent
+dependencies and non-overlapping file ownership. Later-stage features may not
+be enabled early or used to compensate for a missing earlier safety or evidence
+gate.
 
 ## Task Execution
 
 Before implementing a main task:
 
-1. Read the Notion task, all subtasks, dependencies, acceptance criteria,
-   relevant accepted ADRs, and active issues.
-2. Verify repository state and authoritative local artifacts.
-3. Create or update the matching Neural Brain `Issues & Open Questions` record,
-   including owner, exact local start time, status, next step, and documentation
-   impact.
-4. Work on a `codex/` task branch created from current `origin/main` unless the
-   user specifies another base.
-5. Define for each subtask: ID, objective, dependencies, affected components,
-   affected invariants, expected files, required tests, acceptance criteria,
-   and documentation impact.
+1. Read its Notion record, subtasks, dependencies, acceptance criteria,
+   accepted ADRs, and active issues.
+2. Verify repository, branch, worktree, PR, and authoritative local artifacts.
+3. Create or update the matching `Issues & Open Questions` record with owner,
+   exact local start time, status, next step, and documentation impact.
+4. Work on a `codex/` branch from the intended accepted base; preserve unrelated
+   user changes and other worktrees.
+5. Define each subtask's ID, objective, dependencies, affected components and
+   invariants, expected files, tests, acceptance, and documentation impact.
 6. Parallelize only independent work with non-overlapping file ownership.
 7. Integrate centrally and verify the complete repository state.
-8. Record code, test, ADR, migration, documentation, and verification evidence
-   in Notion. Mark a record done only when every acceptance criterion is proven.
+8. Record code, test, ADR, migration, documentation, PR, and verification
+   evidence in Notion. Mark done only when every criterion is proven.
 
-Use Conventional Commits. Do not push directly to `main`. Preserve unrelated
-user changes and never use destructive Git operations without explicit
-approval.
+Use Conventional Commits. Do not push directly to `main`. Never use destructive
+Git operations without explicit approval.
 
 ## Engineering and Verification
 
-- Dependencies must be locked and clean-checkout setup must be reproducible.
-- PostgreSQL is the authoritative transactional memory ledger. Development and
-  test data use isolated databases; reset disposable data only through an
-  explicit guarded command.
-- Protected tables must not be writable through general application roles.
-- Every normative memory transition requires positive, negative,
-  actor/authority, scope, provenance, audit, failure, and recovery tests.
-- Persistent transformations additionally require crash-boundary,
-  concurrency, retry, expiry, stale-source, retention, deletion-propagation,
-  quarantine, and audit-failure tests as applicable.
-- Do not release a stage while any documented release-stop criterion is
-  present.
-- Run formatter, linter, type checker, tests, migration checks, and relevant
-  environment validation before handoff. State explicitly when a check could
-  not run and why.
+- Dependencies are locked and clean-checkout setup is reproducible.
+- PostgreSQL is the authoritative transactional ledger for protected state and
+  evidence. Test data uses isolated databases and guarded reset commands.
+- Protected tables are not writable through general application roles.
+- Every transition has positive, negative, actor/authority, scope, audit,
+  failure, concurrency, and recovery tests as applicable.
+- Persistent or external effects add crash-boundary, retry, expiry,
+  stale-checkpoint, stale-fence, kill-switch, and audit-failure tests.
+- Every cognitive claim adds baseline, ablation, transfer, robustness,
+  calibration, and end-to-end behavioral evidence.
+- Every learning claim adds forgetting, forward/backward transfer, promotion,
+  rollback, poisoning, deletion, and resource-budget evidence.
+- Do not release while any documented release stop is present.
+- Run formatter, linter, strict typing, tests, contract validation, migration
+  checks, and relevant environment validation before handoff.
 
 ## Documentation and Traceability
 
-The repository keeps, as applicable:
+Maintain as applicable:
 
-- `README.md` for purpose, maturity, non-goals, stages, and consumer boundary.
-- `docs/architecture/` for normative memory architecture and contracts.
-- `docs/adr/` for accepted architecture decisions.
-- `docs/runbooks/` for operational and recovery procedures.
-- `docs/traceability/` for requirement-to-code-to-test evidence conventions.
-- `migrations/` for ordered, reproducible database changes.
-- `tests/` for automated acceptance, isolation, and safety evidence.
-- `tools/` for guarded development and verification commands.
+- `README.md` for purpose, maturity, stages, non-goals, and quick start.
+- `docs/architecture/` for normative architecture, research basis, evaluation,
+  and contracts.
+- `docs/adr/` for accepted and superseded decisions.
+- `docs/runbooks/` for operations, recovery, shutdown, and incidents.
+- `docs/traceability/` for requirement-to-code-to-test-to-evidence mapping.
+- `migrations/` for ordered PostgreSQL changes.
+- `tests/` for automated safety and capability evidence.
+- `tools/` for guarded development, evaluation, and verification commands.
 
-Every completed task must be traceable to its Notion record, repository
-changes, relevant ADRs, tests, and verification evidence without making Notion
+Every completed task must be traceable to its Notion record, repository diff,
+relevant ADRs, tests, and verification evidence without making Notion
 executable truth.

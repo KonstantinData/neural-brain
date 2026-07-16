@@ -1,6 +1,6 @@
 # Implementation Traceability
 
-This directory defines how Neural Brain memory-system work is linked from an
+This directory defines how Neural Brain work is linked from an
 approved task to versioned implementation and independently reviewable
 evidence. Notion is the coordination ledger; repository artifacts remain the
 durable technical source of truth.
@@ -14,8 +14,8 @@ Notion task ID
   -> accepted requirement and acceptance criteria
   -> relevant repository ADRs and contracts
   -> branch and commit or pull request
-  -> changed memory code, migrations, configuration, and documentation
-  -> automated tests and exact verification commands
+  -> changed code, migrations, configuration, and documentation
+  -> baselines, ablations, automated tests, evaluation, and exact commands
   -> recorded results, limitations, risks, and follow-ups
 ```
 
@@ -88,8 +88,9 @@ Before a pull request or final handoff:
    complete repository diff.
 2. Verify that accepted ADRs are synchronized to versioned records before their
    dependent implementation is treated as authorized.
-3. Confirm that each changed memory behavior, schema, operation, or safety
-   invariant has corresponding tests and durable documentation.
+3. Confirm that each changed cognitive or memory behavior, schema, operation,
+   claim, or safety invariant has corresponding tests, evaluation, and durable
+   documentation.
 4. Record exact commands and results from the integrated branch, not only from
    isolated contributor work.
 5. Keep incomplete, blocked, or deferred work visible as a separate Notion issue

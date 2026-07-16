@@ -1,12 +1,13 @@
 # Neural Brain Architecture Directive v3.0
 
-- Status: Normative memory-system baseline
+- Status: Superseded by Architecture Directive v4.0 and ADR-018
 - Version: 3.0
 - Effective date: 2026-07-15
 - Work item: Memory scope and Dreaming baseline
 - Repository: `neural-brain`
 - Governing decisions: ADR-015, ADR-016, and ADR-017
 - Supersedes: Architecture Directive v2.0
+- Historical scope: protected Memory Core subsystem
 
 ## 1. Purpose and applicability
 
@@ -140,7 +141,7 @@ claims, assessments, procedures, and stale or contested material. Retrieval
 ranking MUST NOT erase origin, uncertainty, sensitivity, or validity status.
 
 Raw Working Memory and concrete memory MUST NOT cross Area boundaries. Cross-Area
-reuse requires the Stage 4 transfer contract and provides only a separately
+reuse requires the MS-4 transfer contract and provides only a separately
 authorized minimized abstraction with retained origin provenance.
 
 ## 7. Governed Dreaming
@@ -167,13 +168,13 @@ any required state is unknown. The activity guard and lease close the race
 between the inactivity check and snapshot capture. A run processes exactly one
 authenticated Tenant and Area and MUST NOT read or infer from another Area.
 
-Stage 1 permits only a dry run: immutable snapshot, report, findings, and
+MS-1 permits only a dry run: immutable snapshot, report, findings, and
 inactive non-retrievable candidates. It MUST NOT create or activate a successor
-memory version or change an active-version pointer. Stage 2 may analyze governed
+memory version or change an active-version pointer. MS-2 may analyze governed
 episodes, claims, assessments, freshness, and retrieval evidence but still
-cannot promote. Stage 3 may independently assess and promote a versioned
+cannot promote. MS-3 may independently assess and promote a versioned
 successor, quarantine it, re-evaluate it, or roll it back through the Memory
-Transition Gate. Stage 4 may propose minimized cross-Area abstractions only
+Transition Gate. MS-4 may propose minimized cross-Area abstractions only
 through a separately accepted dual-scope transfer contract.
 
 Model output is untrusted analysis input. It cannot establish scope, suppress
@@ -198,7 +199,7 @@ or widen a consumer request.
 ## 9. PostgreSQL, audit, and crash consistency
 
 PostgreSQL is authoritative for hierarchy lineage, transactional memory state,
-Dreaming coordination state, and the audit ledger. Stage 1 uses synchronous
+Dreaming coordination state, and the audit ledger. MS-1 uses synchronous
 Psycopg with `autocommit=True` and explicit `connection.transaction()` blocks.
 No transaction may remain open across model, network, connector, Dreaming
 analysis, or other unbounded calls.
@@ -239,11 +240,11 @@ deployment state.
 
 | Stage | Memory capability | Explicit boundary |
 | --- | --- | --- |
-| Foundation / MS-0 | Repository governance, normative memory contracts, engineering quality, and CI | No productive memory runtime is authorized. |
-| Stage 1 / MS-1 | Hierarchy catalog, authenticated scope, governed intake, observations, Working Memory, checkpoints, inactive candidates, Dreaming dry run, audit, retention foundation, deterministic verification, backup, restore, and operations evidence | No episodic or semantic retrieval, Dreaming activation, promotion, procedural memory, or cross-Area transfer. |
-| Stage 2 / MS-2 | Source registry, episodic memory, semantic claims and assessments, retrieval, freshness, dependency-aware deletion, and inactive Dreaming analysis | No Dreaming activation, candidate promotion, or procedural memory. |
-| Stage 3 / MS-3 | Controlled Dreaming consolidation, independent assessment, re-evaluation, procedural memory, quarantine, authorized promotion, and rollback | No implicit or raw cross-Area memory use. |
-| Stage 4 / MS-4 | Explicit audited cross-Area abstraction and handover plus scalable memory coordination | No agent planning, action execution, tools, goal completion, or autonomy. |
+| MS-0 | Repository governance, normative memory contracts, engineering quality, and CI | No productive memory runtime is authorized. |
+| MS-1 | Hierarchy catalog, authenticated scope, governed intake, observations, Working Memory, checkpoints, inactive candidates, Dreaming dry run, audit, retention foundation, deterministic verification, backup, restore, and operations evidence | No episodic or semantic retrieval, Dreaming activation, promotion, procedural memory, or cross-Area transfer. |
+| MS-2 | Source registry, episodic memory, semantic claims and assessments, retrieval, freshness, dependency-aware deletion, and inactive Dreaming analysis | No Dreaming activation, candidate promotion, or procedural memory. |
+| MS-3 | Controlled Dreaming consolidation, independent assessment, re-evaluation, procedural memory, quarantine, authorized promotion, and rollback | No implicit or raw cross-Area memory use. |
+| MS-4 | Explicit audited cross-Area abstraction and handover plus scalable memory coordination | No agent planning, action execution, tools, goal completion, or autonomy. |
 
 Later-stage schemas and operations MUST NOT be enabled early or used to replace
 a missing earlier-stage control.

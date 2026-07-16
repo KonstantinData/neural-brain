@@ -6,6 +6,12 @@
 - Notion source: https://app.notion.com/p/39e1c1ac5ec081c1b2d4e1f86d8c7061
 - Notion page ID: `39e1c1ac-5ec0-81c1-b2d4-e1f86d8c7061`
 
+## Amendment by ADR-018
+
+ADR-018 retains this decision as Memory Core authority. Its historical Stage 1
+through Stage 4 terms map to the namespaced MS-1 through MS-4 subsystem stages;
+they do not define or advance NB product stages.
+
 ## Context
 
 Neural Brain needs an offline process analogous to biological memory

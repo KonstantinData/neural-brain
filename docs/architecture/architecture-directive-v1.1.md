@@ -14,6 +14,10 @@
 > `architecture-directive-v3.0.md`. Version 2.0 remains the intermediate
 > memory-system rebaseline in repository history.
 
+> **Current authority note (2026-07-16).** The preceding paragraph is retained
+> verbatim as historical evidence. ADR-018 and Architecture Directive v4.0 now
+> govern the complete cognitive-system target.
+
 ## 1. Purpose and applicability
 
 This directive defines the non-negotiable architecture and delivery boundaries

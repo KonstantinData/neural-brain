@@ -17,6 +17,9 @@ FIXTURES = Path(__file__).parent / "fixtures" / "forward"
 WORKFLOW = (Path(__file__).parents[2] / ".github" / "workflows" / "migrations.yml").read_text(
     encoding="utf-8"
 )
+MIGRATIONS_README = (Path(__file__).parents[2] / "migrations" / "README.md").read_text(
+    encoding="utf-8"
+)
 
 
 def test_fixture_plan_is_contiguous_and_normalized() -> None:
@@ -117,4 +120,11 @@ def test_ci_pins_postgresql_18_and_proves_both_migration_paths() -> None:
     assert "--migrations-dir migrations" in WORKFLOW
     assert "--migrations-dir tests/migrations/fixtures/forward" in WORKFLOW
     assert "--allow-empty" not in WORKFLOW
+
+
+def test_migration_runbook_describes_the_nonempty_ms1_plan() -> None:
+    normalized = " ".join(MIGRATIONS_README.split())
+    assert "migrations `0001` through `0003`" in normalized
+    assert "Empty migration plans are no longer accepted" in normalized
+    assert "--allow-empty" not in normalized
     assert "pytest tests/database" in WORKFLOW

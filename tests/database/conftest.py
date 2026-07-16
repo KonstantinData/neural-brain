@@ -1,4 +1,4 @@
-"""Disposable PostgreSQL 18 fixture for live Stage 1 database evidence."""
+"""Disposable PostgreSQL 18 fixture for live MS-1 database evidence."""
 
 # ruff: noqa: SIM117
 

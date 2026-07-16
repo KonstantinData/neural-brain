@@ -1,4 +1,4 @@
-"""End-to-end evidence for the synchronous Psycopg Stage 1 adapter."""
+"""End-to-end evidence for the synchronous Psycopg MS-1 adapter."""
 
 # ruff: noqa: SIM117
 
@@ -6,10 +6,12 @@ from dataclasses import dataclass
 from datetime import UTC, datetime
 
 import psycopg
+import pytest
 
 from neural_brain.memory import (
     CheckpointRequest,
     DreamingRequest,
+    DreamingUnavailableError,
     MemoryService,
     ObservationRequest,
     RuntimeContext,
@@ -85,31 +87,47 @@ def test_psycopg_adapter_commits_and_reads_the_atomic_cycle(database_dsn: str) -
     assert service.read_checkpoint(checkpoint) == result
 
 
-def test_psycopg_adapter_exposes_only_guarded_inactive_dreaming_output(
+def test_psycopg_adapter_rejects_dreaming_without_persisting_any_output(
     database_dsn: str,
 ) -> None:
-    """The adapter cannot ask Dreaming to promote or create caller-selected candidates."""
+    """Service and direct adapter calls fail before any Dreaming persistence."""
     service = _service(database_dsn)
     _record_cycle(service, "dreaming")
 
-    skipped = service.run_dreaming_dry_run(
-        DreamingRequest(dreaming_run_id="dream-adapter-active", requested_reason="test guard")
-    )
-    assert skipped.report.status == "skipped"
-    assert skipped.candidates == ()
-
-    with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
+    with psycopg.connect(database_dsn, autocommit=True) as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                "UPDATE brain_catalog.sessions SET activity_state = 'inactive', "
-                "activity_expires_at = NULL WHERE tenant_id = 'tenant-a' AND area_id = 'area-a'"
+                "SELECT "
+                "(SELECT count(*) FROM memory_core.dreaming_runs), "
+                "(SELECT count(*) FROM memory_core.memory_candidates), "
+                "(SELECT count(*) FROM memory_audit.events)"
             )
+            before = cursor.fetchone()
 
-    completed = service.run_dreaming_dry_run(
-        DreamingRequest(dreaming_run_id="dream-adapter-complete", requested_reason="test dry run")
+    request = DreamingRequest(
+        dreaming_run_id="dream-adapter-unavailable",
+        requested_reason="test unavailable boundary",
     )
-    assert completed.report.status == "completed"
-    assert completed.report.active_pointer_updated is False
-    assert completed.report.candidate_count == 1
-    assert all(candidate.state == "inactive" for candidate in completed.candidates)
-    assert all(candidate.retrievable is False for candidate in completed.candidates)
+    with pytest.raises(DreamingUnavailableError):
+        service.run_dreaming_dry_run(request)
+    with pytest.raises(DreamingUnavailableError):
+        PostgresMemoryRepository(database_dsn).execute_dreaming_dry_run(
+            context=RuntimeContext(
+                actor_id="principal-a",
+                tenant_id="tenant-a",
+                area_id="area-a",
+                project_id="project-a",
+                session_id="session-a",
+            ),
+            request=request,
+        )
+
+    with psycopg.connect(database_dsn, autocommit=True) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT "
+                "(SELECT count(*) FROM memory_core.dreaming_runs), "
+                "(SELECT count(*) FROM memory_core.memory_candidates), "
+                "(SELECT count(*) FROM memory_audit.events)"
+            )
+            assert cursor.fetchone() == before

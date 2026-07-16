@@ -1,4 +1,4 @@
-"""Psycopg 3 adapter for the protected Stage 1 memory and Dreaming gates."""
+"""Psycopg 3 adapter for the protected MS-1 memory and Dreaming gates."""
 
 from collections.abc import Mapping
 from typing import Literal, Never
@@ -10,16 +10,15 @@ from psycopg.types.json import Jsonb
 from neural_brain.memory.errors import (
     AtomicPersistenceError,
     CheckpointUnavailableError,
+    DreamingUnavailableError,
     ScopeIsolationError,
     StaleWorkingMemoryVersionError,
 )
 from neural_brain.memory.models import (
     CheckpointRecord,
     CheckpointRequest,
-    DreamingReport,
     DreamingRequest,
     DreamingResult,
-    InactiveMemoryCandidate,
     MemoryCycleResult,
     MemoryScope,
     ObservationRecord,
@@ -155,65 +154,11 @@ class PostgresMemoryRepository:
     def execute_dreaming_dry_run(
         self, *, context: RuntimeContext, request: DreamingRequest
     ) -> DreamingResult:
-        """Run guarded Area-local Dreaming and expose only inactive candidates."""
-        try:
-            with (
-                psycopg.connect(self._conninfo, autocommit=True) as connection,
-                connection.transaction(),
-                connection.cursor() as cursor,
-            ):
-                self._set_context(cursor, context, "neural_brain_dreamer")
-                cursor.execute(
-                    "SELECT memory_gate.run_dreaming_dry_run(%s, %s)",
-                    (request.dreaming_run_id, request.requested_reason),
-                )
-                document = self._single_json_result(cursor)
-        except psycopg.Error as error:
-            self._raise_domain_error(error)
-
-        scope = MemoryScope(tenant_id=context.tenant_id, area_id=context.area_id)
-        raw_status = self._string(document, "status")
-        if raw_status == "skipped":
-            status: Literal["skipped", "completed"] = "skipped"
-        elif raw_status == "completed":
-            status = "completed"
-        else:
-            raise AtomicPersistenceError("Dreaming returned an unknown status")
-        raw_validation = self._string(document, "validation_result")
-        if raw_validation == "passed":
-            validation: Literal["passed", "not_run"] = "passed"
-        elif raw_validation == "not_run":
-            validation = "not_run"
-        else:
-            raise AtomicPersistenceError("Dreaming returned an unknown validation result")
-        raw_skip_reason = document.get("skip_reason")
-        if raw_skip_reason is not None and not isinstance(raw_skip_reason, str):
-            raise AtomicPersistenceError("Dreaming skip reason is not a string")
-        raw_candidates = document.get("candidates")
-        if not isinstance(raw_candidates, list):
-            raise AtomicPersistenceError("Dreaming candidates are not a JSON array")
-        candidates = tuple(
-            InactiveMemoryCandidate(
-                candidate_id=self._string(self._mapping(item, "candidate"), "candidate_id"),
-                source_observation_id=self._string(
-                    self._mapping(item, "candidate"), "source_observation_id"
-                ),
-                candidate_kind=self._string(self._mapping(item, "candidate"), "candidate_kind"),
-                scope=scope,
-            )
-            for item in raw_candidates
+        """Reject direct adapter use while the Dreaming safety contract is incomplete."""
+        raise DreamingUnavailableError(
+            "Dreaming is unavailable: persistent lease, immutable snapshot, and "
+            "independent validation are not implemented"
         )
-        report = DreamingReport(
-            dreaming_run_id=request.dreaming_run_id,
-            scope=scope,
-            status=status,
-            skip_reason=raw_skip_reason,
-            candidate_count=self._integer(document, "candidate_count"),
-            validation_result=validation,
-            active_pointer_updated=self._false(document, "active_pointer_updated"),
-            audit_committed=True,
-        )
-        return DreamingResult(report=report, candidates=candidates)
 
     @staticmethod
     def _set_context(

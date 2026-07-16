@@ -13,7 +13,7 @@
   "operations": [
     {
       "id": "memory.observe",
-      "minimum_stage": "stage_1",
+      "minimum_memory_stage": "ms_1",
       "result": "observation",
       "requires": [
         "authenticated principal",
@@ -27,7 +27,7 @@
     },
     {
       "id": "memory.checkpoint",
-      "minimum_stage": "stage_1",
+      "minimum_memory_stage": "ms_1",
       "result": "immutable versioned checkpoint",
       "requires": [
         "authenticated principal",
@@ -39,7 +39,7 @@
     },
     {
       "id": "memory.propose_candidate",
-      "minimum_stage": "stage_1",
+      "minimum_memory_stage": "ms_1",
       "result": "inactive non-retrievable candidate",
       "requires": [
         "authenticated producer",
@@ -52,7 +52,7 @@
     },
     {
       "id": "memory.dreaming_dry_run",
-      "minimum_stage": "stage_1",
+      "minimum_memory_stage": "ms_1",
       "result": "immutable Area-local analysis report and optional inactive non-retrievable candidates",
       "requires": [
         "authenticated Area scope",
@@ -66,7 +66,7 @@
     },
     {
       "id": "memory.persist_episode_or_claim",
-      "minimum_stage": "stage_2",
+      "minimum_memory_stage": "ms_2",
       "result": "governed episodic or semantic record",
       "requires": [
         "registered source",
@@ -78,7 +78,7 @@
     },
     {
       "id": "memory.retrieve",
-      "minimum_stage": "stage_2",
+      "minimum_memory_stage": "ms_2",
       "result": "scope-filtered result set with provenance and freshness",
       "requires": [
         "authenticated principal",
@@ -91,7 +91,7 @@
     },
     {
       "id": "memory.promote_candidate",
-      "minimum_stage": "stage_3",
+      "minimum_memory_stage": "ms_3",
       "result": "active governed memory version",
       "requires": [
         "independent candidate assessment",
@@ -104,7 +104,7 @@
     },
     {
       "id": "memory.activate_dreaming_successor",
-      "minimum_stage": "stage_3",
+      "minimum_memory_stage": "ms_3",
       "result": "active governed successor version with rollback target",
       "requires": [
         "independently validated Dreaming decision package",
@@ -118,7 +118,7 @@
     },
     {
       "id": "memory.quarantine_or_rollback",
-      "minimum_stage": "stage_3",
+      "minimum_memory_stage": "ms_3",
       "result": "inactive or prior governed memory version",
       "requires": [
         "authenticated authorized principal",
@@ -129,7 +129,7 @@
     },
     {
       "id": "memory.delete_or_anonymize",
-      "minimum_stage": "stage_2",
+      "minimum_memory_stage": "ms_2",
       "result": "policy-compliant deletion or anonymization outcome",
       "requires": [
         "authenticated authorized principal or due retention rule",
@@ -166,17 +166,17 @@
   "transition_rules": [
     "Only the Memory Transition Gate changes protected lifecycle state.",
     "Unknown operation, state, scope, provenance, freshness, classification, policy, or authorization is denied and audited.",
-    "Candidates are inactive and excluded from normal retrieval until a Stage 3 promotion commits.",
+    "Candidates are inactive and excluded from normal retrieval until an MS-3 promotion commits.",
     "A promotion creates a new immutable memory version and never rewrites candidate provenance.",
     "Sensitive or risky promotion cannot be approved solely by its producer.",
     "Stale, expired, unknown-freshness, quarantined, deleted, or anonymized content is never returned as current fact.",
     "Deletion or anonymization covers dependent derivations, indexes, caches, and retrieval projections unless a documented legal hold applies.",
     "A model output cannot directly activate, promote, delete, anonymize, or quarantine memory.",
     "A Dreaming run operates on exactly one authenticated Area and cannot start with active sessions, an unavailable lease, or a stale or incomplete snapshot.",
-    "Stage 1 and Stage 2 Dreaming outputs remain inactive; only a Stage 3 Memory Transition Gate operation may activate a validated successor version."
+    "MS-1 and MS-2 Dreaming outputs remain inactive; only an MS-3 Memory Transition Gate operation may activate a validated successor version."
   ],
   "cross_area": {
-    "minimum_stage": "stage_4",
+    "minimum_memory_stage": "ms_4",
     "raw_memory_access": "denied",
     "automatic_copy": "denied",
     "generalization": "candidate_only_until_separately_authorized_and_promoted",

@@ -52,6 +52,14 @@ def _scope_validator() -> _Validator:
             "project_id": "project-a",
             "session_id": "session-a",
         },
+        {
+            "catalog_kind": "goal",
+            "tenant_id": "tenant-a",
+            "area_id": "area-a",
+            "project_id": "project-a",
+            "session_id": "session-a",
+            "goal_id": "goal-a",
+        },
     ],
 )
 def test_typed_catalog_accepts_exact_parent_lineage(entry: dict[str, object]) -> None:
@@ -73,6 +81,13 @@ def test_typed_catalog_accepts_exact_parent_lineage(entry: dict[str, object]) ->
             "area_id": "area-a",
             "session_id": "session-a",
         },
+        {
+            "catalog_kind": "goal",
+            "tenant_id": "tenant-a",
+            "area_id": "area-a",
+            "project_id": "project-a",
+            "goal_id": "goal-a",
+        },
         {"scope_kind": "operational_memory", "tenant_id": "tenant-a"},
     ],
 )
@@ -81,19 +96,19 @@ def test_catalog_rejects_descendant_or_incomplete_scope(invalid: dict[str, objec
         _scope_validator().validate(invalid)
 
 
-def test_stage_1_dreaming_is_area_local_and_cannot_activate() -> None:
+def test_ms_1_dreaming_is_area_local_and_cannot_activate() -> None:
     contract = _load("dreaming.json")
     scope = contract["scope"]
-    stage_behavior = contract["stage_behavior"]
+    stage_behavior = contract["memory_stage_behavior"]
     protected_writes = contract["protected_writes"]
     assert isinstance(scope, dict)
     assert isinstance(stage_behavior, dict)
     assert isinstance(protected_writes, dict)
-    stage_1 = stage_behavior["stage_1"]
-    assert isinstance(stage_1, dict)
+    ms_1 = stage_behavior["ms_1"]
+    assert isinstance(ms_1, dict)
     assert scope["cardinality"] == "exactly_one_authenticated_tenant_and_area"
-    assert "cross-area input or output" in stage_1["denied"]
-    assert "candidate promotion" in stage_1["denied"]
-    assert "active pointer change" in stage_1["denied"]
+    assert "cross-area input or output" in ms_1["denied"]
+    assert "candidate promotion" in ms_1["denied"]
+    assert "active pointer change" in ms_1["denied"]
     assert protected_writes["worker_direct_write"] == "forbidden"
     assert protected_writes["model_direct_write"] == "forbidden"

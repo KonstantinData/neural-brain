@@ -121,8 +121,21 @@ def test_sensitive_review_requires_independent_evidence() -> None:
     assert "src/**/ingestion/**" in sensitive["path_patterns"]
     assert "src/**/retrieval/**" in sensitive["path_patterns"]
     assert "src/**/consolidation/**" in sensitive["path_patterns"]
-    assert "src/**/executor/**" not in sensitive["path_patterns"]
-    assert len(sensitive["runtime_boundaries"]) == 6
+    for pattern in (
+        "src/**/perception/**",
+        "src/**/attention/**",
+        "src/**/workspace/**",
+        "src/**/world_model/**",
+        "src/**/goal/**",
+        "src/**/planner/**",
+        "src/**/action/**",
+        "src/**/executor/**",
+        "src/**/verification/**",
+        "src/**/learning/**",
+        "src/**/metacognition/**",
+    ):
+        assert pattern in sensitive["path_patterns"]
+    assert len(sensitive["runtime_boundaries"]) == 12
     assert sensitive["runtime_boundaries"] == [
         "memory_producer_vs_transition_gate",
         "retrieval_consumer_vs_source_policy_assessor",
@@ -130,31 +143,46 @@ def test_sensitive_review_requires_independent_evidence() -> None:
         "policy_author_vs_sole_policy_activator",
         "automatic_memory_reconciliation_vs_human_incident_resolution",
         "memory_candidate_producer_vs_sensitive_candidate_promoter",
+        "planner_vs_executor",
+        "executor_vs_independent_verifier",
+        "cognitive_plane_vs_protected_transition_gates",
+        "learning_candidate_producer_vs_model_promoter",
+        "brain_self_monitoring_vs_independent_safety_supervisor",
+        "brain_runtime_vs_kill_switch_and_credential_revocation",
     ]
     properties = " ".join(sensitive["required_reviewer_properties"])
     assert "CODEOWNER" in properties
     assert "distinct from the change author" in properties
     assert "did not implement the evidence" in properties
     assert "not approved solely by the policy author" in properties
+    assert "cognitive and protected-control-plane separation" in properties
 
 
-def test_repository_narrative_defines_memory_system_consumer_boundary() -> None:
+def test_repository_narrative_defines_complete_system_and_current_maturity() -> None:
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     contributing = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
     project = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
 
-    assert "Neural Brain is not an agent" in readme
-    assert "memory system" in readme
-    assert "consumer_goal_ref" in readme
-    assert "non-authoritative" in readme
-    assert "Brain is a persisted singleton" in readme
-    assert "Session is project-bound" in readme
-    assert "No sentinel Area" in readme
-    assert "Neural Brain itself is not an agent" in agents
-    assert "Memory Transition Gate is the only writer" in agents
-    assert "External agents may consume it" in contributing
-    assert "provenance-preserving memory system" in project
+    normalized_readme = " ".join(readme.split())
+    normalized_contributing = " ".join(contributing.split())
+    assert "biologically inspired cognitive system" in normalized_readme
+    assert "Foundation / early Memory Core development" in readme
+    assert "ADR-018 supersedes the former memory-only product boundary" in readme
+    assert "`Memory Core` subsystem rather than the whole product" in normalized_readme
+    assert "Cognitive Plane" in readme
+    assert "Protected Control Plane" in readme
+    assert "Neural Brain Candidate" in readme
+    assert "The two-plane architecture is mandatory" in agents
+    assert "Cognitive capability does not create authority" in agents
+    assert "Memory Transition Gate remains the sole writer" in agents
+    assert "Neural Brain Candidate" in agents
+    assert "integrated cognitive system" in normalized_contributing
+    assert "early Memory Core foundation" in normalized_contributing
+    assert (
+        'description = "A product-neutral, safety-constrained integrated neural cognitive system."'
+        in project
+    )
 
 
 def test_repository_artifacts_expose_required_review_contract() -> None:
@@ -181,7 +209,7 @@ def test_repository_artifacts_expose_required_review_contract() -> None:
         assert f"## {heading}" in template
     assert "codex/" in contributing
     assert "Conventional Commit" in contributing
-    assert "Never push directly to `main`" in contributing
+    assert "never push directly to `main`" in contributing
 
 
 def test_external_github_enforcement_has_sanitized_live_evidence() -> None:

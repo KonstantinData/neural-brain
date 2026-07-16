@@ -1,92 +1,97 @@
 {
-  "document_type": "system_boundary_contract",
-  "format_version": 1,
+  "document_type": "neural_brain_system_boundary",
+  "format_version": 2,
   "contract_id": "neural-brain.system-boundary",
   "contract_version": "2.0.0",
-  "status": "normative",
-  "decision": "ADR-015",
-  "decisions": [
-    "ADR-015",
-    "ADR-016",
-    "ADR-017"
+  "status": "normative_target",
+  "decision": "ADR-018",
+  "system_kind": "integrated_neural_cognitive_system",
+  "current_maturity": "memory_core_foundation",
+  "target_capabilities": [
+    "active perception and multimodal binding",
+    "attention and salience",
+    "neural cognitive workspace",
+    "working episodic semantic and procedural memory",
+    "world self and value models",
+    "goal lifecycle and executive control",
+    "planning and action selection",
+    "closed-loop effect observation and independent verification",
+    "continual learning consolidation transfer and metacognition"
   ],
-  "system_kind": "memory_system",
-  "purpose": "Provide governed, scoped, provenance-preserving memory services to authenticated consumers.",
-  "capabilities": [
-    "validate typed memory requests",
-    "maintain typed hierarchy catalog lineage",
-    "persist and retrieve governed memory records",
-    "maintain provenance, freshness, retention, and deletion state",
-    "perform governed Area-local Dreaming and evaluate memory candidates through the Memory Gate",
-    "audit protected memory transitions atomically",
-    "support recovery and reconciliation of memory-ledger state"
-  ],
-  "non_capabilities": [
-    "goal ownership or goal lifecycle management",
-    "planning",
-    "tool or adapter execution",
-    "external side-effect execution",
-    "action-intent lifecycle management",
-    "approval or authority creation",
-    "autonomous task orchestration",
-    "independent determination of consumer task success"
-  ],
-  "consumer_boundary": {
-    "consumers": [
-      "humans",
-      "agents",
-      "applications",
-      "services"
+  "cognitive_plane": {
+    "may_propose": [
+      "belief updates",
+      "goal transitions",
+      "plans",
+      "action intents",
+      "memory transitions",
+      "learning and model candidates"
     ],
-    "rule": "Consumers may request memory operations through authenticated typed ports; they remain responsible for their own goals, plans, tools, effects, and success criteria.",
-    "consumer_correlations": {
-      "allowed": true,
-      "examples": [
-        "consumer_session_ref",
-        "consumer_goal_ref",
-        "consumer_task_ref"
-      ],
-      "trust": "untrusted_metadata",
-      "authority": "none",
-      "rules": [
-        "A consumer correlation cannot define or change scope, actor identity, authority, policy, retention, or lifecycle state.",
-        "A consumer correlation is never a foreign key to an aggregate owned by Neural Brain.",
-        "Missing or malformed correlation metadata does not weaken validation of authenticated scope."
-      ]
-    }
+    "may_directly_write_protected_state": false,
+    "may_directly_execute_external_effects": false
   },
-  "protected_state": {
-    "sole_writer": "Memory Transition Gate",
-    "direct_table_mutation": "forbidden",
-    "model_or_consumer_write": "forbidden",
-    "atomicity": "A protected memory transition and its audit record commit in one PostgreSQL transaction or both roll back."
-  },
-  "trust_boundary": {
-    "trusted": [
-      "authenticated runtime principal",
-      "server-derived immutable scope",
-      "authoritative ledger state",
-      "accepted policy and governance configuration"
+  "protected_control_plane": {
+    "sole_writers": {
+      "goal_state": "Goal Transition Gate",
+      "action_state": "Action Transition Gate",
+      "memory_state": "Memory Transition Gate",
+      "active_model_state": "Learning and Model Promotion Gate"
+    },
+    "external_effect_requirements": [
+      "authenticated principal and immutable scope",
+      "committed action intent",
+      "authority snapshot",
+      "policy decision",
+      "required approval",
+      "budget reservation",
+      "resource claims",
+      "valid runtime fence",
+      "enabled kill switch",
+      "sandbox policy",
+      "atomic auditability"
     ],
-    "untrusted": [
-      "request payload",
-      "consumer correlation",
-      "prompt",
-      "model response",
-      "imported content",
-      "retrieved external content"
-    ],
-    "default": "deny"
-  },
-  "tenant_root_boundary": {
-    "status": "resolved_by_ADR_016",
-    "rule": "Brain is a persisted singleton. Catalog objects carry their own immutable identifier and required parent lineage, never descendant identifiers. Tenant carries brain_id and tenant_id and does not carry area_id; Brain ancestry below Tenant is resolved transitively.",
-    "operational_memory_rule": "Every operational memory object carries authenticated immutable tenant_id and area_id; project- and session-bound memory also carries all applicable required parent identifiers.",
-    "prohibitions": [
-      "sentinel Area",
-      "nullable required scope identifier",
-      "implicit root scope",
-      "payload-derived scope"
+    "independent_components": [
+      "executor",
+      "goal and effect verifier",
+      "safety supervisor",
+      "kill switch and credential revocation plane",
+      "learning candidate promoter"
     ]
-  }
+  },
+  "scope": {
+    "object_hierarchy": ["brain", "tenant", "area", "project", "session", "goal"],
+    "isolation_scope_order": ["brain", "tenant", "area", "project", "session"],
+    "goal_is_scope_dimension": false,
+    "trusted_source": "authenticated runtime context",
+    "untrusted_sources": [
+      "prompts",
+      "observations",
+      "model output",
+      "memory content",
+      "tool output",
+      "request payloads"
+    ]
+  },
+  "memory_core": {
+    "governing_decisions": ["ADR-015", "ADR-016", "ADR-017"],
+    "role": "protected subsystem",
+    "retained_invariants": [
+      "immutable authenticated scope",
+      "provenance and freshness",
+      "Memory Transition Gate sole writer",
+      "atomic mutation and audit",
+      "retention and derivative deletion",
+      "candidate producer and promoter separation",
+      "Area-local Dreaming"
+    ]
+  },
+  "non_claims": [
+    "consciousness",
+    "sentience",
+    "subjective experience",
+    "human-level intelligence",
+    "biological or neurophysiological fidelity",
+    "production autonomy"
+  ],
+  "default_behavior": "deny_unknown_or_unproven_state"
 }

@@ -129,7 +129,7 @@
     {
       "id": "MLI-013",
       "rule": "dreaming_cannot_activate_directly",
-      "assertion": "A Dreaming worker or model cannot write protected memory or change an active-version pointer directly; Stage 1 and Stage 2 outputs remain inactive."
+      "assertion": "A Dreaming worker or model cannot write protected memory or change an active-version pointer directly; MS-1 and MS-2 outputs remain inactive."
     }
   ],
   "consumer_metadata": {

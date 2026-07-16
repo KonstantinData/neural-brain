@@ -24,7 +24,7 @@ class RuntimeContextProvider(Protocol):
 
 
 class MemoryRepository(Protocol):
-    """Atomic persistence boundary for protected Stage 1 memory operations."""
+    """Atomic persistence boundary for protected MS-1 memory operations."""
 
     def commit_memory_cycle(
         self,

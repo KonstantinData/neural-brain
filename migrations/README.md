@@ -10,10 +10,13 @@ requires them.
 
 ## Foundation contract
 
-FND-03 establishes the migration validation mechanism but deliberately does not
-introduce the Stage 1 memory schema. Until the first authorized schema slice is
-implemented, this directory contains no SQL migration and validation requires
-the explicit `--allow-empty` flag.
+FND-03 established the migration validation mechanism. The current ordered plan
+contains the MS-1 hierarchy, scoped memory kernel, and reserved Dreaming schema
+in migrations `0001` through `0003`. Migration `0003` deliberately grants no
+productive Dreaming execute capability and its function fails closed until the
+persistent lease, immutable snapshot, and independent validation prerequisites
+exist. Empty migration plans are no longer
+accepted by repository CI or release evidence.
 
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
@@ -29,8 +32,7 @@ instance. It never logs the DSN or migration payloads.
 ```text
 python tools/validate_migrations.py \
   --admin-dsn <postgresql-18-admin-dsn> \
-  --migrations-dir migrations \
-  --allow-empty
+  --migrations-dir migrations
 ```
 
 For each run it creates two randomly named databases inside the guarded
@@ -49,5 +51,5 @@ columns, constraints, indexes, views, routines, triggers, row-level policies,
 sequences, enums, and non-default extensions.
 
 CI additionally runs a two-migration test-only fixture. The fixture proves the
-`N-1` upgrade path before any product schema exists and is never applied outside
-disposable migration-validation databases.
+`N-1` upgrade path and is never applied outside disposable
+migration-validation databases.

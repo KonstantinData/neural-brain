@@ -5,6 +5,13 @@
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081828924ca258ee85602
 - Notion page ID: `39d1c1ac-5ec0-8182-8924-ca258ee85602`
 
+## Amendment by ADR-018
+
+Neural Brain is a product- and domain-neutral complete cognitive system. Its
+Memory Core is governed as a protected subsystem. Product integrations are
+external consumers and effect adapters; they do not define Neural Brain's
+domain model, policies, defaults, goals, or architecture.
+
 ## Amendment by ADR-015
 
 Neural Brain is a product- and domain-neutral **memory system**. Product

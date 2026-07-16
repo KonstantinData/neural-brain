@@ -3,9 +3,10 @@
 ## Purpose
 
 The local environment provides isolated PostgreSQL development and test
-services for the completed Foundation baseline and the first Stage 1 memory
+services for the completed Memory Core foundation and the first MS-1 memory
 kernel. It runs the protected hierarchy, observation, Working Memory,
-checkpoint, audit, and Dreaming dry-run migrations; it is not a
+checkpoint and audit migrations plus a reserved, non-executable Dreaming
+schema; it is not a
 production-ready deployment.
 
 The image is pinned to the multi-platform digest for the official PostgreSQL
@@ -83,6 +84,15 @@ autocommit=True
 No database transaction may span local model inference, a consumer callback, a
 network request, or another unbounded external call. The local environment does
 not weaken database roles, the Memory Gate, provenance and audit atomicity, or
-scope isolation. The Stage 1 role bootstrap, forward-migration validation, and
+scope isolation. The MS-1 role bootstrap, forward-migration validation, and
 live database tests are also enforced in CI. Retention and deletion controls
-remain a later Stage 1 implementation block.
+remain a later MS-1 implementation block.
+
+## Dreaming Availability
+
+Dreaming is fail-closed unavailable at the current maturity. The
+`neural_brain_dreamer` role has no execute privilege on the reserved database
+function, and both the application service and PostgreSQL adapter reject calls
+before persistence. This is intentional: a persistent Area lease, immutable
+input snapshot, and independent validation gate do not yet exist. Do not grant
+execute permission or treat the reserved schema as a runnable dry-run path.

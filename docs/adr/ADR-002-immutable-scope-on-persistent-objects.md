@@ -25,7 +25,7 @@ objects follow ADR-016. Scope comes only from authenticated runtime context.
 
 ## Consequences
 
-Stage 1 may operate with a single configured scope, but its schemas and guards
+Memory Core MS-1 may operate with a single configured scope, but its schemas and guards
 must be ready for multiple scopes.
 
 ## Invariants and Constraints
@@ -37,7 +37,7 @@ must be ready for multiple scopes.
   resolved transitively through the authoritative Tenant entry.
 - Persistent project-bound objects also have an immutable `project_id`.
 - Requests, prompts, model responses, and tool outputs do not determine scope.
-- A Stage 1 single-scope configuration does not permit single-scope schemas or
+- An MS-1 single-scope configuration does not permit single-scope schemas or
   transition guards.
 
 ## Relationship to the Architecture Directive

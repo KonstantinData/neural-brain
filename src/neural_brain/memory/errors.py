@@ -1,4 +1,4 @@
-"""Domain errors exposed by the synchronous Stage 1 memory kernel."""
+"""Domain errors exposed by the synchronous MS-1 Memory Core kernel."""
 
 
 class MemoryKernelError(Exception):
@@ -19,6 +19,10 @@ class StaleWorkingMemoryVersionError(MemoryKernelError):
 
 class CheckpointUnavailableError(MemoryKernelError):
     """Raised when a checkpoint is absent or outside authenticated scope."""
+
+
+class DreamingUnavailableError(MemoryKernelError):
+    """Raised while Dreaming lacks the required lease, snapshot, and validation gates."""
 
 
 class AtomicPersistenceError(MemoryKernelError):

@@ -6,6 +6,16 @@
 - Notion record: https://app.notion.com/p/39e1c1ac5ec081049f97e82c17f6b120
 - Related task: FND-01.5
 
+## Amendment by ADR-018
+
+The selected toolchain currently implements the synchronous Memory Core. It is
+also the default engineering baseline for the complete cognitive system, but
+this ADR does not validate the neural substrate, concurrency model, numerical
+stack, accelerator runtime, simulator, or distributed execution required by
+later NB stages. Those choices require measured evidence and, where they alter
+the runtime boundary, a further ADR. Cognitive components remain separated from
+protected gates, execution, verification, and model promotion.
+
 ## Amendment by ADR-015
 
 The selected toolchain implements a synchronous memory runtime. References in

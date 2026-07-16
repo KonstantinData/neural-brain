@@ -1,0 +1,40 @@
+{
+  "document_type": "memory_core_release_stop_contract",
+  "format_version": 2,
+  "contract_id": "neural-brain.memory-core.release-stops",
+  "contract_version": "3.0.0",
+  "status": "normative_subsystem",
+  "decisions": ["ADR-010", "ADR-015", "ADR-016", "ADR-017", "ADR-018"],
+  "namespace": "Memory Core",
+  "default_behavior": "stop_implementation_or_release_of_affected_memory_capability",
+  "waiver": "security_floor_prohibitions_are_non_waivable",
+  "criteria": [
+    {"id": "MRS-01", "condition": "The Memory Core owns goals, plans, tools, action intents, external effects, or task-success decisions, or memory output is treated as execution authority."},
+    {"id": "MRS-02", "condition": "Scope or principal identity can be supplied or changed by untrusted content or consumer correlation metadata."},
+    {"id": "MRS-03", "condition": "A protected memory lifecycle state can be changed outside the Memory Transition Gate."},
+    {"id": "MRS-04", "condition": "A protected memory transition and its audit record are not atomic."},
+    {"id": "MRS-05", "condition": "A cross-Tenant or cross-Area read, write, cache, index, inference, replay, or Dreaming context is possible without an accepted explicit contract."},
+    {"id": "MRS-06", "condition": "A memory record can exist without required classification, purpose, retention, deletion responsibility, or provenance."},
+    {"id": "MRS-07", "condition": "An inactive, rejected, quarantined, deleted, or anonymized record can appear in normal active-memory retrieval."},
+    {"id": "MRS-08", "condition": "Stale, expired, or unknown-freshness content can be represented as current fact."},
+    {"id": "MRS-09", "condition": "A model, consumer, inference adapter, or cognitive component can directly promote, activate, delete, anonymize, or quarantine memory."},
+    {"id": "MRS-10", "condition": "Sensitive or risky candidate promotion can be completed solely by its producer."},
+    {"id": "MRS-11", "condition": "Deletion or anonymization can leave governed derivations, embeddings, model inputs, indexes, caches, or retrieval projections accessible without a documented legal hold."},
+    {"id": "MRS-12", "condition": "Startup or restore can report ready=true before memory-ledger, deletion, projection, artifact, and audit reconciliation completes."},
+    {"id": "MRS-13", "condition": "A non-idempotent memory transition with unknown commit outcome can be retried without authoritative reconciliation."},
+    {"id": "MRS-14", "condition": "A later MS memory capability can be enabled before its accepted Memory Core stage."},
+    {"id": "MRS-15", "condition": "Secrets or credentials can be persisted in memory content, prompts, logs, audit payloads, examples, replay data, or inference configuration."},
+    {"id": "MRS-16", "condition": "A Tenant catalog entry requires or accepts area_id, a catalog entry omits an ancestor or accepts a descendant identifier, or a sentinel, nullable required, implicit, or payload-derived scope is used."},
+    {"id": "MRS-17", "condition": "Backup or restore of authoritative memory, dependencies, model inputs, and audit state has not been proven."},
+    {"id": "MRS-18", "condition": "A Memory Core delivery-stage gate is incomplete or is incorrectly presented as satisfying an NB product stage."},
+    {"id": "MRS-19", "condition": "Dreaming can run while its Area has an active session or admitted live memory activity, without an exclusive valid lease, or with unknown activity state."},
+    {"id": "MRS-20", "condition": "Dreaming can use a stale, incomplete, unaudited, or cross-Area snapshot or can mix raw memory from different Areas."},
+    {"id": "MRS-21", "condition": "A Dreaming worker, model, MS-1 dry run, or MS-2 analysis can directly activate memory, promote a candidate, or change an active-version pointer."},
+    {"id": "MRS-22", "condition": "A Dreaming successor can activate without independent validation, current provenance and policy, producer-promoter separation where required, or a rollback target."}
+  ],
+  "rules": [
+    "Unknown evaluation state triggers the release stop.",
+    "A configurable policy, approval, cognitive proposal, consumer request, or model response cannot waive a release stop.",
+    "Every triggered criterion blocks implementation of the affected memory capability and blocks any product release that depends on it."
+  ]
+}

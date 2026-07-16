@@ -1,54 +1,45 @@
 # Architecture
 
-This directory contains versioned normative architecture specifications and
-machine-readable contract documentation for Neural Brain.
-
-Documents here describe accepted platform boundaries and invariants. Proposals
-that have not been accepted remain outside the normative architecture baseline.
+This directory contains versioned normative architecture, recognition,
+evaluation, threat, and machine-readable contract documentation for Neural
+Brain. Target architecture and implemented maturity must remain explicitly
+distinct.
 
 ## Normative baseline
 
+- [`architecture-directive-v4.0.md`](architecture-directive-v4.0.md) is the
+  complete cognitive-system target governed by ADR-018.
+- [`neural-brain-recognition-standard.md`](neural-brain-recognition-standard.md)
+  defines the non-compensatory criteria for the product name.
+- [`evaluation-framework.md`](evaluation-framework.md) defines ordered evidence
+  gates, baselines, ablations, transfer, robustness, and safety evaluation.
+- [`delivery-roadmap.md`](delivery-roadmap.md) defines NB-0 through NB-8 and
+  their hard dependencies.
 - [`architecture-directive-v3.0.md`](architecture-directive-v3.0.md) is the
-  current normative memory-system directive governed by ADR-015, ADR-016, and
-  ADR-017.
-- [`architecture-directive-v2.0.md`](architecture-directive-v2.0.md) is the
-  superseded memory-system baseline retained as historical evidence.
-- [`architecture-directive-v1.1.md`](architecture-directive-v1.1.md) is the
-  superseded agent-system baseline retained as historical evidence.
-- `contracts/` contains machine-readable contracts produced by their owning
-  backlog tasks. A contract is not authorized merely because a later-stage
-  operation appears in a schema.
+  superseded Memory Core baseline retained as historical evidence.
+- v2.0 and v1.1 remain earlier superseded baselines.
 
-Current machine-readable contracts:
+## Active machine-readable contracts
 
-- [`contracts/system-boundary.json`](contracts/system-boundary.json) defines
-  Neural Brain's memory-only capability boundary and excludes agent-runtime
-  responsibilities.
-- [`contracts/scope-catalog.json`](contracts/scope-catalog.json) defines typed
-  Brain-to-Session catalog lineage without descendant or sentinel scope.
-- [`contracts/envelopes.json`](contracts/envelopes.json) defines validated,
-  provenance-bearing memory request and result envelopes with immutable
-  authenticated scope.
-- [`contracts/memory-lifecycle.json`](contracts/memory-lifecycle.json) defines
-  protected memory lifecycle transitions and their fail-closed guards.
-- [`contracts/stage-capabilities.json`](contracts/stage-capabilities.json)
-  defines cumulative memory delivery-stage capabilities and rejects unavailable
-  or agent-runtime operations.
-- [`contracts/ledger-invariants.json`](contracts/ledger-invariants.json) defines
-  transactional memory, provenance, audit, retention, and deletion invariants.
-- [`contracts/inference-provider.json`](contracts/inference-provider.json)
-  defines the bounded local Ollama-only, no-cloud-fallback memory-processing
-  boundary.
-- [`contracts/release-stops.json`](contracts/release-stops.json) is the
-  machine-readable memory-system release-stop set.
-- [`contracts/dreaming.json`](contracts/dreaming.json) defines Area-local
-  offline Dreaming, stage limits, artifacts, guards, and prohibited effects.
+- `system-boundary.json`: complete-system and two-plane boundary.
+- `cognitive-cycle.json`: protected serial perception-to-learning cycle.
+- `stage-capabilities.json`: NB-0 through NB-8 availability and prohibitions.
+- `recognition-gates.json`: mandatory product-recognition gates.
+- `evaluation-gates.json`: ordered G0 through G8 evidence chain.
+- `release-stops.json`: complete-system non-waivable release stops.
+- `memory-release-stops.json`: retained Memory Core-specific release stops.
+- `scope-catalog.json`: Brain-to-Goal protected-object hierarchy with isolation ending at Session.
+- `envelopes.json`: authenticated, provenance-bearing memory envelopes.
+- `memory-lifecycle.json`: protected Memory Core lifecycle.
+- `ledger-invariants.json`: transactional state, audit, provenance, and recovery.
+- `dreaming.json`: Area-local offline Dreaming constraints.
+- `inference-provider.json`: bounded local inference for Memory Core operations.
 
-The superseded Goal, Action Intent, intent-purpose, and quiescence contracts
-were removed from the active tree. Their Git history and superseded ADRs remain
-historical evidence; they are not implementation authority.
+Memory-specific contracts remain subsystem authority under ADR-015 through
+ADR-017. They do not define the complete product boundary. Goal, Action,
+execution, verification, cognitive inference, world-model, and model-promotion
+contracts must be added by their owning delivery tasks before implementation.
 
-[`threat-model.md`](threat-model.md) contains the initial Foundation technical
-threat model and trust-boundary diagram. Deployment- and use-case-specific
-regulatory roles, classifications, prohibited-use determinations,
-fundamental-rights assessments, and DPIA evidence remain assigned to FND-04.
+[`threat-model.md`](threat-model.md) defines the Foundation threat model.
+Deployment-specific legal classification, DPIA, fundamental-rights assessment,
+and production authorization remain separate evidence.

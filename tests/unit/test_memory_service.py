@@ -1,4 +1,4 @@
-"""Unit evidence for the synchronous trusted-context Stage 1 memory kernel."""
+"""Unit evidence for the synchronous trusted-context MS-1 Memory Core kernel."""
 
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -11,10 +11,9 @@ from neural_brain.memory import (
     CheckpointRecord,
     CheckpointRequest,
     CheckpointUnavailableError,
-    DreamingReport,
     DreamingRequest,
     DreamingResult,
-    InactiveMemoryCandidate,
+    DreamingUnavailableError,
     InvalidMemoryCycleError,
     MemoryCycleResult,
     MemoryScope,
@@ -28,6 +27,7 @@ from neural_brain.memory import (
     WorkingMemoryRecord,
     WorkingMemoryRequest,
 )
+from neural_brain.postgres import PostgresMemoryRepository
 
 type ScopeKey = tuple[str, str, str | None, str | None]
 
@@ -50,11 +50,10 @@ class InMemoryMemoryRepository:
         self.observations: dict[tuple[ScopeKey, str], ObservationRecord] = {}
         self.working_memories: dict[tuple[ScopeKey, str], WorkingMemoryRecord] = {}
         self.checkpoints: dict[tuple[ScopeKey, str], CheckpointRecord] = {}
-        self.candidates: dict[tuple[ScopeKey, str], InactiveMemoryCandidate] = {}
-        self.active_areas: set[tuple[str, str]] = set()
         self.active_pointers: dict[tuple[str, str], str] = {}
         self.audit_count = 0
         self.fail_next_cycle = False
+        self.dreaming_calls = 0
 
     def commit_memory_cycle(
         self,
@@ -125,50 +124,9 @@ class InMemoryMemoryRepository:
     def execute_dreaming_dry_run(
         self, *, context: RuntimeContext, request: DreamingRequest
     ) -> DreamingResult:
-        """Guard activity and persist only inactive candidates and an audit record."""
-        area_key = (context.tenant_id, context.area_id)
-        area_scope = MemoryScope(tenant_id=context.tenant_id, area_id=context.area_id)
-        if area_key in self.active_areas:
-            self.audit_count += 1
-            return DreamingResult(
-                report=DreamingReport(
-                    dreaming_run_id=request.dreaming_run_id,
-                    scope=area_scope,
-                    status="skipped",
-                    skip_reason="Area has active memory work",
-                    candidate_count=0,
-                    validation_result="not_run",
-                    active_pointer_updated=False,
-                    audit_committed=True,
-                ),
-                candidates=(),
-            )
-
-        candidates = tuple(
-            InactiveMemoryCandidate(
-                candidate_id=record.observation_id,
-                source_observation_id=record.observation_id,
-                candidate_kind="observation_review",
-                scope=area_scope,
-            )
-            for (record_scope, _), record in self.observations.items()
-            if record_scope[:2] == (context.tenant_id, context.area_id)
-        )
-        for candidate in candidates:
-            self.candidates[(self._scope_key(context), candidate.candidate_id)] = candidate
-        self.audit_count += 1
-        return DreamingResult(
-            report=DreamingReport(
-                dreaming_run_id=request.dreaming_run_id,
-                scope=area_scope,
-                status="completed",
-                candidate_count=len(candidates),
-                validation_result="passed",
-                active_pointer_updated=False,
-                audit_committed=True,
-            ),
-            candidates=candidates,
-        )
+        """Detect any accidental call past the service-level availability guard."""
+        self.dreaming_calls += 1
+        raise AssertionError("Dreaming repository must not be called")
 
     @staticmethod
     def _scope(context: RuntimeContext) -> MemoryScope:
@@ -438,58 +396,45 @@ def test_atomic_failure_leaves_no_partial_cycle(
     assert repository.audit_count == 0
 
 
-def test_active_area_produces_audited_dreaming_skip_without_candidates(
+def test_dreaming_is_unavailable_without_calling_repository_or_mutating_state(
     service: MemoryService, repository: InMemoryMemoryRepository
 ) -> None:
-    """Stage 1 Dreaming fails closed while the authenticated Area is active."""
-    area_key = ("tenant-condata", "area-neural-brain")
-    repository.active_areas.add(area_key)
-    repository.active_pointers[area_key] = "active-memory-v1"
-
-    result = service.run_dreaming_dry_run(
-        DreamingRequest(
-            dreaming_run_id="dream-1",
-            requested_reason="scheduled dry run",
-        )
-    )
-
-    assert result.report.status == "skipped"
-    assert result.candidates == ()
-    assert result.report.audit_committed is True
-    assert repository.active_pointers[area_key] == "active-memory-v1"
-
-
-def test_completed_dreaming_keeps_candidates_inactive_and_pointer_unchanged(
-    service: MemoryService, repository: InMemoryMemoryRepository
-) -> None:
-    """A completed dry run cannot promote, retrieve, or activate its output."""
+    """The service rejects Dreaming before any repository or state interaction."""
     area_key = ("tenant-condata", "area-neural-brain")
     repository.active_pointers[area_key] = "active-memory-v1"
-    service.record_observation_and_checkpoint(
-        transition_request_id="transition-1",
-        observation=observation(),
-        working_memory=working_memory(),
-        checkpoint=CheckpointRequest(checkpoint_id="checkpoint-1"),
-    )
+    audit_count = repository.audit_count
 
-    result = service.run_dreaming_dry_run(
-        DreamingRequest(
-            dreaming_run_id="dream-1",
-            requested_reason="scheduled dry run",
-        )
-    )
-
-    assert result.report.status == "completed"
-    assert len(result.candidates) == 1
-    assert result.candidates[0].state == "inactive"
-    assert result.candidates[0].retrievable is False
-    assert (
-        repository.candidates[
-            (
-                ("tenant-condata", "area-neural-brain", "project-stage-1", "session-1"),
-                "observation-1",
+    with pytest.raises(
+        DreamingUnavailableError,
+        match="persistent lease, immutable snapshot, and independent validation",
+    ):
+        service.run_dreaming_dry_run(
+            DreamingRequest(
+                dreaming_run_id="dream-1",
+                requested_reason="scheduled dry run",
             )
-        ]
-        == result.candidates[0]
-    )
+        )
+
+    assert repository.dreaming_calls == 0
+    assert repository.audit_count == audit_count
+    assert repository.observations == {}
     assert repository.active_pointers[area_key] == "active-memory-v1"
+
+
+def test_postgres_repository_rejects_dreaming_before_opening_a_connection(
+    context_provider: MutableContextProvider,
+) -> None:
+    """Direct adapter use is unavailable even when callers bypass the service."""
+    repository = PostgresMemoryRepository("postgresql://must-not-be-contacted.invalid/test")
+
+    with pytest.raises(
+        DreamingUnavailableError,
+        match="persistent lease, immutable snapshot, and independent validation",
+    ):
+        repository.execute_dreaming_dry_run(
+            context=context_provider.context,
+            request=DreamingRequest(
+                dreaming_run_id="dream-direct",
+                requested_reason="direct adapter call",
+            ),
+        )

@@ -1,10 +1,22 @@
 # ADR-015: Neural Brain Is a Memory System, Not an Agent Runtime
 
-- Status: Accepted
+- Status: Superseded as product boundary by ADR-018; retained for the Memory Core
 - Date: 2026-07-15
 - Decision owner: Konstantin Milonas
 - Notion source: https://app.notion.com/p/39e1c1ac5ec081c28b2af5439d510529
 - Notion page ID: `39e1c1ac-5ec0-81c2-8b2a-f5439d510529`
+
+## Supersession by ADR-018
+
+ADR-018 restores Neural Brain as the complete protected cognitive system. This
+ADR remains authoritative only for the governed Memory Core subsystem and its
+memory-specific trust, lifecycle, isolation, privacy, and audit boundary. Its
+exclusion of goals, planning, action, feedback, and autonomy no longer applies
+to Neural Brain as a whole.
+
+The remaining decision text is retained as accepted historical evidence.
+Present-tense and `current` statements below describe the 2026-07-15
+memory-system baseline, not the authority after ADR-018.
 
 ## Context
 

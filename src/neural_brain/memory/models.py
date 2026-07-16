@@ -1,4 +1,4 @@
-"""Strict request and immutable result models for the Stage 1 memory kernel."""
+"""Strict request and immutable result models for the MS-1 Memory Core kernel."""
 
 from datetime import datetime
 from typing import Annotated, Literal, Self
@@ -161,7 +161,7 @@ class MemoryCycleResult(StrictModel):
 
 
 class InactiveMemoryCandidate(StrictModel):
-    """Non-retrievable Stage 1 Dreaming output."""
+    """Non-retrievable MS-1 Dreaming output."""
 
     candidate_id: OpaqueId
     source_observation_id: OpaqueId
@@ -172,7 +172,7 @@ class InactiveMemoryCandidate(StrictModel):
 
 
 class DreamingReport(StrictModel):
-    """Terminal Stage 1 dry-run report."""
+    """Terminal MS-1 dry-run report."""
 
     dreaming_run_id: OpaqueId
     scope: MemoryScope
@@ -198,7 +198,7 @@ class DreamingReport(StrictModel):
 
 
 class DreamingResult(StrictModel):
-    """Stage 1 Dreaming output with no activation or pointer surface."""
+    """MS-1 Dreaming output with no activation or pointer surface."""
 
     report: DreamingReport
     candidates: tuple[InactiveMemoryCandidate, ...]

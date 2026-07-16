@@ -79,7 +79,7 @@
     "adapter_direct_memory_write": "denied",
     "adapter_direct_candidate_promotion": "denied",
     "model_output_may_define_scope_actor_or_governance": false,
-    "stage_1_persistent_output": "inactive_non_retrievable_candidate_only"
+    "ms_1_persistent_output": "inactive_non_retrievable_candidate_only"
   },
   "readiness_gate": {
     "default": "not_ready",

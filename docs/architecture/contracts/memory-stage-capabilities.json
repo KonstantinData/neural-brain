@@ -1,0 +1,106 @@
+{
+  "document_type": "memory_core_stage_capability_contract",
+  "format_version": 2,
+  "contract_id": "neural-brain.memory-core.stage-capabilities",
+  "contract_version": "3.0.0",
+  "status": "normative_subsystem",
+  "decisions": ["ADR-010", "ADR-015", "ADR-016", "ADR-017", "ADR-018"],
+  "namespace": {
+    "subsystem": "Memory Core",
+    "stage_prefix": "MS",
+    "product_stage_contract": "stage-capabilities.json",
+    "rule": "MS-0 through MS-4 are Memory Core maturity stages. They are not aliases for the NB-0 through NB-8 Neural Brain product stages."
+  },
+  "semantics": {
+    "stage_order": ["ms_0", "ms_1", "ms_2", "ms_3", "ms_4"],
+    "cumulative": true,
+    "domain": "protected_memory_core_subsystem",
+    "unknown_operation": "denied",
+    "later_stage_early_enablement": "denied",
+    "rule": "A Memory Core stage authorizes only the declared memory capability. Product cognition, goals, planning, actions, external effects, and autonomy require their own NB product stage and protected control-plane authorization."
+  },
+  "stages": [
+    {
+      "id": "ms_0",
+      "label": "MS-0",
+      "name": "Memory Core Foundation",
+      "capabilities": [
+        "memory governance and architecture contracts",
+        "reproducible quality and migration validation",
+        "protected ledger and scope foundations"
+      ],
+      "prohibited": ["productive memory runtime", "memory retrieval", "candidate promotion"]
+    },
+    {
+      "id": "ms_1",
+      "label": "MS-1",
+      "name": "Scoped Working Memory",
+      "capabilities": [
+        "authenticated hierarchy and scope",
+        "observations working context and immutable checkpoints",
+        "inactive non-retrievable candidates",
+        "Area-local Dreaming dry runs",
+        "audit retention and deletion foundations"
+      ],
+      "prohibited": [
+        "episodic or semantic retrieval",
+        "candidate promotion",
+        "active model or memory pointer change",
+        "cross-Area memory transfer"
+      ]
+    },
+    {
+      "id": "ms_2",
+      "label": "MS-2",
+      "name": "Episodic Semantic Memory and Retrieval",
+      "capabilities": [
+        "source registry",
+        "episodic memory and semantic claims",
+        "scope-safe retrieval with provenance and freshness",
+        "dependency-aware deletion and anonymization",
+        "inactive Dreaming analysis"
+      ],
+      "prohibited": ["candidate promotion", "procedural memory activation", "active Dreaming successor"]
+    },
+    {
+      "id": "ms_3",
+      "label": "MS-3",
+      "name": "Controlled Consolidation and Procedural Memory",
+      "capabilities": [
+        "independent candidate assessment",
+        "controlled consolidation and re-evaluation",
+        "versioned promotion quarantine and rollback",
+        "procedural memory as governed information"
+      ],
+      "prohibited": ["producer-only sensitive promotion", "in-place active-memory rewrite", "procedural memory as execution authority"]
+    },
+    {
+      "id": "ms_4",
+      "label": "MS-4",
+      "name": "Governed Distribution and Scale",
+      "capabilities": [
+        "fenced distributed Memory Core ownership",
+        "replication projection recovery and disaster recovery",
+        "explicit minimized dual-scope cross-Area abstraction"
+      ],
+      "prohibited": ["raw cross-Area memory sharing", "implicit transfer authority", "split-brain protected-state ownership"]
+    }
+  ],
+  "operation_families": [
+    {"id": "memory.hierarchy_catalog", "minimum_memory_stage": "ms_1"},
+    {"id": "memory.scoped_working_context", "minimum_memory_stage": "ms_1"},
+    {"id": "memory.inactive_candidates", "minimum_memory_stage": "ms_1"},
+    {"id": "memory.governed_dreaming", "minimum_memory_stage": "ms_1"},
+    {"id": "memory.episodic_semantic_retrieval", "minimum_memory_stage": "ms_2"},
+    {"id": "memory.controlled_consolidation", "minimum_memory_stage": "ms_3"},
+    {"id": "memory.governed_distribution_and_scale", "minimum_memory_stage": "ms_4"}
+  ],
+  "absolute_prohibitions": [
+    "An MS stage never satisfies or advances an NB product stage by itself.",
+    "Memory content, candidates, Dreaming output, configuration, policy, approval, or model output cannot change the accepted MS stage.",
+    "Only the Memory Transition Gate writes protected memory state.",
+    "Raw memory and working context never cross an Area boundary.",
+    "A candidate is not active memory merely because it was persisted.",
+    "No later MS stage weakens scope isolation, provenance, audit atomicity, privacy, retention, deletion, or default deny."
+  ]
+}

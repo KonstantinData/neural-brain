@@ -1,6 +1,10 @@
-"""Synchronous application service for the Stage 1 memory kernel."""
+"""Synchronous application service for the MS-1 Memory Core kernel."""
 
-from neural_brain.memory.errors import InvalidMemoryCycleError, ScopeIsolationError
+from neural_brain.memory.errors import (
+    DreamingUnavailableError,
+    InvalidMemoryCycleError,
+    ScopeIsolationError,
+)
 from neural_brain.memory.models import (
     CheckpointRecord,
     CheckpointRequest,
@@ -45,7 +49,7 @@ class MemoryService:
         context = self._context_provider.current_context()
         if context.project_id is None or context.session_id is None:
             raise ScopeIsolationError(
-                "Stage 1 memory cycles require authenticated project and session scope"
+                "MS-1 memory cycles require authenticated project and session scope"
             )
         result = self._repository.commit_memory_cycle(
             context=context,
@@ -69,13 +73,11 @@ class MemoryService:
         return checkpoint
 
     def run_dreaming_dry_run(self, request: DreamingRequest) -> DreamingResult:
-        """Run Stage 1 Dreaming without activation, promotion, or cross-Area access."""
-        context = self._context_provider.current_context()
-        result = self._repository.execute_dreaming_dry_run(context=context, request=request)
-        self._assert_area_scope(context, result.report.scope)
-        for candidate in result.candidates:
-            self._assert_area_scope(context, candidate.scope)
-        return result
+        """Reject Dreaming until its persistent safety prerequisites are implemented."""
+        raise DreamingUnavailableError(
+            "Dreaming is unavailable: persistent lease, immutable snapshot, and "
+            "independent validation are not implemented"
+        )
 
     @staticmethod
     def _assert_scope(context: RuntimeContext, scope: MemoryScope) -> None:

@@ -30,10 +30,10 @@ def test_memory_operations_have_declared_stage_result_and_requirements() -> None
         "memory.quarantine_or_rollback",
         "memory.delete_or_anonymize",
     }
-    assert indexed["memory.observe"]["minimum_stage"] == "stage_1"
-    assert indexed["memory.retrieve"]["minimum_stage"] == "stage_2"
-    assert indexed["memory.delete_or_anonymize"]["minimum_stage"] == "stage_2"
-    assert indexed["memory.promote_candidate"]["minimum_stage"] == "stage_3"
+    assert indexed["memory.observe"]["minimum_memory_stage"] == "ms_1"
+    assert indexed["memory.retrieve"]["minimum_memory_stage"] == "ms_2"
+    assert indexed["memory.delete_or_anonymize"]["minimum_memory_stage"] == "ms_2"
+    assert indexed["memory.promote_candidate"]["minimum_memory_stage"] == "ms_3"
     for operation in indexed.values():
         assert operation["result"]
         assert operation["requires"]
@@ -59,7 +59,7 @@ def test_candidate_promotion_preserves_independence_and_provenance() -> None:
 
 def test_cross_area_memory_is_denied_by_default() -> None:
     cross_area = _map(_contract()["cross_area"])
-    assert cross_area["minimum_stage"] == "stage_4"
+    assert cross_area["minimum_memory_stage"] == "ms_4"
     assert cross_area["raw_memory_access"] == "denied"
     assert cross_area["automatic_copy"] == "denied"
     assert cross_area["generalization"] == (
