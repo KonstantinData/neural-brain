@@ -37,6 +37,11 @@ executive control, and planning proposals. No external effects or online model
 updates. Exit requires neural, attention, and working-memory ablations plus
 scope, crash, recovery, and gate-bypass tests.
 
+The first ordered slice is specified in
+[`nb1-work-packages.md`](nb1-work-packages.md). Its frozen evaluation is
+`EVAL-01.NB-1.safe-serial-cognition.v1`. Completing that slice does not by
+itself complete NB-1 or authorize later-stage capabilities.
+
 ### NB-2 — Perception, Attention, and World Model
 
 Deliver provenance-preserving temporal perception, at least one non-language
@@ -93,7 +98,9 @@ cognitive quality.
 
 - Foundation governance, PostgreSQL, scope, audit, Memory Gate, Working Memory,
   observations, checkpoints, inactive candidates, and Dreaming are reusable.
-- PR #5 provides early NB-3 and NB-4 prerequisites but is not a complete stage.
+- Merged PR #6 provides the current NB-0 and early incomplete MS-1 baseline.
+- NB-1 contracts and its first preregistered implementation slice are in
+  progress; no NB-1 runtime evidence has been accepted yet.
 - No NB-1 through NB-8 stage currently has complete exit evidence.
 - Historical Goal, Action, dispatch, kill-switch, and verification designs are
   inputs for revalidation, not automatically active contracts.

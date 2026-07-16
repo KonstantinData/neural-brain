@@ -9,6 +9,10 @@ ADR-017.
 - `system-boundary.json`: Cognitive Plane, Protected Control Plane, scope,
   target capabilities, Memory Core role, and non-claims.
 - `cognitive-cycle.json`: typed serial cognitive-cycle order and invariants.
+- `nb1-safe-serial-cognition.json`: first implementation-slice boundary for
+  recorded or synthetic observations, bounded learned attention, a fixed-version
+  recurrent workspace, internal proposals, deterministic checkpoints, and no
+  external effects.
 - `stage-capabilities.json`: cumulative NB-0 through NB-8 delivery contract.
 - `recognition-gates.json`: all-required recognition criteria.
 - `evaluation-gates.json`: ordered, non-compensatory G0 through G8 evidence.
@@ -31,6 +35,10 @@ ADR-017.
 Historical Goal, Action Intent, dispatch, intent-purpose, and quiescence
 contracts remain in Git history. ADR-018 does not reactivate them automatically;
 each must be revalidated or replaced by its delivery task.
+
+Preregistered evaluation specifications live under
+`docs/architecture/evaluations/`. Their digest is frozen before the evaluated
+runtime or evidence report is accepted.
 
 Unknown scope, actor, authority, state, operation, model version, provenance,
 freshness, data class, promotion, evaluation, or authorization state fails

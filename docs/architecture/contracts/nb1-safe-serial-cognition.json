@@ -1,0 +1,60 @@
+{
+  "document_type": "nb1_safe_serial_cognition_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.nb1.safe-serial-cognition",
+  "contract_version": "1.0.0",
+  "status": "implementation_slice",
+  "decision": "ADR-018",
+  "stage": "NB-1",
+  "input_boundary": {
+    "allowed": ["recorded_observation", "synthetic_observation"],
+    "trusted_context_source": "authenticated_runtime_context",
+    "untrusted_fields": ["features", "occurred_at", "provenance_ref"],
+    "forbidden_request_fields": ["actor_id", "tenant_id", "area_id", "project_id", "session_id", "roles", "authority", "approval"]
+  },
+  "serial_cycle": [
+    "validate_recorded_or_synthetic_observation",
+    "resolve_authenticated_session_scope",
+    "load_expected_workspace_checkpoint",
+    "apply_bounded_learned_attention",
+    "update_fixed-version_recurrent_neural_workspace",
+    "derive_internal_goal_and_plan_proposals",
+    "derive_metacognitive_decision",
+    "commit_next_checkpoint_and_evidence"
+  ],
+  "bounds": {
+    "input_features": 2,
+    "workspace_units": 1,
+    "maximum_observations_per_cycle": 1,
+    "maximum_internal_plan_steps": 2
+  },
+  "required_outputs": [
+    "attention_distribution",
+    "workspace_state",
+    "internal_goal_proposal",
+    "internal_plan_proposal",
+    "metacognitive_decision",
+    "checkpoint",
+    "audit_evidence"
+  ],
+  "metacognitive_decisions": ["continue", "ask", "defer", "stop"],
+  "prohibited_surfaces": [
+    "action_intent",
+    "action_gate",
+    "tool_registry",
+    "tool_call",
+    "executor",
+    "external_effect",
+    "online_training",
+    "active_model_mutation"
+  ],
+  "invariants": [
+    "Only one cycle transition may commit for an expected checkpoint version.",
+    "Observation payloads never define trusted actor or scope.",
+    "The recurrent model version and parameters are immutable during runtime.",
+    "Attention and workspace capacity are bounded by this contract.",
+    "All proposals are internal and carry no execution authority.",
+    "A stale checkpoint, unknown model version, invalid scope, or failed evidence commit fails closed.",
+    "No external effect is representable by this slice."
+  ]
+}
