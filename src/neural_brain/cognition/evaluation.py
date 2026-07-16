@@ -83,8 +83,8 @@ class PairedLift(StrictModel):
 class Nb1EvaluationReport(StrictModel):
     """Behavioral report that cannot itself claim a maturity-gate pass."""
 
-    spec_id: Literal["EVAL-01.NB-1.safe-serial-cognition.v2"]
-    spec_digest: Literal["0dd87fb28a17534ea08c4f681e8c8fc19d559faf171a23b7c14f396ad05c26d9"]
+    spec_id: Literal["EVAL-01.NB-1.safe-serial-cognition.v3"]
+    spec_digest: Literal["3ac6d895d3f33b5d63c462471ca335d6d538cc379ae8eb3ad0611c81271b3fc8"]
     dataset_role: DatasetRole
     dataset_digest: str
     independent_evaluator_id: str
@@ -152,8 +152,8 @@ def evaluate_dataset(
         else "independent_hidden_result_requires_gate_review"
     )
     return Nb1EvaluationReport(
-        spec_id="EVAL-01.NB-1.safe-serial-cognition.v2",
-        spec_digest="0dd87fb28a17534ea08c4f681e8c8fc19d559faf171a23b7c14f396ad05c26d9",
+        spec_id="EVAL-01.NB-1.safe-serial-cognition.v3",
+        spec_digest="3ac6d895d3f33b5d63c462471ca335d6d538cc379ae8eb3ad0611c81271b3fc8",
         dataset_role=dataset.role,
         dataset_digest=dataset.artifact_digest,
         independent_evaluator_id=independent_evaluator_id,

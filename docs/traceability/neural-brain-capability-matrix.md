@@ -6,7 +6,7 @@
 
 | Capability | Target stage | Normative contract | Current implementation | Required evidence before claim |
 | --- | --- | --- | --- | --- |
-| Neural cognitive substrate | NB-1 | Directive v4 section 4; R1; G1 | First slice: fixed-version recurrent neural workspace over recorded or synthetic observations; development-only EVAL-01 v2 harness passes no gate | Independent hidden-test artifact, model/training/environment digests, confidence-bound lift, accepted EVAL-01 report; broader G1 evidence still requires complete perception, inhibition, working-memory, and executive ablations |
+| Neural cognitive substrate | NB-1 | Directive v4 section 4; R1; G1 | First slice: fixed-version recurrent neural workspace over recorded or synthetic observations; development-only EVAL-01 v3 harness passes no gate | Independent hidden-test artifact, model/training/environment digests, confidence-bound lift, accepted EVAL-01 report; broader G1 evidence still requires complete perception, inhibition, working-memory, and executive ablations |
 | Perception and binding | NB-2 | Directive v4 section 6; cognitive cycle | Not implemented | Signal/observation separation, temporal and modality tests, spoofing, missing input, OOD, provenance |
 | Attention and salience | NB-1/NB-2 | Recognition NC-03; cognitive cycle | First NB-1 slice adds bounded trainable feature gating only; this is not yet general cognitive attention or salience | Independent feature-gate ablation, capacity and distraction tests, safety-channel preservation, hidden task lift, accepted EVAL-01 report |
 | Neural Cognitive Workspace | NB-1 | Recognition NC-04; system boundary | First effect-free serial slice implemented with immutable runtime model version; NB-1 integration evidence is incomplete | Recurrent-vs-stateless baseline, recurrence ablation, deterministic replay, capacity and interference evidence, accepted EVAL-01 report |
@@ -30,6 +30,6 @@
 
 `Current implementation` is updated only with objective code and test evidence.
 A target document, schema field, backlog entry, or model response is never
-implementation evidence. The frozen EVAL-01 v2 specification preregisters the
+implementation evidence. The frozen EVAL-01 v3 specification preregisters the
 first slice's baselines and ablations; it is not a passing evaluation result and
 does not complete NB-1.

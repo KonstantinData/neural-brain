@@ -41,7 +41,7 @@ def active_model() -> ActiveCognitiveModel:
             code_digest=digest,
             contract_digest=digest,
             evaluation_spec_digest=(
-                "0dd87fb28a17534ea08c4f681e8c8fc19d559faf171a23b7c14f396ad05c26d9"
+                "3ac6d895d3f33b5d63c462471ca335d6d538cc379ae8eb3ad0611c81271b3fc8"
             ),
         ),
     )

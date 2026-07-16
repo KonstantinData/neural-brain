@@ -3,7 +3,7 @@
 - Status: Implementation plan
 - Governing decision: ADR-018
 - Parent milestone: NB-1
-- Evaluation specification: `EVAL-01.NB-1.safe-serial-cognition.v2`
+- Evaluation specification: `EVAL-01.NB-1.safe-serial-cognition.v3`
 
 ## Boundary
 

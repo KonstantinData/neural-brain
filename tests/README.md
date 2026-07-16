@@ -15,7 +15,7 @@ session isolation, checkpoint replay and stale-version rejection, and typed
 internal goal, plan, and metacognitive proposals. Tests must prove that no
 external effect can be requested or executed through this slice.
 
-`EVAL-01.NB-1.safe-serial-cognition.v2` supersedes rejected v1 and freezes the
+`EVAL-01.NB-1.safe-serial-cognition.v3` supersedes rejected v2 and freezes the
 external hidden-split contract, six baselines, three ablations, resource budget,
 confidence method, and hard safety thresholds before execution. Architecture
 tests prove only that the specification and digest are well-formed; development

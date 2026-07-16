@@ -9,7 +9,7 @@ from pydantic import TypeAdapter
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT_PATH = ROOT / "docs/architecture/contracts/nb1-safe-serial-cognition.json"
-SPEC_PATH = ROOT / "docs/architecture/evaluations/nb1-safe-serial-cognition-v2.json"
+SPEC_PATH = ROOT / "docs/architecture/evaluations/nb1-safe-serial-cognition-v3.json"
 JSON_OBJECT = TypeAdapter(dict[str, Any])
 
 
@@ -43,9 +43,9 @@ def test_nb1_contract_is_internal_serial_and_effect_free() -> None:
 def test_nb1_evaluation_specification_is_frozen_and_self_consistent() -> None:
     specification = _load(SPEC_PATH)
 
-    assert specification["status"] == "frozen_before_evaluation"
+    assert specification["status"] == "frozen_before_hidden_evaluation"
     assert specification["stage"] == "NB-1"
-    assert specification["supersedes"] == "EVAL-01.NB-1.safe-serial-cognition.v1"
+    assert specification["supersedes"] == "EVAL-01.NB-1.safe-serial-cognition.v2"
     assert specification["evidence_scope"]["contributes_to_evaluation_gates"] == ["g0", "g1"]
     assert specification["evidence_scope"]["passes_evaluation_gates"] == []
     assert specification["evidence_scope"]["passes_recognition_gates"] == []

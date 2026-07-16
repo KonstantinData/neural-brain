@@ -39,8 +39,8 @@ scope, crash, recovery, and gate-bypass tests.
 
 The first ordered slice is specified in
 [`nb1-work-packages.md`](nb1-work-packages.md). Its frozen evaluation is
-`EVAL-01.NB-1.safe-serial-cognition.v2`. Version 1 is retained as rejected
-historical preregistration evidence. Completing the current slice does not by
+`EVAL-01.NB-1.safe-serial-cognition.v3`. Versions 1 and 2 are retained as
+rejected historical preregistration evidence. Completing the current slice does not by
 itself complete NB-1 or authorize later-stage capabilities.
 
 ### NB-2 — Perception, Attention, and World Model
