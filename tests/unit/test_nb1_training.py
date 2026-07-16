@@ -13,7 +13,7 @@ from neural_brain.cognition.training import (
     generate_training_dataset,
     train_offline,
 )
-from tools.train_nb1_workspace import build_training_evidence
+from tools.train_nb1_workspace import _sha256_text_file, build_training_evidence
 
 ROOT = Path(__file__).resolve().parents[2]
 DIGEST_A = "a" * 64
@@ -116,3 +116,12 @@ def test_checked_in_artifact_matches_the_deterministic_evidence_builder() -> Non
     )
 
     assert json.loads(path.read_text(encoding="utf-8")) == build_training_evidence(ROOT)
+
+
+def test_repository_text_digests_ignore_checkout_line_endings(tmp_path: Path) -> None:
+    lf_path = tmp_path / "lf.txt"
+    crlf_path = tmp_path / "crlf.txt"
+    lf_path.write_bytes(b"first\nsecond\n")
+    crlf_path.write_bytes(b"first\r\nsecond\r\n")
+
+    assert _sha256_text_file(lf_path) == _sha256_text_file(crlf_path)

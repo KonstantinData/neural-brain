@@ -23,8 +23,10 @@ def _sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
 
-def _sha256_file(path: Path) -> str:
-    return _sha256_bytes(path.read_bytes())
+def _sha256_text_file(path: Path) -> str:
+    """Hash repository text independently of checkout line-ending policy."""
+    canonical_text = path.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    return _sha256_bytes(canonical_text.encode())
 
 
 def _canonical_bytes(value: object) -> bytes:
@@ -65,13 +67,13 @@ def build_training_evidence(root: Path) -> dict[str, object]:
     environment = {
         "implementation": platform.python_implementation(),
         "python_version": platform.python_version(),
-        "uv_lock_sha256": _sha256_file(root / "uv.lock"),
+        "uv_lock_sha256": _sha256_text_file(root / "uv.lock"),
     }
     dataset = generate_training_dataset()
     bundle = train_offline(
         dataset=dataset,
-        training_code_digest=_sha256_file(training_path),
-        contract_digest=_sha256_file(contract_path),
+        training_code_digest=_sha256_text_file(training_path),
+        contract_digest=_sha256_text_file(contract_path),
         environment_digest=_sha256_bytes(_canonical_bytes(environment).rstrip(b"\n")),
     )
     return {
