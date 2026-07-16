@@ -96,8 +96,16 @@ The current implementation includes early, reusable prerequisites:
   proposals;
 - a frozen `EVAL-01.NB-1.safe-serial-cognition.v3` specification and harness
   with six baselines, three mechanism ablations, dataset digests, and confidence
-  intervals; v1 and v2 are retained as rejected history and neither the spec nor the
-  development-only tests prove an evaluation or recognition gate;
+  intervals, plus a deterministic train-only offline grid search and
+  self-verifying non-promoted model/provenance bundle;
+- an external hidden-evaluator interface that stores no hidden dataset and makes
+  no gate claim without an independently supplied artifact and review;
+- a dedicated PostgreSQL cognitive checkpoint adapter and migration that keep
+  CAS, transition evidence, trusted training/model provenance, receipt, and
+  audit inside one existing Memory Transition Gate transaction;
+- v1 and v2 are retained as rejected evaluation history, and neither the v3
+  specification, training bundle, development tests, nor interface tests prove
+  an evaluation or recognition gate;
 - a Memory Transition Gate boundary and a reserved Dreaming schema whose
   execution is fail-closed disabled;
 - normative provenance, default-deny, privacy, retention, deletion, and
@@ -319,6 +327,7 @@ Prerequisite: uv 0.11.28.
 
 ```powershell
 uvx --from uv==0.11.28 uv sync --locked --all-groups
+uvx --from uv==0.11.28 uv run --locked --all-groups python tools/train_nb1_workspace.py --check
 uvx --from uv==0.11.28 uv run --locked --all-groups python tools/quality.py --locked
 ```
 
@@ -345,7 +354,8 @@ must use disposable databases. The guarded migration and database procedures
 are documented in the [local-development runbook](docs/runbooks/local-development.md).
 Passing repository tests proves only the tested Foundation, Memory Core, and
 first NB-1 implementation surfaces. The frozen EVAL-01 v3 baselines and
-ablations still require an independent hidden-test artifact and acceptance
+ablations and the checked-in offline training bundle still require an
+independently supplied hidden-test artifact, independent execution, and acceptance
 before their cognitive claim is supported;
 neither repository tests nor that evaluation alone complete NB-1, satisfy
 Neural Brain recognition, or authorize production use.

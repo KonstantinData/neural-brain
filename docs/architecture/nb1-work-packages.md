@@ -28,11 +28,11 @@ NB-1 stage release evidence or authorization to use `Neural Brain Candidate`.
 | Work package | Current evidence | Remaining before package completion |
 | --- | --- | --- |
 | NB-1.1 | v3 contract and evaluation digest frozen | Independent acceptance of the complete stage harness |
-| NB-1.2 | One-unit recurrent mechanism and bounded trainable feature gate implemented; development ablations execute | Offline training artifact plus independent hidden-test evidence |
-| NB-1.3 | Session-scoped serial state commits through the existing Memory Transition Gate with CAS, idempotency, checkpoint, and audit tests | PostgreSQL integration and crash-recovery evidence for this cognition path |
+| NB-1.2 | One-unit recurrent mechanism, bounded trainable feature gate, deterministic train-only grid search, self-verifying offline bundle, and independent hidden-evaluator interface implemented | Externally supplied hidden artifact, independent run, contamination report, threshold review, and accepted evidence |
+| NB-1.3 | Dedicated PostgreSQL cognition adapter and migration keep checkpoint, transition envelope, trusted training/model evidence, receipt, and audit inside one Memory Transition Gate transaction; recovery tests cover CAS, replay, scope, corruption, restart, and rollback | Successful PostgreSQL 18 execution of the live suite and accepted evidence review |
 | NB-1.4 | Internal Goal and Plan proposals implemented without an action or effect surface | Separate causal executive-control evidence |
 | NB-1.5 | `continue` and `ask` activation-ambiguity proposals implemented | Calibrated uncertainty plus reachable `defer`, `stop`, and recovery behavior |
-| NB-1.6 | Six baselines, three ablations, confidence intervals, and deterministic development evaluation implemented | Independent hidden artifact, contamination report, environment hashes, and gate review |
+| NB-1.6 | Six baselines, three ablations, confidence intervals, deterministic development evaluation, training/environment hashes, and external hidden-evaluator interface implemented | Independent hidden artifact and run, contamination report, complete safety results, and gate review |
 
 ## Acceptance rule
 

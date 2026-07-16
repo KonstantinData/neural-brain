@@ -11,12 +11,15 @@ requires them.
 ## Foundation contract
 
 FND-03 established the migration validation mechanism. The current ordered plan
-contains the MS-1 hierarchy, scoped memory kernel, and reserved Dreaming schema
-in migrations `0001` through `0003`. Migration `0003` deliberately grants no
+contains the MS-1 hierarchy, scoped memory kernel, reserved Dreaming schema,
+and protected NB-1 cognitive checkpoint evidence in migrations `0001` through
+`0004`. Migration `0003` deliberately grants no
 productive Dreaming execute capability and its function fails closed until the
 persistent lease, immutable snapshot, and independent validation prerequisites
-exist. Empty migration plans are no longer
-accepted by repository CI or release evidence.
+exist. Migration `0004` adds scope-bound immutable cognitive transition evidence
+and dedicated Memory Transition Gate functions; it does not grant table-write
+access or create a second protected-state writer. Empty migration plans are no
+longer accepted by repository CI or release evidence.
 
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use

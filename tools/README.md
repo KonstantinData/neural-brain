@@ -26,3 +26,16 @@ mypy strict mode, the controlled type-exception audit, and the complete pytest
 suite. It stops at the first failed command. Invoking `tools/quality.py` without
 the explicit locked-invocation guard is rejected; the guard does not replace
 the required `uv --locked` option.
+
+## NB-1 offline training evidence
+
+The bounded EVAL-01 v3 grid search is an offline evidence builder, not a runtime
+training or promotion interface. Verify the checked-in non-hidden artifact with:
+
+```text
+uv run --locked --all-groups python tools/train_nb1_workspace.py --check
+```
+
+Regeneration without `--check` uses only the preregistered public training split
+and rewrites the deterministic development-candidate bundle. It never reads a
+hidden artifact, promotes a model, or marks an evaluation gate as passed.

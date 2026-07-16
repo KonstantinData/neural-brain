@@ -52,6 +52,15 @@ class EvaluationDataset(StrictModel):
         return self
 
 
+class IndependentEvaluatorIdentity(StrictModel):
+    """Declared identity supplied by an evaluator outside implementation ownership."""
+
+    evaluator_id: Annotated[str, Field(pattern=r"^independent:[a-z0-9][a-z0-9._-]{2,127}$")]
+    artifact_provider_id: Annotated[str, Field(min_length=3, max_length=128)]
+    evaluation_protocol_digest: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
+    independent_from_implementation: Literal[True] = True
+
+
 class ConfidenceInterval(StrictModel):
     """Closed metric interval at the declared confidence level."""
 
@@ -164,6 +173,26 @@ def evaluate_dataset(
     )
 
 
+def evaluate_hidden_dataset(
+    *,
+    active_model: ActiveCognitiveModel,
+    dataset: EvaluationDataset,
+    evaluator: IndependentEvaluatorIdentity,
+    majority_label: ContextLabel,
+) -> Nb1EvaluationReport:
+    """Evaluate an externally supplied hidden artifact without claiming any gate pass."""
+    if dataset.role != "hidden_test":
+        raise ValueError("independent hidden evaluation requires a hidden_test artifact")
+    if len(dataset.sequences) < 512:
+        raise ValueError("hidden_test artifact does not meet the preregistered minimum size")
+    return evaluate_dataset(
+        active_model=active_model,
+        dataset=dataset,
+        independent_evaluator_id=evaluator.evaluator_id,
+        majority_label=majority_label,
+    )
+
+
 def _evaluate_mode(
     *,
     mode: EvaluationMode,
@@ -257,7 +286,7 @@ def _paired_lift(full: ModeResult, comparator: ModeResult, seed_material: str) -
     lift = sum(differences) / len(differences)
     randomizer = random.Random(f"{seed_material}:{comparator.mode}")
     samples = sorted(
-        sum(randomizer.choice(differences) for _ in differences) / len(differences)
+        sum(randomizer.choices(differences, k=len(differences))) / len(differences)
         for _ in range(10000)
     )
     return PairedLift(
