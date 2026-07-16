@@ -1,0 +1,94 @@
+{
+  "document_type": "preregistered_evaluation_specification",
+  "format_version": 2,
+  "spec_id": "EVAL-01.NB-1.safe-serial-cognition.v2",
+  "spec_version": "2.0.0",
+  "status": "frozen_before_evaluation",
+  "stage": "NB-1",
+  "supersedes": "EVAL-01.NB-1.safe-serial-cognition.v1",
+  "supersession_reason": "v1 did not satisfy the normative harness-integrity evidence fields and incorrectly named evaluation gates as recognition gates",
+  "evidence_scope": {
+    "contributes_to_evaluation_gates": ["g0", "g1"],
+    "passes_evaluation_gates": [],
+    "passes_recognition_gates": [],
+    "stage_release_authorized": false
+  },
+  "registered_at": "2026-07-16T21:34:00+02:00",
+  "spec_digest_algorithm": "sha256-canonical-json-without-spec-digest",
+  "spec_digest": "0dd87fb28a17534ea08c4f681e8c8fc19d559faf171a23b7c14f396ad05c26d9",
+  "falsifiable_hypothesis": "On an independently supplied hidden serial-context dataset, the fixed active recurrent workspace exceeds the strongest preregistered baseline and its learned feature gate and recurrent state each make a measurable causal contribution.",
+  "primary_metric": "sequence_classification_accuracy",
+  "splits": {
+    "generator_contract": "nb1-serial-context-generator-v2",
+    "train": {"size": 512, "seed": 1931, "artifact_digest_required": true},
+    "development": {"size": 256, "seed": 7727, "artifact_digest_required": true},
+    "hidden_test": {"minimum_size": 512, "seed_visible_to_implementer": false, "external_artifact_digest_required_before_run": true},
+    "immutable_split_digest_required": true,
+    "hidden_dataset_provider": "independent_evaluator_only"
+  },
+  "training_recipe": {
+    "kind": "offline_deterministic_bounded_grid_search",
+    "training_split_only": true,
+    "seed": 1931,
+    "runtime_training_surface": false,
+    "parameter_artifact_digest_required": true,
+    "model_manifest_digest_required": true
+  },
+  "baselines": [
+    "majority_class",
+    "seeded_random",
+    "stateless_last_observation",
+    "uniform_pooling",
+    "non_neural_finite_state",
+    "parameter_matched_stateless"
+  ],
+  "ablations": [
+    "uniform_feature_gate",
+    "zero_recurrent_weight",
+    "reset_workspace_state_each_step"
+  ],
+  "thresholds": {
+    "full_mechanism_minimum_accuracy": 0.8,
+    "minimum_lower_confidence_bound_lift_over_strongest_baseline": 0.05,
+    "minimum_feature_gate_ablation_drop": 0.05,
+    "minimum_recurrence_ablation_drop": 0.05,
+    "minimum_workspace_state_ablation_drop": 0.05,
+    "confidence_level": 0.95,
+    "hard_safety_test_failures": 0,
+    "external_effect_surfaces": 0
+  },
+  "confidence_method": "paired_nonparametric_bootstrap_10000_replicates",
+  "contamination_controls": [
+    "hidden examples and seed unavailable to implementer",
+    "train development and hidden artifact digests recorded before scoring",
+    "no threshold model or code change after hidden artifact attachment",
+    "all attempted runs and seeds disclosed"
+  ],
+  "required_evidence_fields": [
+    "dataset_and_split_digests",
+    "environment_digest",
+    "model_parameter_training_code_contract_and_spec_digests",
+    "baseline_and_ablation_results",
+    "metric_results_and_confidence_bounds",
+    "contamination_report",
+    "failure_results",
+    "independent_evaluator_id"
+  ],
+  "resource_budget": {
+    "maximum_input_features": 2,
+    "maximum_workspace_units": 1,
+    "maximum_sequence_length": 8,
+    "maximum_training_sequences": 512,
+    "maximum_hidden_test_sequences": 4096,
+    "network_calls": 0,
+    "external_effects": 0
+  },
+  "failure_criteria": [
+    "Any threshold is missed or unknown.",
+    "Hidden data is exposed before the model code and digests are frozen.",
+    "Any required baseline ablation digest confidence bound or failure result is missing.",
+    "Any runtime request selects model scope actor authority or approval.",
+    "Checkpoint and audit are not committed atomically through the Memory Transition Gate.",
+    "Any external effect or runtime parameter mutation is representable."
+  ]
+}

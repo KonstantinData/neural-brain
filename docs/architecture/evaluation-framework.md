@@ -22,6 +22,25 @@ Each claimed capability must define before evaluation:
 Reports include confidence intervals, interquartile means or performance
 profiles across tasks, worst protected capability, and all failed sub-gates.
 
+## Preregistered specification registry
+
+Every implementation evaluation has a versioned JSON specification under
+`docs/architecture/evaluations/`. The specification freezes its claim,
+dataset and held-out split, strongest baseline, primary metric, meaningful
+thresholds, causal ablations, resource budget, safety tests, failure criteria,
+and independent-verification requirement before the evaluated run.
+
+The `spec_digest` is SHA-256 over canonical JSON after removing only the
+`spec_digest` field. Any other change creates a new specification version.
+Post-hoc threshold edits invalidate the evidence rather than improving it.
+
+`EVAL-01.NB-1.safe-serial-cognition.v1` is retained as immutable historical
+evidence but was rejected before evaluation because it did not satisfy the
+normative G0/G1 evidence contract. Version 2 was also rejected because its
+recorded registration time followed its actual Git commit. Version 3 supersedes
+both. Version 3 defines only partial evidence contributions toward `g0` and `g1`; it passes no
+evaluation or recognition gate and does not release NB-1.
+
 ## Gate chain
 
 | Gate | Evidence | Release stop examples |

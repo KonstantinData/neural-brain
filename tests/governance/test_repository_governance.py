@@ -167,7 +167,7 @@ def test_repository_narrative_defines_complete_system_and_current_maturity() -> 
     normalized_readme = " ".join(readme.split())
     normalized_contributing = " ".join(contributing.split())
     assert "biologically inspired cognitive system" in normalized_readme
-    assert "Foundation / early Memory Core development" in readme
+    assert "Foundation / early Memory Core and NB-1 development" in readme
     assert "ADR-018 supersedes the former memory-only product boundary" in readme
     assert "`Memory Core` subsystem rather than the whole product" in normalized_readme
     assert "Cognitive Plane" in readme

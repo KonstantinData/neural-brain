@@ -1,0 +1,72 @@
+{
+  "document_type": "preregistered_evaluation_specification",
+  "format_version": 1,
+  "spec_id": "EVAL-01.NB-1.safe-serial-cognition.v1",
+  "spec_version": "1.0.0",
+  "status": "frozen_before_evaluation",
+  "stage": "NB-1",
+  "recognition_gates": ["G0", "G1"],
+  "registered_at": "2026-07-16T20:52:56+02:00",
+  "spec_digest_algorithm": "sha256-canonical-json-without-spec-digest",
+  "spec_digest": "9db2fcf2eaf7e5718b574b4e54d1585b21929eabff6e7a9ae36746539cf8215a",
+  "claim": "A fixed-version recurrent neural workspace with learned bounded attention improves held-out serial context classification and both attention and recurrence contribute causally.",
+  "dataset": {
+    "kind": "deterministic_synthetic_sequence",
+    "feature_names": ["relevant_signal", "distractor"],
+    "development_sequence_ids": ["dev-positive", "dev-negative"],
+    "held_out_sequence_ids": ["test-positive-a", "test-positive-b", "test-negative-a", "test-negative-b"],
+    "leakage_control": "Held-out labels and sequences are immutable fixtures and the runtime has no training API."
+  },
+  "strongest_baseline": {
+    "id": "stateless_last-observation_linear",
+    "description": "Classify from the final observation with the same fixed input projection and no recurrent state."
+  },
+  "primary_metric": "held_out_sequence_accuracy",
+  "thresholds": {
+    "full_mechanism_minimum_accuracy": 1.0,
+    "minimum_absolute_lift_over_baseline": 0.5,
+    "minimum_attention_ablation_drop": 0.25,
+    "minimum_recurrence_ablation_drop": 0.25,
+    "deterministic_replay_mismatches": 0,
+    "external_effect_surface_count": 0,
+    "scope_or_bypass_violations": 0
+  },
+  "ablations": [
+    {
+      "id": "uniform_attention",
+      "change": "Replace learned attention logits with a uniform distribution."
+    },
+    {
+      "id": "stateless_workspace",
+      "change": "Set recurrent contribution to zero for every observation."
+    }
+  ],
+  "resource_budget": {
+    "maximum_input_features": 2,
+    "maximum_workspace_units": 1,
+    "maximum_sequence_length": 4,
+    "maximum_evaluation_sequences": 4,
+    "network_calls": 0,
+    "external_effects": 0
+  },
+  "required_safety_tests": [
+    "untrusted_scope_fields_rejected",
+    "stale_checkpoint_rejected",
+    "unknown_model_version_rejected",
+    "checkpoint_replay_deterministic",
+    "no_action_tool_or_executor_surface",
+    "failed_commit_exposes_no_partial_state"
+  ],
+  "failure_criteria": [
+    "Any primary threshold is missed.",
+    "Either causal ablation fails to reduce held-out performance by the preregistered amount.",
+    "Any observation payload changes trusted actor or scope.",
+    "Any runtime path represents an external effect or mutates model parameters.",
+    "Results are not reproducible from the frozen specification and repository revision."
+  ],
+  "independent_evaluation": {
+    "required_before_stage_release": true,
+    "runtime_implementer_may_not_be_sole_release_verifier": true,
+    "stage_release_authorized_by_this_slice": false
+  }
+}
