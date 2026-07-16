@@ -122,9 +122,10 @@ def test_ci_pins_postgresql_18_and_proves_both_migration_paths() -> None:
     assert "--allow-empty" not in WORKFLOW
 
 
-def test_migration_runbook_describes_the_nonempty_ms1_plan() -> None:
+def test_migration_runbook_describes_the_nonempty_memory_and_cognition_plan() -> None:
     normalized = " ".join(MIGRATIONS_README.split())
-    assert "migrations `0001` through `0003`" in normalized
+    assert "migrations `0001` through `0004`" in normalized
+    assert "Migration `0004` adds scope-bound immutable cognitive transition evidence" in normalized
     assert "Empty migration plans are no longer accepted" in normalized
     assert "--allow-empty" not in normalized
     assert "pytest tests/database" in WORKFLOW

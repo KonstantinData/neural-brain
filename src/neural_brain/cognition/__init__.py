@@ -17,8 +17,10 @@ from neural_brain.cognition.errors import (
 from neural_brain.cognition.evaluation import (
     EvaluationDataset,
     EvaluationSequence,
+    IndependentEvaluatorIdentity,
     Nb1EvaluationReport,
     evaluate_dataset,
+    evaluate_hidden_dataset,
     evaluation_sequence_digest,
 )
 from neural_brain.cognition.models import (
@@ -56,6 +58,7 @@ __all__ = [
     "EvaluationDataset",
     "EvaluationSequence",
     "FixedWorkspaceProvider",
+    "IndependentEvaluatorIdentity",
     "InternalGoalProposal",
     "InternalPlanProposal",
     "MemoryServiceCognitiveGate",
@@ -67,6 +70,7 @@ __all__ = [
     "StaleCognitiveCheckpointError",
     "UnknownNeuralModelError",
     "evaluate_dataset",
+    "evaluate_hidden_dataset",
     "evaluation_sequence_digest",
     "model_manifest_digest",
     "workspace_parameter_digest",

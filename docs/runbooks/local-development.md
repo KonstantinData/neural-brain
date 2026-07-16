@@ -5,8 +5,8 @@
 The local environment provides isolated PostgreSQL development and test
 services for the completed Memory Core foundation and the first MS-1 memory
 kernel. It runs the protected hierarchy, observation, Working Memory,
-checkpoint and audit migrations plus a reserved, non-executable Dreaming
-schema; it is not a
+checkpoint and audit migrations, protected NB-1 cognitive checkpoint evidence,
+plus a reserved, non-executable Dreaming schema; it is not a
 production-ready deployment.
 
 The image is pinned to the multi-platform digest for the official PostgreSQL
@@ -87,6 +87,19 @@ not weaken database roles, the Memory Gate, provenance and audit atomicity, or
 scope isolation. The MS-1 role bootstrap, forward-migration validation, and
 live database tests are also enforced in CI. Retention and deletion controls
 remain a later MS-1 implementation block.
+
+Migration `0004` keeps cognitive persistence inside the Memory Transition Gate.
+The runtime adapter has execute access only to the dedicated gate functions and
+never receives direct table-write permission. With a guarded disposable
+PostgreSQL 18 administrative DSN set, run the focused recovery evidence with:
+
+```powershell
+uv run --locked --all-groups pytest tests/database/test_postgres_cognitive_repository.py
+```
+
+The suite proves transaction rollback, restart/readback consistency, CAS,
+idempotency, corruption denial, and authenticated scope isolation. Do not place
+the DSN in command history, documentation, or repository files.
 
 ## Dreaming Availability
 
