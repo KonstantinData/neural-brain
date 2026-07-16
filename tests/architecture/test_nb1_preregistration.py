@@ -5,14 +5,16 @@ import json
 from pathlib import Path
 from typing import Any
 
+from pydantic import TypeAdapter
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT_PATH = ROOT / "docs/architecture/contracts/nb1-safe-serial-cognition.json"
 SPEC_PATH = ROOT / "docs/architecture/evaluations/nb1-safe-serial-cognition-v2.json"
+JSON_OBJECT = TypeAdapter(dict[str, Any])
 
 
 def _load(path: Path) -> dict[str, Any]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return JSON_OBJECT.validate_json(path.read_text(encoding="utf-8"))
 
 
 def _canonical_digest(specification: dict[str, Any]) -> str:

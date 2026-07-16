@@ -6,10 +6,12 @@ perception, attention, differentiated memory, world/self/value models,
 executive control, planning, action selection, real outcome feedback,
 continual learning, and metacognition.
 
-The repository is in **Foundation / early Memory Core development**. It does
-not yet implement or claim a complete Neural Brain, stable production API,
-production deployment, autonomous operation, consciousness, sentience,
-human-level intelligence, or neurophysiological fidelity.
+The repository is in **Foundation / early Memory Core and NB-1 development**.
+It includes the first effect-free NB-1 implementation slice, but does not claim
+that NB-1 or any complete Neural Brain stage is released. It also does not claim
+a stable production API, production deployment, autonomous operation,
+consciousness, sentience, human-level intelligence, or neurophysiological
+fidelity.
 
 ADR-018 supersedes the former memory-only product boundary. The governed memory
 system remains a protected `Memory Core` subsystem rather than the whole
@@ -20,12 +22,12 @@ product.
 | Surface | Current state |
 | --- | --- |
 | Product boundary | Complete cognitive-system target governed by [ADR-018](docs/adr/ADR-018-complete-cognitive-system.md) |
-| Product maturity | NB-0 Foundation artifacts are present; no NB-1 through NB-8 product stage is released |
+| Product maturity | NB-0 Foundation artifacts and a first effect-free NB-1 implementation slice are present; NB-1 is not released |
 | Memory maturity | Early MS-1 subset with scoped Working Memory; MS-1 is not complete |
 | Runtime | Python library and protected PostgreSQL memory kernel; no stable service API or deployment |
 | Dreaming | Reserved schema and contracts; all supported execution paths are disabled fail closed |
 | Inference | Normative local-only boundary; no inference adapter or ready deployment exists |
-| Autonomy | No productive planning, action execution, external effects, or autonomous operation |
+| Autonomy | Internal goal, plan, and metacognitive proposals only; no action execution, external effects, or autonomous operation |
 | Recognition | The system is not a `Neural Brain Candidate`; NB-6 plus independent G8 evidence is required |
 
 ## Why This Project Exists
@@ -88,6 +90,14 @@ The current implementation includes early, reusable prerequisites:
   `RuntimeContext`;
 - PostgreSQL-backed Working Memory, observations, checkpoints, audit records,
   source references, and schema constraints for inactive memory candidates;
+- a first serial NB-1 cognition slice with a fixed-version recurrent neural
+  workspace, bounded trainable feature gating, authenticated session scope,
+  Memory-Gate checkpoints, and typed internal goal, plan, and metacognitive
+  proposals;
+- a frozen `EVAL-01.NB-1.safe-serial-cognition.v2` specification and harness
+  with six baselines, three mechanism ablations, dataset digests, and confidence
+  intervals; v1 is retained as rejected history and neither version nor the
+  development-only tests prove an evaluation or recognition gate;
 - a Memory Transition Gate boundary and a reserved Dreaming schema whose
   execution is fail-closed disabled;
 - normative provenance, default-deny, privacy, retention, deletion, and
@@ -96,10 +106,13 @@ The current implementation includes early, reusable prerequisites:
 - normative target, recognition, evaluation, delivery, and release-stop
   contracts for the complete system.
 
-It does **not** yet include an implemented neural workspace, active perception,
-world or self model, Goal or Action runtime, Planner, Executor, closed-loop
-feedback, productive continual learning, transfer evidence, or Neural Brain
-Candidate evaluation.
+The NB-1 slice accepts only recorded or synthetic observations and cannot
+execute an action or cause an external effect. Its feature gate is not yet
+evidence of general cognitive attention, and its `continue`/`ask` ambiguity
+heuristic is not calibrated uncertainty. It does **not** yet include active
+multimodal perception, a world or self model, protected Goal or Action runtime,
+an Executor, closed-loop feedback, productive continual learning, transfer
+evidence, completed EVAL-01 results, or Neural Brain Candidate evaluation.
 
 Dreaming is currently unavailable at both service and database boundaries. The
 runtime role has no execute privilege, and direct privileged calls fail closed.
@@ -196,8 +209,9 @@ working state never cross Tenant or Area boundaries implicitly.
 product. `MS-0` through `MS-4` describe only the protected Memory Core
 subsystem. An MS stage is never an alias for, and never proves, an NB stage.
 
-The current repository contains NB-0 Foundation artifacts and an early subset
-of MS-1. It does not claim complete MS-1 release evidence or any released NB-1
+The current repository contains NB-0 Foundation artifacts, an early subset of
+MS-1, and the first effect-free NB-1 implementation slice. It does not claim
+complete MS-1 evidence, complete NB-1 exit evidence, or any released NB-1
 through NB-8 cognitive stage. See the machine-readable
 [product-stage](docs/architecture/contracts/stage-capabilities.json) and
 [Memory Core stage](docs/architecture/contracts/memory-stage-capabilities.json)
@@ -329,8 +343,12 @@ secret history, and deterministic release evidence.
 Live database tests require an isolated PostgreSQL 18 administrative DSN and
 must use disposable databases. The guarded migration and database procedures
 are documented in the [local-development runbook](docs/runbooks/local-development.md).
-Passing repository tests proves only the implemented Foundation and Memory Core
-slice; it does not satisfy Neural Brain recognition or production authorization.
+Passing repository tests proves only the tested Foundation, Memory Core, and
+first NB-1 implementation surfaces. The frozen EVAL-01 v2 baselines and
+ablations still require an independent hidden-test artifact and acceptance
+before their cognitive claim is supported;
+neither repository tests nor that evaluation alone complete NB-1, satisfy
+Neural Brain recognition, or authorize production use.
 
 ## Accepted Foundation Toolchain and Inference Boundary
 

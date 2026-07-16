@@ -16,7 +16,7 @@
     "validate_recorded_or_synthetic_observation",
     "resolve_authenticated_session_scope",
     "load_expected_workspace_checkpoint",
-    "apply_bounded_learned_attention",
+    "apply_bounded_trainable_feature_gate",
     "update_fixed-version_recurrent_neural_workspace",
     "derive_internal_goal_and_plan_proposals",
     "derive_metacognitive_decision",
@@ -37,7 +37,8 @@
     "checkpoint",
     "audit_evidence"
   ],
-  "metacognitive_decisions": ["continue", "ask", "defer", "stop"],
+  "implemented_metacognitive_decisions": ["continue", "ask"],
+  "reserved_metacognitive_decisions": ["defer", "stop"],
   "prohibited_surfaces": [
     "action_intent",
     "action_gate",
@@ -51,10 +52,11 @@
   "invariants": [
     "Only one cycle transition may commit for an expected checkpoint version.",
     "Observation payloads never define trusted actor or scope.",
-    "The recurrent model version and parameters are immutable during runtime.",
+    "The active model and its parameter training code contract and evaluation digests come only from trusted runtime configuration and are immutable during runtime.",
     "Attention and workspace capacity are bounded by this contract.",
     "All proposals are internal and carry no execution authority.",
-    "A stale checkpoint, unknown model version, invalid scope, or failed evidence commit fails closed.",
+    "A stale checkpoint, model manifest mismatch, invalid scope, or failed evidence commit fails closed.",
+    "Cognitive state checkpoint receipt and audit are committed only by the existing Memory Transition Gate.",
     "No external effect is representable by this slice."
   ]
 }
