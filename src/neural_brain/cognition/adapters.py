@@ -13,6 +13,7 @@ from neural_brain.cognition.errors import (
 from neural_brain.cognition.models import (
     ActiveCognitiveModelManifest,
     CognitiveCheckpoint,
+    CognitiveTransitionEnvelope,
     RecordedObservation,
 )
 from neural_brain.cognition.workspace import NeuralWorkspace
@@ -24,12 +25,14 @@ from neural_brain.memory.errors import (
 from neural_brain.memory.models import (
     CheckpointRequest,
     MemoryCycleResult,
+    MemoryScope,
     ObservationRequest,
     OpaqueId,
     RuntimeContext,
     WorkingMemoryEntryRequest,
     WorkingMemoryRequest,
 )
+from neural_brain.memory.ports import RuntimeContextProvider
 from neural_brain.memory.service import MemoryService
 
 
@@ -73,14 +76,19 @@ class MemoryServiceCognitiveGate:
 
     _ENTRY_ID = "nb1-cognitive-workspace-state"
 
-    def __init__(self, memory_service: MemoryService) -> None:
+    def __init__(
+        self,
+        memory_service: MemoryService,
+        context_provider: RuntimeContextProvider,
+    ) -> None:
         self._memory_service = memory_service
+        self._context_provider = context_provider
 
     def load_checkpoint(
         self, *, context: RuntimeContext, checkpoint_id: OpaqueId
     ) -> CognitiveCheckpoint:
         """Read and validate one cognition checkpoint through Memory Core."""
-        del context
+        self._assert_context_binding(context)
         try:
             record = self._memory_service.read_checkpoint(
                 CheckpointRequest(checkpoint_id=checkpoint_id)
@@ -95,14 +103,19 @@ class MemoryServiceCognitiveGate:
         try:
             payload = json.loads(entries[0].content)
             model_version = payload["model_version"]
-            hidden_state = payload["hidden_state"]
+            raw_hidden_state = payload["hidden_state"]
             observation_id = payload["observation_id"]
         except (KeyError, TypeError, json.JSONDecodeError) as error:
             raise CognitiveRuntimeError("cognitive checkpoint state is invalid") from error
         if not isinstance(model_version, str) or not isinstance(observation_id, str):
             raise CognitiveRuntimeError("cognitive checkpoint identifiers are invalid")
+        if not isinstance(raw_hidden_state, list) or len(raw_hidden_state) != 1:
+            raise CognitiveRuntimeError("cognitive checkpoint hidden state is invalid")
+        hidden_state = raw_hidden_state[0]
         if not isinstance(hidden_state, (int, float)) or isinstance(hidden_state, bool):
             raise CognitiveRuntimeError("cognitive checkpoint hidden state is invalid")
+        if record.scope != self._scope(context):
+            raise CognitiveScopeError("cognitive checkpoint crossed adapter context binding")
         return CognitiveCheckpoint(
             checkpoint_id=record.checkpoint_id,
             version=record.working_memory_version,
@@ -118,24 +131,22 @@ class MemoryServiceCognitiveGate:
         context: RuntimeContext,
         cycle_id: OpaqueId,
         expected_version: int,
-        model_version: OpaqueId,
-        hidden_state: float,
+        transition: CognitiveTransitionEnvelope,
         observation: RecordedObservation,
     ) -> MemoryCycleResult:
         """Commit state and real audit evidence atomically through Memory Core."""
         if context.session_id is None:
             raise CognitiveRuntimeError("cognition checkpoint requires session scope")
-        content = json.dumps(
-            {
-                "hidden_state": hidden_state,
-                "model_version": model_version,
-                "observation_id": observation.observation_id,
-            },
-            sort_keys=True,
-            separators=(",", ":"),
-        )
+        self._assert_context_binding(context)
+        if transition.cycle_id != cycle_id:
+            raise CognitiveRuntimeError("transition cycle identity mismatch")
+        if transition.observation_id != observation.observation_id:
+            raise CognitiveRuntimeError("transition observation identity mismatch")
+        if transition.previous_checkpoint_version != expected_version:
+            raise CognitiveRuntimeError("transition predecessor version mismatch")
+        content = transition.model_dump_json()
         try:
-            return self._memory_service.record_observation_and_checkpoint(
+            result = self._memory_service.record_observation_and_checkpoint(
                 transition_request_id=cycle_id,
                 observation=ObservationRequest(
                     observation_id=observation.observation_id,
@@ -162,7 +173,25 @@ class MemoryServiceCognitiveGate:
                 ),
                 checkpoint=CheckpointRequest(checkpoint_id=f"nb1:{cycle_id}"),
             )
+            if result.checkpoint.scope != self._scope(context):
+                raise CognitiveScopeError("cognitive commit crossed adapter context binding")
+            return result
         except StaleWorkingMemoryVersionError as error:
             raise StaleCognitiveCheckpointError("stale cognitive checkpoint version") from error
         except ScopeIsolationError as error:
             raise CognitiveScopeError("cognitive checkpoint crossed trusted scope") from error
+
+    def _assert_context_binding(self, context: RuntimeContext) -> None:
+        if self._context_provider.current_context() != context:
+            raise CognitiveScopeError("cognitive and memory context providers diverged")
+
+    @staticmethod
+    def _scope(context: RuntimeContext) -> MemoryScope:
+        if context.project_id is None or context.session_id is None:
+            raise CognitiveScopeError("cognitive adapter requires project and session scope")
+        return MemoryScope(
+            tenant_id=context.tenant_id,
+            area_id=context.area_id,
+            project_id=context.project_id,
+            session_id=context.session_id,
+        )

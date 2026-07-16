@@ -27,7 +27,7 @@ NB-1 stage release evidence or authorization to use `Neural Brain Candidate`.
 
 | Work package | Current evidence | Remaining before package completion |
 | --- | --- | --- |
-| NB-1.1 | v2 contract and evaluation digest frozen | Independent acceptance of the complete stage harness |
+| NB-1.1 | v3 contract and evaluation digest frozen | Independent acceptance of the complete stage harness |
 | NB-1.2 | One-unit recurrent mechanism and bounded trainable feature gate implemented; development ablations execute | Offline training artifact plus independent hidden-test evidence |
 | NB-1.3 | Session-scoped serial state commits through the existing Memory Transition Gate with CAS, idempotency, checkpoint, and audit tests | PostgreSQL integration and crash-recovery evidence for this cognition path |
 | NB-1.4 | Internal Goal and Plan proposals implemented without an action or effect surface | Separate causal executive-control evidence |

@@ -143,6 +143,22 @@ class MetacognitiveAssessment(StrictModel):
     reason: Literal["sufficient_context", "insufficient_context"]
 
 
+class CognitiveTransitionEnvelope(StrictModel):
+    """Complete internal transition persisted atomically before result publication."""
+
+    cycle_id: OpaqueId
+    observation_id: OpaqueId
+    previous_checkpoint_version: Annotated[int, Field(strict=True, ge=0)]
+    next_checkpoint_version: Annotated[int, Field(strict=True, ge=1)]
+    model_version: OpaqueId
+    hidden_state: WorkspaceUnit
+    attention: AttentionDecision
+    goal_proposal: InternalGoalProposal
+    plan_proposal: InternalPlanProposal
+    metacognition: MetacognitiveAssessment
+    active_model: ActiveCognitiveModelEvidence
+
+
 class CognitiveAuditEvidence(StrictModel):
     """Deterministic evidence attached to the committed internal cycle."""
 

@@ -3,7 +3,11 @@
 from typing import Protocol
 
 from neural_brain.cognition.adapters import ActiveCognitiveModel
-from neural_brain.cognition.models import CognitiveCheckpoint, RecordedObservation
+from neural_brain.cognition.models import (
+    CognitiveCheckpoint,
+    CognitiveTransitionEnvelope,
+    RecordedObservation,
+)
 from neural_brain.memory.models import MemoryCycleResult, OpaqueId, RuntimeContext
 
 
@@ -30,8 +34,7 @@ class CognitiveMemoryGate(Protocol):
         context: RuntimeContext,
         cycle_id: OpaqueId,
         expected_version: int,
-        model_version: OpaqueId,
-        hidden_state: float,
+        transition: CognitiveTransitionEnvelope,
         observation: RecordedObservation,
     ) -> MemoryCycleResult:
         """Commit observation, state, checkpoint, receipt, and audit atomically."""

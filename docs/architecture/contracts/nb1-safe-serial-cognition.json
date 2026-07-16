@@ -10,7 +10,7 @@
     "allowed": ["recorded_observation", "synthetic_observation"],
     "trusted_context_source": "authenticated_runtime_context",
     "untrusted_fields": ["features", "occurred_at", "provenance_ref"],
-    "forbidden_request_fields": ["actor_id", "tenant_id", "area_id", "project_id", "session_id", "roles", "authority", "approval"]
+    "forbidden_request_fields": ["actor_id", "tenant_id", "area_id", "project_id", "session_id", "roles", "authority", "approval", "model_version", "model_manifest", "parameter_digest", "training_artifact_digest"]
   },
   "serial_cycle": [
     "validate_recorded_or_synthetic_observation",

@@ -14,6 +14,7 @@ from neural_brain.cognition.models import (
     CognitiveCheckpoint,
     CognitiveCycleRequest,
     CognitiveCycleResult,
+    CognitiveTransitionEnvelope,
     InternalGoalProposal,
     InternalPlanProposal,
     MetacognitiveAssessment,
@@ -87,14 +88,45 @@ class CognitiveCycleService:
                 reason="sufficient_context",
             )
 
+        goal_proposal = InternalGoalProposal(
+            goal_ref=goal_ref,
+            objective=objective,
+            confidence=confidence,
+        )
+        plan_proposal = InternalPlanProposal(
+            plan_ref=f"internal-plan:{request.cycle_id}",
+            steps=plan_steps,
+        )
+        active_model_evidence = ActiveCognitiveModelEvidence(
+            manifest_digest=model_manifest_digest(manifest),
+            parameter_digest=manifest.parameter_digest,
+            training_artifact_digest=manifest.training_artifact_digest,
+            code_digest=manifest.code_digest,
+            contract_digest=manifest.contract_digest,
+            evaluation_spec_digest=manifest.evaluation_spec_digest,
+        )
+        transition = CognitiveTransitionEnvelope(
+            cycle_id=request.cycle_id,
+            observation_id=request.observation.observation_id,
+            previous_checkpoint_version=actual_version,
+            next_checkpoint_version=actual_version + 1,
+            model_version=model_version,
+            hidden_state=(hidden,),
+            attention=attention,
+            goal_proposal=goal_proposal,
+            plan_proposal=plan_proposal,
+            metacognition=metacognitive,
+            active_model=active_model_evidence,
+        )
         committed = self._memory_gate.commit_checkpoint(
             context=context,
             cycle_id=request.cycle_id,
             expected_version=request.expected_checkpoint_version,
-            model_version=model_version,
-            hidden_state=hidden,
+            transition=transition,
             observation=request.observation,
         )
+        if committed.checkpoint.scope != scope:
+            raise CognitiveScopeError("committed checkpoint crossed authenticated scope")
         checkpoint = CognitiveCheckpoint(
             checkpoint_id=committed.checkpoint.checkpoint_id,
             version=committed.checkpoint.working_memory_version,
@@ -106,15 +138,8 @@ class CognitiveCycleService:
         result = CognitiveCycleResult(
             attention=attention,
             checkpoint=checkpoint,
-            goal_proposal=InternalGoalProposal(
-                goal_ref=goal_ref,
-                objective=objective,
-                confidence=confidence,
-            ),
-            plan_proposal=InternalPlanProposal(
-                plan_ref=f"internal-plan:{request.cycle_id}",
-                steps=plan_steps,
-            ),
+            goal_proposal=goal_proposal,
+            plan_proposal=plan_proposal,
             metacognition=metacognitive,
             evidence=CognitiveAuditEvidence(
                 cycle_id=request.cycle_id,
@@ -123,14 +148,7 @@ class CognitiveCycleService:
                 observation_id=request.observation.observation_id,
                 previous_checkpoint_version=actual_version,
                 committed_checkpoint_version=committed.checkpoint.working_memory_version,
-                active_model=ActiveCognitiveModelEvidence(
-                    manifest_digest=model_manifest_digest(manifest),
-                    parameter_digest=manifest.parameter_digest,
-                    training_artifact_digest=manifest.training_artifact_digest,
-                    code_digest=manifest.code_digest,
-                    contract_digest=manifest.contract_digest,
-                    evaluation_spec_digest=manifest.evaluation_spec_digest,
-                ),
+                active_model=active_model_evidence,
                 audit_committed=committed.audit_committed,
             ),
         )

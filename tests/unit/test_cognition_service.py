@@ -1,5 +1,6 @@
 """Safety and behavior tests for the first effect-free NB-1 runtime slice."""
 
+import json
 from datetime import UTC, datetime
 from threading import Lock
 
@@ -204,7 +205,7 @@ def build_service(
     digest = "a" * 64
     service = CognitiveCycleService(
         context_provider=context_provider,
-        memory_gate=MemoryServiceCognitiveGate(memory_service),
+        memory_gate=MemoryServiceCognitiveGate(memory_service, context_provider),
         workspace_provider=FixedWorkspaceProvider(
             workspace,
             ActiveCognitiveModelManifest(
@@ -256,6 +257,14 @@ def test_cycle_commits_serial_state_and_real_memory_audit() -> None:
     assert repository.audit_ids == ["cycle-1", "cycle-2"]
     assert second.checkpoint.hidden_state != first.checkpoint.hidden_state
     assert second.goal_proposal.goal_ref == "internal-goal:session-a"
+    working_key = (repository._key(context()), "nb1-cognition:session-a")
+    persisted = json.loads(repository.working[working_key].entries[0].content)
+    assert persisted["attention"] == second.attention.model_dump(mode="json")
+    assert persisted["goal_proposal"] == second.goal_proposal.model_dump(mode="json")
+    assert persisted["plan_proposal"] == second.plan_proposal.model_dump(mode="json")
+    assert persisted["metacognition"] == second.metacognition.model_dump(mode="json")
+    assert persisted["active_model"] == second.evidence.active_model.model_dump(mode="json")
+    assert persisted["next_checkpoint_version"] == second.checkpoint.version
 
 
 def test_exact_replay_is_idempotent_but_changed_payload_is_denied() -> None:
@@ -327,6 +336,38 @@ def test_cross_scope_checkpoint_and_incomplete_scope_fail_closed() -> None:
     with pytest.raises(CognitiveScopeError):
         service.run_cycle(request("cycle-3", "obs-3", (1.0, -1.0)))
     assert repository.audit_ids == ["cycle-1"]
+
+
+def test_divergent_cognitive_and_memory_context_providers_fail_before_commit() -> None:
+    cognitive_context = ContextProvider(context("session-a"))
+    memory_context = ContextProvider(context("session-b"))
+    repository = AtomicMemoryRepository()
+    memory_service = MemoryService(
+        context_provider=memory_context,
+        repository=repository,
+    )
+    workspace = NeuralWorkspace(parameters())
+    digest = "c" * 64
+    service = CognitiveCycleService(
+        context_provider=cognitive_context,
+        memory_gate=MemoryServiceCognitiveGate(memory_service, memory_context),
+        workspace_provider=FixedWorkspaceProvider(
+            workspace,
+            ActiveCognitiveModelManifest(
+                model_version=workspace.parameters.model_version,
+                parameter_digest=workspace_parameter_digest(workspace),
+                training_artifact_digest=digest,
+                code_digest=digest,
+                contract_digest=digest,
+                evaluation_spec_digest=digest,
+            ),
+        ),
+    )
+
+    with pytest.raises(CognitiveScopeError, match="context providers diverged"):
+        service.run_cycle(request("cycle-divergent", "obs-divergent", (1.0, -1.0)))
+    assert repository.checkpoints == {}
+    assert repository.audit_ids == []
 
 
 def test_trusted_provider_prevents_request_model_selection_and_model_switch() -> None:
