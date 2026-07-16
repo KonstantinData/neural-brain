@@ -1,12 +1,16 @@
 # Neural Brain Architecture Directive v2.0
 
-- Status: Normative memory-system baseline
+- Status: Superseded by Architecture Directive v3.0, ADR-016, and ADR-017
 - Version: 2.0
 - Effective date: 2026-07-15
 - Work item: Memory-system rebaseline
 - Repository: `neural-brain`
 - Governing decision: ADR-015
 - Supersedes: Architecture Directive v1.1
+
+> Historical baseline only. Architecture Directive v3.0 resolves the Tenant
+> catalog rule and defines governed Dreaming. This directive is no longer
+> implementation authority.
 
 ## 1. Purpose and applicability
 

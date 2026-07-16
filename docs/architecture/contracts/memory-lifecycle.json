@@ -2,9 +2,14 @@
   "document_type": "memory_lifecycle_contract",
   "format_version": 1,
   "contract_id": "neural-brain.memory-lifecycle",
-  "contract_version": "1.0.0",
+  "contract_version": "2.0.0",
   "status": "normative",
   "decision": "ADR-015",
+  "decisions": [
+    "ADR-015",
+    "ADR-016",
+    "ADR-017"
+  ],
   "operations": [
     {
       "id": "memory.observe",
@@ -46,6 +51,20 @@
       ]
     },
     {
+      "id": "memory.dreaming_dry_run",
+      "minimum_stage": "stage_1",
+      "result": "immutable Area-local analysis report and optional inactive non-retrievable candidates",
+      "requires": [
+        "authenticated Area scope",
+        "inactive Area and no active sessions",
+        "exclusive unexpired Dreaming lease",
+        "immutable complete snapshot",
+        "current policy and provenance",
+        "audit availability",
+        "Memory Transition Gate for candidate persistence"
+      ]
+    },
+    {
       "id": "memory.persist_episode_or_claim",
       "minimum_stage": "stage_2",
       "result": "governed episodic or semantic record",
@@ -79,6 +98,20 @@
         "current provenance and source assessment",
         "policy authorization",
         "producer-promoter separation when sensitive or risky",
+        "rollback target",
+        "Memory Transition Gate"
+      ]
+    },
+    {
+      "id": "memory.activate_dreaming_successor",
+      "minimum_stage": "stage_3",
+      "result": "active governed successor version with rollback target",
+      "requires": [
+        "independently validated Dreaming decision package",
+        "current source versions and provenance",
+        "policy authorization",
+        "producer-promoter separation when sensitive or risky",
+        "unchanged expected active version",
         "rollback target",
         "Memory Transition Gate"
       ]
@@ -138,7 +171,9 @@
     "Sensitive or risky promotion cannot be approved solely by its producer.",
     "Stale, expired, unknown-freshness, quarantined, deleted, or anonymized content is never returned as current fact.",
     "Deletion or anonymization covers dependent derivations, indexes, caches, and retrieval projections unless a documented legal hold applies.",
-    "A model output cannot directly activate, promote, delete, anonymize, or quarantine memory."
+    "A model output cannot directly activate, promote, delete, anonymize, or quarantine memory.",
+    "A Dreaming run operates on exactly one authenticated Area and cannot start with active sessions, an unavailable lease, or a stale or incomplete snapshot.",
+    "Stage 1 and Stage 2 Dreaming outputs remain inactive; only a Stage 3 Memory Transition Gate operation may activate a validated successor version."
   ],
   "cross_area": {
     "minimum_stage": "stage_4",

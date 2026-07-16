@@ -2,9 +2,11 @@
 
 ## Purpose
 
-FND-01.6 provides isolated local PostgreSQL development and test services. The
-environment is a Foundation reproducibility baseline, not the final Stage 1
-PostgreSQL version decision required by S1-03.1.
+The local environment provides isolated PostgreSQL development and test
+services for the completed Foundation baseline and the first Stage 1 memory
+kernel. It runs the protected hierarchy, observation, Working Memory,
+checkpoint, audit, and Dreaming dry-run migrations; it is not a
+production-ready deployment.
 
 The image is pinned to the multi-platform digest for the official PostgreSQL
 18.4 Bookworm image. Development and test data use separate containers, ports,
@@ -80,5 +82,7 @@ autocommit=True
 
 No database transaction may span local model inference, a consumer callback, a
 network request, or another unbounded external call. The local environment does
-not weaken database roles, the Memory Gate, provenance and audit atomicity,
-retention controls, or scope isolation planned for Stage 1.
+not weaken database roles, the Memory Gate, provenance and audit atomicity, or
+scope isolation. The Stage 1 role bootstrap, forward-migration validation, and
+live database tests are also enforced in CI. Retention and deletion controls
+remain a later Stage 1 implementation block.

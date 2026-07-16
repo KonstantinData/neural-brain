@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neural-brain.invalid/contracts/scope-catalog.schema.json",
+  "title": "Neural Brain hierarchy catalog and operational scope",
+  "description": "Typed catalog lineage from a singleton Brain through project-bound Sessions plus the authenticated scope required by operational memory. Catalog objects carry their own identifier and required parent lineage, never descendants; Brain ancestry below Tenant is resolved transitively through Tenant.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/BrainCatalogEntry"
+    },
+    {
+      "$ref": "#/$defs/TenantCatalogEntry"
+    },
+    {
+      "$ref": "#/$defs/AreaCatalogEntry"
+    },
+    {
+      "$ref": "#/$defs/ProjectCatalogEntry"
+    },
+    {
+      "$ref": "#/$defs/SessionCatalogEntry"
+    },
+    {
+      "$ref": "#/$defs/OperationalMemoryScope"
+    }
+  ],
+  "$defs": {
+    "OpaqueId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "BrainCatalogEntry": {
+      "type": "object",
+      "required": [
+        "catalog_kind",
+        "brain_id"
+      ],
+      "properties": {
+        "catalog_kind": {
+          "const": "brain"
+        },
+        "brain_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TenantCatalogEntry": {
+      "type": "object",
+      "required": [
+        "catalog_kind",
+        "brain_id",
+        "tenant_id"
+      ],
+      "properties": {
+        "catalog_kind": {
+          "const": "tenant"
+        },
+        "brain_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "tenant_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "additionalProperties": false
+    },
+    "AreaCatalogEntry": {
+      "type": "object",
+      "required": [
+        "catalog_kind",
+        "tenant_id",
+        "area_id"
+      ],
+      "properties": {
+        "catalog_kind": {
+          "const": "area"
+        },
+        "tenant_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "area_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "additionalProperties": false
+    },
+    "ProjectCatalogEntry": {
+      "type": "object",
+      "required": [
+        "catalog_kind",
+        "tenant_id",
+        "area_id",
+        "project_id"
+      ],
+      "properties": {
+        "catalog_kind": {
+          "const": "project"
+        },
+        "tenant_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "area_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "project_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "additionalProperties": false
+    },
+    "SessionCatalogEntry": {
+      "type": "object",
+      "required": [
+        "catalog_kind",
+        "tenant_id",
+        "area_id",
+        "project_id",
+        "session_id"
+      ],
+      "properties": {
+        "catalog_kind": {
+          "const": "session"
+        },
+        "tenant_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "area_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "project_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "session_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "additionalProperties": false
+    },
+    "OperationalMemoryScope": {
+      "type": "object",
+      "required": [
+        "scope_kind",
+        "tenant_id",
+        "area_id"
+      ],
+      "properties": {
+        "scope_kind": {
+          "const": "operational_memory"
+        },
+        "tenant_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "area_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "project_id": {
+          "$ref": "#/$defs/OpaqueId"
+        },
+        "session_id": {
+          "$ref": "#/$defs/OpaqueId"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "required": [
+              "session_id"
+            ]
+          },
+          "then": {
+            "required": [
+              "project_id"
+            ]
+          }
+        }
+      ],
+      "additionalProperties": false,
+      "x-trust-source": "authenticated_runtime_context_and_authoritative_catalog",
+      "x-immutable": true
+    }
+  },
+  "x-decision": "ADR-016",
+  "x-prohibitions": [
+    "Exactly one Brain catalog entry exists in a Neural Brain deployment.",
+    "A Tenant catalog entry never carries area_id.",
+    "A catalog entry never carries a descendant identifier or omits required parent lineage.",
+    "Operational memory never omits tenant_id or area_id.",
+    "Sentinel, nullable required, implicit, and payload-derived scope are prohibited."
+  ]
+}

@@ -16,7 +16,7 @@ def test_memory_release_stops_are_closed_and_non_waivable() -> None:
     criteria = contract["criteria"]
     assert isinstance(criteria, list)
     assert [item["id"] for item in criteria if isinstance(item, dict)] == [
-        f"MRS-{number:02d}" for number in range(1, 19)
+        f"MRS-{number:02d}" for number in range(1, 23)
     ]
     assert contract["default_behavior"] == "stop_implementation_and_release"
     assert contract["waiver"] == "prohibited"
@@ -36,9 +36,11 @@ def test_release_stops_cover_memory_safety_boundaries() -> None:
         "deletion or anonymization",
         "ready=true",
         "unknown commit outcome",
-        "tenant scope",
+        "tenant catalog entry",
         "backup or restore",
         "delivery-stage gate",
+        "dreaming can run",
+        "active-version pointer",
     ):
         assert expected in text
 

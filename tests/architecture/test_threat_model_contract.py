@@ -35,11 +35,11 @@ def _ids(rows: dict[str, str], prefix: str) -> set[str]:
 def test_catalog_identifiers_are_unique_and_complete(
     catalog_rows: dict[str, str],
 ) -> None:
-    assert _ids(catalog_rows, "A-") == {f"A-{number:02d}" for number in range(1, 16)}
-    assert _ids(catalog_rows, "TB-") == {f"TB-{number:02d}" for number in range(1, 13)}
-    assert _ids(catalog_rows, "T-") == {f"T-{number:02d}" for number in range(1, 22)}
-    assert _ids(catalog_rows, "M-") == {f"M-{number:02d}" for number in range(1, 16)}
-    assert _ids(catalog_rows, "V-") == {f"V-{number:02d}" for number in range(1, 16)}
+    assert _ids(catalog_rows, "A-") == {f"A-{number:02d}" for number in range(1, 17)}
+    assert _ids(catalog_rows, "TB-") == {f"TB-{number:02d}" for number in range(1, 14)}
+    assert _ids(catalog_rows, "T-") == {f"T-{number:02d}" for number in range(1, 26)}
+    assert _ids(catalog_rows, "M-") == {f"M-{number:02d}" for number in range(1, 17)}
+    assert _ids(catalog_rows, "V-") == {f"V-{number:02d}" for number in range(1, 17)}
 
 
 def test_every_threat_has_asset_mitigation_and_verification_references(
@@ -136,10 +136,13 @@ def test_release_stops_cover_memory_specific_failures(threat_model_text: str) ->
         assert term in normalized
 
 
-def test_tenant_root_conflict_is_not_silently_resolved(threat_model_text: str) -> None:
+def test_tenant_root_scope_and_dreaming_are_explicitly_governed(
+    threat_model_text: str,
+) -> None:
     normalized = " ".join(threat_model_text.split())
-    assert "remains a separate unresolved architecture question" in normalized
-    assert "neither creates a sentinel Area nor introduces an exception" in normalized
+    assert "ADR-016 hierarchy scope" in normalized
+    assert "ADR-017 governed Dreaming" in normalized
+    assert "descendant `area_id` on Tenant" in normalized
 
 
 def test_model_is_a_required_control_baseline_not_implementation_claim(

@@ -2,16 +2,22 @@
   "document_type": "system_boundary_contract",
   "format_version": 1,
   "contract_id": "neural-brain.system-boundary",
-  "contract_version": "1.0.0",
+  "contract_version": "2.0.0",
   "status": "normative",
   "decision": "ADR-015",
+  "decisions": [
+    "ADR-015",
+    "ADR-016",
+    "ADR-017"
+  ],
   "system_kind": "memory_system",
   "purpose": "Provide governed, scoped, provenance-preserving memory services to authenticated consumers.",
   "capabilities": [
     "validate typed memory requests",
+    "maintain typed hierarchy catalog lineage",
     "persist and retrieve governed memory records",
     "maintain provenance, freshness, retention, and deletion state",
-    "evaluate and promote memory candidates through the Memory Gate",
+    "perform governed Area-local Dreaming and evaluate memory candidates through the Memory Gate",
     "audit protected memory transitions atomically",
     "support recovery and reconciliation of memory-ledger state"
   ],
@@ -73,8 +79,14 @@
     "default": "deny"
   },
   "tenant_root_boundary": {
-    "status": "open_architecture_issue",
-    "rule": "This contract does not decide how a persistent Tenant root satisfies the general tenant_id and area_id persistence invariant.",
-    "implementation_effect": "No implementation may invent a sentinel Area, omit a required scope field, or encode a root exception until an accepted decision resolves the conflict."
+    "status": "resolved_by_ADR_016",
+    "rule": "Brain is a persisted singleton. Catalog objects carry their own immutable identifier and required parent lineage, never descendant identifiers. Tenant carries brain_id and tenant_id and does not carry area_id; Brain ancestry below Tenant is resolved transitively.",
+    "operational_memory_rule": "Every operational memory object carries authenticated immutable tenant_id and area_id; project- and session-bound memory also carries all applicable required parent identifiers.",
+    "prohibitions": [
+      "sentinel Area",
+      "nullable required scope identifier",
+      "implicit root scope",
+      "payload-derived scope"
+    ]
   }
 }

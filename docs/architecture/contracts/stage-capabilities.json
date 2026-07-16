@@ -2,9 +2,14 @@
   "document_type": "memory_stage_capability_contract",
   "format_version": 1,
   "contract_id": "neural-brain.memory-stage-capabilities",
-  "contract_version": "1.0.0",
+  "contract_version": "2.0.0",
   "status": "normative",
   "decision": "ADR-015",
+  "decisions": [
+    "ADR-015",
+    "ADR-016",
+    "ADR-017"
+  ],
   "semantics": {
     "stage_order": [
       "stage_1",
@@ -38,6 +43,26 @@
     }
   },
   "capabilities": [
+    {
+      "id": "memory.hierarchy_catalog",
+      "minimum_stage": "stage_1",
+      "availability": {
+        "stage_1": "allowed",
+        "stage_2": "allowed",
+        "stage_3": "allowed",
+        "stage_4": "allowed"
+      },
+      "scope": [
+        "Brain-to-Session catalog lineage",
+        "authenticated operational-memory scope resolution"
+      ],
+      "constraints": [
+        "Catalog objects carry their own identifier and required parent lineage, never descendants; Brain ancestry below Tenant is resolved transitively.",
+        "Tenant does not carry area_id.",
+        "Operational memory always carries tenant_id and area_id.",
+        "Sentinel, nullable required, implicit, and payload-derived scope are denied."
+      ]
+    },
     {
       "id": "memory.scoped_working_context",
       "minimum_stage": "stage_1",
@@ -75,6 +100,28 @@
         "Candidates are operational work items, not active memories.",
         "Candidates are excluded from normal retrieval until controlled Stage 3 promotion.",
         "Persistence alone never activates a candidate."
+      ]
+    },
+    {
+      "id": "memory.governed_dreaming",
+      "minimum_stage": "stage_1",
+      "availability": {
+        "stage_1": "allowed",
+        "stage_2": "allowed",
+        "stage_3": "allowed",
+        "stage_4": "allowed"
+      },
+      "scope": [
+        "Area-local offline memory analysis",
+        "immutable snapshots and decision packages",
+        "inactive candidate proposals"
+      ],
+      "constraints": [
+        "Stage 1 is dry-run only and cannot activate a successor or change an active pointer.",
+        "Stage 2 may analyze durable memory but cannot promote or activate.",
+        "Stage 3 owns controlled consolidation, independent validation, promotion, quarantine, and rollback.",
+        "Stage 4 cross-Area output is minimized candidate-only under a separate dual-scope transfer contract.",
+        "Every run requires an inactive Area, exclusive valid lease, immutable current snapshot, provenance, policy, and audit."
       ]
     },
     {
@@ -131,6 +178,7 @@
       },
       "scope": [
         "candidate assessment",
+        "Dreaming successor validation",
         "semantic consolidation and re-evaluation",
         "controlled promotion",
         "procedural memory",
@@ -188,6 +236,8 @@
     "Raw memory and working context do not cross an Area boundary in any stage.",
     "A later stage cannot override default deny, scope isolation, governance, the Memory Transition Gate, audit atomicity, privacy, retention, or deletion.",
     "A candidate is not active memory merely because it was persisted.",
+    "A Dreaming worker or model cannot write protected memory, activate a candidate, or change an active-version pointer directly.",
+    "Dreaming does not run in an active Area and never mixes raw memory across Areas.",
     "No configuration can enable a later-stage capability early."
   ]
 }

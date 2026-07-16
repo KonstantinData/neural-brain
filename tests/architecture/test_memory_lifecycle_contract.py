@@ -22,9 +22,11 @@ def test_memory_operations_have_declared_stage_result_and_requirements() -> None
         "memory.observe",
         "memory.checkpoint",
         "memory.propose_candidate",
+        "memory.dreaming_dry_run",
         "memory.persist_episode_or_claim",
         "memory.retrieve",
         "memory.promote_candidate",
+        "memory.activate_dreaming_successor",
         "memory.quarantine_or_rollback",
         "memory.delete_or_anonymize",
     }

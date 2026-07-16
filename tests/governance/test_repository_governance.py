@@ -148,8 +148,9 @@ def test_repository_narrative_defines_memory_system_consumer_boundary() -> None:
     assert "memory system" in readme
     assert "consumer_goal_ref" in readme
     assert "non-authoritative" in readme
-    assert "The persistent Tenant-root representation" in readme
-    assert "remains an open architecture decision" in readme
+    assert "Brain is a persisted singleton" in readme
+    assert "Session is project-bound" in readme
+    assert "No sentinel Area" in readme
     assert "Neural Brain itself is not an agent" in agents
     assert "Memory Transition Gate is the only writer" in agents
     assert "External agents may consume it" in contributing

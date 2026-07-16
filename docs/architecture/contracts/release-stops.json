@@ -2,9 +2,14 @@
   "document_type": "memory_release_stop_contract",
   "format_version": 1,
   "contract_id": "neural-brain.memory-release-stops",
-  "contract_version": "1.0.0",
+  "contract_version": "2.0.0",
   "status": "normative",
   "decision": "ADR-015",
+  "decisions": [
+    "ADR-015",
+    "ADR-016",
+    "ADR-017"
+  ],
   "default_behavior": "stop_implementation_and_release",
   "waiver": "prohibited",
   "criteria": [
@@ -70,7 +75,7 @@
     },
     {
       "id": "MRS-16",
-      "condition": "Implementation of persistent Tenant scope proceeds by inventing a root exception or sentinel Area before the open invariant is resolved."
+      "condition": "A Tenant catalog entry requires or accepts area_id, a catalog entry omits an ancestor or accepts a descendant identifier, or a sentinel, nullable required, implicit, or payload-derived scope is used."
     },
     {
       "id": "MRS-17",
@@ -79,6 +84,22 @@
     {
       "id": "MRS-18",
       "condition": "A memory delivery-stage gate is incomplete."
+    },
+    {
+      "id": "MRS-19",
+      "condition": "Dreaming can run while its Area has an active session or admitted live memory activity, without an exclusive valid lease, or with unknown activity state."
+    },
+    {
+      "id": "MRS-20",
+      "condition": "Dreaming can use a stale, incomplete, unaudited, or cross-Area snapshot or can mix raw memory from different Areas."
+    },
+    {
+      "id": "MRS-21",
+      "condition": "A Dreaming worker, model, Stage 1 dry run, or Stage 2 analysis can directly activate memory, promote a candidate, or change an active-version pointer."
+    },
+    {
+      "id": "MRS-22",
+      "condition": "A Dreaming successor can activate without independent validation, current provenance and policy, producer-promoter separation where required, or a rollback target."
     }
   ],
   "rules": [

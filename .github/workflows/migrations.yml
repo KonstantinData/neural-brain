@@ -52,12 +52,16 @@ jobs:
           uv python install
           uv sync --locked --all-groups
 
+      - name: Bootstrap fixed database roles
+        run: >-
+          uv run --locked --all-groups python tools/bootstrap_database_roles.py
+          --admin-dsn "$MIGRATION_ADMIN_DSN"
+
       - name: Validate repository migration plan
         run: >-
           uv run --locked --all-groups python tools/validate_migrations.py
           --admin-dsn "$MIGRATION_ADMIN_DSN"
           --migrations-dir migrations
-          --allow-empty
 
       - name: Prove forward migration from previous schema
         run: >-
@@ -67,3 +71,6 @@ jobs:
 
       - name: Run migration contract tests
         run: uv run --locked --all-groups pytest tests/migrations
+
+      - name: Run live scoped-memory database tests
+        run: uv run --locked --all-groups pytest tests/database

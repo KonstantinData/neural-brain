@@ -1,11 +1,11 @@
 # Neural Brain Memory-System Threat Model
 
 - Status: Normative Foundation security baseline
-- Version: 2.0
+- Version: 3.0
 - Effective date: 2026-07-15
 - Repository: `neural-brain`
 - Scope: product- and domain-neutral memory service
-- Related decision: ADR-015
+- Related decisions: ADR-015, ADR-016, and ADR-017
 
 ## Overview
 
@@ -19,9 +19,9 @@ their safety obligations remain outside this repository in consuming systems.
 This threat model covers authenticated ingress, schema and classification
 validation, source and provenance records, the Memory Gate, working and context
 memory, observations, episodes, semantic claims and assessments, retrieval and
-freshness evaluation, inactive candidates and controlled promotion, retention
-and deletion, derived indexes and caches, bounded local inference, PostgreSQL,
-audit, backup, restore, and readiness.
+freshness evaluation, inactive candidates, governed Dreaming and controlled
+promotion, retention and deletion, derived indexes and caches, bounded local
+inference, PostgreSQL, audit, backup, restore, and readiness.
 
 The repository is being rebaselined in its Foundation phase. This document
 defines required controls and verification evidence; it does not claim those
@@ -30,11 +30,11 @@ security certification. Unknown, missing, stale, expired, conflicting,
 malformed, unclassified, or unverifiable security-relevant state is denied by
 default.
 
-The precise persistent representation of the Brain and Tenant roots remains a
-separate unresolved architecture question. This model neither creates a
-sentinel Area nor introduces an exception to an existing scope rule. Its
-security requirements begin at authenticated consumer identity, trusted runtime
-scope, and explicit scope binding for every memory operation.
+ADR-016 resolves persistent hierarchy scope through typed catalog lineage. Each
+catalog object carries its own identifier and ancestors, never descendants; a
+Tenant therefore carries no `area_id`. Operational memory still requires
+authenticated `tenant_id` and `area_id`. This model permits neither sentinel or
+nullable required scope nor implicit or payload-derived root scope.
 
 ## Threat Model, Trust Boundaries, and Assumptions
 
@@ -57,6 +57,7 @@ scope, and explicit scope binding for every memory operation.
 | A-13 | Memory schemas, policies, classifications, and lifecycle contracts | Version integrity, default deny, controlled activation, and rollback |
 | A-14 | Backup, restore, reconciliation, and readiness evidence | Completeness, consistency, durability, and fail-closed readiness |
 | A-15 | Personal data, secrets, classified content, logs, metrics, and traces | Confidentiality, minimization, purpose limitation, and governed deletion |
+| A-16 | Dreaming leases, snapshots, reports, candidates, decision packages, validations, and active-version pointers | Area isolation, snapshot integrity, inactivity, non-activation by default, independent validation, auditability, and rollback |
 
 ### Actors and control assumptions
 
@@ -69,6 +70,7 @@ scope, and explicit scope binding for every memory operation.
 | Untrusted computational source | Local model response, extracted text, derived summary, embedding result, stale cache or index | May be wrong, adversarial, stale, or encode sensitive information; never determines scope, policy, promotion, or protected state directly |
 | Developer and operator | Contributor, dependency maintainer, migration author, CI operator, database operator | Can introduce code, schema, dependency, policy, configuration, or recovery defects; requires review, reproducible inputs, and auditable activation |
 | Infrastructure dependency | PostgreSQL, local inference server, filesystem, backup store, operating system | May be unavailable, compromised, stale, partially restored, or misconfigured; availability does not imply correctness |
+| Dreaming worker | Area-local snapshot reader, replay analyzer, candidate producer | Holds no direct protected-write or promotion authority; model-assisted output is untrusted; active Areas and unknown guard state are skipped or aborted |
 
 ### Repository trust-boundary diagram
 
@@ -92,6 +94,7 @@ flowchart LR
         Context["Working and context memory"]
         Durable["Episodes, claims, and assessments"]
         Candidate["Inactive candidates and controlled promotion"]
+        Dream["Area-local offline Dreaming"]
         Lifecycle["Retention, correction, deletion, and rollback"]
     end
 
@@ -121,6 +124,8 @@ flowchart LR
     Durable --> DB
     Candidate --> DB
     Lifecycle --> DB
+    DB -->|"immutable scoped snapshot"| Dream
+    Dream -->|"untrusted findings and candidates"| Validate
     DB --> Retrieval
     DB --> Index
     Index --> Retrieval
@@ -155,6 +160,7 @@ PostgreSQL.
 | TB-10 | Retention or deletion decision to all copies and derivatives | Propagate authorized lifecycle changes to episodes, claims, assessments, indexes, caches, summaries, and eligible backups with resumable evidence |
 | TB-11 | One Area to another Area | Raw memory disclosure is denied; later generalization requires an explicit accepted contract, sanitization, origin provenance, review, and auditable promotion |
 | TB-12 | Backup or restore to ready service | Reconcile records, audit, lifecycle state, indexes, deletion work, model configuration, and scope controls before readiness becomes true |
+| TB-13 | Authoritative Area snapshot to Dreaming decision package | Require an inactive Area, exclusive valid lease, immutable current snapshot, bounded analysis, retained provenance, inactive outputs, and independent validation before any Memory Gate transition |
 
 ### Security objectives and assumptions
 
@@ -186,6 +192,11 @@ PostgreSQL.
    accountable for their behavior and must not treat retrieval as authority.
 10. Readiness after startup or restore is false until reconciliation has proved
     authoritative and derived state consistent enough for the exposed ports.
+11. Hierarchy catalog entries carry their own immutable identifier and required
+    parent lineage, never descendants. Brain ancestry below Tenant is resolved
+    transitively. Catalog existence alone grants no memory access.
+12. Dreaming processes one inactive Area and one immutable snapshot at a time.
+    Workers and models cannot activate memory or change active pointers.
 
 ## Attack Surface, Mitigations, and Attacker Stories
 
@@ -214,6 +225,10 @@ PostgreSQL.
 | T-19 | A compromised connector replays an accepted ingestion, substitutes content under the same idempotency key, or changes data after validation, corrupting A-03, A-04, A-05, and A-11; enforce M-03, M-04, and M-08 and verify with V-03, V-05, and V-08. |
 | T-20 | Concurrent updates, stale versions, or duplicated workers lose corrections, resurrect deleted memory, double-promote candidates, or overwrite newer assessments, compromising A-06, A-08, A-09, and A-11; enforce M-04, M-08, and M-12 and verify with V-05, V-08, and V-12. |
 | T-21 | A malicious dependency, migration, policy activation, model artifact, or deployment configuration weakens isolation, changes schema semantics, enables external egress, or falsifies release evidence, compromising A-11 through A-14; enforce M-11, M-12, and M-15 and verify with V-11, V-12, and V-15. |
+| T-22 | A malformed catalog records a descendant `area_id` on Tenant, omits an ancestor, or accepts a sentinel, nullable, implicit, or payload-derived scope, corrupting A-02 and enabling isolation bypass; enforce M-02 and M-16 and verify with V-02 and V-16. |
+| T-23 | Dreaming starts while an Area has active sessions or admitted memory activity, races after an inactivity check, or proceeds with an unavailable or stale lease, producing an inconsistent snapshot and candidates that compromise A-04, A-08, A-11, and A-16; enforce M-16 and verify with V-16. |
+| T-24 | A Dreaming worker, model response, or early-stage dry run directly changes protected memory or an active-version pointer, self-promotes a conclusion, or suppresses contradictory evidence, compromising A-06, A-08, A-13, and A-16; enforce M-04, M-09, and M-16 and verify with V-05, V-09, and V-16. |
+| T-25 | A Dreaming snapshot or decision package mixes Areas, uses stale or incomplete source versions, loses provenance, or leaves sensitive reconstructive artifacts after deletion, compromising A-02, A-09, A-15, and A-16; enforce M-02, M-10, and M-16 and verify with V-02, V-10, and V-16. |
 
 ### Mitigation catalog
 
@@ -234,6 +249,7 @@ PostgreSQL.
 | M-13 | Keep audit and observability payloads minimal, structured, scope-aware, secret-free, access-controlled, retention-bound, and sufficient to prove who changed or disclosed what and why. |
 | M-14 | Publish explicit consumer contracts stating that memory output is context only; expose provenance and uncertainty; require consumers to own planning, actions, tools, approvals, verification, and autonomy. |
 | M-15 | Pin dependencies, runtime, schemas, migrations, model artifacts, and configuration; review privileged changes separately; scan for secrets; enforce resource limits and immutable release evidence. |
+| M-16 | Enforce typed hierarchy lineage and Area-local Dreaming: verify inactive sessions and admitted activity under an exclusive lease, bind an immutable snapshot epoch, keep outputs inactive, treat model results as untrusted, require independent validation and Memory-Gate-only activation, preserve rollback, and reconcile interrupted runs before readiness. |
 
 ### Verification catalog
 
@@ -254,6 +270,7 @@ PostgreSQL.
 | V-13 | Audit completeness, causation linkage, payload minimization, log and trace access, secret scanning, retention, tamper evidence, and audit-failure tests. |
 | V-14 | Consumer contract tests and deployment review proving the Brain exposes no planning, action, tool execution, task-completion verification, scheduling, or autonomous-loop capability. |
 | V-15 | Locked clean-checkout build, dependency and model-artifact integrity, migration review, configuration validation, resource limits, egress policy, ADR consistency, and immutable release-evidence checks. |
+| V-16 | Catalog positive and negative lineage tests; Tenant-with-`area_id` rejection; operational scope tests; Dreaming active-session and race tests; lease expiry and replay; stale or incomplete snapshot; cross-Area denial; inactive-output and pointer-immutability checks; independent validation, crash, audit failure, recovery, quarantine, and rollback tests. |
 
 ### Realistic attacker stories
 
@@ -288,6 +305,9 @@ PostgreSQL.
 - The future mechanics of cross-area generalization require a separate accepted
   contract and updated threat analysis. This baseline permits inactive
   candidates but does not authorize raw cross-area retrieval or promotion.
+- Dreaming scheduling frequency, capacity allocation, and model selection are
+  trusted deployment policy. Memory content, candidates, and consumers cannot
+  select or widen them.
 - Total compromise of the host, PostgreSQL superuser, hardware root of trust, or
   CI administrator is outside the containment claim of application-level
   controls. Deployment hardening, independent backups, provenance, detection,
@@ -331,6 +351,15 @@ Release of an affected capability stops if any of the following is possible:
     runtime loop.
 13. A critical or high threat in this model lacks implemented mitigation and
     objective verification evidence for the capability being released.
+14. A Tenant carries `area_id`, operational memory omits authenticated
+    `tenant_id` or `area_id`, or catalog lineage accepts a missing ancestor,
+    descendant identifier, sentinel, nullable required, implicit, or
+    payload-derived scope.
+15. Dreaming can run in an active Area, without an exclusive valid lease and
+    immutable current snapshot, across Areas, or with unknown guard state.
+16. A Dreaming worker, model, Stage 1 dry run, or Stage 2 analysis can directly
+    activate memory, promote a candidate, change an active pointer, or bypass
+    independent validation and rollback.
 
 No later stage, policy exception, operator approval, consumer convenience, or
 availability workaround may waive a release stop.
@@ -384,4 +413,4 @@ metric, or documentation drift caught by contract tests before release. Pure
 style defects and scenarios requiring total host compromise without increasing
 the attacker's existing power are not security findings.
 
-Baseline: ADR-015 memory-system boundary
+Baseline: ADR-015 memory-system boundary, ADR-016 hierarchy scope, and ADR-017 governed Dreaming

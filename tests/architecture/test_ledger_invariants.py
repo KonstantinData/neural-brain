@@ -48,6 +48,8 @@ def test_memory_ledger_invariant_registry_is_exact() -> None:
         "MLI-009": "area_isolation",
         "MLI-010": "reconciliation_before_ready",
         "MLI-011": "unknown_state_fails_closed",
+        "MLI-012": "catalog_lineage_typed",
+        "MLI-013": "dreaming_cannot_activate_directly",
     }
 
 

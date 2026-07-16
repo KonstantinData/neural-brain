@@ -52,16 +52,16 @@ runtime concerns: ADR-004, ADR-006, ADR-007, ADR-008, ADR-009, and ADR-011.
 Their files remain as historical records. ADR-001, ADR-002, ADR-003, ADR-005,
 ADR-010, ADR-012, ADR-013, and ADR-014 remain accepted as amended by this ADR.
 
-Architecture Directive v1.1 is superseded by Architecture Directive v2.0.
+Architecture Directive v1.1 is superseded by Architecture Directive v2.0,
+which is in turn superseded by Architecture Directive v3.0.
 
-## Explicitly Open Decision
+## Resolution by ADR-016
 
-This ADR does not resolve how the persistent Tenant root relates to the rule
-that every persistent domain object carries `tenant_id` and `area_id`. A Tenant
-cannot naturally reference an Area below itself without a circular or synthetic
-scope. Until a separate accepted decision resolves that conflict, the affected
-Tenant-root schema and dependent implementation remain blocked. No sentinel
-Area, nullable exception, or implicit root scope is authorized here.
+At the time of acceptance, this ADR left the persistent Tenant-root rule open.
+ADR-016 now resolves it through typed catalog objects with explicit required
+parent lineage, while operational memory always carries `tenant_id` and
+`area_id`. No sentinel Area, nullable exception, or implicit root scope is
+authorized.
 
 ## Consequences
 
@@ -89,6 +89,6 @@ Area, nullable exception, or implicit root scope is authorized here.
 
 ## Relationship to the Architecture Directive
 
-Architecture Directive v2.0 is the normative consolidation of this decision.
-It replaces the agent-system boundary in v1.1 with the memory-system boundary
-and preserves the unresolved Tenant-root conflict as a release stop.
+Architecture Directive v3.0 is the current normative consolidation of this
+decision together with ADR-016 and ADR-017. It retains the memory-system
+boundary, resolves the Tenant-root conflict, and adds governed Dreaming.

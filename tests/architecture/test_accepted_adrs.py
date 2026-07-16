@@ -13,7 +13,7 @@ def _adr_paths() -> list[Path]:
 def test_repository_contains_current_accepted_adr_sequence() -> None:
     paths = _adr_paths()
     identifiers = [path.name[:7] for path in paths]
-    assert identifiers == [f"ADR-{number:03d}" for number in range(1, 16)]
+    assert identifiers == [f"ADR-{number:03d}" for number in range(1, 18)]
 
 
 def test_fnd_02_7_foundation_baseline_is_adr_001_through_adr_013() -> None:
@@ -37,9 +37,9 @@ def test_adr_has_traceable_decision_record(adr_path: Path) -> None:
 
 def test_adr_index_records_complete_continuous_sequence() -> None:
     index = (ADR_DIRECTORY / "README.md").read_text(encoding="utf-8")
-    for number in range(1, 16):
+    for number in range(1, 18):
         assert f"[ADR-{number:03d}]" in index
-    assert "continuous decision sequence from ADR-001 through\nADR-015" in index
+    assert "continuous decision sequence from ADR-001 through\nADR-017" in index
 
 
 def test_adr_015_is_current_governing_boundary_decision() -> None:
@@ -49,7 +49,21 @@ def test_adr_015_is_current_governing_boundary_decision() -> None:
     assert "- Status: Accepted" in text
     assert "Neural Brain is a product- and domain-neutral memory system" in text
     assert "Goals, plans, action intents, tools, execution" in text
-    assert "This ADR does not resolve how the persistent Tenant root" in text
+    assert "resolves the Tenant-root conflict" in text
+
+
+def test_adr_016_and_017_are_current_scope_and_dreaming_decisions() -> None:
+    scope = (ADR_DIRECTORY / "ADR-016-hierarchy-catalog-and-operational-memory-scope.md").read_text(
+        encoding="utf-8"
+    )
+    dreaming = (ADR_DIRECTORY / "ADR-017-governed-area-local-dreaming.md").read_text(
+        encoding="utf-8"
+    )
+    assert "exactly one Brain catalog row" in scope
+    assert "Tenant carries `brain_id` and `tenant_id`; it does not carry `area_id`" in scope
+    assert "Session carries `tenant_id`, `area_id`, `project_id`, and `session_id`" in scope
+    assert "Stage 1 permits only a Dreaming dry run" in dreaming
+    assert "cannot change an active-version pointer" in dreaming
 
 
 @pytest.mark.parametrize("number", [4, 6, 7, 8, 9, 11])

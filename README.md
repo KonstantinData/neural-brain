@@ -10,11 +10,11 @@ The Brain accepts bounded memory requests, enforces identity and scope, stores
 and retrieves evidence-backed records, and governs retention, deletion,
 consolidation, and learning.
 
-The project is being rebaselined in its Foundation phase. Its Python toolchain
-and engineering quality environment are reproducible, but it does not yet
-provide a stable production API or production-ready deployment. Repository
-documentation describes the intended memory platform without claiming that
-later-stage capabilities already exist.
+The project has completed its Foundation milestone and is in early Stage 1.
+The current implementation provides a protected PostgreSQL vertical slice for
+the hierarchy catalog, observations, Working Memory, checkpoints, atomic audit,
+and guarded Dreaming dry runs. It does not yet provide a stable production API,
+complete Stage 1 operations, or a production-ready deployment.
 
 ## Who This Is For
 
@@ -71,13 +71,15 @@ Brain
             └── Session
 ```
 
-Tenant and Area are mandatory authenticated isolation dimensions for
-operational memory. Projects and sessions provide narrower provenance and
-retrieval context where applicable. The persistent Tenant-root representation
-remains an open architecture decision because a Tenant cannot naturally carry
-an `area_id` for an Area below it. No sentinel Area, nullable exception, or
-implicit root scope is authorized. Scope and actor identity come only from
-authenticated runtime context and are immutable after persistence.
+Brain, Tenant, Area, Project, and Session are typed hierarchy catalog objects.
+Brain is a persisted singleton. Tenant has `brain_id` and `tenant_id`, but no
+`area_id`. Area has `tenant_id` and `area_id`; its Brain is resolved transitively
+through Tenant. Project adds `project_id`, and Session is project-bound and adds
+`session_id`. Operational memory always carries authenticated `tenant_id` and
+`area_id`; project- and session-bound memory also carries every applicable
+parent identifier. No sentinel Area, nullable required identifier, or implicit
+root scope is authorized. Scope and actor identity come only from authenticated
+runtime context and are immutable after persistence.
 
 External identifiers such as `consumer_session_ref`, `consumer_goal_ref`, and
 `consumer_task_ref` may be stored only as non-authoritative correlation
@@ -98,14 +100,17 @@ and verification guarantees of the previous one:
 
 1. **Foundation (`MS-0`)** — repository governance, normative memory
    architecture, contracts, engineering quality, and CI baselines.
-2. **Stage 1 (`MS-1`)** — a secure scoped memory kernel with authenticated
-   consumers and producers, sources and provenance, ingestion normalization and
-   salience, working/context memory, observations, checkpoints, the Memory Gate,
-   audit and RLS, retention and deletion foundations, and backup/restore.
+2. **Stage 1 (`MS-1`)** — a secure scoped memory kernel with the hierarchy
+   catalog, authenticated consumers and producers, source references and
+   provenance, ingestion normalization and salience, working/context memory,
+   observations, checkpoints, the Memory Gate, inactive candidates, Dreaming
+   dry runs, audit and RLS, retention and deletion foundations, and
+   backup/restore.
 3. **Stage 2 (`MS-2`)** — durable episodic and semantic memory, claims and
    assessments, ranked retrieval, and freshness handling.
-4. **Stage 3 (`MS-3`)** — controlled consolidation, re-evaluation, procedural
-   memory, quarantine, and rollback.
+4. **Stage 3 (`MS-3`)** — controlled Dreaming consolidation, independent
+   assessment, re-evaluation, procedural memory, quarantine, promotion, and
+   rollback.
 5. **Stage 4 (`MS-4`)** — governed cross-area abstraction and handover plus
    scalable distributed memory and index reconciliation.
 
@@ -113,6 +118,20 @@ Later-stage features must not be enabled early or used to compensate for a
 missing earlier-stage control. Local model inference is an internal bounded
 memory-processing dependency, not an autonomous agent capability. It cannot
 perform external actions or bypass deterministic gates.
+
+## Dreaming
+
+Dreaming is Neural Brain's governed offline memory-analysis process. It works on
+one inactive Area and one immutable snapshot at a time, under an exclusive
+lease. It can replay evidence, detect duplication or contradiction, assess
+freshness, and propose inactive candidates. It is not an agent and cannot
+execute tools or external actions.
+
+Stage 1 supports only a dry run: reports, findings, and inactive candidates. A
+Dreaming worker or model cannot change protected memory or an active-version
+pointer. Controlled activation begins in Stage 3 and requires independent
+validation, a separate Memory Gate transition, preserved provenance, and a
+rollback target. Raw cross-Area Dreaming is prohibited.
 
 ## Non-Goals
 
@@ -155,7 +174,8 @@ proposals, not implementation authorization.
 ## Quick Start
 
 There is no production memory service to start yet. The Foundation quality
-environment is executable and locked.
+environment and the first Stage 1 PostgreSQL memory-kernel slice are executable
+and locked.
 
 Prerequisite: uv 0.11.28.
 

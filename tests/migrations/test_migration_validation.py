@@ -67,6 +67,24 @@ def test_migration_cannot_control_its_transaction(tmp_path: Path, statement: str
         discover_migrations(tmp_path)
 
 
+def test_plpgsql_function_body_may_contain_begin_and_rollback_words(tmp_path: Path) -> None:
+    """Transaction keywords inside a dollar-quoted routine body are not top-level control."""
+
+    (tmp_path / "0001_function.sql").write_text(
+        """CREATE FUNCTION example() RETURNS void LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE NOTICE 'ROLLBACK is descriptive text';
+END;
+$$;
+""",
+        encoding="utf-8",
+    )
+
+    migrations = discover_migrations(tmp_path)
+
+    assert len(migrations) == 1
+
+
 def test_disposable_database_guard_accepts_only_exact_generated_namespace() -> None:
     validate_disposable_database_name(f"{DATABASE_PREFIX}0123456789abcdef")
 
@@ -94,7 +112,9 @@ def test_ci_pins_postgresql_18_and_proves_both_migration_paths() -> None:
     assert "uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0" in WORKFLOW
     assert "version: 0.11.28" in WORKFLOW
     assert "uv sync --locked --all-groups" in WORKFLOW
-    assert WORKFLOW.count("uv run --locked --all-groups") == 3
+    assert WORKFLOW.count("uv run --locked --all-groups") == 5
+    assert "tools/bootstrap_database_roles.py" in WORKFLOW
     assert "--migrations-dir migrations" in WORKFLOW
     assert "--migrations-dir tests/migrations/fixtures/forward" in WORKFLOW
-    assert "--allow-empty" in WORKFLOW
+    assert "--allow-empty" not in WORKFLOW
+    assert "pytest tests/database" in WORKFLOW

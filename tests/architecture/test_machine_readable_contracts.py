@@ -20,12 +20,14 @@ def _maps(value: object) -> list[dict[str, object]]:
 def test_contract_inventory_is_memory_only() -> None:
     assert {path.name for path in CONTRACTS.glob("*.json")} == {
         "envelopes.json",
+        "dreaming.json",
         "inference-provider.json",
         "ledger-invariants.json",
         "memory-lifecycle.json",
         "release-stops.json",
         "stage-capabilities.json",
         "system-boundary.json",
+        "scope-catalog.json",
     }
 
 
@@ -64,11 +66,12 @@ def test_consumer_correlations_are_non_authoritative() -> None:
     assert correlations["authority"] == "none"
 
 
-def test_tenant_root_conflict_remains_explicitly_open() -> None:
+def test_tenant_root_conflict_is_resolved_by_typed_catalog_contract() -> None:
     boundary = _load("system-boundary.json")["tenant_root_boundary"]
     assert isinstance(boundary, dict)
-    assert boundary["status"] == "open_architecture_issue"
-    assert "sentinel Area" in str(boundary["implementation_effect"])
+    assert boundary["status"] == "resolved_by_ADR_016"
+    assert "persisted singleton" in str(boundary["rule"])
+    assert "sentinel Area" in boundary["prohibitions"]
 
 
 def test_stage_capabilities_are_cumulative_memory_capabilities() -> None:

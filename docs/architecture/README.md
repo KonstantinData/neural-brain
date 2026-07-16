@@ -8,8 +8,11 @@ that have not been accepted remain outside the normative architecture baseline.
 
 ## Normative baseline
 
+- [`architecture-directive-v3.0.md`](architecture-directive-v3.0.md) is the
+  current normative memory-system directive governed by ADR-015, ADR-016, and
+  ADR-017.
 - [`architecture-directive-v2.0.md`](architecture-directive-v2.0.md) is the
-  current normative memory-system directive governed by ADR-015.
+  superseded memory-system baseline retained as historical evidence.
 - [`architecture-directive-v1.1.md`](architecture-directive-v1.1.md) is the
   superseded agent-system baseline retained as historical evidence.
 - `contracts/` contains machine-readable contracts produced by their owning
@@ -21,6 +24,8 @@ Current machine-readable contracts:
 - [`contracts/system-boundary.json`](contracts/system-boundary.json) defines
   Neural Brain's memory-only capability boundary and excludes agent-runtime
   responsibilities.
+- [`contracts/scope-catalog.json`](contracts/scope-catalog.json) defines typed
+  Brain-to-Session catalog lineage without descendant or sentinel scope.
 - [`contracts/envelopes.json`](contracts/envelopes.json) defines validated,
   provenance-bearing memory request and result envelopes with immutable
   authenticated scope.
@@ -36,6 +41,8 @@ Current machine-readable contracts:
   boundary.
 - [`contracts/release-stops.json`](contracts/release-stops.json) is the
   machine-readable memory-system release-stop set.
+- [`contracts/dreaming.json`](contracts/dreaming.json) defines Area-local
+  offline Dreaming, stage limits, artifacts, guards, and prohibited effects.
 
 The superseded Goal, Action Intent, intent-purpose, and quiescence contracts
 were removed from the active tree. Their Git history and superseded ADRs remain

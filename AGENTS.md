@@ -55,13 +55,14 @@ actions, establish scope, or bypass deterministic gates.
 
 ## Scope, Provenance, and Identity Invariants
 
-- The current logical hierarchy is Brain, Tenant, Area, Project, then Session.
-  Tenant and Area are mandatory authenticated memory-isolation dimensions for
-  operational memory.
-- The persistent Tenant-root representation remains an open architecture
-  decision because Tenant cannot naturally carry the `area_id` of an Area below
-  it. No sentinel Area, nullable exception, or implicit root scope is
-  authorized.
+- Brain, Tenant, Area, Project, and Session are typed hierarchy catalog objects.
+  Brain is a persisted singleton. Tenant carries `brain_id` and `tenant_id` but
+  no `area_id`; Area and its descendants carry their required Tenant/Area parent
+  lineage. Brain ancestry below Tenant is resolved transitively through Tenant.
+- Operational memory always carries authenticated immutable `tenant_id` and
+  `area_id`. Project- and session-bound memory also carries every applicable
+  ancestor identifier. No sentinel Area, nullable required identifier, or
+  implicit root scope is authorized.
 - `Area` separates distinct memory contexts.
 - Project and session identifiers narrow provenance and retrieval context when
   the record is bound to those levels.
@@ -116,6 +117,20 @@ permissions, transitions, and audit evidence must preserve these boundaries.
   cleanup are protected transitions.
 - Protected memory changes and their audit records commit atomically.
 
+## Governed Dreaming
+
+- Dreaming is an Area-local offline memory-analysis process, not an autonomous
+  agent loop.
+- A run requires authenticated Area scope, an inactive Area, an exclusive
+  Dreaming lease, and an immutable versioned snapshot.
+- Stage 1 Dreaming is dry-run only. It may produce reports, findings, and
+  inactive candidates, but cannot activate a successor memory version or change
+  an active pointer.
+- Dreaming workers and model output never mutate protected memory directly,
+  approve their own candidates, or mix raw memory across Areas.
+- Stage 3 promotion requires independent validation, a separate Memory Gate
+  transition, preserved provenance, and a rollback target.
+
 ## Delivery Stages
 
 Implement strictly in this order:
@@ -133,9 +148,10 @@ missing earlier-stage safety mechanism. Stage 1 establishes authenticated
 consumers and producers, source provenance, ingestion normalization and
 salience, working/context memory, observations, checkpoints, inactive
 candidates, the Memory Gate, audit and RLS, retention and deletion foundations,
-and backup/restore. Stage 2 adds durable episodic and semantic memory, claims,
-assessments, ranked retrieval, and freshness. Stage 3 owns controlled
-consolidation, re-evaluation, procedural memory, quarantine, and rollback.
+Dreaming dry runs, and backup/restore. Stage 2 adds durable episodic and
+semantic memory, claims, assessments, ranked retrieval, freshness, and inactive
+Dreaming analysis. Stage 3 owns controlled Dreaming consolidation,
+re-evaluation, procedural memory, quarantine, promotion, and rollback.
 Stage 4 owns governed cross-area abstraction and handover plus scalable
 distributed memory and index reconciliation.
 
