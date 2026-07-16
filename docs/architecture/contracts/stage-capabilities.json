@@ -1,193 +1,129 @@
 {
-  "document_type": "memory_stage_capability_contract",
-  "format_version": 1,
-  "contract_id": "neural-brain.memory-stage-capabilities",
-  "contract_version": "1.0.0",
-  "status": "normative",
-  "decision": "ADR-015",
+  "document_type": "neural_brain_stage_capabilities",
+  "format_version": 3,
+  "contract_id": "neural-brain.stage-capabilities",
+  "contract_version": "3.0.0",
+  "status": "normative_target",
+  "decision": "ADR-018",
   "semantics": {
+    "domain": "integrated_neural_cognitive_system",
     "stage_order": [
-      "stage_1",
-      "stage_2",
-      "stage_3",
-      "stage_4"
+      "nb_0",
+      "nb_1",
+      "nb_2",
+      "nb_3",
+      "nb_4",
+      "nb_5",
+      "nb_6",
+      "nb_7",
+      "nb_8"
     ],
     "cumulative": true,
-    "domain": "memory_only",
-    "rule": "A stage adds memory capabilities only. It never authorizes goal management, planning, tool execution, external effects, or task orchestration."
+    "unknown_operation": "denied",
+    "later_stage_early_enablement": "denied",
+    "failed_or_unknown_gate": "release_stop"
   },
-  "request_enforcement": {
-    "known_operation": {
-      "rule": "Resolve the operation to its declared memory capability and compare its minimum stage with the accepted deployment stage.",
-      "unavailable_result": "denied",
-      "deny_before": [
-        "content_processing",
-        "inference_invocation",
-        "Memory Transition Gate execution",
-        "protected memory mutation",
-        "index or cache update",
-        "retrieval result emission"
-      ]
-    },
-    "unknown_operation": {
-      "result": "denied",
-      "rule": "An unknown, malformed, unclassified, or non-memory operation is denied before processing or side effects."
-    },
-    "configuration": {
-      "rule": "Configuration, policy, approval, request content, consumer correlation, prompt, or model output cannot change the accepted stage or enable a denied capability."
-    }
-  },
-  "capabilities": [
+  "stages": [
     {
-      "id": "memory.scoped_working_context",
-      "minimum_stage": "stage_1",
-      "availability": {
-        "stage_1": "allowed",
-        "stage_2": "allowed",
-        "stage_3": "allowed",
-        "stage_4": "allowed"
-      },
-      "scope": [
-        "bounded working context",
-        "immutable versioned checkpoints",
-        "observations"
+      "id": "nb_0",
+      "name": "Foundation Rebaseline",
+      "capabilities": [
+        "full-system contracts",
+        "recognition and evaluation harness",
+        "protected Memory Core foundation"
       ],
-      "constraints": [
-        "Only the Memory Transition Gate writes protected memory state.",
-        "Every record has authenticated immutable scope, governance metadata, and provenance.",
-        "Raw working context never crosses an Area boundary."
-      ]
+      "prohibited": ["productive cognition", "external effects", "active model learning"]
     },
     {
-      "id": "memory.inactive_candidates",
-      "minimum_stage": "stage_1",
-      "availability": {
-        "stage_1": "allowed",
-        "stage_2": "allowed",
-        "stage_3": "allowed",
-        "stage_4": "allowed"
-      },
-      "scope": [
-        "inactive semantic candidates",
-        "inactive procedural candidates"
+      "id": "nb_1",
+      "name": "Safe Serial Neural Cognition",
+      "capabilities": [
+        "stateful neural workspace",
+        "attention and working memory",
+        "internal goal and planning proposals",
+        "recorded or synthetic observations"
       ],
-      "constraints": [
-        "Candidates are operational work items, not active memories.",
-        "Candidates are excluded from normal retrieval until controlled Stage 3 promotion.",
-        "Persistence alone never activates a candidate."
-      ]
+      "prohibited": ["live external effects", "online active-model mutation", "parallel goals"]
     },
     {
-      "id": "memory.privacy_and_deletion_foundation",
-      "minimum_stage": "stage_1",
-      "availability": {
-        "stage_1": "allowed",
-        "stage_2": "allowed",
-        "stage_3": "allowed",
-        "stage_4": "allowed"
-      },
-      "scope": [
-        "classification and purpose limitation",
-        "retention metadata and legal hold foundation",
-        "deletion responsibility and deletion-work recording"
+      "id": "nb_2",
+      "name": "Perception, Attention, and World Model",
+      "capabilities": [
+        "temporal active perception",
+        "multimodal binding",
+        "action-conditioned world model",
+        "simulation-only active sensing"
       ],
-      "constraints": [
-        "Immutable means unchanged until policy-compliant deletion or anonymization.",
-        "Stage 1 establishes the deletion foundation; dependency-aware deletion and anonymization execute only from Stage 2.",
-        "Secrets and credentials are excluded."
-      ]
+      "prohibited": ["uncontrolled external effects", "observation-prediction conflation"]
     },
     {
-      "id": "memory.episodic_semantic_retrieval",
-      "minimum_stage": "stage_2",
-      "availability": {
-        "stage_1": "denied",
-        "stage_2": "allowed",
-        "stage_3": "allowed",
-        "stage_4": "allowed"
-      },
-      "scope": [
-        "Source Registry",
-        "episodic memory",
-        "semantic claims and assessments",
+      "id": "nb_3",
+      "name": "Differentiated Memory and Retrieval",
+      "capabilities": [
+        "working episodic semantic and procedural memory",
         "scope-safe retrieval",
-        "freshness evaluation",
-        "dependency-aware deletion and anonymization"
+        "freshness uncertainty contradiction and deletion"
       ],
-      "constraints": [
-        "Retrieval returns provenance and freshness.",
-        "Stage 2 does not authorize candidate promotion or procedural learning.",
-        "Unknown-freshness content is not represented as current fact."
-      ]
+      "prohibited": ["automatic risky promotion", "procedural memory as execution authority"]
     },
     {
-      "id": "memory.controlled_consolidation",
-      "minimum_stage": "stage_3",
-      "availability": {
-        "stage_1": "denied",
-        "stage_2": "denied",
-        "stage_3": "allowed",
-        "stage_4": "allowed"
-      },
-      "scope": [
-        "candidate assessment",
-        "semantic consolidation and re-evaluation",
-        "controlled promotion",
-        "procedural memory",
-        "quarantine and rollback"
+      "id": "nb_4",
+      "name": "Learning, Consolidation, and Plasticity",
+      "capabilities": [
+        "selective replay",
+        "fast and slow learning paths",
+        "immutable model candidates",
+        "independent promotion canary and rollback"
       ],
-      "constraints": [
-        "Sensitive or risky candidates preserve producer-promoter separation.",
-        "Promotion creates a new version and preserves source provenance.",
-        "Procedural memory is information for consumers and cannot execute a procedure."
-      ]
+      "prohibited": ["in-place productive self-modification", "self-change of safety or evaluation"]
     },
     {
-      "id": "memory.governed_distribution_and_scale",
-      "minimum_stage": "stage_4",
-      "availability": {
-        "stage_1": "denied",
-        "stage_2": "denied",
-        "stage_3": "denied",
-        "stage_4": "allowed"
-      },
-      "scope": [
-        "distributed memory-ledger ownership",
-        "fenced projection and indexing workers",
-        "replication and disaster recovery",
-        "explicitly contracted minimized memory handover"
+      "id": "nb_5",
+      "name": "Closed Perception-Cognition-Action Loop",
+      "capabilities": [
+        "bounded single-goal action",
+        "controlled tool sandbox",
+        "post-action observation",
+        "independent effect and goal verification"
       ],
-      "constraints": [
-        "Distributed operation preserves single protected-transition ownership, audit atomicity, and fail-closed recovery.",
-        "No raw memory, working context, authority, or implicit access crosses an Area boundary.",
-        "Any cross-Area handover requires a separately accepted explicit contract and dual-scope authorization; Stage 4 alone does not create that authorization."
-      ]
+      "prohibited": ["unbounded tools", "parallel goals", "distributed execution ownership"]
+    },
+    {
+      "id": "nb_6",
+      "name": "Transfer, Causality, and Metacognition",
+      "capabilities": [
+        "continual adaptation",
+        "causal interventions",
+        "held-out transfer",
+        "calibrated stop ask explore fallback and escalate"
+      ],
+      "prohibited": ["self-authorization", "self-selected success criteria"]
+    },
+    {
+      "id": "nb_7",
+      "name": "Multi-Goal Executive Control",
+      "capabilities": [
+        "hierarchical goals",
+        "preemption and fair scheduling",
+        "attention budget and resource arbitration"
+      ],
+      "prohibited": ["unauthorized goal creation", "safety goal preemption"]
+    },
+    {
+      "id": "nb_8",
+      "name": "Distributed Operation and Scale",
+      "capabilities": [
+        "fenced distributed ownership",
+        "durable queues leases and failover",
+        "disaster recovery",
+        "governed cross-Area abstraction"
+      ],
+      "prohibited": ["split-brain authority", "implicit raw cross-Area sharing"]
     }
   ],
-  "candidate_semantics": {
-    "kind": "operational_work_item",
-    "is_active_memory": false,
-    "stage_1": {
-      "normal_retrieval": false,
-      "promotion": "denied"
-    },
-    "stage_2": {
-      "normal_retrieval": false,
-      "promotion": "denied"
-    },
-    "stage_3": {
-      "controlled_assessment": "allowed",
-      "controlled_promotion": "allowed"
-    },
-    "stage_4": {
-      "inherits_stage_3_controls": true
-    }
-  },
-  "absolute_prohibitions": [
-    "Neural Brain does not own goals, plans, tools, actions, external effects, or task-success decisions in any stage.",
-    "Raw memory and working context do not cross an Area boundary in any stage.",
-    "A later stage cannot override default deny, scope isolation, governance, the Memory Transition Gate, audit atomicity, privacy, retention, or deletion.",
-    "A candidate is not active memory merely because it was persisted.",
-    "No configuration can enable a later-stage capability early."
-  ]
+  "recognition": {
+    "minimum_stage_for_candidate_label": "nb_6",
+    "required_evaluation_gate": "g8",
+    "production_autonomy_is_separate_approval": true
+  }
 }

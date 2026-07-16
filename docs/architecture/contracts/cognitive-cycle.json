@@ -1,0 +1,46 @@
+{
+  "document_type": "protected_cognitive_cycle",
+  "format_version": 1,
+  "contract_id": "neural-brain.cognitive-cycle",
+  "contract_version": "1.0.0",
+  "status": "normative_target",
+  "decision": "ADR-018",
+  "steps": [
+    "observation_admission",
+    "perceptual_inference_and_binding",
+    "attention_competition",
+    "workspace_and_working_memory_update",
+    "memory_retrieval",
+    "world_self_and_value_belief_update",
+    "goal_and_executive_arbitration",
+    "planning_and_action_selection",
+    "action_gate_decision",
+    "fenced_execution",
+    "post_action_observation",
+    "independent_effect_and_goal_verification",
+    "prediction_error_and_metacognitive_update",
+    "memory_and_learning_candidate_submission"
+  ],
+  "required_record_fields": [
+    "cycle_id",
+    "principal_id",
+    "tenant_id",
+    "area_id",
+    "project_id",
+    "session_id",
+    "goal_id",
+    "source_refs",
+    "model_versions",
+    "uncertainty",
+    "started_at",
+    "completed_at"
+  ],
+  "invariants": [
+    "Predictions and model output are not observations.",
+    "Cognitive components submit requests and do not write protected state.",
+    "External effects require an Action Gate commitment before dispatch.",
+    "Tool success is not goal success.",
+    "Actual outcome evidence feeds world-model correction.",
+    "Learning output is an inactive candidate until independent promotion."
+  ]
+}

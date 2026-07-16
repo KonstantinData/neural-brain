@@ -5,6 +5,14 @@
 - Notion source: https://app.notion.com/p/39d1c1ac5ec0813488b7e9b58c91d563
 - Notion page ID: `39d1c1ac-5ec0-8134-88b7-e9b58c91d563`
 
+## Amendment by ADR-018
+
+PostgreSQL is authoritative for protected Goal, Action, Memory, model-promotion,
+authority, approval, budget, resource, fence, dispatch, reconciliation, and
+audit state. Neural model parameters and large artifacts may use versioned
+artifact storage, but their activation record, digest, lineage, and rollback
+target remain transactional ledger state.
+
 ## Amendment by ADR-015
 
 PostgreSQL is authoritative for transactional memory state and its audit

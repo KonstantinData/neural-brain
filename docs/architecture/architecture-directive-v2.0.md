@@ -1,12 +1,17 @@
 # Neural Brain Architecture Directive v2.0
 
-- Status: Normative memory-system baseline
+- Status: Superseded by Architecture Directive v3.0 and then v4.0/ADR-018
 - Version: 2.0
 - Effective date: 2026-07-15
 - Work item: Memory-system rebaseline
 - Repository: `neural-brain`
 - Governing decision: ADR-015
 - Supersedes: Architecture Directive v1.1
+
+> Historical baseline only. Architecture Directive v3.0 resolved the Tenant
+> catalog rule and governed Dreaming; Architecture Directive v4.0 replaced the
+> memory-only product boundary. This directive is no longer implementation
+> authority.
 
 ## 1. Purpose and applicability
 
@@ -124,7 +129,7 @@ claims, assessments, procedures, and stale or contested material. Retrieval
 ranking MUST NOT erase origin, uncertainty, sensitivity, or validity status.
 
 Raw Working Memory MUST NOT cross Area boundaries. Cross-area use requires the
-Stage 4 transfer contract and MUST provide only an authorized minimized
+MS-4 transfer contract and MUST provide only an authorized minimized
 representation with retained provenance.
 
 ## 7. Security and governance
@@ -143,7 +148,7 @@ permissions or widen a consumer request.
 ## 8. PostgreSQL, audit, and crash consistency
 
 PostgreSQL is authoritative for transactional memory state and its audit
-ledger. Stage 1 uses synchronous Psycopg with `autocommit=True` and explicit
+ledger. MS-1 uses synchronous Psycopg with `autocommit=True` and explicit
 `connection.transaction()` blocks. No transaction may remain open across model,
 network, connector, or other unbounded calls.
 
@@ -181,11 +186,11 @@ identity, budget, and logging policy come only from trusted deployment state.
 
 | Stage | Memory capability | Explicit boundary |
 | --- | --- | --- |
-| Foundation / MS-0 | Repository governance, normative memory contracts, engineering quality, and CI | No productive memory runtime is authorized. |
-| Stage 1 / MS-1 | Authenticated scope, governed intake, observations, Working Memory, checkpoints, inactive candidates, audit, retention foundation, deterministic verification, backup, restore, and operations evidence | No episodic or semantic retrieval, promotion, procedural memory, or cross-area transfer. |
-| Stage 2 / MS-2 | Source registry, episodic memory, semantic claims and assessments, retrieval, freshness, retention, and dependency-aware deletion | No autonomous consolidation, candidate promotion, or procedural memory. |
-| Stage 3 / MS-3 | Controlled consolidation, re-evaluation, procedural memory, evaluation, quarantine, authorized promotion, and rollback | No implicit or raw cross-area memory use. |
-| Stage 4 / MS-4 | Explicit audited cross-area knowledge transfer and scalable memory coordination | No agent planning, action execution, tools, goal completion, or autonomy. |
+| MS-0 | Repository governance, normative memory contracts, engineering quality, and CI | No productive memory runtime is authorized. |
+| MS-1 | Authenticated scope, governed intake, observations, Working Memory, checkpoints, inactive candidates, audit, retention foundation, deterministic verification, backup, restore, and operations evidence | No episodic or semantic retrieval, promotion, procedural memory, or cross-area transfer. |
+| MS-2 | Source registry, episodic memory, semantic claims and assessments, retrieval, freshness, retention, and dependency-aware deletion | No autonomous consolidation, candidate promotion, or procedural memory. |
+| MS-3 | Controlled consolidation, re-evaluation, procedural memory, evaluation, quarantine, authorized promotion, and rollback | No implicit or raw cross-area memory use. |
+| MS-4 | Explicit audited cross-area knowledge transfer and scalable memory coordination | No agent planning, action execution, tools, goal completion, or autonomy. |
 
 Later-stage schemas and operations MUST NOT be enabled early or used to replace
 a missing earlier-stage control.

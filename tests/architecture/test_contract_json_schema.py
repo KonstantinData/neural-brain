@@ -36,7 +36,7 @@ def _validator() -> _Validator:
 
 def _request(*, scope: dict[str, object] | None = None) -> dict[str, object]:
     return {
-        "contract_version": "1.0.0",
+        "contract_version": "2.0.0",
         "envelope_id": "envelope-001",
         "envelope_kind": "memory_request",
         "scope": scope or {"scope_level": "area", "tenant_id": "tenant-001", "area_id": "area-001"},

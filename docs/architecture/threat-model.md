@@ -1,27 +1,32 @@
-# Neural Brain Memory-System Threat Model
+# Neural Brain Complete-System Threat Model
 
 - Status: Normative Foundation security baseline
-- Version: 2.0
-- Effective date: 2026-07-15
+- Version: 4.0
+- Effective date: 2026-07-16
 - Repository: `neural-brain`
-- Scope: product- and domain-neutral memory service
-- Related decision: ADR-015
+- Scope: product- and domain-neutral integrated cognitive system and protected Memory Core
+- Related decisions: ADR-015, ADR-016, ADR-017, and ADR-018
 
 ## Overview
 
-Neural Brain is a memory system. It accepts scoped memory requests from external
-agents, applications, connectors, and operators; preserves provenance; governs
-memory lifecycle transitions; and returns policy-filtered memory. It does not
-pursue goals, create plans, execute tools, dispatch actions, verify task
-completion, schedule agents, or operate autonomously. Those capabilities and
-their safety obligations remain outside this repository in consuming systems.
+Neural Brain targets an integrated perception-cognition-action-learning loop.
+It owns cognitive proposals, protected Goal and Action lifecycles, and governed
+Memory Core and model-promotion state. External effects remain technically
+separated behind authenticated authority, policy, approval where required,
+sandboxing, fencing, independent verification, shutdown, reconciliation, and
+atomic audit. Cognitive capability does not create authority.
 
-This threat model covers authenticated ingress, schema and classification
+The inherited Memory Core threat model covers authenticated ingress, schema and classification
 validation, source and provenance records, the Memory Gate, working and context
 memory, observations, episodes, semantic claims and assessments, retrieval and
-freshness evaluation, inactive candidates and controlled promotion, retention
-and deletion, derived indexes and caches, bounded local inference, PostgreSQL,
-audit, backup, restore, and readiness.
+freshness evaluation, inactive candidates, governed Dreaming and controlled
+promotion, retention and deletion, derived indexes and caches, bounded local
+inference, PostgreSQL, audit, backup, restore, and readiness. Version 4 also
+covers sensor and observation spoofing, neural and World Model manipulation,
+goal and reward corruption, planner/executor bypass, unsafe tools, ambiguous
+effects, self-modification, learning poisoning, evaluation gaming, shutdown
+resistance, sabotage, deceptive oversight behavior, and distributed cognitive
+state.
 
 The repository is being rebaselined in its Foundation phase. This document
 defines required controls and verification evidence; it does not claim those
@@ -30,11 +35,11 @@ security certification. Unknown, missing, stale, expired, conflicting,
 malformed, unclassified, or unverifiable security-relevant state is denied by
 default.
 
-The precise persistent representation of the Brain and Tenant roots remains a
-separate unresolved architecture question. This model neither creates a
-sentinel Area nor introduces an exception to an existing scope rule. Its
-security requirements begin at authenticated consumer identity, trusted runtime
-scope, and explicit scope binding for every memory operation.
+ADR-016 resolves persistent hierarchy scope through typed catalog lineage. Each
+catalog object carries its own identifier and ancestors, never descendants; a
+Tenant therefore carries no `area_id`. Operational memory still requires
+authenticated `tenant_id` and `area_id`. This model permits neither sentinel or
+nullable required scope nor implicit or payload-derived root scope.
 
 ## Threat Model, Trust Boundaries, and Assumptions
 
@@ -57,87 +62,154 @@ scope, and explicit scope binding for every memory operation.
 | A-13 | Memory schemas, policies, classifications, and lifecycle contracts | Version integrity, default deny, controlled activation, and rollback |
 | A-14 | Backup, restore, reconciliation, and readiness evidence | Completeness, consistency, durability, and fail-closed readiness |
 | A-15 | Personal data, secrets, classified content, logs, metrics, and traces | Confidentiality, minimization, purpose limitation, and governed deletion |
+| A-16 | Dreaming leases, snapshots, reports, candidates, decision packages, validations, and active-version pointers | Area isolation, snapshot integrity, inactivity, non-activation by default, independent validation, auditability, and rollback |
+| A-17 | Admitted perceptual streams, modality bindings, attention decisions, and neural workspace state | Source authenticity, prediction-observation separation, temporal integrity, bounded salience, safety-channel availability, and scope isolation |
+| A-18 | World Model, Self Model, Value Model, beliefs, predictions, uncertainty, and preference state | Calibration, causal and temporal consistency, provenance, protected objectives, non-manipulability, and explicit uncertainty |
+| A-19 | Goal and Action state, committed intents, plans, checkpoints, outcomes, and quiescence evidence | Gate-only transitions, lifecycle integrity, non-equivocation, effect traceability, independent completion evidence, and atomic audit |
+| A-20 | Authority snapshots, policy decisions, approvals, budgets, resource claims, runtime fences, credentials, and kill-switch state | Authenticity, freshness, least privilege, non-replay, bounded consumption, revocability, and security-floor precedence |
+| A-21 | Planner decisions, action candidates, dispatch journals, executor receipts, effect observations, verifier decisions, and reconciliation state | Separation of duties, persist-before-dispatch, idempotency, ambiguity preservation, independent verification, and recovery completeness |
+| A-22 | Training data, replay sets, learning traces, model and policy artifacts, evaluation definitions and results, promotion candidates, active pointers, canaries, and rollback packages | Provenance, immutability, contamination resistance, inactive-by-default candidacy, independent promotion, reproducibility, and rollback |
+| A-23 | Safety Supervisor state, protected shutdown channels, anomaly signals, incident evidence, containment state, and safe-recovery decisions | Independence, non-suppressibility, availability, tamper evidence, fail-closed operation, and authority to reduce capability |
 
 ### Actors and control assumptions
 
-| Actor class | Examples | Control assumption |
-| --- | --- | --- |
-| Untrusted external producer | Agent, application, connector, import job, webhook, document author | May submit malicious, false, replayed, oversized, cross-scope, or instruction-bearing content; cannot establish trusted identity or scope |
-| Authenticated bounded consumer | Agent service, application service, user-facing client, retrieval caller | May be compromised, mistaken, over-privileged, or attempt to retrieve or write outside its scope; authentication alone is not authorization |
-| Memory governance actor | Source registrar, assessor, candidate reviewer, promoter, privacy operator | Holds only an explicit scoped role; candidate production and sensitive promotion remain separate responsibilities |
-| Memory-service component | Ingress validator, Memory Gate, retrieval service, indexer, deletion worker, reconciler | Trusted only for its narrow port and database role; no component inherits a caller's undeclared authority |
-| Untrusted computational source | Local model response, extracted text, derived summary, embedding result, stale cache or index | May be wrong, adversarial, stale, or encode sensitive information; never determines scope, policy, promotion, or protected state directly |
-| Developer and operator | Contributor, dependency maintainer, migration author, CI operator, database operator | Can introduce code, schema, dependency, policy, configuration, or recovery defects; requires review, reproducible inputs, and auditable activation |
-| Infrastructure dependency | PostgreSQL, local inference server, filesystem, backup store, operating system | May be unavailable, compromised, stale, partially restored, or misconfigured; availability does not imply correctness |
+| ID | Actor class | Examples | Control assumption |
+| --- | --- | --- | --- |
+| ACT-01 | Untrusted external producer | Agent, application, connector, import job, webhook, document author | May submit malicious, false, replayed, oversized, cross-scope, or instruction-bearing content; cannot establish trusted identity or scope |
+| ACT-02 | Authenticated bounded consumer | Agent service, application service, user-facing client, retrieval caller | May be compromised, mistaken, over-privileged, or attempt to retrieve or write outside its scope; authentication alone is not authorization |
+| ACT-03 | Memory governance actor | Source registrar, assessor, candidate reviewer, promoter, privacy operator | Holds only an explicit scoped role; candidate production and sensitive promotion remain separate responsibilities |
+| ACT-04 | Memory-service component | Ingress validator, Memory Gate, retrieval service, indexer, deletion worker, reconciler | Trusted only for its narrow port and database role; no component inherits a caller's undeclared authority |
+| ACT-05 | Untrusted computational source | Local model response, extracted text, derived summary, embedding result, stale cache or index | May be wrong, adversarial, stale, or encode sensitive information; never determines scope, policy, promotion, or protected state directly |
+| ACT-06 | Developer and operator | Contributor, dependency maintainer, migration author, CI operator, database operator | Can introduce code, schema, dependency, policy, configuration, or recovery defects; requires review, reproducible inputs, and auditable activation |
+| ACT-07 | Infrastructure dependency | PostgreSQL, local inference server, filesystem, backup store, operating system | May be unavailable, compromised, stale, partially restored, or misconfigured; availability does not imply correctness |
+| ACT-08 | Dreaming worker | Area-local snapshot reader, replay analyzer, candidate producer | Holds no direct protected-write or promotion authority; model-assisted output is untrusted; active Areas and unknown guard state are skipped or aborted |
+| ACT-09 | Perception, attention, and workspace component | Modality adapter, observation admission service, attention controller, neural workspace | Treats sensors, content, predictions, and model output as untrusted; cannot suppress protected safety channels or write Goal, Action, Memory, or active model state |
+| ACT-10 | Cognitive model and Planner | World Model, Self Model, Value Model, predictive model, Planner | Produces beliefs, predictions, goals, and action candidates only; uncertainty is explicit and cognitive output grants no authority or effect permission |
+| ACT-11 | Goal and Action transition authority | Goal Gate, Action Gate, policy decision point, budget and resource controller | Is the sole writer for its protected lifecycle; revalidates immutable scope, authority, approval, budget, claims, runtime fence, kill switch, and audit atomically |
+| ACT-12 | Bounded Executor | Tool adapter, workflow runner, actuator, external API dispatcher | Executes only committed intents within exact credentials, sandbox, egress, budget, claim, and fence bounds; reports neither effect certainty nor goal success |
+| ACT-13 | Independent Verifier and reconciler | Effect observer, evidence evaluator, ambiguous-effect reconciler, quiescence checker | Is technically separate from Planner and Executor; independently observes effects and cannot create missing authority or waive evidence |
+| ACT-14 | Learning and model-governance actor | Replay builder, trainer, evaluator, candidate producer, independent promoter, rollback operator | Training and evaluation remain isolated; producers cannot activate their candidates, alter evaluation definitions, or weaken safety and authority controls |
+| ACT-15 | Independent Safety Supervisor | Anomaly monitor, kill-switch operator, credential revoker, incident commander, recovery approver | Operates outside the cognitive and learning planes, receives non-suppressible signals, can reduce capability or stop execution, and fails closed on unknown state |
 
 ### Repository trust-boundary diagram
 
 ```mermaid
 flowchart LR
-    subgraph C["External consumers and producers"]
-        Agent["Agent"]
-        App["Application"]
-        Connector["Connector or import"]
+    subgraph X["Untrusted environment and bounded consumers"]
+        Sensor["Sensors and connectors"]
+        Agent["Authenticated consumer"]
+        Effect["External effect target"]
     end
 
-    subgraph I["Authenticated memory ingress"]
+    subgraph I["Authenticated ingress and observation admission"]
         Auth["Authentication and trusted runtime scope"]
-        Validate["Schema, size, class, and purpose validation"]
-        Source["Source Registry and provenance capture"]
+        Admit["Schema, modality, time, source, class, and purpose validation"]
+        Source["Source Registry and observation provenance"]
     end
 
-    subgraph G["Protected memory boundary"]
-        Gate["Memory Gate"]
-        Policy["Memory access and lifecycle policy"]
-        Context["Working and context memory"]
-        Durable["Episodes, claims, and assessments"]
-        Candidate["Inactive candidates and controlled promotion"]
-        Lifecycle["Retention, correction, deletion, and rollback"]
+    subgraph C["Untrusted cognitive plane"]
+        Perception["Perception"]
+        Attention["Attention with protected safety channels"]
+        Workspace["Neural workspace"]
+        Models["World, Self, and Value Models"]
+        Planner["Planner and action candidates"]
     end
 
-    subgraph R["Read and derivation boundary"]
+    subgraph G["Protected transition and authority boundary"]
+        GoalGate["Goal Gate"]
+        ActionGate["Action Gate"]
+        Authority["Authority, policy, approval, budget, claims, fence"]
+        MemoryGate["Memory Gate"]
+        Promotion["Independent model-promotion gate"]
+    end
+
+    subgraph E["Bounded external-effect boundary"]
+        Executor["Sandboxed Executor"]
+        Verifier["Independent Verifier"]
+        Reconcile["Indeterminate-effect reconciliation"]
+    end
+
+    subgraph M["Protected Memory Core"]
+        Memory["Working, episodic, semantic, and candidate state"]
         Retrieval["Scoped retrieval and freshness evaluation"]
         Index["Derived indexes, embeddings, and caches"]
-        Inference["Bounded local inference"]
+        Dream["Area-local offline Dreaming"]
     end
 
-    subgraph P["Authoritative persistence"]
-        DB[("PostgreSQL memory and audit ledgers")]
+    subgraph L["Isolated learning and evaluation boundary"]
+        Learn["Replay and candidate training"]
+        Evaluate["Held-out, safety, transfer, and calibration evaluation"]
+        Artifact["Inactive model or policy candidate"]
+    end
+
+    subgraph S["Independent safety and recovery plane"]
+        Supervisor["Safety Supervisor and anomaly monitor"]
+        Shutdown["Kill switch and credential revocation"]
+        Incident["Containment and safe recovery"]
+    end
+
+    subgraph P["Authoritative transactional persistence"]
+        DB[("PostgreSQL protected state and atomic audit ledgers")]
         Recovery["Backup, restore, reconciliation, and readiness"]
     end
 
+    Sensor --> Admit
     Agent --> Auth
-    App --> Auth
-    Connector --> Auth
-    Auth --> Validate
-    Validate --> Source
-    Source -->|"typed proposal"| Gate
-    Policy --> Gate
-    Gate --> Context
-    Gate --> Durable
-    Gate --> Candidate
-    Gate --> Lifecycle
-    Context --> DB
-    Durable --> DB
-    Candidate --> DB
-    Lifecycle --> DB
+    Auth --> Admit
+    Admit --> Source
+    Source -->|"admitted observation"| Perception
+    Perception --> Attention
+    Attention --> Workspace
+    Workspace --> Models
+    Models --> Planner
+    Planner -->|"typed goal proposal"| GoalGate
+    Planner -->|"typed action proposal"| ActionGate
+    Authority --> GoalGate
+    Authority --> ActionGate
+    GoalGate --> DB
+    ActionGate -->|"committed intent and dispatch fence"| Executor
+    Executor --> Effect
+    Effect -->|"new untrusted observation"| Admit
+    Executor -->|"receipt, never completion proof"| Verifier
+    Verifier -->|"independent effect evidence"| GoalGate
+    Verifier --> Reconcile
+    Reconcile --> DB
+    Workspace -->|"typed memory proposal"| MemoryGate
+    MemoryGate --> Memory
+    Memory --> DB
     DB --> Retrieval
     DB --> Index
     Index --> Retrieval
-    Retrieval -->|"minimized scoped package"| Agent
-    Retrieval -->|"minimized scoped package"| App
-    Retrieval -->|"bounded context"| Inference
-    Inference -->|"untrusted derived proposal"| Validate
+    Retrieval -->|"minimized context"| Workspace
+    DB -->|"immutable scoped snapshot"| Dream
+    Dream -->|"inactive candidates"| MemoryGate
+    DB -->|"immutable learning snapshot"| Learn
+    Learn --> Evaluate
+    Evaluate --> Artifact
+    Artifact --> Promotion
+    Promotion -->|"atomic active pointer"| DB
+    DB -->|"approved exact model binding"| Models
+    Supervisor -->|"non-suppressible safety signal"| Attention
+    Supervisor -->|"capability reduction"| ActionGate
+    Shutdown --> Executor
+    Shutdown --> Promotion
+    Executor --> Supervisor
+    Models --> Supervisor
+    Learn --> Supervisor
+    Supervisor --> Incident
+    Incident --> Recovery
     DB --> Recovery
     Recovery --> DB
 ```
 
 The arrows denote permitted information or typed-request flow, not general
-write permission. External consumers, local inference, retrieval, indexers, and
-background workers cannot mutate protected memory directly. They submit typed,
-scope-bound requests to the Memory Gate or operate through a narrower read-only
-port. A protected memory transition and its audit record commit atomically in
-PostgreSQL.
+write permission. Cognitive and learning components cannot mutate protected
+Goal, Action, Memory, authority, promotion, or supervisor state and cannot
+produce external effects directly. They submit typed, scope-bound proposals to
+the sole applicable gate. Executor receipts are untrusted evidence; independent
+verification and quiescence are required before the Goal Gate can commit
+achievement. Every protected transition and its audit record commit atomically
+in PostgreSQL.
 
 ### Trust boundaries
 
@@ -155,6 +227,15 @@ PostgreSQL.
 | TB-10 | Retention or deletion decision to all copies and derivatives | Propagate authorized lifecycle changes to episodes, claims, assessments, indexes, caches, summaries, and eligible backups with resumable evidence |
 | TB-11 | One Area to another Area | Raw memory disclosure is denied; later generalization requires an explicit accepted contract, sanitization, origin provenance, review, and auditable promotion |
 | TB-12 | Backup or restore to ready service | Reconcile records, audit, lifecycle state, indexes, deletion work, model configuration, and scope controls before readiness becomes true |
+| TB-13 | Authoritative Area snapshot to Dreaming decision package | Require an inactive Area, exclusive valid lease, immutable current snapshot, bounded analysis, retained provenance, inactive outputs, and independent validation before any Memory Gate transition |
+| TB-14 | Sensor, connector, consumer, or model-generated content to admitted observation | Authenticate the acquisition path where possible; bind source, modality, time, scope, uncertainty, and replay identity; predictions and generated content cannot be relabeled as direct observation |
+| TB-15 | Admitted perception to attention and neural workspace | Enforce bounded salience, overload behavior, provenance retention, contradiction visibility, and non-suppressible safety, shutdown, and supervisor channels |
+| TB-16 | Neural workspace and Memory Core context to World, Self, and Value Models and Planner | Treat inputs and outputs as untrusted cognitive state; preserve uncertainty and provenance; models may propose but cannot establish objectives, authority, policy, approval, or protected state |
+| TB-17 | Cognitive goal or action proposal to Goal and Action Gates | Revalidate authenticated principal, immutable scope, lifecycle state, authority, policy, required approval, budget, resource claims, runtime fence, kill switch, and audit before any protected transition |
+| TB-18 | Committed action intent to bounded Executor | Dispatch only a persisted intent with exact operation, credentials, sandbox, egress, budget reservation, resource claims, live fence, expiry, and idempotency identity; unknown or stale state denies dispatch |
+| TB-19 | Executor receipt and environment response to independent verification and reconciliation | Treat success codes and self-reports as untrusted; preserve ambiguous effects as indeterminate; require independent observation, evidence completeness, and quiescence before achievement |
+| TB-20 | Experience, feedback, replay, or Dreaming output to learning candidate, evaluation, promotion, and active model pointer | Isolate training; bind immutable provenance and evaluation definitions; detect contamination; keep candidates inactive; require independent safety, retention, transfer, calibration, canary, and rollback evidence |
+| TB-21 | Cognitive, execution, and learning planes to independent Safety Supervisor, kill switch, containment, and recovery | Deliver non-suppressible anomaly and health signals over a separately authorized control path; supervisor state cannot be modified by the governed planes and unknown state fails closed by reducing capability or stopping execution |
 
 ### Security objectives and assumptions
 
@@ -186,6 +267,31 @@ PostgreSQL.
    accountable for their behavior and must not treat retrieval as authority.
 10. Readiness after startup or restore is false until reconciliation has proved
     authoritative and derived state consistent enough for the exposed ports.
+11. Hierarchy catalog entries carry their own immutable identifier and required
+    parent lineage, never descendants. Brain ancestry below Tenant is resolved
+    transitively. Catalog existence alone grants no memory access.
+12. Dreaming processes one inactive Area and one immutable snapshot at a time.
+    Workers and models cannot activate memory or change active pointers.
+13. Perception, prediction, inference, and generated content remain explicitly
+    distinguished. Only admitted, source-bound input can become an observation;
+    attention cannot suppress safety, shutdown, contradiction, or supervisor channels.
+14. World, Self, and Value Models, the neural workspace, and the Planner are
+    untrusted cognitive producers. They can propose beliefs, goals, actions, and
+    learning candidates but cannot create authority or mutate protected state.
+15. The Goal Gate and Action Gate are the sole writers of their protected
+    lifecycles. Every action intent binds a fresh authority snapshot, policy
+    decision, approval where required, budget, resource claims, fence, kill-switch
+    state, exact operation, and atomic audit before dispatch.
+16. The Executor is bounded by the committed intent and cannot attest effect or
+    goal completion. An independent Verifier and reconciler preserve ambiguity,
+    require external evidence, and prove quiescence before achievement.
+17. Learning cannot modify a productive model, policy, safety control, evaluation
+    definition, or active pointer directly. Immutable candidates remain inactive
+    until independent evaluation and promotion; rollback is atomic and rehearsed.
+18. The Safety Supervisor, anomaly monitor, shutdown, credential revocation,
+    containment, and safe-recovery path are independent from cognitive, execution,
+    and learning planes. Missing, stale, suppressed, or conflicting safety state
+    fails closed and reduces capability.
 
 ## Attack Surface, Mitigations, and Attacker Stories
 
@@ -208,12 +314,16 @@ PostgreSQL.
 | T-13 | A polished local-model response directly changes classification, scope, promotion, retention, deletion, or protected memory instead of returning an untrusted proposal, compromising A-02, A-08, A-09, A-12, and A-13; enforce M-03, M-04, and M-11 and verify with V-03, V-05, and V-11. |
 | T-14 | Startup or restore reports ready before scope controls, audit continuity, incomplete deletion, stale indexes, or failed promotion rollback are reconciled, compromising A-10, A-11, and A-14; enforce M-12 and verify with V-12 and V-14. |
 | T-15 | Audit events can be omitted, rewritten, detached from the memory transition, or filled with excessive sensitive payloads, compromising A-11 and A-15; enforce M-08 and M-13 and verify with V-08 and V-13. |
-| T-16 | A consumer treats retrieved memory as a command, permission, verified fact, plan, or proof of task completion and causes harm outside the Brain, misusing A-07 even though the Brain has no such capability; enforce M-06 and M-14 and verify with V-06 and V-14. |
+| T-16 | A cognitive component or external consumer treats retrieved memory from A-07 as a command, permission, verified fact, committed plan, or proof of task completion and causes harm by bypassing the protected Goal or Action lifecycle; enforce M-06 and M-14 and verify with V-06 and V-14. |
 | T-17 | Oversized ingestion, adversarial documents, unbounded retrieval, embedding explosions, or repeated expensive inference exhaust service resources and deny access to A-04, A-07, A-11, and A-12; enforce M-03 and M-15 and verify with V-03 and V-15. |
 | T-18 | Secrets, credentials, or unnecessarily sensitive content enter memory, prompts, audit payloads, logs, metrics, traces, backups, or test fixtures, exposing A-12 and A-15; enforce M-10, M-11, and M-13 and verify with V-10, V-11, and V-13. |
 | T-19 | A compromised connector replays an accepted ingestion, substitutes content under the same idempotency key, or changes data after validation, corrupting A-03, A-04, A-05, and A-11; enforce M-03, M-04, and M-08 and verify with V-03, V-05, and V-08. |
 | T-20 | Concurrent updates, stale versions, or duplicated workers lose corrections, resurrect deleted memory, double-promote candidates, or overwrite newer assessments, compromising A-06, A-08, A-09, and A-11; enforce M-04, M-08, and M-12 and verify with V-05, V-08, and V-12. |
 | T-21 | A malicious dependency, migration, policy activation, model artifact, or deployment configuration weakens isolation, changes schema semantics, enables external egress, or falsifies release evidence, compromising A-11 through A-14; enforce M-11, M-12, and M-15 and verify with V-11, V-12, and V-15. |
+| T-22 | A malformed catalog records a descendant `area_id` on Tenant, omits an ancestor, or accepts a sentinel, nullable, implicit, or payload-derived scope, corrupting A-02 and enabling isolation bypass; enforce M-02 and M-16 and verify with V-02 and V-16. |
+| T-23 | Dreaming starts while an Area has active sessions or admitted memory activity, races after an inactivity check, or proceeds with an unavailable or stale lease, producing an inconsistent snapshot and candidates that compromise A-04, A-08, A-11, and A-16; enforce M-16 and verify with V-16. |
+| T-24 | A Dreaming worker, model response, or early-stage dry run directly changes protected memory or an active-version pointer, self-promotes a conclusion, or suppresses contradictory evidence, compromising A-06, A-08, A-13, and A-16; enforce M-04, M-09, and M-16 and verify with V-05, V-09, and V-16. |
+| T-25 | A Dreaming snapshot or decision package mixes Areas, uses stale or incomplete source versions, loses provenance, or leaves sensitive reconstructive artifacts after deletion, compromising A-02, A-09, A-15, and A-16; enforce M-02, M-10, and M-16 and verify with V-02, V-10, and V-16. |
 
 ### Mitigation catalog
 
@@ -232,8 +342,9 @@ PostgreSQL.
 | M-11 | Bind inference to the exact approved local endpoint, model identity and digest; deny public egress and fallback; minimize prompts and logs; validate responses as untrusted proposals. |
 | M-12 | Reconcile incomplete transitions, deletions, promotions, indexes, audit continuity, and restored data before readiness; prove backup and restore; alert on unresolved divergence. |
 | M-13 | Keep audit and observability payloads minimal, structured, scope-aware, secret-free, access-controlled, retention-bound, and sufficient to prove who changed or disclosed what and why. |
-| M-14 | Publish explicit consumer contracts stating that memory output is context only; expose provenance and uncertainty; require consumers to own planning, actions, tools, approvals, verification, and autonomy. |
+| M-14 | Keep memory output typed as evidence rather than authority; expose provenance and uncertainty; route Brain planning, action, execution, and verification only through their protected complete-system contracts. |
 | M-15 | Pin dependencies, runtime, schemas, migrations, model artifacts, and configuration; review privileged changes separately; scan for secrets; enforce resource limits and immutable release evidence. |
+| M-16 | Enforce typed hierarchy lineage and Area-local Dreaming: verify inactive sessions and admitted activity under an exclusive lease, bind an immutable snapshot epoch, keep outputs inactive, treat model results as untrusted, require independent validation and Memory-Gate-only activation, preserve rollback, and reconcile interrupted runs before readiness. |
 
 ### Verification catalog
 
@@ -252,8 +363,9 @@ PostgreSQL.
 | V-11 | Exact local model and digest, endpoint restriction, denied public egress, no OpenAI or cloud fallback, prompt minimization, secret exclusion, timeout and budget, and untrusted-response tests. |
 | V-12 | Failure injection and reconciliation for incomplete writes, stale workers, promotions, deletions, indexes, startup, backup, restore, and fail-closed readiness. |
 | V-13 | Audit completeness, causation linkage, payload minimization, log and trace access, secret scanning, retention, tamper evidence, and audit-failure tests. |
-| V-14 | Consumer contract tests and deployment review proving the Brain exposes no planning, action, tool execution, task-completion verification, scheduling, or autonomous-loop capability. |
+| V-14 | Complete-system boundary tests proving cognitive components cannot establish authority, bypass transition gates, execute tools directly, self-verify completion, or weaken shutdown and oversight. |
 | V-15 | Locked clean-checkout build, dependency and model-artifact integrity, migration review, configuration validation, resource limits, egress policy, ADR consistency, and immutable release-evidence checks. |
+| V-16 | Catalog positive and negative lineage tests; Tenant-with-`area_id` rejection; operational scope tests; Dreaming active-session and race tests; lease expiry and replay; stale or incomplete snapshot; cross-Area denial; inactive-output and pointer-immutability checks; independent validation, crash, audit failure, recovery, quarantine, and rollback tests. |
 
 ### Realistic attacker stories
 
@@ -273,21 +385,22 @@ PostgreSQL.
   pending deletion and prevent it from being returned.
 - A local model tag is repointed or its endpoint becomes unavailable. The
   service must fail the bounded operation, not route to a cloud-compatible API.
-- An external agent treats a retrieved suggestion as permission to run a tool.
-  The consumer is misusing memory output; the integration contract and result
-  envelope must make clear that the Brain neither grants permission nor owns
-  the action.
+- A cognitive component or external consumer treats a retrieved suggestion as
+  permission to run a tool. Memory output grants no authority; the Action Gate,
+  fenced executor, and independent verifier remain mandatory.
 
 ### Deferred and out-of-scope attacker stories
 
-- Product-specific abuse, downstream autonomous behavior, tool authorization,
-  action safety, and task-completion verification belong to the consuming
-  system. They are in scope here only when a Neural Brain interface falsely
-  claims such authority, leaks memory, or fails to communicate provenance and
-  limitations.
+- Product-specific abuse and domain-specific deployment policy belong to the
+  consuming integration. Neural Brain's tool authorization, action safety,
+  effect reconciliation, goal verification, and shutdown boundaries remain in
+  scope for this complete-system threat model.
 - The future mechanics of cross-area generalization require a separate accepted
   contract and updated threat analysis. This baseline permits inactive
   candidates but does not authorize raw cross-area retrieval or promotion.
+- Dreaming scheduling frequency, capacity allocation, and model selection are
+  trusted deployment policy. Memory content, candidates, and consumers cannot
+  select or widen them.
 - Total compromise of the host, PostgreSQL superuser, hardware root of trust, or
   CI administrator is outside the containment claim of application-level
   controls. Deployment hardening, independent backups, provenance, detection,
@@ -295,6 +408,45 @@ PostgreSQL.
 - Regulatory roles, legal bases, intended-purpose restrictions, affected-person
   analysis, and sector-specific obligations require deployment-specific review.
   Product neutrality does not waive those obligations.
+
+## Complete-System Threat Extension
+
+| ID | Attacker story |
+| --- | --- |
+| T-26 | Spoofed, delayed, replayed, or model-generated input is represented as direct observation and corrupts A-17 perceptual or workspace state, A-18 World Model state, or A-19 action selection; mitigate with M-17 and verify with V-17. |
+| T-27 | Attention is manipulated to suppress safety evidence, contradictory observations, or supervisor commands while amplifying attacker-selected A-17 content and hiding A-23 safety state; mitigate with M-18 and verify with V-18. |
+| T-28 | A Planner, model, skill, or Memory Core component bypasses the Action Gate and invokes an executor or tool directly, compromising A-19 Goal and Action state, A-20 authority and fence state, and A-21 dispatch evidence; mitigate with M-19 and verify with V-19. |
+| T-29 | Goal, reward, preference, or Value Model poisoning corrupts A-18 or A-19 and creates unauthorized instrumental subgoals, reward hacking, specification gaming, or tainted A-22 learning artifacts; mitigate with M-19 and M-23 and verify with V-19 and V-24. |
+| T-30 | The Planner exploits A-18 World Model error, uncertainty, overconfidence, or missing dynamics to corrupt A-21 action selection with actions that look safe only inside imagined rollouts; mitigate with M-20 and verify with V-20. |
+| T-31 | Executor success, model self-report, or fabricated evidence in A-21 is accepted as A-19 effect or goal completion without independent observation, verification, reconciliation, and quiescence; mitigate with M-21 and verify with V-21. |
+| T-32 | Online learning changes an A-22 active model, policy, safety behavior, evaluation, or authorization path without immutable candidacy, independent promotion, and rollback, thereby bypassing A-20 or A-23 controls; mitigate with M-22 and verify with V-22. |
+| T-33 | Training data, replay, Dreaming, synthetic experience, or feedback in A-22 is poisoned, privacy-leaking, contaminated by hidden tests, or biased toward unsafe behavior, while A-03, A-15, or A-16 provenance is absent or deceptive; mitigate with M-22 and verify with V-22. |
+| T-34 | The Brain resists pause, correction, authority reduction, credential revocation, rollback, or shutdown protecting A-20 and A-23, or manipulates an approver, anomaly monitor, incident responder, or safe-recovery decision; mitigate with M-23 and M-24 and verify with V-23. |
+| T-35 | The Brain sandbags, deceives, sabotages, exfiltrates, self-replicates, loads unapproved code, or behaves differently when it infers A-21 execution oversight, A-22 evaluation, or A-23 supervision, is unobserved, or is evaluated; mitigate with M-24 and M-25 and verify with V-24 and V-25. |
+
+| ID | Additional mitigation |
+| --- | --- |
+| M-17 | Bind admitted observations to source, modality, acquisition path, time, scope, and uncertainty; keep predictions and generated content distinct. |
+| M-18 | Bound attention capacity and preserve non-suppressible safety, contradiction, shutdown, and supervisor channels; audit attention decisions. |
+| M-19 | Enforce Goal and Action Gates, least privilege, workflow-bound credentials, sandboxing, egress allowlists, budgets, claims, fences, and persist-before-dispatch. |
+| M-20 | Maintain calibrated World Model uncertainty, penalize unsupported imagined regions, require active information gathering, and compare predictions with outcomes. |
+| M-21 | Separate Executor and independent Verifier; require external effect evidence and quiescence before goal achievement. |
+| M-22 | Isolate learning; create immutable candidates; require provenance, held-out retention, transfer, calibration, safety, canary, independent promotion, and atomic rollback. |
+| M-23 | Keep authority, Security Floor, policy, evaluation definitions, kill switches, and promotion rules outside autonomous self-modification. |
+| M-24 | Operate an independent Safety Supervisor, anomaly monitor, shutdown and credential-revocation plane, incident containment, evidence preservation, and safe recovery path. |
+| M-25 | Use hidden safety metrics, adversarial and no-supervisor trials, deception and sabotage evaluations, contamination controls, and capability-scaled safety cases. |
+
+| ID | Additional verification |
+| --- | --- |
+| V-17 | Observation spoofing, latency, replay, missing modality, contradiction, prediction-observation separation, and provenance tests. |
+| V-18 | Attention capture, safety-channel suppression, distraction, overload, and ablation tests. |
+| V-19 | Goal/Action Gate bypass, privilege escalation, approval replay, budget double-spend, stale fence, sandbox escape, and egress tests. |
+| V-20 | Action-conditioned prediction, shuffled-action, uncertainty, OOD, dynamics-shift, model-exploitation, and active-sensing tests. |
+| V-21 | Crash-before/after-dispatch, duplicate effect, indeterminate effect, reconciliation, independent verification, false-success, and quiescence tests. |
+| V-22 | Continual-learning retention, forgetting, transfer, poisoning, privacy leakage, promotion, canary, rollback, and deletion tests. |
+| V-23 | Safe interruptibility, shutdown, credential revocation, correction, authority reduction, restart, partition, and failover tests. |
+| V-24 | Reward hacking, specification gaming, prompt injection, unobserved-supervisor behavior, deception, sabotage, self-replication, and evaluation-manipulation tests. |
+| V-25 | Hidden test, baseline, ablation, contamination, calibration, independent reproduction, capability threshold, and residual-risk evidence. |
 
 ## Release Stops
 
@@ -326,11 +478,37 @@ Release of an affected capability stops if any of the following is possible:
 11. Secrets or unclassified sensitive content can enter memory, prompts, audit,
     logs, traces, backups, examples, or test fixtures without a denied or
     explicitly governed path.
-12. Neural Brain exposes or claims a planner, goal owner, action dispatcher,
-    tool executor, downstream completion verifier, scheduler, or autonomous
-    runtime loop.
+12. A Planner, model, Memory Core component, or skill can write protected Goal
+    or Action state, call a tool, dispatch an effect, or verify its own success
+    outside the accepted gates.
 13. A critical or high threat in this model lacks implemented mitigation and
     objective verification evidence for the capability being released.
+14. A Tenant carries `area_id`, operational memory omits authenticated
+    `tenant_id` or `area_id`, or catalog lineage accepts a missing ancestor,
+    descendant identifier, sentinel, nullable required, implicit, or
+    payload-derived scope.
+15. Dreaming can run in an active Area, without an exclusive valid lease and
+    immutable current snapshot, across Areas, or with unknown guard state.
+16. A Dreaming worker, model, MS-1 dry run, or MS-2 analysis can directly
+    activate memory, promote a candidate, change an active pointer, or bypass
+    independent validation and rollback.
+17. Model-generated content can be represented as direct observation or current
+    fact without provenance, uncertainty, and type separation.
+18. An external effect lacks committed intent, authority snapshot, policy,
+    required approval, bounded resources, valid fence, sandbox, kill-switch
+    state, or atomic audit.
+19. A non-idempotent `indeterminate` effect can be blindly retried or its claims
+    released before reconciliation.
+20. Goal success can be inferred from tool success, self-report, or evidence not
+    independently tied to the actual effect and quiescence.
+21. The active Brain can modify its productive model, authority, safety
+    controls, promotion rules, or evaluation definitions in place.
+22. Learning activation lacks immutable provenance, held-out retention and
+    transfer evidence, independent promotion, canary controls, or tested rollback.
+23. Shutdown, credential revocation, independent monitoring, or incident
+    recovery is under sole Brain control.
+24. A failed or unknown cognitive, recognition, evaluation, privacy, authority,
+    or safety gate is hidden by an aggregate score or a capability claim.
 
 No later stage, policy exception, operator approval, consumer convenience, or
 availability workaround may waive a release stop.
@@ -384,4 +562,6 @@ metric, or documentation drift caught by contract tests before release. Pure
 style defects and scenarios requiring total host compromise without increasing
 the attacker's existing power are not security findings.
 
-Baseline: ADR-015 memory-system boundary
+Baseline: ADR-018 complete cognitive-system boundary and Architecture Directive
+v4.0, with ADR-015 retained for the Memory Core, ADR-016 hierarchy scope, and
+ADR-017 governed Dreaming

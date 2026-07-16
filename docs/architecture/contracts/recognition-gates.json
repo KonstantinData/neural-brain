@@ -1,0 +1,24 @@
+{
+  "document_type": "neural_brain_recognition_gates",
+  "format_version": 2,
+  "contract_id": "neural-brain.recognition-gates",
+  "contract_version": "2.0.0",
+  "status": "normative",
+  "decision": "ADR-018",
+  "aggregation": "all_required_non_compensatory",
+  "result_semantics": {"allowed": ["pass", "fail", "unknown"], "unknown": "fail", "failed_gate": "recognition_prohibited", "score_compensation": "prohibited"},
+  "evidence_reference_required": true,
+  "gates": [
+    {"id": "R1", "name": "neural_substance", "required": true, "required_evaluation_gates": ["g1", "g8"], "evidence_requirements": ["trainable stateful neural mechanism", "neural versus non-neural and stateless causal ablation", "contribution across multiple cognitive functions"]},
+    {"id": "R2", "name": "integrated_cognition", "required": true, "required_evaluation_gates": ["g1", "g2", "g3", "g8"], "evidence_requirements": ["typed perception-attention-workspace-memory-model-executive-action cycle", "cross-component state provenance", "integration and workspace ablations"]},
+    {"id": "R3", "name": "closed_perception_action_loop", "required": true, "required_evaluation_gates": ["g3", "g8"], "evidence_requirements": ["controlled effector", "actual post-action observation", "prediction-error feedback and independent effect verification"]},
+    {"id": "R4", "name": "independent_adaptation", "required": true, "required_evaluation_gates": ["g4", "g8"], "evidence_requirements": ["behavior-changing learning without code prompt or workflow rewrite", "fixed update and interaction budget", "versioned learning candidate and promotion evidence"]},
+    {"id": "R5", "name": "retention", "required": true, "required_evaluation_gates": ["g4", "g8"], "evidence_requirements": ["protected-capability inventory", "worst protected regression within preregistered limit", "backward transfer forgetting and rollback results"]},
+    {"id": "R6", "name": "held_out_transfer", "required": true, "required_evaluation_gates": ["g5", "g8"], "evidence_requirements": ["positive held-out forward transfer", "fixed zero-shot or few-shot budget", "contamination controls"]},
+    {"id": "R7", "name": "multiple_task_families", "required": true, "required_evaluation_gates": ["g5", "g8"], "evidence_requirements": ["same architecture across multiple task families", "no task-specific architecture rewiring", "per-family and worst-family results"]},
+    {"id": "R8", "name": "causal_component_evidence", "required": true, "required_evaluation_gates": ["g1", "g8"], "evidence_requirements": ["preregistered component interventions", "predicted behavioral impairment", "full release-artifact ablation reproduction"]},
+    {"id": "R9", "name": "end_to_end_behavioral_evidence", "required": true, "required_evaluation_gates": ["g2", "g3", "g5", "g6", "g8"], "evidence_requirements": ["held-out success error detection learning and generalization", "robustness calibration abstention and recovery", "confidence bounds and failure disclosure"]},
+    {"id": "R10", "name": "safety_control_and_independent_validation", "required": true, "required_evaluation_gates": ["g7", "g8"], "evidence_requirements": ["authority effect learning-promotion and shutdown gates", "independent supervisor and evaluator", "incident recovery rollback and reproducible safety evidence"]}
+  ],
+  "prohibited_inferences": ["recognition implies consciousness", "recognition implies sentience", "recognition implies human equivalence", "recognition implies production autonomy"]
+}

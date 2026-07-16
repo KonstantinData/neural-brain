@@ -1,89 +1,34 @@
 {
-  "document_type": "memory_release_stop_contract",
-  "format_version": 1,
-  "contract_id": "neural-brain.memory-release-stops",
-  "contract_version": "1.0.0",
+  "document_type": "neural_brain_release_stop_contract",
+  "format_version": 2,
+  "contract_id": "neural-brain.release-stops",
+  "contract_version": "2.0.0",
   "status": "normative",
-  "decision": "ADR-015",
-  "default_behavior": "stop_implementation_and_release",
-  "waiver": "prohibited",
+  "decision": "ADR-018",
+  "default_behavior": "stop_implementation_or_release_of_affected_capability",
+  "waiver": "security_floor_prohibitions_are_non_waivable",
   "criteria": [
-    {
-      "id": "MRS-01",
-      "condition": "Neural Brain owns goals, plans, tools, action intents, external effects, or consumer task-success decisions."
-    },
-    {
-      "id": "MRS-02",
-      "condition": "Scope or principal identity can be supplied or changed by untrusted content or consumer correlation metadata."
-    },
-    {
-      "id": "MRS-03",
-      "condition": "A protected memory lifecycle state can be changed outside the Memory Transition Gate."
-    },
-    {
-      "id": "MRS-04",
-      "condition": "A protected memory transition and its audit record are not atomic."
-    },
-    {
-      "id": "MRS-05",
-      "condition": "A cross-tenant or cross-area read, write, cache, index, or inference context is possible without an accepted explicit contract."
-    },
-    {
-      "id": "MRS-06",
-      "condition": "A memory record can exist without required classification, purpose, retention, deletion responsibility, or provenance."
-    },
-    {
-      "id": "MRS-07",
-      "condition": "An inactive, rejected, quarantined, deleted, or anonymized record can appear in normal active-memory retrieval."
-    },
-    {
-      "id": "MRS-08",
-      "condition": "Stale, expired, or unknown-freshness content can be represented as current fact."
-    },
-    {
-      "id": "MRS-09",
-      "condition": "A model, consumer, or inference adapter can directly promote, activate, delete, anonymize, or quarantine memory."
-    },
-    {
-      "id": "MRS-10",
-      "condition": "Sensitive or risky candidate promotion can be completed solely by its producer."
-    },
-    {
-      "id": "MRS-11",
-      "condition": "Deletion or anonymization can leave governed derivations, indexes, caches, or retrieval projections accessible without a documented legal hold."
-    },
-    {
-      "id": "MRS-12",
-      "condition": "Startup or restore can report ready=true before memory-ledger, deletion, projection, and audit reconciliation completes."
-    },
-    {
-      "id": "MRS-13",
-      "condition": "A non-idempotent memory transition with unknown commit outcome can be retried without authoritative reconciliation."
-    },
-    {
-      "id": "MRS-14",
-      "condition": "A later-stage memory capability can be enabled before its accepted stage."
-    },
-    {
-      "id": "MRS-15",
-      "condition": "Secrets or credentials can be persisted in memory content, prompts, logs, audit payloads, examples, or inference configuration."
-    },
-    {
-      "id": "MRS-16",
-      "condition": "Implementation of persistent Tenant scope proceeds by inventing a root exception or sentinel Area before the open invariant is resolved."
-    },
-    {
-      "id": "MRS-17",
-      "condition": "Backup or restore of authoritative memory and audit state has not been proven."
-    },
-    {
-      "id": "MRS-18",
-      "condition": "A memory delivery-stage gate is incomplete."
-    }
+    {"id": "NBRS-01", "condition": "Protected goal, action, memory, or active-model state is writable outside its owning transition gate."},
+    {"id": "NBRS-02", "condition": "Identity, scope, authority, policy, approval, kill-switch state, or evaluation criteria can be supplied or changed by untrusted content."},
+    {"id": "NBRS-03", "condition": "A model, planner, memory subsystem, or skill can directly execute an external action."},
+    {"id": "NBRS-04", "condition": "An external effect lacks committed intent, authority snapshot, policy, required approval, bounded resources, a valid fence, enabled kill switch, sandbox policy, or atomic audit."},
+    {"id": "NBRS-05", "condition": "A non-idempotent indeterminate effect can be blindly retried or its claims released before reconciliation."},
+    {"id": "NBRS-06", "condition": "Goal success can be inferred from tool success, an API or process status, model output, or Brain self-report."},
+    {"id": "NBRS-07", "condition": "The active Brain can modify its own productive model, authority, safety controls, promotion rules, or evaluation definitions in place."},
+    {"id": "NBRS-08", "condition": "Learning activation lacks immutable provenance, held-out retention and transfer evidence, independent promotion, canary controls, or tested rollback."},
+    {"id": "NBRS-09", "condition": "A neural or cognitive claim lacks a predeclared baseline, held-out test, meaningful effect threshold, component ablation, or contamination control."},
+    {"id": "NBRS-10", "condition": "A failed or unknown recognition, evaluation, privacy, authority, or safety gate is hidden by an aggregate score."},
+    {"id": "NBRS-11", "condition": "Model-generated content is represented as direct observation or current fact without provenance and uncertainty."},
+    {"id": "NBRS-12", "condition": "Inactive, quarantined, expired, deleted, or out-of-scope memory or model state can influence normal cognition."},
+    {"id": "NBRS-13", "condition": "Scope, raw memory, working state, authority, or unapproved learning crosses a Tenant or Area boundary."},
+    {"id": "NBRS-14", "condition": "Shutdown, credential revocation, independent monitoring, or incident recovery is under sole Brain control."},
+    {"id": "NBRS-15", "condition": "A later-stage capability is enabled before every required earlier stage and evidence gate passes."},
+    {"id": "NBRS-16", "condition": "Repository maturity or product claims exceed the versioned implementation and evaluation evidence."}
   ],
   "rules": [
-    "Unknown evaluation state is treated as a triggered release stop.",
-    "A configurable policy, approval, consumer request, or model response cannot waive a release stop.",
-    "Every triggered criterion blocks implementation of the affected capability and blocks release of the affected stage."
+    "Unknown evaluation state triggers the release stop.",
+    "Capability gain cannot compensate for a failed safety or control gate.",
+    "Approval does not create missing authority.",
+    "A later stage cannot weaken an earlier invariant."
   ]
 }

@@ -2,9 +2,40 @@
   "document_type": "memory_ledger_invariant_contract",
   "format_version": 1,
   "contract_id": "neural-brain.memory-ledger-invariants",
-  "contract_version": "1.0.0",
+  "contract_version": "2.0.0",
   "status": "normative",
   "decision": "ADR-015",
+  "decisions": [
+    "ADR-015",
+    "ADR-016",
+    "ADR-017"
+  ],
+  "catalog_scope": {
+    "brain": [
+      "brain_id"
+    ],
+    "tenant": [
+      "brain_id",
+      "tenant_id"
+    ],
+    "area": [
+      "tenant_id",
+      "area_id"
+    ],
+    "project": [
+      "tenant_id",
+      "area_id",
+      "project_id"
+    ],
+    "session": [
+      "tenant_id",
+      "area_id",
+      "project_id",
+      "session_id"
+    ],
+    "rule": "Brain is a persisted singleton. Each catalog object carries its own identifier and required parent lineage, never descendant identifiers. Brain ancestry below Tenant is resolved transitively through Tenant.",
+    "tenant_area_id": "forbidden"
+  },
   "transition_record": {
     "required_immutable_fields": [
       "tenant_id",
@@ -26,7 +57,8 @@
     ],
     "conditional_scope_fields": {
       "project_id": "required for project-bound memory",
-      "session_id": "required for session-bound memory"
+      "session_id": "required for session-bound memory; session-bound memory also requires project_id",
+      "dreaming_run_id": "required for a Dreaming-derived protected transition"
     },
     "writer_rule": "Only the Memory Transition Gate database role may write protected memory state.",
     "atomicity": "Protected memory state, version, indexes or projections owned by the transition, and audit evidence commit in one PostgreSQL transaction or all roll back.",
@@ -88,6 +120,16 @@
       "id": "MLI-011",
       "rule": "unknown_state_fails_closed",
       "assertion": "Unknown state, scope, provenance, freshness, classification, authorization, or commit outcome blocks mutation and current-fact retrieval."
+    },
+    {
+      "id": "MLI-012",
+      "rule": "catalog_lineage_typed",
+      "assertion": "Catalog lineage contains every required parent identifier, contains no descendant identifier, resolves Brain ancestry transitively through Tenant, and is immutable after persistence."
+    },
+    {
+      "id": "MLI-013",
+      "rule": "dreaming_cannot_activate_directly",
+      "assertion": "A Dreaming worker or model cannot write protected memory or change an active-version pointer directly; MS-1 and MS-2 outputs remain inactive."
     }
   ],
   "consumer_metadata": {
@@ -106,5 +148,5 @@
     "audit_failure": "rollback_and_deny",
     "reconciliation_incomplete": "not_ready"
   },
-  "tenant_root_boundary": "Unresolved by this contract; no root-scope exception or sentinel value is authorized."
+  "tenant_root_boundary": "Resolved by ADR-016 through typed catalog lineage; Tenant carries brain_id and tenant_id but never area_id."
 }

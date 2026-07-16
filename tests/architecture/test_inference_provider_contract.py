@@ -57,7 +57,7 @@ def test_inference_cannot_retrieve_write_or_promote_memory() -> None:
     assert boundary["adapter_direct_memory_write"] == "denied"
     assert boundary["adapter_direct_candidate_promotion"] == "denied"
     assert boundary["model_output_may_define_scope_actor_or_governance"] is False
-    assert boundary["stage_1_persistent_output"] == "inactive_non_retrievable_candidate_only"
+    assert boundary["ms_1_persistent_output"] == "inactive_non_retrievable_candidate_only"
 
 
 def test_provider_failure_is_fail_closed_without_fallback() -> None:

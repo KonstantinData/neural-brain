@@ -1,6 +1,7 @@
 # Neural Brain Architecture Directive v1.1
 
-- Status: Superseded by Architecture Directive v2.0 and ADR-015
+- Status: Superseded by Architecture Directives v2.0 and v3.0 and ADR-015,
+  ADR-016, and ADR-017
 - Version: 1.1
 - Effective date: 2026-07-15
 - Work item: FND-02.1 / NB-10
@@ -10,7 +11,12 @@
 > **Historical record.** This directive is no longer implementation authority.
 > ADR-015 corrected the system boundary: Neural Brain is a memory system, not
 > an agent runtime. The current normative directive is
-> `architecture-directive-v2.0.md`.
+> `architecture-directive-v3.0.md`. Version 2.0 remains the intermediate
+> memory-system rebaseline in repository history.
+
+> **Current authority note (2026-07-16).** The preceding paragraph is retained
+> verbatim as historical evidence. ADR-018 and Architecture Directive v4.0 now
+> govern the complete cognitive-system target.
 
 ## 1. Purpose and applicability
 

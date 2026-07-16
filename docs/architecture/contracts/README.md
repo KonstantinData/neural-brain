@@ -1,32 +1,38 @@
-# Machine-readable memory contracts
+# Machine-readable Neural Brain contracts
 
-These contracts implement the active memory-system boundary established by
-ADR-015. They define Neural Brain as a governed memory service for authenticated
-consumers. Neural Brain does not own consumer goals, plans, tools, action
-intents, external effects, or task-success decisions.
+These contracts implement the complete cognitive-system target established by
+ADR-018 while retaining the governed Memory Core established by ADR-015 through
+ADR-017.
 
-The active contract set is:
+## Complete-system contracts
 
-- [`system-boundary.json`](system-boundary.json): system purpose, consumer
-  boundary, non-capabilities, trusted context, and the unresolved Tenant-root
-  boundary.
-- [`envelopes.json`](envelopes.json): strict memory request and record schemas
-  with authenticated scope and optional non-authoritative consumer correlations.
-- [`memory-lifecycle.json`](memory-lifecycle.json): memory operations, lifecycle
-  rules, candidate promotion, deletion, and reconciliation.
-- [`ledger-invariants.json`](ledger-invariants.json): PostgreSQL Memory Gate,
-  provenance, versioning, audit atomicity, isolation, and recovery invariants.
-- [`release-stops.json`](release-stops.json): non-waivable memory-specific release
-  stops.
-- [`stage-capabilities.json`](stage-capabilities.json): cumulative memory-only
-  stage capabilities.
-- [`inference-provider.json`](inference-provider.json): local Ollama inference
-  restricted to supporting memory functions.
+- `system-boundary.json`: Cognitive Plane, Protected Control Plane, scope,
+  target capabilities, Memory Core role, and non-claims.
+- `cognitive-cycle.json`: typed serial cognitive-cycle order and invariants.
+- `stage-capabilities.json`: cumulative NB-0 through NB-8 delivery contract.
+- `recognition-gates.json`: all-required recognition criteria.
+- `evaluation-gates.json`: ordered, non-compensatory G0 through G8 evidence.
+- `release-stops.json`: non-waivable complete-system release stops.
 
-Goal state machines, Action Intent state machines, intent-purpose guards, and
-goal quiescence are not Neural Brain contracts. Their historical definitions
-remain available through version control only.
+## Memory Core contracts
 
-All unknown scope, actor, operation, lifecycle, provenance, freshness,
-classification, policy, or authorization states fail closed. The open Tenant
-root scope conflict is intentionally not resolved by these files.
+- `scope-catalog.json`: strict Brain-to-Goal object lineage; Goal is not an isolation dimension.
+- `envelopes.json`: authenticated memory requests and records.
+- `memory-lifecycle.json`: Memory Gate operations and lifecycle.
+- `memory-stage-capabilities.json`: cumulative, separately namespaced MS-0
+  through MS-4 Memory Core maturity contract. These stages are not NB product
+  stages and do not advance product maturity by themselves.
+- `memory-release-stops.json`: retained non-waivable Memory Core-specific
+  release stops under ADR-018.
+- `ledger-invariants.json`: PostgreSQL, provenance, audit, isolation, and recovery.
+- `dreaming.json`: Area-local offline Dreaming and inactive candidates.
+- `inference-provider.json`: bounded local Ollama memory-processing boundary.
+
+Historical Goal, Action Intent, dispatch, intent-purpose, and quiescence
+contracts remain in Git history. ADR-018 does not reactivate them automatically;
+each must be revalidated or replaced by its delivery task.
+
+Unknown scope, actor, authority, state, operation, model version, provenance,
+freshness, data class, promotion, evaluation, or authorization state fails
+closed. A schema may describe a later operation without authorizing it before
+its stage and evidence gates pass.

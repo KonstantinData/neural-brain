@@ -1,6 +1,6 @@
 {
   "document_type": "repository_governance_policy",
-  "contract_version": "1.1.0",
+  "contract_version": "1.2.0",
   "status": "normative_desired_state",
   "work_item": "FND-03.4",
   "repository": "KonstantinData/neural-brain",
@@ -134,6 +134,17 @@
       "src/**/retrieval/**",
       "src/**/consolidation/**",
       "src/**/memory/**",
+      "src/**/perception/**",
+      "src/**/attention/**",
+      "src/**/workspace/**",
+      "src/**/world_model/**",
+      "src/**/goal/**",
+      "src/**/planner/**",
+      "src/**/action/**",
+      "src/**/executor/**",
+      "src/**/verification/**",
+      "src/**/learning/**",
+      "src/**/metacognition/**",
       "tools/**",
       ".github/**"
     ],
@@ -143,7 +154,7 @@
       "at least one reviewer distinct from the change author and last pusher",
       "the independent verification reviewer did not implement the evidence under review",
       "policy activation is not approved solely by the policy author",
-      "memory runtime separation boundaries are explicitly assessed when affected"
+      "cognitive and protected-control-plane separation boundaries are explicitly assessed when affected"
     ],
     "runtime_boundaries": [
       "memory_producer_vs_transition_gate",
@@ -151,7 +162,13 @@
       "requester_vs_approver_for_elevated_risk_memory_operation",
       "policy_author_vs_sole_policy_activator",
       "automatic_memory_reconciliation_vs_human_incident_resolution",
-      "memory_candidate_producer_vs_sensitive_candidate_promoter"
+      "memory_candidate_producer_vs_sensitive_candidate_promoter",
+      "planner_vs_executor",
+      "executor_vs_independent_verifier",
+      "cognitive_plane_vs_protected_transition_gates",
+      "learning_candidate_producer_vs_model_promoter",
+      "brain_self_monitoring_vs_independent_safety_supervisor",
+      "brain_runtime_vs_kill_switch_and_credential_revocation"
     ],
     "fail_closed": "A sensitive change without complete reviewer identity and independence evidence is not mergeable."
   },

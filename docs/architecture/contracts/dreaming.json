@@ -1,0 +1,157 @@
+{
+  "document_type": "governed_dreaming_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.governed-dreaming",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "decision": "ADR-017",
+  "system_role": "area_local_offline_memory_analysis",
+  "not_agent_runtime": true,
+  "scope": {
+    "cardinality": "exactly_one_authenticated_tenant_and_area",
+    "source": "authenticated_runtime_context_and_authoritative_catalog",
+    "raw_cross_area_access": "denied",
+    "scope_change_during_run": "denied"
+  },
+  "guards": {
+    "required": [
+      "trusted trigger",
+      "authenticated enabled principal",
+      "resolved Tenant and Area catalog lineage",
+      "no active session in Area",
+      "no admitted live memory activity in Area",
+      "exclusive unexpired Area Dreaming lease",
+      "immutable complete snapshot",
+      "current policy and retention context",
+      "audit availability"
+    ],
+    "unknown_result": "skip_or_abort_and_audit",
+    "active_area_result": "protected_skip",
+    "lease_unavailable_result": "protected_skip",
+    "stale_or_incomplete_snapshot_result": "abort_without_active_memory_change"
+  },
+  "run_states": [
+    "requested",
+    "guard_evaluating",
+    "skipped",
+    "snapshotting",
+    "analyzing",
+    "decision_packaged",
+    "validating",
+    "completed",
+    "aborted",
+    "failed"
+  ],
+  "terminal_states": [
+    "skipped",
+    "completed",
+    "aborted",
+    "failed"
+  ],
+  "process": [
+    "accept a trusted schedule or operator request",
+    "resolve authenticated Area scope",
+    "evaluate activity and active-session guards",
+    "acquire exclusive Area Dreaming lease",
+    "capture immutable versioned snapshot and source-version manifest",
+    "perform bounded replay and analysis outside database transactions",
+    "produce findings and inactive candidate proposals",
+    "seal immutable decision package",
+    "validate package independently",
+    "submit any authorized lifecycle request to the Memory Transition Gate"
+  ],
+  "artifacts": {
+    "snapshot": "immutable_versioned_area_local_input",
+    "analysis_report": "immutable_findings_with_provenance_and_uncertainty",
+    "candidate": "inactive_non_retrievable_operational_work_item",
+    "decision_package": "immutable_input_to_independent_validation",
+    "validation_report": "independent_recorded_decision",
+    "successor_version": "ms_3_only_memory_gate_output_with_rollback_target"
+  },
+  "memory_stage_behavior": {
+    "ms_1": {
+      "mode": "dry_run_only",
+      "allowed": [
+        "snapshot",
+        "bounded analysis",
+        "analysis report",
+        "findings",
+        "inactive candidate proposal",
+        "inactive candidate persistence through Memory Transition Gate"
+      ],
+      "denied": [
+        "successor memory version",
+        "candidate promotion",
+        "active pointer change",
+        "episodic or semantic retrieval",
+        "cross-area input or output"
+      ]
+    },
+    "ms_2": {
+      "mode": "durable_memory_analysis_without_activation",
+      "allowed": [
+        "episode replay",
+        "claim and assessment comparison",
+        "freshness analysis",
+        "contradiction and duplication findings",
+        "inactive candidate and decision package"
+      ],
+      "denied": [
+        "candidate promotion",
+        "active pointer change",
+        "procedural memory activation",
+        "cross-area input or output"
+      ]
+    },
+    "ms_3": {
+      "mode": "controlled_consolidation",
+      "allowed": [
+        "independent candidate assessment",
+        "semantic consolidation and re-evaluation",
+        "procedural memory proposal",
+        "authorized promotion through Memory Transition Gate",
+        "quarantine",
+        "rollback"
+      ],
+      "required": [
+        "producer-promoter separation when sensitive or risky",
+        "versioned successor",
+        "preserved provenance",
+        "rollback target"
+      ]
+    },
+    "ms_4": {
+      "mode": "governed_abstraction_and_scale",
+      "cross_area": "minimized_candidate_only_through_separately_accepted_dual_scope_transfer_contract",
+      "raw_memory_transfer": "denied"
+    }
+  },
+  "protected_writes": {
+    "sole_writer": "Memory Transition Gate",
+    "worker_direct_write": "forbidden",
+    "model_direct_write": "forbidden",
+    "active_pointer_change": "ms_3_only_separately_authorized_transition",
+    "atomicity": "Protected output and audit evidence commit together or both roll back."
+  },
+  "model_boundary": {
+    "output_trust": "untrusted_analysis_input",
+    "may_establish_scope": false,
+    "may_approve_own_candidate": false,
+    "may_suppress_contradictory_evidence": false,
+    "may_activate_or_promote": false
+  },
+  "recovery": {
+    "ready_default": false,
+    "interrupted_run": "active memory remains unchanged and the run is reconciled",
+    "expired_lease": "reconcile owner and snapshot epoch before another run",
+    "unknown_commit_outcome": "inspect authoritative ledger by dreaming_run_id and do not retry blindly",
+    "startup_or_restore": "reconcile runs, leases, packages, promotions, quarantines, rollbacks, and audit continuity before ready=true"
+  },
+  "absolute_prohibitions": [
+    "Dreaming does not run while its Area has active sessions or admitted live memory activity.",
+    "Dreaming never mixes raw memory from different Areas.",
+    "A Dreaming worker or model never mutates protected memory or an active pointer directly.",
+    "MS-1 and MS-2 Dreaming outputs never become active memory.",
+    "Dreaming never creates goals, plans, actions, tools, external effects, approvals, or consumer authority."
+  ]
+}

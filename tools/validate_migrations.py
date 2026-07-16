@@ -21,6 +21,9 @@ MIGRATION_NAME: Final = re.compile(r"^(?P<sequence>[0-9]{4})_[a-z0-9]+(?:_[a-z0-
 TRANSACTION_CONTROL: Final = re.compile(
     r"(?im)^\s*(?:BEGIN|START\s+TRANSACTION|COMMIT|ROLLBACK|SAVEPOINT|RELEASE\s+SAVEPOINT)\b"
 )
+DOLLAR_QUOTED_BODY: Final = re.compile(
+    r"\$(?P<tag>[A-Za-z_][A-Za-z0-9_]*|)\$.*?\$(?P=tag)\$", re.DOTALL
+)
 DATABASE_PREFIX: Final = "neural_brain_migration_validation_"
 
 
@@ -199,7 +202,8 @@ def _normalized_sql(path: Path) -> str:
     normalized = text.replace("\r\n", "\n").replace("\r", "\n")
     if not normalized.strip():
         raise ValueError(f"Migration is empty: {path.name}")
-    if TRANSACTION_CONTROL.search(normalized):
+    top_level_sql = DOLLAR_QUOTED_BODY.sub("$body$", normalized)
+    if TRANSACTION_CONTROL.search(top_level_sql):
         raise ValueError(f"Migration contains transaction control: {path.name}")
     return normalized
 

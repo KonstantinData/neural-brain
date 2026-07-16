@@ -1,9 +1,10 @@
 # Tests
 
 This directory contains automated acceptance, isolation, privacy, safety,
-recovery, and regression evidence for the Neural Brain memory system.
+recovery, cognitive-capability, and regression evidence for Neural Brain.
 
 Test organization should mirror the implemented contracts and delivery stages.
-Tests must distinguish Brain-owned memory behavior from external-agent behavior.
-Product-specific fixtures, agent planning, goal-management, and tool-execution
-assumptions do not belong in the platform test suite.
+Tests must distinguish implemented behavior from target contracts and the
+Cognitive Plane from the Protected Control Plane. Product-specific fixtures do
+not belong in the platform suite. Every cognitive claim additionally requires
+baselines, ablations, held-out transfer, robustness, and calibration evidence.
