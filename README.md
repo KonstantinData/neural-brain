@@ -15,6 +15,19 @@ ADR-018 supersedes the former memory-only product boundary. The governed memory
 system remains a protected `Memory Core` subsystem rather than the whole
 product.
 
+## Status at a Glance
+
+| Surface | Current state |
+| --- | --- |
+| Product boundary | Complete cognitive-system target governed by [ADR-018](docs/adr/ADR-018-complete-cognitive-system.md) |
+| Product maturity | NB-0 Foundation artifacts are present; no NB-1 through NB-8 product stage is released |
+| Memory maturity | Early MS-1 subset with scoped Working Memory; MS-1 is not complete |
+| Runtime | Python library and protected PostgreSQL memory kernel; no stable service API or deployment |
+| Dreaming | Reserved schema and contracts; all supported execution paths are disabled fail closed |
+| Inference | Normative local-only boundary; no inference adapter or ready deployment exists |
+| Autonomy | No productive planning, action execution, external effects, or autonomous operation |
+| Recognition | The system is not a `Neural Brain Candidate`; NB-6 plus independent G8 evidence is required |
+
 ## Why This Project Exists
 
 Most systems called a brain are an LLM with retrieval, an agent workflow, or a
@@ -27,14 +40,54 @@ The project serves cognitive-architecture, AI-safety, memory, database,
 reliability, and evaluation engineers who need one auditable platform rather
 than disconnected cognitive demos.
 
+## Ownership and Intended Use
+
+Konstantin Milonas is the repository owner and architecture decision owner. The
+repository records product direction, architecture, implementation, safety
+constraints, and evaluation evidence as reviewable engineering artifacts.
+
+The platform is product- and domain-neutral. A consuming product may integrate
+through an explicit scoped contract, but it does not define Neural Brain's
+architecture, policies, defaults, or authority model.
+
+## Target State
+
+The enduring target is one complete, protected Neural Brain: an integrated
+system that learns from perception, maintains differentiated memory, forms and
+updates world/self/value models, controls goals and attention, selects bounded
+actions, observes their real effects, corrects its predictions, transfers
+learned structure, and monitors the limits of its own competence.
+
+The target is not an LLM wrapper, retrieval database, workflow graph, or loose
+collection of cognitive services. The same governed architecture must provide:
+
+- trainable neural mechanisms with demonstrated causal contribution;
+- perception, attention, Working Memory, episodic, semantic, and procedural
+  memory operating in one closed cognitive loop;
+- executive control, planning, action selection, and verified outcome feedback;
+- continual learning with bounded forgetting, transfer, canary promotion, and
+  rollback;
+- metacognitive uncertainty, stop, ask, explore, fallback, and escalation;
+- an independent Protected Control Plane for identity, scope, authority,
+  approvals, budgets, fences, verification, shutdown, and audit; and
+- reproducible benchmarks, baselines, ablations, robustness tests, and
+  independent evidence for every recognition claim.
+
+This target remains stable while the implementation status below changes over
+time. The normative definition lives in
+[ADR-018](docs/adr/ADR-018-complete-cognitive-system.md),
+[Architecture Directive v4.0](docs/architecture/architecture-directive-v4.0.md),
+and the [recognition standard](docs/architecture/neural-brain-recognition-standard.md).
+
 ## Current Implemented State
 
-The current branch includes early, reusable prerequisites:
+The current implementation includes early, reusable prerequisites:
 
 - repository governance, locked Python toolchain, quality and release gates;
-- typed Brain-to-Session catalog identifiers and authenticated scope context;
+- a Brain-to-Session PostgreSQL catalog and strict authenticated
+  `RuntimeContext`;
 - PostgreSQL-backed Working Memory, observations, checkpoints, audit records,
-  source references, and inactive memory candidates;
+  source references, and schema constraints for inactive memory candidates;
 - a Memory Transition Gate boundary and a reserved Dreaming schema whose
   execution is fail-closed disabled;
 - normative provenance, default-deny, privacy, retention, deletion, and
@@ -50,11 +103,14 @@ Candidate evaluation.
 
 Dreaming is currently unavailable at both service and database boundaries. The
 runtime role has no execute privilege, and direct privileged calls fail closed.
-No Dreaming run, candidate, audit event, or active-pointer update may be created
-until a persistent Area lease, immutable input snapshot, and independent
-validation are implemented and verified.
+No supported runtime path may create a Dreaming run, candidate, audit event, or
+active-pointer update until a persistent Area lease, immutable input snapshot,
+and independent validation are implemented and verified.
 
 ## Target Architecture
+
+The target is normative in [Architecture Directive v4.0](docs/architecture/architecture-directive-v4.0.md).
+It is not a claim that the displayed components already exist.
 
 ```text
 Neural Brain
@@ -134,6 +190,19 @@ Persistent operational objects carry immutable authenticated Tenant and Area
 scope; project-bound objects also carry `project_id`. Concrete memory and
 working state never cross Tenant or Area boundaries implicitly.
 
+## Product and Memory Stage Namespaces
+
+`NB-0` through `NB-8` describe cumulative maturity of the complete Neural Brain
+product. `MS-0` through `MS-4` describe only the protected Memory Core
+subsystem. An MS stage is never an alias for, and never proves, an NB stage.
+
+The current repository contains NB-0 Foundation artifacts and an early subset
+of MS-1. It does not claim complete MS-1 release evidence or any released NB-1
+through NB-8 cognitive stage. See the machine-readable
+[product-stage](docs/architecture/contracts/stage-capabilities.json) and
+[Memory Core stage](docs/architecture/contracts/memory-stage-capabilities.json)
+contracts.
+
 ## Delivery Model
 
 Delivery is cumulative and fail-closed:
@@ -162,6 +231,10 @@ Delivery is cumulative and fail-closed:
 validation. Production autonomy remains a separate deployment approval.
 
 ## Safety Baseline
+
+The following are non-negotiable target invariants, not claims that every named
+runtime component is implemented. The current code implements only an early
+Memory Core slice of these boundaries.
 
 - Goal, Action, Memory, and Model Promotion Gates are the only writers of their
   protected state.
@@ -207,6 +280,22 @@ Repository code, tests, migrations, and executable configuration are the
 primary technical truth. Notion coordinates decisions, lifecycle, backlog, and
 evidence; it is not executable truth.
 
+## Documentation and Evidence Map
+
+- [Architecture index](docs/architecture/README.md) and
+  [Architecture Directive v4.0](docs/architecture/architecture-directive-v4.0.md)
+- [ADR index](docs/adr/README.md) and
+  [ADR-018](docs/adr/ADR-018-complete-cognitive-system.md)
+- [Recognition standard](docs/architecture/neural-brain-recognition-standard.md)
+  and [evaluation framework](docs/architecture/evaluation-framework.md)
+- [Delivery roadmap](docs/architecture/delivery-roadmap.md) and
+  [capability traceability](docs/traceability/neural-brain-capability-matrix.md)
+- [Machine-readable contracts](docs/architecture/contracts/README.md),
+  [threat model](docs/architecture/threat-model.md), and
+  [repository governance](docs/governance/README.md)
+- [Operational runbooks](docs/runbooks/README.md) and
+  [release evidence](docs/runbooks/release-artifacts.md)
+
 ## Quick Start
 
 There is no production Neural Brain service to start. The locked development
@@ -215,7 +304,7 @@ and quality environment is executable.
 Prerequisite: uv 0.11.28.
 
 ```powershell
-uvx --from uv==0.11.28 uv sync --locked
+uvx --from uv==0.11.28 uv sync --locked --all-groups
 uvx --from uv==0.11.28 uv run --locked --all-groups python tools/quality.py --locked
 ```
 
@@ -230,14 +319,35 @@ Reset only disposable test data with `.\tools\dev.ps1 reset-test`. See
 [local development](docs/runbooks/local-development.md) for ports, transaction
 rules, and shutdown.
 
-## Accepted Foundation Toolchain
+## Verification and Release Evidence
+
+The locked quality command runs Ruff formatting and linting, strict mypy,
+type-exception auditing, and the complete pytest suite. Pull-request CI also
+checks PostgreSQL 18 forward migrations, dependency and workflow policy,
+secret history, and deterministic release evidence.
+
+Live database tests require an isolated PostgreSQL 18 administrative DSN and
+must use disposable databases. The guarded migration and database procedures
+are documented in the [local-development runbook](docs/runbooks/local-development.md).
+Passing repository tests proves only the implemented Foundation and Memory Core
+slice; it does not satisfy Neural Brain recognition or production authorization.
+
+## Accepted Foundation Toolchain and Inference Boundary
 
 - CPython 3.14.6 and uv 0.11.28 with an exact lockfile
 - Ruff, strict mypy, pytest, Hypothesis, and JSON Schema validation
 - Pydantic v2 for untrusted runtime boundaries
 - synchronous Psycopg 3 and PostgreSQL as the transactional ledger
-- local-only Ollama under ADR-014 for bounded inference ports
+- Ollama is the only architecturally approved future local inference adapter
+  under ADR-014; no inference adapter or inference deployment is implemented
+  or ready.
 
-Ollama is an implementation dependency, not proof of neural integration. Any
-future cognitive substrate requires its own accepted ADR, contracts, baselines,
-ablations, and evaluation evidence.
+Ollama is an approved future adapter boundary, not a current runtime dependency
+and not proof of neural integration. Any future cognitive substrate requires
+its own accepted ADR, contracts, baselines, ablations, and evaluation evidence.
+
+## License and Reuse
+
+This repository currently contains no license file. Do not assume permission to
+copy, redistribute, or reuse its contents beyond rights explicitly granted by
+the repository owner.
