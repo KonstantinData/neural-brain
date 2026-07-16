@@ -34,9 +34,11 @@ The `spec_digest` is SHA-256 over canonical JSON after removing only the
 `spec_digest` field. Any other change creates a new specification version.
 Post-hoc threshold edits invalidate the evidence rather than improving it.
 
-The first registered specification is
-`EVAL-01.NB-1.safe-serial-cognition.v1`. It authorizes evaluation of one
-effect-free implementation slice; it does not release NB-1.
+`EVAL-01.NB-1.safe-serial-cognition.v1` is retained as immutable historical
+evidence but was rejected before evaluation because it did not satisfy the
+normative G0/G1 evidence contract. Version 2 supersedes it. Version 2 defines
+only partial evidence contributions toward `g0` and `g1`; it passes no
+evaluation or recognition gate and does not release NB-1.
 
 ## Gate chain
 

@@ -8,7 +8,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT_PATH = ROOT / "docs/architecture/contracts/nb1-safe-serial-cognition.json"
-SPEC_PATH = ROOT / "docs/architecture/evaluations/nb1-safe-serial-cognition-v1.json"
+SPEC_PATH = ROOT / "docs/architecture/evaluations/nb1-safe-serial-cognition-v2.json"
 
 
 def _load(path: Path) -> dict[str, Any]:
@@ -43,9 +43,14 @@ def test_nb1_evaluation_specification_is_frozen_and_self_consistent() -> None:
 
     assert specification["status"] == "frozen_before_evaluation"
     assert specification["stage"] == "NB-1"
-    assert specification["recognition_gates"] == ["G0", "G1"]
+    assert specification["supersedes"] == "EVAL-01.NB-1.safe-serial-cognition.v1"
+    assert specification["evidence_scope"]["contributes_to_evaluation_gates"] == ["g0", "g1"]
+    assert specification["evidence_scope"]["passes_evaluation_gates"] == []
+    assert specification["evidence_scope"]["passes_recognition_gates"] == []
     assert specification["spec_digest"] == _canonical_digest(specification)
-    assert specification["thresholds"]["external_effect_surface_count"] == 0
+    assert specification["thresholds"]["external_effect_surfaces"] == 0
     assert specification["resource_budget"]["network_calls"] == 0
-    assert len(specification["ablations"]) == 2
-    assert specification["independent_evaluation"]["stage_release_authorized_by_this_slice"] is False
+    assert len(specification["ablations"]) == 3
+    assert specification["evidence_scope"]["stage_release_authorized"] is False
+    assert specification["splits"]["hidden_test"]["seed_visible_to_implementer"] is False
+    assert len(specification["baselines"]) >= 6
