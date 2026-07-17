@@ -28,7 +28,8 @@ distinct.
 - `evaluation-gates.json`: ordered G0 through G8 evidence chain.
 - `release-stops.json`: complete-system non-waivable release stops.
 - `memory-release-stops.json`: retained Memory Core-specific release stops.
-- `scope-catalog.json`: Brain-to-Goal protected-object hierarchy with isolation ending at Session.
+- `scope-catalog.json`: Brain-to-Session catalog hierarchy; Goals are
+  session-bound protected aggregates, not isolation dimensions.
 - `envelopes.json`: authenticated, provenance-bearing memory envelopes.
 - `memory-lifecycle.json`: protected Memory Core lifecycle.
 - `ledger-invariants.json`: transactional state, audit, provenance, and recovery.

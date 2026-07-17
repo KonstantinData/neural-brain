@@ -22,6 +22,10 @@ def test_repository_has_no_unapproved_type_exceptions() -> None:
     "source",
     [
         "from typing import cast as narrow\nnarrow(int, object())",
+        "from typing import cast\nnarrow = cast\nnarrow(int, object())",
+        "from typing import cast\nnarrow = cast\nagain = narrow\nagain(int, object())",
+        "from typing import cast\nnarrow: object = cast\nnarrow(int, object())",
+        "import typing\nnarrow = typing.cast\nnarrow(int, object())",
         "import typing as types\ntypes.cast(int, object())",
         "import typing_extensions\ntyping_extensions.cast(int, object())",
     ],

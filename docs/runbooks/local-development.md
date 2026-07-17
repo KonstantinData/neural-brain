@@ -11,7 +11,9 @@ production-ready deployment.
 
 The image is pinned to the multi-platform digest for the official PostgreSQL
 18.4 Bookworm image. Development and test data use separate containers, ports,
-users, databases, and named volumes.
+users, databases, and named volumes. The Docker Compose project name is derived
+from the canonical repository path and stored in `.local/dev.env`, so separate
+local worktrees do not share the same disposable test volume by default.
 
 ## Prerequisites
 
@@ -22,7 +24,9 @@ No password or connection secret is stored in Git. The first command creates
 random local credentials in `.local/dev.env`, which is ignored by Git. Commands
 must not print this file or its values. The generated file is restricted to the
 current operating-system user (`FullControl` with inheritance disabled on
-Windows; mode `0600` on POSIX systems).
+Windows; mode `0600` on POSIX systems). The file contains a random local
+PostgreSQL bootstrap password plus separate non-superuser development and test
+role credentials.
 
 ## Start Dependencies
 
@@ -46,9 +50,10 @@ Both ports bind only to loopback. Host authentication uses SCRAM-SHA-256.
 ```
 
 Verification connects through synchronous Psycopg 3 with `autocommit=True`,
-checks PostgreSQL 18.4, exercises explicit commit and rollback transaction
-blocks, and proves each probe returns to idle transaction status. It never
-prints credentials.
+checks PostgreSQL 18.4, rejects superuser application/test roles, exercises
+explicit commit and rollback transaction blocks with temporary writes, and
+proves each probe returns to idle transaction status. It never prints
+credentials.
 
 ## Reset Only Disposable Test Data
 
@@ -58,9 +63,9 @@ prints credentials.
 
 The command fails closed unless the configured database name ends in `_test`.
 It also requires the expected Docker Compose project and service-volume ownership
-labels before it removes the fixed `neural-brain-postgres-test-data` volume. It
-then recreates the test service without stopping or deleting the development
-volume.
+labels before it stops the test container, removes it, or removes the
+worktree-specific test volume. It then recreates the test service without
+stopping or deleting the development volume.
 
 ## Status and Shutdown
 

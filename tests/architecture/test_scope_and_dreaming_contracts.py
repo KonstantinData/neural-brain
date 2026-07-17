@@ -52,14 +52,6 @@ def _scope_validator() -> _Validator:
             "project_id": "project-a",
             "session_id": "session-a",
         },
-        {
-            "catalog_kind": "goal",
-            "tenant_id": "tenant-a",
-            "area_id": "area-a",
-            "project_id": "project-a",
-            "session_id": "session-a",
-            "goal_id": "goal-a",
-        },
     ],
 )
 def test_typed_catalog_accepts_exact_parent_lineage(entry: dict[str, object]) -> None:
@@ -86,6 +78,7 @@ def test_typed_catalog_accepts_exact_parent_lineage(entry: dict[str, object]) ->
             "tenant_id": "tenant-a",
             "area_id": "area-a",
             "project_id": "project-a",
+            "session_id": "session-a",
             "goal_id": "goal-a",
         },
         {"scope_kind": "operational_memory", "tenant_id": "tenant-a"},
