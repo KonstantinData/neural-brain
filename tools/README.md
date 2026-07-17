@@ -36,6 +36,26 @@ training or promotion interface. Verify the checked-in non-hidden artifact with:
 uv run --locked --all-groups python tools/train_nb1_workspace.py --check
 ```
 
-Regeneration without `--check` uses only the preregistered public training split
+Generation without `--check` requires a new, explicitly versioned output path and uses only the preregistered public training split
 and rewrites the deterministic development-candidate bundle. It never reads a
 hidden artifact, promotes a model, or marks an evaluation gate as passed.
+
+## NB-1 external evaluator handoff
+
+Candidate export is currently blocked. The only checked-in model is bound to
+rejected EVAL-01 v3, and the command fails closed for that digest. After a
+replacement specification, generator, versioned training artifact, and
+candidate are frozen, this interface can export a label-free freeze receipt to
+evaluator-controlled storage:
+
+```text
+uv run --locked --all-groups python tools/export_nb1_evaluation_candidate.py --frozen-at 2026-07-17T10:00:00+02:00 --output <external-path>/candidate.json
+```
+
+The export contains no hidden data and is not a passing evaluation artifact.
+The external evaluator keeps hidden seed, labels, scoring implementation,
+detailed correctness, attempts ledger, and Ed25519 private key outside this
+repository. Signed evidence is accepted only against reviewer-supplied trusted
+candidate, specification, and public-key registries and still requires an
+independent gate review. Historical EVAL-01 v3 is rejected and must not be
+placed in an accepted-specification registry.

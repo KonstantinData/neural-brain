@@ -16,16 +16,14 @@ adapter whose `SECURITY DEFINER` functions remain inside the existing Memory
 Transition Gate and atomically bind checkpoint, transition, training/model
 evidence, receipt, and audit.
 
-The slice is governed by the frozen
-`EVAL-01.NB-1.safe-serial-cognition.v3` requires an external hidden dataset,
-six baselines, three ablations, digests, and confidence bounds. The implemented
-training bundle and development harness pass no evaluation or recognition gate.
-The hidden-evaluation interface accepts only an externally supplied artifact and
-an explicit independent-evaluator identity; the repository stores no hidden
-dataset. Version 1 is
-retained with v2 as rejected historical evidence. Later cognitive modules belong
-here only after their ADRs, contracts, stage dependencies, and evidence gates
-are accepted.
+The immutable EVAL-01 v3 specification and training bundle remain historical
+evidence, but v3 was rejected before hidden attachment because its public
+generator exposes only six distinct patterns. The cognition package now exposes
+only label-free candidate predictions plus strict freeze and signed-evidence
+contracts. Hidden labels, scoring, detailed correctness, evaluator code, and
+signing keys remain outside the repository. Versions 1 through 3 are retained
+as rejected history; a replacement specification and candidate must be frozen
+before an independent hidden run.
 
 Runtime packages belong here only when their delivery-stage dependencies,
 contracts, and cognitive and control-plane safety boundaries have been accepted and tested.

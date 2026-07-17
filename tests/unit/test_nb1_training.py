@@ -13,7 +13,10 @@ from neural_brain.cognition.training import (
     generate_training_dataset,
     train_offline,
 )
-from tools.train_nb1_workspace import _sha256_text_file, build_training_evidence
+from tools.train_nb1_workspace import (
+    HISTORICAL_ARTIFACT_SHA256,
+    _sha256_text_file,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 DIGEST_A = "a" * 64
@@ -105,7 +108,7 @@ def test_checked_in_artifact_is_non_hidden_non_promoted_and_self_verifying() -> 
     assert bundle.stage_release_authorized is False
 
 
-def test_checked_in_artifact_matches_the_deterministic_evidence_builder() -> None:
+def test_checked_in_historical_artifact_matches_its_frozen_digest() -> None:
     path = (
         ROOT
         / "docs"
@@ -115,7 +118,7 @@ def test_checked_in_artifact_matches_the_deterministic_evidence_builder() -> Non
         / "nb1-v1-offline-training-bundle.json"
     )
 
-    assert json.loads(path.read_text(encoding="utf-8")) == build_training_evidence(ROOT)
+    assert _sha256_text_file(path) == HISTORICAL_ARTIFACT_SHA256
 
 
 def test_repository_text_digests_ignore_checkout_line_endings(tmp_path: Path) -> None:

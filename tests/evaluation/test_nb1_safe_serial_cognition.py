@@ -1,7 +1,6 @@
-"""Development-only mechanism evidence for EVAL-01 v2."""
+"""Development-only mechanism evidence retained outside the hidden boundary."""
 
 from datetime import UTC, datetime
-from typing import Literal
 
 import pytest
 from pydantic import ValidationError
@@ -80,12 +79,10 @@ def development_sequences(size: int = 64) -> tuple[EvaluationSequence, ...]:
     return tuple(sequences)
 
 
-def dataset(
-    role: Literal["development", "hidden_test"] = "development",
-) -> EvaluationDataset:
+def dataset() -> EvaluationDataset:
     sequences = development_sequences()
     return EvaluationDataset(
-        role=role,
+        role="development",
         artifact_digest=evaluation_sequence_digest(sequences),
         sequences=sequences,
     )
@@ -118,14 +115,10 @@ def test_dataset_digest_is_verified_and_hidden_run_requires_independence() -> No
     with pytest.raises(ValidationError):
         EvaluationDataset.model_validate(payload)
 
-    hidden = dataset("hidden_test")
-    with pytest.raises(ValueError, match="independent evaluator"):
-        evaluate_dataset(
-            active_model=active_model(),
-            dataset=hidden,
-            independent_evaluator_id="implementer:not-independent",
-            majority_label="positive",
-        )
+    hidden_payload = dataset().model_dump(mode="python")
+    hidden_payload["role"] = "hidden_test"
+    with pytest.raises(ValidationError):
+        EvaluationDataset.model_validate(hidden_payload)
 
 
 def test_development_evaluation_is_deterministic() -> None:

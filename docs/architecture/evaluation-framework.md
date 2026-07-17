@@ -41,13 +41,22 @@ recorded registration time followed its actual Git commit. Version 3 supersedes
 both. Version 3 defines only partial evidence contributions toward `g0` and `g1`; it passes no
 evaluation or recognition gate and does not release NB-1.
 
-The current EVAL-01 v3 implementation includes a deterministic 27-candidate
+The EVAL-01 v3 implementation includes a deterministic 27-candidate
 offline grid search over the fixed 512-sequence public training split. Its
 checked-in artifact binds dataset, recipe, training code, environment, contract,
 parameters, training provenance, and model-manifest digests and remains an
-unpromoted development candidate. An independent hidden-evaluator interface is
-implemented, but the repository contains no hidden dataset and records no hidden
-result. G0, G1, G8, stage release, and recognition therefore remain unpassed.
+unpromoted development candidate. Before any hidden artifact was attached, the
+public generator was shown to contain only six distinct feature/label patterns.
+Version 3 is therefore retained unchanged but rejected: its hidden examples are
+enumerable by the implementer and its contamination control cannot pass.
+
+The replacement boundary exposes only unlabeled observations to the candidate,
+binds source, model, training, contract, lockfile, and fixed training-baseline
+evidence in a candidate freeze receipt, and accepts aggregate external evidence
+only with an Ed25519 signature from a reviewer-supplied trusted registry. Hidden
+seeds, labels, detailed correctness, scoring, evaluator code, and signing keys
+remain outside this repository. The intake validates evidence structure and
+authenticity but never grants G0, G1, G8, stage release, or recognition.
 
 ## Gate chain
 

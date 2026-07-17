@@ -13,6 +13,8 @@ ADR-017.
   recorded or synthetic observations, bounded learned attention, a fixed-version
   recurrent workspace, internal proposals, deterministic checkpoints, and no
   external effects.
+- `nb1-hidden-evaluation.json`: label-free candidate boundary, candidate freeze
+  receipt, external evaluator custody, and signed evidence intake for EVAL-01 v3.
 - `stage-capabilities.json`: cumulative NB-0 through NB-8 delivery contract.
 - `recognition-gates.json`: all-required recognition criteria.
 - `evaluation-gates.json`: ordered, non-compensatory G0 through G8 evidence.

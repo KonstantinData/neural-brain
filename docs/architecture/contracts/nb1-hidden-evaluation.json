@@ -1,0 +1,96 @@
+{
+  "document_type": "nb1_hidden_evaluation_boundary_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.nb1.hidden-evaluation",
+  "contract_version": "1.0.0",
+  "status": "implementation_boundary",
+  "decision": "ADR-018",
+  "evaluation_spec": "replacement_required_before_operation",
+  "rejected_historical_spec": "EVAL-01.NB-1.safe-serial-cognition.v3",
+  "candidate_boundary": {
+    "allowed_inputs": [
+      "opaque_run_id",
+      "frozen_candidate_digest",
+      "canonical_unlabeled_observation_sequences"
+    ],
+    "allowed_outputs": [
+      "opaque_sequence_id",
+      "predicted_label",
+      "candidate_digest",
+      "input_digest",
+      "bounded_resource_counters"
+    ],
+    "forbidden_inputs": [
+      "expected_label",
+      "hidden_seed",
+      "hidden_role",
+      "provider_identity",
+      "score",
+      "threshold_decision",
+      "baseline_result",
+      "ablation_result"
+    ],
+    "forbidden_outputs": [
+      "correctness",
+      "per_sequence_score",
+      "gate_pass",
+      "recognition_claim",
+      "stage_release",
+      "external_effect"
+    ]
+  },
+  "freeze_receipt": {
+    "required_before_hidden_attachment": true,
+    "required_bindings": [
+      "source_commit",
+      "source_tree_digest",
+      "candidate_artifact_digest",
+      "model_manifest_digest",
+      "parameter_digest",
+      "training_artifact_digest",
+      "training_code_digest",
+      "candidate_code_digest",
+      "evaluation_contract_digest",
+      "evaluation_spec_digest",
+      "dependency_lock_digest",
+      "fixed_train_derived_majority_label"
+    ]
+  },
+  "independent_evaluator_boundary": {
+    "outside_candidate_repository": true,
+    "holds_hidden_seed_and_labels": true,
+    "candidate_network_calls": 0,
+    "candidate_external_effects": 0,
+    "candidate_persistent_state": false,
+    "fresh_process_per_declared_attempt": true,
+    "all_attempts_recorded": true,
+    "baseline_and_ablation_scoring_owned_by_evaluator": true,
+    "detailed_per_sequence_results_returned_to_implementer": false
+  },
+  "signed_evidence": {
+    "signature_algorithm": "Ed25519",
+    "trusted_key_registry_supplied_by_reviewer": true,
+    "trusted_attestation_registry_supplied_by_reviewer": true,
+    "candidate_registry_contains_full_freeze_receipt": true,
+    "hidden_commitment_registry_supplied_by_reviewer": true,
+    "attempts_bind_input_and_prediction_digests": true,
+    "required_sections": [
+      "candidate_and_hidden_commitments",
+      "provider_evaluator_and_runner_identity",
+      "environment_and_resource_results",
+      "complete_attempt_ledger",
+      "baseline_and_ablation_aggregates",
+      "confidence_intervals",
+      "contamination_report",
+      "hard_failure_results",
+      "claim_boundary"
+    ]
+  },
+  "non_claims": [
+    "Repository tests cannot prove that the implementer never observed hidden data.",
+    "A subagent branch process or independent-prefixed identifier is not an independent evaluator.",
+    "A structurally valid signature does not itself prove organizational independence.",
+    "No evidence package automatically passes an evaluation recognition or release gate."
+  ],
+  "failure_rule": "Unknown missing mismatched unsigned self-signed leaked repeated or post-freeze evidence fails closed."
+}
