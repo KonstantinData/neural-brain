@@ -46,6 +46,33 @@ def test_license_policy_does_not_misclassify_reviewed_lgpl(tmp_path: Path) -> No
     validate_license_inventory(inventory, POLICY)
 
 
+@pytest.mark.parametrize("license_name", ["MIT-0", "Apache-2.0 OR BSD-3-Clause"])
+def test_license_policy_accepts_exact_reviewed_dependency_expressions(
+    tmp_path: Path, license_name: str
+) -> None:
+    inventory = tmp_path / "licenses.json"
+    inventory.write_text(
+        json.dumps([{"Name": "reviewed", "Version": "1.0", "License": license_name}]),
+        encoding="utf-8",
+    )
+
+    validate_license_inventory(inventory, POLICY)
+
+
+@pytest.mark.parametrize("license_name", ["MIT-0 OR Unknown", "Apache-2.0 OR BSD-3-Clause+"])
+def test_license_policy_rejects_unreviewed_nearby_expressions(
+    tmp_path: Path, license_name: str
+) -> None:
+    inventory = tmp_path / "licenses.json"
+    inventory.write_text(
+        json.dumps([{"Name": "unreviewed", "Version": "1.0", "License": license_name}]),
+        encoding="utf-8",
+    )
+
+    with pytest.raises(SecurityPolicyError, match="license policy violations"):
+        validate_license_inventory(inventory, POLICY)
+
+
 @pytest.mark.parametrize("license_name", ["UNKNOWN", "AGPL-3.0-only", "unlicensed"])
 def test_license_policy_rejects_unknown_or_prohibited_license(
     tmp_path: Path, license_name: str
