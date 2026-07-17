@@ -1,0 +1,33 @@
+{
+  "document_type": "preregistered_evaluation_specification_rejection",
+  "format_version": 1,
+  "spec_id": "EVAL-01.NB-1.safe-serial-cognition.v3",
+  "spec_digest": "3ac6d895d3f33b5d63c462471ca335d6d538cc379ae8eb3ad0611c81271b3fc8",
+  "decision": "rejected_before_hidden_artifact_attachment",
+  "decided_at": "2026-07-17T09:36:49+02:00",
+  "reason": "The public generator v2 has only six distinct feature-label patterns across the 512-sequence training split, so every possible hidden pattern is reconstructable by the implementer and the preregistered contamination control cannot be satisfied.",
+  "reproduction": {
+    "command": "PYTHONPATH=src python -c <count canonical feature-label patterns from generate_training_dataset>",
+    "training_sequence_count": 512,
+    "unique_feature_label_pattern_count": 6,
+    "hidden_run_attempted": false,
+    "hidden_artifact_attached": false
+  },
+  "failed_requirements": [
+    "hidden examples and seed unavailable to implementer",
+    "meaningful held-out contamination control",
+    "immutable split evidence capable of distinguishing unseen examples"
+  ],
+  "required_remediation": [
+    "Retain v3 unchanged as immutable rejected history.",
+    "Freeze a replacement generator with a non-enumerable example space and explicit split commitments.",
+    "Freeze a new evaluation specification before any hidden artifact attachment.",
+    "Retrain or explicitly preregister transfer from the historical training artifact under the replacement specification."
+  ],
+  "claim_boundary": {
+    "evaluation_gates_passed": [],
+    "recognition_gates_passed": [],
+    "stage_release_authorized": false,
+    "neural_brain_candidate_claimed": false
+  }
+}

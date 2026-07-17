@@ -94,18 +94,19 @@ The current implementation includes early, reusable prerequisites:
   workspace, bounded trainable feature gating, authenticated session scope,
   Memory-Gate checkpoints, and typed internal goal, plan, and metacognitive
   proposals;
-- a frozen `EVAL-01.NB-1.safe-serial-cognition.v3` specification and harness
+- the immutable `EVAL-01.NB-1.safe-serial-cognition.v3` specification and harness
   with six baselines, three mechanism ablations, dataset digests, and confidence
   intervals, plus a deterministic train-only offline grid search and
   self-verifying non-promoted model/provenance bundle;
-- an external hidden-evaluator interface that stores no hidden dataset and makes
-  no gate claim without an independently supplied artifact and review;
+- a label-free candidate interface, complete candidate freeze receipt, and
+  Ed25519-signed external-evidence intake that keep hidden labels, scoring, and
+  evaluator key custody outside this repository and never grant a gate;
 - a dedicated PostgreSQL cognitive checkpoint adapter and migration that keep
   CAS, transition evidence, trusted training/model provenance, receipt, and
   audit inside one existing Memory Transition Gate transaction;
-- v1 and v2 are retained as rejected evaluation history, and neither the v3
-  specification, training bundle, development tests, nor interface tests prove
-  an evaluation or recognition gate;
+- v1 and v2 are retained as rejected evaluation history; v3 is also retained
+  unchanged but was rejected before hidden attachment after its public generator
+  was proven to expose only six distinct feature/label patterns;
 - a Memory Transition Gate boundary and a reserved Dreaming schema whose
   execution is fail-closed disabled;
 - normative provenance, default-deny, privacy, retention, deletion, and
@@ -353,10 +354,10 @@ Live database tests require an isolated PostgreSQL 18 administrative DSN and
 must use disposable databases. The guarded migration and database procedures
 are documented in the [local-development runbook](docs/runbooks/local-development.md).
 Passing repository tests proves only the tested Foundation, Memory Core, and
-first NB-1 implementation surfaces. The frozen EVAL-01 v3 baselines and
-ablations and the checked-in offline training bundle still require an
-independently supplied hidden-test artifact, independent execution, and acceptance
-before their cognitive claim is supported;
+first NB-1 implementation surfaces. EVAL-01 v3 cannot supply accepted hidden
+evidence because its enumerable generator violates its own contamination
+boundary. A replacement specification and candidate must be frozen before an
+independent provider attaches any hidden artifact;
 neither repository tests nor that evaluation alone complete NB-1, satisfy
 Neural Brain recognition, or authorize production use.
 

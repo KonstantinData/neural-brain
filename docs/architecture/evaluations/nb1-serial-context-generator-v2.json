@@ -1,0 +1,75 @@
+{
+  "document_type": "evaluation_dataset_generator_contract",
+  "format_version": 1,
+  "generator_contract_id": "nb1-serial-context-generator-v2",
+  "status": "frozen_for_eval_01_v3",
+  "runtime": {
+    "implementation": "CPython",
+    "version": "3.14.*",
+    "prng": "random.Random_mersenne_twister",
+    "seed_encoding": "non_negative_integer"
+  },
+  "sequence": {
+    "minimum_length": 4,
+    "maximum_length": 4,
+    "feature_count": 2,
+    "label_rule": "positive_when_sign_is_plus_one_else_negative",
+    "id_rule": "<split-id>-<zero-padded-index>",
+    "observation_id_rule": "<sequence-id>:<zero-based-position>"
+  },
+  "generation_order": [
+    "positive = randomizer.randrange(2) == 0",
+    "sign = 1.0 if positive else -1.0",
+    "jitter = randomizer.choice((-0.1, 0.0, 0.1))",
+    "emit the four ordered feature pairs"
+  ],
+  "ordered_feature_pairs": [
+    ["sign + jitter", "-2.0 * sign"],
+    ["sign", "-2.0 * sign - jitter"],
+    ["sign - jitter", "-2.0 * sign"],
+    ["-0.5 * sign", "0.2 * sign"]
+  ],
+  "splits": {
+    "train": {
+      "size": 512,
+      "seed": 1931,
+      "split_id": "train"
+    },
+    "development": {
+      "size": 256,
+      "seed": 7727,
+      "split_id": "development"
+    },
+    "hidden_test": {
+      "minimum_size": 512,
+      "maximum_size": 4096,
+      "seed_visibility": "independent_evaluator_only",
+      "split_id_visibility": "evaluator_only_until_candidate_freeze"
+    }
+  },
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "sorted-key compact JSON",
+    "bound_fields": [
+      "generator_contract_id",
+      "role",
+      "split_id",
+      "provider_id",
+      "seed_commitment",
+      "sequence_count",
+      "canonical_sequences"
+    ]
+  },
+  "separation_rules": [
+    "Train and development seeds and identifiers are public and immutable.",
+    "The hidden seed and labels never enter the candidate repository, process, logs, or prediction output.",
+    "Train development and hidden identifiers and canonical sequence digests are pairwise disjoint.",
+    "The hidden provider commits the artifact digest before candidate scoring begins.",
+    "Any generator contract, candidate, model, threshold, or code change after hidden attachment invalidates the run."
+  ],
+  "claim_boundary": {
+    "evaluation_gates_passed": [],
+    "recognition_gates_passed": [],
+    "stage_release_authorized": false
+  }
+}

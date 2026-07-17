@@ -17,6 +17,9 @@ DEFAULT_OUTPUT: Final = (
     / "artifacts"
     / "nb1-v1-offline-training-bundle.json"
 )
+HISTORICAL_ARTIFACT_SHA256: Final = (
+    "4b7c5eba8a6b468b395cef35f9665474b84fb53feb77e8106745af2980b7d66b"
+)
 
 
 def _sha256_bytes(value: bytes) -> str:
@@ -107,15 +110,21 @@ def _parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Write or verify the deterministic checked-in evidence artifact."""
+    """Verify immutable history or write a new candidate to a different path."""
     arguments = _parser().parse_args(argv)
     try:
-        payload = _canonical_bytes(build_training_evidence(arguments.root))
         if arguments.check:
-            if not arguments.output.is_file() or arguments.output.read_bytes() != payload:
-                raise ValueError("checked-in NB-1 training evidence is absent or stale")
+            if not arguments.output.is_file():
+                raise ValueError("checked-in NB-1 training evidence is absent")
+            if _sha256_text_file(arguments.output) != HISTORICAL_ARTIFACT_SHA256:
+                raise ValueError("checked-in NB-1 historical training evidence was modified")
             print(f"NB-1 training evidence verified: {arguments.output}")
             return 0
+        if arguments.output.resolve() == DEFAULT_OUTPUT.resolve():
+            raise ValueError(
+                "historical NB-1 training evidence is immutable; select a new versioned output path"
+            )
+        payload = _canonical_bytes(build_training_evidence(arguments.root))
         arguments.output.parent.mkdir(parents=True, exist_ok=True)
         arguments.output.write_bytes(payload)
         print(f"NB-1 training evidence written: {arguments.output}")

@@ -1,4 +1,4 @@
-"""Independent-dataset evaluation harness for the first NB-1 mechanism slice."""
+"""Development-only labeled evaluation harness for the first NB-1 mechanism slice."""
 
 import hashlib
 import json
@@ -14,7 +14,7 @@ from neural_brain.cognition.workspace import NeuralWorkspace
 from neural_brain.memory.models import StrictModel
 
 type ContextLabel = Literal["positive", "negative"]
-type DatasetRole = Literal["development", "hidden_test"]
+type DatasetRole = Literal["development"]
 type EvaluationMode = Literal[
     "full",
     "majority_class",
@@ -38,7 +38,7 @@ class EvaluationSequence(StrictModel):
 
 
 class EvaluationDataset(StrictModel):
-    """Immutable development or independently held hidden-test artifact."""
+    """Immutable labeled development artifact; never an independent hidden dataset."""
 
     role: DatasetRole
     artifact_digest: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
@@ -50,15 +50,6 @@ class EvaluationDataset(StrictModel):
         if self.artifact_digest != evaluation_sequence_digest(self.sequences):
             raise ValueError("evaluation dataset digest does not match its sequences")
         return self
-
-
-class IndependentEvaluatorIdentity(StrictModel):
-    """Declared identity supplied by an evaluator outside implementation ownership."""
-
-    evaluator_id: Annotated[str, Field(pattern=r"^independent:[a-z0-9][a-z0-9._-]{2,127}$")]
-    artifact_provider_id: Annotated[str, Field(min_length=3, max_length=128)]
-    evaluation_protocol_digest: Annotated[str, Field(pattern=r"^[0-9a-f]{64}$")]
-    independent_from_implementation: Literal[True] = True
 
 
 class ConfidenceInterval(StrictModel):
@@ -102,9 +93,7 @@ class Nb1EvaluationReport(StrictModel):
     paired_lifts: tuple[PairedLift, ...]
     evaluation_gates_passed: tuple[()] = ()
     recognition_gates_passed: tuple[()] = ()
-    claim_status: Literal[
-        "development_only_hidden_test_required", "independent_hidden_result_requires_gate_review"
-    ]
+    claim_status: Literal["development_only_hidden_test_required"]
 
 
 def evaluation_sequence_digest(sequences: tuple[EvaluationSequence, ...]) -> str:
@@ -125,8 +114,6 @@ def evaluate_dataset(
     majority_label: ContextLabel,
 ) -> Nb1EvaluationReport:
     """Measure all preregistered modes on one immutable external artifact."""
-    if dataset.role == "hidden_test" and not independent_evaluator_id.startswith("independent:"):
-        raise ValueError("hidden evaluation requires an independent evaluator identity")
     modes: tuple[EvaluationMode, ...] = (
         "full",
         "majority_class",
@@ -153,13 +140,6 @@ def evaluate_dataset(
     lifts = tuple(
         _paired_lift(full, comparator, dataset.artifact_digest) for comparator in results[1:]
     )
-    status: Literal[
-        "development_only_hidden_test_required", "independent_hidden_result_requires_gate_review"
-    ] = (
-        "development_only_hidden_test_required"
-        if dataset.role == "development"
-        else "independent_hidden_result_requires_gate_review"
-    )
     return Nb1EvaluationReport(
         spec_id="EVAL-01.NB-1.safe-serial-cognition.v3",
         spec_digest="3ac6d895d3f33b5d63c462471ca335d6d538cc379ae8eb3ad0611c81271b3fc8",
@@ -169,27 +149,7 @@ def evaluate_dataset(
         model_manifest_digest=model_manifest_digest(active_model.manifest),
         mode_results=results,
         paired_lifts=lifts,
-        claim_status=status,
-    )
-
-
-def evaluate_hidden_dataset(
-    *,
-    active_model: ActiveCognitiveModel,
-    dataset: EvaluationDataset,
-    evaluator: IndependentEvaluatorIdentity,
-    majority_label: ContextLabel,
-) -> Nb1EvaluationReport:
-    """Evaluate an externally supplied hidden artifact without claiming any gate pass."""
-    if dataset.role != "hidden_test":
-        raise ValueError("independent hidden evaluation requires a hidden_test artifact")
-    if len(dataset.sequences) < 512:
-        raise ValueError("hidden_test artifact does not meet the preregistered minimum size")
-    return evaluate_dataset(
-        active_model=active_model,
-        dataset=dataset,
-        independent_evaluator_id=evaluator.evaluator_id,
-        majority_label=majority_label,
+        claim_status="development_only_hidden_test_required",
     )
 
 
