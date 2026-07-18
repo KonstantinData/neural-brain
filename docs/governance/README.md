@@ -22,8 +22,10 @@ Modernization-only source insights that do not prove a current repository defect
 or risk remain in the controlled
 [`future-considerations-register.md`](future-considerations-register.md).
 Individual external source records belong in
-[`engineering-source-registry.md`](engineering-source-registry.md). Source
-profile validations, conflicts, approvals, rejections, and supersession
+[`engineering-source-registry.md`](engineering-source-registry.md) and must
+validate against
+[`engineering-source-registry.schema.json`](engineering-source-registry.schema.json).
+Source profile validations, conflicts, approvals, rejections, and supersession
 decisions belong in
 [`source-governance-audit-records.md`](source-governance-audit-records.md).
 Potential architecture implications from external sources belong in

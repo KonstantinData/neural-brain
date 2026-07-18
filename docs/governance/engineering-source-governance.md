@@ -98,33 +98,39 @@ It must state:
 Internal model knowledge is neither repository evidence nor external engineering
 evidence.
 
-## Source Lifecycle States
+## Source Status Dimensions
 
-Every source record must have exactly one active lifecycle state:
+Every source record must separate three independent status dimensions:
 
-- `normative`
-- `approved`
-- `draft`
-- `watch_only`
-- `deprecated`
-- `withdrawn`
-- `rejected`
+- `external_publication_status`: `draft`, `final`, `superseded`, or `withdrawn`
+- `internal_registry_status`: `proposed`, `approved`, `rejected`, or
+  `deprecated`
+- `permitted_evidence_use`: `normative`, `supporting`, `watch_only`, or
+  `prohibited`
 
-Draft and watch-only sources may inform monitoring and future considerations.
+The external publication status describes the publisher's document state. It
+does not create internal approval. Normative use is allowed only when the
+internally approved source record explicitly sets `permitted_evidence_use` to
+`normative`.
 
-They must not independently establish a normative defect, architecture
-requirement, or mandatory implementation change unless an authorized governance
-decision explicitly approves that use.
+Records with `watch_only` evidence use may inform monitoring and future
+considerations. They must not independently establish a normative defect,
+architecture requirement, or mandatory implementation change unless an
+authorized governance decision changes their internal status and permitted use.
 
 ## Mandatory Source Record
 
 Every source must record at least:
 
 - source identifier
+- lifecycle state
 - title
 - issuing organization
 - canonical document reference
 - source class
+- external publication status
+- internal registry status
+- permitted evidence use
 - document or specification version
 - publication status
 - publication date
@@ -142,6 +148,17 @@ Every source must record at least:
 - next review trigger or review date
 
 A search-result summary is not a source record.
+
+The deterministic source-record schema is
+[`engineering-source-registry.schema.json`](engineering-source-registry.schema.json).
+Every source record must validate against that schema before it is activated or
+referenced by the repository source profile.
+
+Claims must be modeled as a structured list. Each claim must include a claim ID,
+section or fragment reference, summarized external statement, applicable
+technology and version, permitted evidence use, and known limitations. Every
+externally grounded finding must reference at least one concrete claim ID; a
+whole source record is not sufficient.
 
 ## Engineering Source Governance Skill
 
@@ -229,6 +246,13 @@ Approver or Governance Judge.
 
 The proposer and sole approver must not be the same autonomous agent.
 
+The active profile may reference only existing source IDs whose
+`internal_registry_status` is `approved` and whose `permitted_evidence_use` is
+compatible with the referenced use. It must not reference unknown, `rejected`,
+`withdrawn`, deprecated-for-current-use, `watch_only`, or `prohibited` sources
+as normative basis. Unknown or invalid registry-profile references fail
+validation.
+
 ## New-Knowledge Classification
 
 Every newly identified approach, standard, technique, or recommendation must be
@@ -304,6 +328,11 @@ Each entry must include:
 
 An Architecture Evolution Register entry is not an approval, requirement,
 backlog commitment, or implementation mandate.
+
+Promotion into ADR discussion or backlog triage is only a completed governance
+handoff. It requires a target reference, responsible receiver, and documented
+acceptance timestamp. Without acceptance by the target process, the entry
+remains `proposed` or `parked`.
 
 ## Production-Readiness Protection
 

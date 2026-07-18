@@ -15,6 +15,14 @@ def load_profile() -> dict[str, Any]:
     return value
 
 
+def load_registry_schema() -> dict[str, Any]:
+    value: object = json.loads(
+        (GOVERNANCE_DIR / "engineering-source-registry.schema.json").read_text(encoding="utf-8")
+    )
+    assert isinstance(value, dict)
+    return value
+
+
 def test_engineering_source_profile_is_repo_scoped_and_not_runtime_scoped() -> None:
     profile = load_profile()
 
@@ -43,6 +51,7 @@ def test_governance_hierarchy_has_four_distinct_layers_and_artifacts() -> None:
     }
     for artifact in hierarchy.values():
         assert (ROOT / artifact).is_file()
+    assert len(hierarchy) == 4
 
 
 def test_runtime_non_effects_block_product_scope_expansion() -> None:
@@ -122,32 +131,48 @@ def test_repository_evidence_is_excluded_from_external_source_registry() -> None
     }
 
 
-def test_source_records_have_exact_lifecycle_states_and_mandatory_metadata() -> None:
+def test_source_records_have_separate_status_dimensions_and_mandatory_metadata() -> None:
     profile = load_profile()
 
-    assert profile["source_lifecycle_states"] == [
-        "normative",
-        "approved",
+    statuses = profile["source_status_dimensions"]
+    assert statuses["external_publication_status"] == [
         "draft",
-        "watch_only",
-        "deprecated",
+        "final",
+        "superseded",
         "withdrawn",
-        "rejected",
     ]
+    assert statuses["internal_registry_status"] == [
+        "proposed",
+        "approved",
+        "rejected",
+        "deprecated",
+    ]
+    assert statuses["permitted_evidence_use"] == [
+        "normative",
+        "supporting",
+        "watch_only",
+        "prohibited",
+    ]
+    assert statuses["external_publication_status_grants_internal_approval"] is False
+    assert statuses["normative_use_requires_internal_approval"] is True
     assert {
+        "schema_version",
         "source_identifier",
+        "lifecycle_state",
         "title",
         "issuing_organization",
         "canonical_document_reference",
         "source_class",
+        "external_publication_status",
+        "internal_registry_status",
+        "permitted_evidence_use",
         "document_or_specification_version",
-        "publication_status",
         "publication_date",
         "retrieval_date",
-        "content_hash_or_immutable_snapshot_reference",
+        "content_hash",
         "applicable_technology_and_version_range",
         "repository_scope_mapping",
-        "relevant_sections_or_claims",
+        "claims",
         "source_authority_assessment",
         "freshness_status",
         "conflict_status",
@@ -156,7 +181,78 @@ def test_source_records_have_exact_lifecycle_states_and_mandatory_metadata() -> 
         "superseded_and_superseding_sources",
         "next_review_trigger_or_review_date",
     } <= set(profile["source_record_required_fields"])
+    assert profile["source_registry_schema"] == (
+        "docs/governance/engineering-source-registry.schema.json"
+    )
+    assert profile["source_registry_schema_version"] == "1.0.0"
     assert profile["search_result_summary_is_source_record"] is False
+
+
+def test_source_registry_schema_is_deterministic_and_claim_level() -> None:
+    schema = load_registry_schema()
+
+    assert schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+    assert schema["additionalProperties"] is False
+    assert schema["properties"]["schema_version"]["const"] == "1.0.0"
+    assert (
+        schema["properties"]["content_hash"]["properties"]["value"]["pattern"] == "^[a-f0-9]{64}$"
+    )
+    assert schema["properties"]["content_hash"]["properties"]["algorithm"]["const"] == "sha256"
+    assert schema["properties"]["retrieval_date"]["format"] == "date-time"
+    assert schema["properties"]["publication_date"]["format"] == "date"
+    assert schema["properties"]["external_publication_status"]["enum"] == [
+        "draft",
+        "final",
+        "superseded",
+        "withdrawn",
+    ]
+    assert schema["properties"]["internal_registry_status"]["enum"] == [
+        "proposed",
+        "approved",
+        "rejected",
+        "deprecated",
+    ]
+    assert schema["properties"]["permitted_evidence_use"]["enum"] == [
+        "normative",
+        "supporting",
+        "watch_only",
+        "prohibited",
+    ]
+    claim_schema = schema["properties"]["claims"]["items"]
+    assert {
+        "claim_id",
+        "section_or_fragment_reference",
+        "summarized_external_statement",
+        "applicable_technology_and_version",
+        "permitted_evidence_use",
+        "known_limitations",
+    } <= set(claim_schema["required"])
+
+
+def test_profile_reference_integrity_blocks_invalid_normative_source_references() -> None:
+    integrity = load_profile()["profile_reference_integrity"]
+
+    assert integrity["active_profile_may_reference_unknown_source_ids"] is False
+    assert integrity["normative_reference_requires_internal_registry_status"] == "approved"
+    assert integrity["normative_reference_requires_permitted_evidence_use"] == "normative"
+    assert integrity["normative_reference_allows_external_publication_status"] == ["final"]
+    assert integrity["normative_reference_requires_claim_ids"] is True
+    assert integrity["forbidden_normative_internal_registry_statuses"] == [
+        "proposed",
+        "rejected",
+        "deprecated",
+    ]
+    assert integrity["forbidden_normative_permitted_evidence_use"] == [
+        "supporting",
+        "watch_only",
+        "prohibited",
+    ]
+    assert integrity["forbidden_normative_external_publication_statuses"] == [
+        "draft",
+        "superseded",
+        "withdrawn",
+    ]
+    assert integrity["invalid_references_fail_validation"] is True
 
 
 def test_role_baseline_coverage_is_task_filtered_not_profile_mutating() -> None:
@@ -219,6 +315,27 @@ def test_profile_change_control_requires_approval_and_complete_change_record() -
         "recommendation",
         "proposed_activation_date",
     } <= set(change_control["required_proposed_change_fields"])
+
+
+def test_audit_log_is_append_only_and_reconstructs_registry_profile_versions() -> None:
+    audit = load_profile()["source_audit_log_rules"]
+
+    assert audit["append_only"] is True
+    assert audit["existing_records_may_be_edited"] is False
+    assert audit["existing_records_may_be_deleted"] is False
+    assert audit["corrections_require_new_record"] is True
+    assert audit["correction_relationship_fields"] == ["corrects", "supersedes"]
+    assert {
+        "affected_source_ids",
+        "previous_registry_version",
+        "proposed_registry_version",
+        "previous_profile_version",
+        "proposed_profile_version",
+        "structured_change_set",
+        "decision_rationale",
+        "superseded_audit_record",
+    } <= set(audit["required_version_references"])
+    assert audit["state_reconstruction_required"] is True
 
 
 def test_external_content_is_untrusted_and_cannot_authorize_repository_actions() -> None:
@@ -285,6 +402,14 @@ def test_architecture_and_adr_boundary_uses_evolution_register_without_mandate()
     assert boundary["architecture_evolution_entry_is_backlog_commitment"] is False
     assert boundary["architecture_evolution_entry_is_implementation_mandate"] is False
     assert {
+        "entry_identifier",
+        "created_at",
+        "created_by",
+        "originating_source_governance_audit_record",
+        "last_reviewed_at",
+        "next_reassessment_date_or_trigger",
+        "new_knowledge_classification_reference",
+        "classification_evidence",
         "relevant_sources",
         "affected_components",
         "affected_adrs",
@@ -292,6 +417,24 @@ def test_architecture_and_adr_boundary_uses_evolution_register_without_mandate()
         "implementation_and_migration_cost",
         "recommended_reassessment_point",
     } <= set(boundary["required_entry_fields"])
+    assert boundary["allowed_statuses"] == [
+        "proposed",
+        "parked",
+        "accepted_for_reassessment",
+        "handed_off_for_adr_evaluation",
+        "handed_off_for_backlog_triage",
+        "rejected",
+        "superseded",
+        "closed",
+    ]
+    assert (
+        boundary["handoff_statuses_require_target_reference_receiver_and_acceptance_time"] is True
+    )
+    assert boundary["standard_entry_requires_future_consideration_classification"] is True
+    assert (
+        boundary["current_mandatory_concern_must_also_use_defect_security_or_review_process"]
+        is True
+    )
 
 
 def test_source_conflicts_have_required_record_and_judge_path() -> None:
@@ -361,13 +504,18 @@ def test_governance_docs_publish_policy_profile_registry_audit_and_evolution_bou
     assert "Architecture Evolution Register entry is not an approval" in normalized_governance
     assert "Engineering source governance" in index
     assert "engineering-source-registry.md" in index
+    assert "engineering-source-registry.schema.json" in index
     assert "source-governance-audit-records.md" in index
     assert "architecture-evolution-register.md" in index
     assert "Engineering source governance" in root_readme
     assert "Engineering source registry" in root_readme
+    assert "source record schema" in root_readme
     assert "source governance audit records" in root_readme
     assert "architecture evolution register" in root_readme
     assert "It never becomes product work automatically." in future_register
     assert "No individual source records are active yet." in source_registry
-    assert "No audit records are active yet." in audit_records
+    assert "No governance audit events have been recorded yet." in audit_records
     assert "No architecture evolution entries are active." in evolution_register
+    assert "External publication status never creates internal approval." in source_registry
+    assert "append-only" in audit_records
+    assert "handoff accepted at" in evolution_register

@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/KonstantinData/neural-brain/docs/governance/engineering-source-registry.schema.json",
+  "title": "Engineering Source Registry Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_identifier",
+    "lifecycle_state",
+    "title",
+    "issuing_organization",
+    "canonical_document_reference",
+    "source_class",
+    "external_publication_status",
+    "internal_registry_status",
+    "permitted_evidence_use",
+    "document_or_specification_version",
+    "publication_date",
+    "retrieval_date",
+    "content_hash",
+    "applicable_technology_and_version_range",
+    "repository_scope_mapping",
+    "claims",
+    "source_authority_assessment",
+    "freshness_status",
+    "conflict_status",
+    "validator",
+    "approval_status",
+    "superseded_sources",
+    "superseding_sources",
+    "next_review_trigger_or_review_date"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "source_identifier": {
+      "type": "string",
+      "pattern": "^engsrc-[a-z0-9]+(?:-[a-z0-9]+)*-[0-9]{4}$"
+    },
+    "lifecycle_state": {
+      "type": "string",
+      "enum": ["proposed", "approved", "rejected", "deprecated"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "issuing_organization": {
+      "type": "string",
+      "minLength": 1
+    },
+    "canonical_document_reference": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_class": {
+      "type": "string",
+      "enum": [
+        "standards_and_specifications",
+        "language_framework_library_database_platform_tool_documentation",
+        "security_advisories",
+        "release_support_and_migration_sources",
+        "operations_and_deployment",
+        "scientific_evidence"
+      ]
+    },
+    "external_publication_status": {
+      "type": "string",
+      "enum": ["draft", "final", "superseded", "withdrawn"]
+    },
+    "internal_registry_status": {
+      "type": "string",
+      "enum": ["proposed", "approved", "rejected", "deprecated"]
+    },
+    "permitted_evidence_use": {
+      "type": "string",
+      "enum": ["normative", "supporting", "watch_only", "prohibited"]
+    },
+    "document_or_specification_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "publication_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "retrieval_date": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "content_hash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["algorithm", "value"],
+      "properties": {
+        "algorithm": {
+          "const": "sha256"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "immutable_snapshot_reference": {
+      "type": "string"
+    },
+    "applicable_technology_and_version_range": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["technology", "version_range"],
+        "properties": {
+          "technology": {"type": "string", "minLength": 1},
+          "version_range": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "repository_scope_mapping": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["repository_area", "roles"],
+        "properties": {
+          "repository_area": {"type": "string", "minLength": 1},
+          "roles": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          }
+        }
+      }
+    },
+    "claims": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "claim_id",
+          "section_or_fragment_reference",
+          "summarized_external_statement",
+          "applicable_technology_and_version",
+          "permitted_evidence_use",
+          "known_limitations"
+        ],
+        "properties": {
+          "claim_id": {
+            "type": "string",
+            "pattern": "^claim-[a-z0-9]+(?:-[a-z0-9]+)*-[0-9]{3}$"
+          },
+          "section_or_fragment_reference": {"type": "string", "minLength": 1},
+          "summarized_external_statement": {"type": "string", "minLength": 1},
+          "applicable_technology_and_version": {"type": "string", "minLength": 1},
+          "permitted_evidence_use": {
+            "type": "string",
+            "enum": ["normative", "supporting", "watch_only", "prohibited"]
+          },
+          "known_limitations": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "source_authority_assessment": {
+      "type": "string",
+      "enum": ["primary", "official", "authoritative", "supporting", "insufficient"]
+    },
+    "freshness_status": {
+      "type": "string",
+      "enum": ["current", "stale", "unknown", "superseded", "withdrawn"]
+    },
+    "conflict_status": {
+      "type": "string",
+      "enum": ["none", "potential_conflict", "conflicted", "resolved"]
+    },
+    "validator": {
+      "type": "string",
+      "minLength": 1
+    },
+    "approval_status": {
+      "type": "string",
+      "enum": ["not_submitted", "pending", "approved", "rejected"]
+    },
+    "superseded_sources": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "superseding_sources": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "next_review_trigger_or_review_date": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
