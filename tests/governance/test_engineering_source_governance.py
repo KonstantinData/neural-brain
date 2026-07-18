@@ -27,9 +27,17 @@ def load_registry_schema() -> dict[str, Any]:
 
 def load_source_records() -> list[dict[str, Any]]:
     value: object = json.loads(SOURCE_RECORDS_PATH.read_text(encoding="utf-8"))
-    assert isinstance(value, list)
+    assert isinstance(value, dict)
+    assert value["document_type"] == "engineering_source_record_collection"
+    assert value["schema_version"] == "1.0.0"
+    assert value["status"] == "approved"
+    assert value["repository"] == "KonstantinData/neural-brain"
+    assert value["record_schema"] == "docs/governance/engineering-source-registry.schema.json"
+    assert value["activation_audit_record"] == "sgaudit-20260718-initial-source-baseline-0001"
+    record_values = value["records"]
+    assert isinstance(record_values, list)
     records: list[dict[str, Any]] = []
-    for item in value:
+    for item in record_values:
         assert isinstance(item, dict)
         records.append(item)
     return records

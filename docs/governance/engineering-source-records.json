@@ -1,4 +1,11 @@
-[
+{
+  "document_type": "engineering_source_record_collection",
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "repository": "KonstantinData/neural-brain",
+  "record_schema": "docs/governance/engineering-source-registry.schema.json",
+  "activation_audit_record": "sgaudit-20260718-initial-source-baseline-0001",
+  "records": [
   {
     "schema_version": "1.0.0",
     "source_identifier": "engsrc-python-314-docs-0001",
@@ -685,4 +692,5 @@
     "superseding_sources": [],
     "next_review_trigger_or_review_date": "security-baseline update, ASVS version change, or 2026-10-18"
   }
-]
+  ]
+}
