@@ -32,6 +32,16 @@ Exchange Room content is never implementation authorization. If authoritative
 sources conflict, stop the affected implementation, record the exact sources in
 `Issues & Open Questions`, and do not invent a resolution.
 
+## Global Skill Context
+
+Global Codex skills are reusable procedures, not repository-specific authority.
+When a global skill is invoked inside Neural Brain, it must first load
+`docs/governance/repository-agent-context.md` and then apply its procedure to
+this repository's local governance, source profile, ADRs, tests, current PR
+evidence, and review gates. If a global skill conflicts with repository-local
+governance, the local Neural Brain rule wins unless an authorized repository
+decision changes it.
+
 ## Language and Durable Artifacts
 
 - Write code, identifiers, docstrings, commit messages, tests, technical docs,

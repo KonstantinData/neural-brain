@@ -316,6 +316,8 @@ evidence; it is not executable truth.
 - [Machine-readable contracts](docs/architecture/contracts/README.md),
   [threat model](docs/architecture/threat-model.md), and
   [repository governance](docs/governance/README.md)
+- [Repository agent context](docs/governance/repository-agent-context.md)
+  for applying global Codex skills inside Neural Brain
 - [Engineering source governance](docs/governance/engineering-source-governance.md)
   and [Neural Brain source profile](docs/governance/engineering-source-profile.json)
 - [Engineering source registry](docs/governance/engineering-source-registry.md),

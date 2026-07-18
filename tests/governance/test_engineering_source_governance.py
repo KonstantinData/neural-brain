@@ -57,6 +57,27 @@ def test_engineering_source_profile_is_repo_scoped_and_not_runtime_scoped() -> N
     assert "runtime_rag" in profile["does_not_apply_to"]
 
 
+def test_global_skills_use_repository_local_agent_context_anchor() -> None:
+    context = (GOVERNANCE_DIR / "repository-agent-context.md").read_text(encoding="utf-8")
+    governance_index = (GOVERNANCE_DIR / "README.md").read_text(encoding="utf-8")
+    root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+
+    assert "Repository Agent Context" in context
+    assert "Global Codex skills are reusable procedures" in context
+    assert "AGENTS.md" in context
+    assert "docs/governance/README.md" in context
+    assert "docs/governance/engineering-source-profile.json" in context
+    assert "docs/governance/engineering-source-records.json" in context
+    assert "$engineering-source-governance" in context
+    assert "$pull-request-specialist-review" in context
+    assert "runtime retrieval" in context
+    assert "automatically change product behavior" in context
+    assert "repository-agent-context.md" in governance_index
+    assert "repository-agent-context.md" in root_readme
+    assert "repository-agent-context.md" in agents
+
+
 def test_governance_hierarchy_has_four_distinct_layers_and_artifacts() -> None:
     profile = load_profile()
     hierarchy = {entry["layer"]: entry["artifact"] for entry in profile["governance_hierarchy"]}
@@ -550,6 +571,10 @@ def test_governance_docs_publish_policy_profile_registry_audit_and_evolution_bou
     normalized_governance = " ".join(governance.split())
     index = (GOVERNANCE_DIR / "README.md").read_text(encoding="utf-8")
     root_readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    repository_context = (GOVERNANCE_DIR / "repository-agent-context.md").read_text(
+        encoding="utf-8"
+    )
+    normalized_repository_context = " ".join(repository_context.split())
     future_register = (GOVERNANCE_DIR / "future-considerations-register.md").read_text(
         encoding="utf-8"
     )
@@ -572,12 +597,16 @@ def test_governance_docs_publish_policy_profile_registry_audit_and_evolution_bou
     assert "A search-result summary is not a source record." in governance
     assert "Future Consideration" in governance
     assert "Architecture Evolution Register entry is not an approval" in normalized_governance
+    assert "the global skill defines the reusable method" in normalized_repository_context
+    assert "this repository defines the applicable scope" in normalized_repository_context
     assert "Engineering source governance" in index
+    assert "repository-agent-context.md" in index
     assert "engineering-source-registry.md" in index
     assert "engineering-source-registry.schema.json" in index
     assert "source-governance-audit-records.md" in index
     assert "architecture-evolution-register.md" in index
     assert "Engineering source governance" in root_readme
+    assert "Repository agent context" in root_readme
     assert "Engineering source registry" in root_readme
     assert "source record schema" in root_readme
     assert "source governance audit records" in root_readme

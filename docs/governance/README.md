@@ -10,6 +10,12 @@ additional independence evidence for memory separation-of-duties-sensitive
 changes.
 Unknown or unverifiable governance state fails closed.
 
+Global Codex skills invoked in this repository must first load the local
+[`repository-agent-context.md`](repository-agent-context.md). That context
+anchor binds reusable global procedures to Neural Brain's repository-specific
+architecture, source profile, role coverage, review rules, and governance
+gates.
+
 Engineering source governance is defined in
 [`engineering-source-governance.md`](engineering-source-governance.md). It sets
 the source-governance boundary for development, review, maintenance, operations,
