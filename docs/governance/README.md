@@ -21,6 +21,14 @@ changes.
 Modernization-only source insights that do not prove a current repository defect
 or risk remain in the controlled
 [`future-considerations-register.md`](future-considerations-register.md).
+Individual external source records belong in
+[`engineering-source-registry.md`](engineering-source-registry.md). Source
+profile validations, conflicts, approvals, rejections, and supersession
+decisions belong in
+[`source-governance-audit-records.md`](source-governance-audit-records.md).
+Potential architecture implications from external sources belong in
+[`architecture-evolution-register.md`](architecture-evolution-register.md) until
+the authorized ADR process accepts a change.
 
 `@KonstantinData` and `@KonstantinCondata` are the declared code owners. Each
 account must retain accepted repository write access. A pending invitation or

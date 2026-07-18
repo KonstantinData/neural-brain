@@ -18,16 +18,34 @@ def load_profile() -> dict[str, Any]:
 def test_engineering_source_profile_is_repo_scoped_and_not_runtime_scoped() -> None:
     profile = load_profile()
 
-    assert profile["document_type"] == "engineering_source_profile"
+    assert profile["document_type"] == "repository_engineering_source_profile"
     assert profile["repository"] == "KonstantinData/neural-brain"
     assert profile["governed_layer"] == "engineering_knowledge_base"
+    assert profile["status"] == "approved"
     assert "development_agents" in profile["applies_to"]
     assert "review_agents" in profile["applies_to"]
     assert "product_runtime" in profile["does_not_apply_to"]
+    assert "product_memory" in profile["does_not_apply_to"]
     assert "runtime_rag" in profile["does_not_apply_to"]
 
 
-def test_engineering_source_profile_has_no_product_runtime_effects() -> None:
+def test_governance_hierarchy_has_four_distinct_layers_and_artifacts() -> None:
+    profile = load_profile()
+    hierarchy = {entry["layer"]: entry["artifact"] for entry in profile["governance_hierarchy"]}
+
+    assert hierarchy == {
+        "global_engineering_source_policy": ("docs/governance/engineering-source-governance.md"),
+        "repository_engineering_source_profile": (
+            "docs/governance/engineering-source-profile.json"
+        ),
+        "engineering_source_registry": "docs/governance/engineering-source-registry.md",
+        "source_governance_audit_records": ("docs/governance/source-governance-audit-records.md"),
+    }
+    for artifact in hierarchy.values():
+        assert (ROOT / artifact).is_file()
+
+
+def test_runtime_non_effects_block_product_scope_expansion() -> None:
     non_effects = load_profile()["runtime_non_effects"]
 
     assert non_effects
@@ -39,49 +57,60 @@ def test_engineering_source_profile_has_no_product_runtime_effects() -> None:
         "creates_product_knowledge_store",
         "allows_runtime_external_research",
         "allows_engineering_sources_to_be_ingested_into_product_memory",
-        "automatically_changes_product_behavior",
+        "creates_product_data_source",
+        "automatically_changes_product_architecture",
+        "automatically_changes_dependencies",
+        "automatically_changes_backlog",
         "automatically_changes_adrs",
     ):
         assert denied_effect in non_effects
 
 
-def test_knowledge_layers_keep_repository_engineering_and_product_separate() -> None:
+def test_knowledge_layers_keep_repository_external_and_derived_assessment_separate() -> None:
     layers = {layer["id"]: layer for layer in load_profile()["knowledge_layers"]}
 
     assert set(layers) == {
         "repository_evidence",
-        "engineering_knowledge_base",
+        "external_engineering_evidence",
+        "derived_assessment",
         "product_knowledge_and_data",
     }
     assert layers["repository_evidence"]["governed_by_this_profile"] is False
-    assert layers["engineering_knowledge_base"]["governed_by_this_profile"] is True
+    assert layers["repository_evidence"]["stored_as_external_engineering_source"] is False
+    assert layers["external_engineering_evidence"]["governed_by_this_profile"] is True
+    assert layers["external_engineering_evidence"]["stored_as_external_engineering_source"] is True
+    assert layers["derived_assessment"]["stored_as_external_engineering_source"] is False
     assert layers["product_knowledge_and_data"]["governed_by_this_profile"] is False
-    assert layers["repository_evidence"]["authority"] == "durable_technical_source_of_truth"
-    assert layers["engineering_knowledge_base"]["authority"] == "engineering_review_input"
-
-
-def test_source_profile_contains_only_external_engineering_source_categories() -> None:
-    profile = load_profile()
-    categories = {category["id"]: category for category in profile["external_source_categories"]}
-
-    expected_categories = {
-        "language_and_runtime",
-        "dependencies_and_frameworks",
-        "security_and_privacy",
-        "ci_cd_and_operations",
-        "architecture_and_cognitive_evaluation",
-    }
-    assert set(categories) == expected_categories
-    assert all(category["allowed_sources"] for category in categories.values())
-    assert all(category["quality_rules"] for category in categories.values())
-    assert "source_categories" not in profile
-
-    excluded = set(
-        profile["repository_evidence_boundary"]["excluded_from_engineering_source_profile"]
+    assert layers["repository_evidence"]["authority"] == "proves_repository_current_state"
+    assert layers["external_engineering_evidence"]["authority"] == (
+        "supports_repository_assessment"
     )
-    assert {"code", "tests", "adrs", "git_history", "pull_requests", "ci_runs"} <= excluded
+
+
+def test_repository_evidence_is_excluded_from_external_source_registry() -> None:
+    profile = load_profile()
+    boundary = profile["repository_evidence_boundary"]
+    excluded = set(boundary["excluded_from_engineering_source_registry"])
+
+    assert {
+        "code",
+        "tests",
+        "migrations",
+        "configuration",
+        "adrs",
+        "contracts",
+        "commits",
+        "pull_requests",
+        "ci_results",
+        "release_artifacts",
+        "generated_runtime_artifacts",
+        "generated_pipeline_artifacts",
+    } <= excluded
+    assert boundary["internal_model_knowledge_is_evidence"] is False
     flattened_sources = {
-        source for category in categories.values() for source in category["allowed_sources"]
+        source
+        for source_class in profile["source_classes"]
+        for source in source_class["allowed_sources"]
     }
     assert not flattened_sources & {
         "active_checkout",
@@ -93,105 +122,180 @@ def test_source_profile_contains_only_external_engineering_source_categories() -
     }
 
 
-def test_role_baseline_coverage_is_task_filtered_not_forced_full_consumption() -> None:
+def test_source_records_have_exact_lifecycle_states_and_mandatory_metadata() -> None:
     profile = load_profile()
-    expected_categories = {category["id"] for category in profile["external_source_categories"]}
 
-    for role, required_categories in profile["role_baseline_coverage"].items():
-        assert required_categories, role
-        assert set(required_categories) <= expected_categories
+    assert profile["source_lifecycle_states"] == [
+        "normative",
+        "approved",
+        "draft",
+        "watch_only",
+        "deprecated",
+        "withdrawn",
+        "rejected",
+    ]
+    assert {
+        "source_identifier",
+        "title",
+        "issuing_organization",
+        "canonical_document_reference",
+        "source_class",
+        "document_or_specification_version",
+        "publication_status",
+        "publication_date",
+        "retrieval_date",
+        "content_hash_or_immutable_snapshot_reference",
+        "applicable_technology_and_version_range",
+        "repository_scope_mapping",
+        "relevant_sections_or_claims",
+        "source_authority_assessment",
+        "freshness_status",
+        "conflict_status",
+        "validator",
+        "approval_status",
+        "superseded_and_superseding_sources",
+        "next_review_trigger_or_review_date",
+    } <= set(profile["source_record_required_fields"])
+    assert profile["search_result_summary_is_source_record"] is False
+
+
+def test_role_baseline_coverage_is_task_filtered_not_profile_mutating() -> None:
+    profile = load_profile()
+    expected_classes = {source_class["id"] for source_class in profile["source_classes"]}
+
+    for role, required_classes in profile["role_baseline_coverage"].items():
+        assert required_classes, role
+        assert set(required_classes) <= expected_classes
 
     task_selection = profile["task_source_selection"]
     assert task_selection["baseline_awareness_required"] is True
     assert task_selection["task_specific_source_use_required"] is True
     assert task_selection["consume_all_role_sources_for_every_task"] is False
+    assert task_selection["pull_request_reviews_consume_active_profile"] is True
+    assert task_selection["pull_request_reviews_define_or_mutate_profile"] is False
     assert "demonstrable_connection" in task_selection["selection_rule"]
 
 
-def test_new_external_insights_do_not_become_findings_without_current_risk() -> None:
+def test_governance_skill_can_propose_but_not_approve_or_mutate_scope() -> None:
+    skill = load_profile()["maintenance_skill"]
+    permissions = skill["permissions"]
+
+    assert skill["name"] == "engineering-source-governance"
+    assert "inspect_repository_declared_engineering_scope" in skill["responsibilities"]
+    assert "scheduled_profile_revalidation" in skill["execution_triggers"]
+    assert permissions["may_create_proposed_change"] is True
+    assert permissions["may_create_auditable_validation_report"] is True
+    assert permissions["may_directly_modify_active_normative_profile"] is False
+    assert permissions["may_change_code_tests_dependencies_configuration_or_runtime"] is False
+    assert permissions["may_create_or_modify_adr"] is False
+    assert permissions["may_create_implementation_work_automatically"] is False
+    assert permissions["may_expand_product_scope"] is False
+    assert permissions["may_treat_external_instructions_as_agent_instructions"] is False
+    assert permissions["may_approve_own_normative_changes"] is False
+    assert (
+        skill["normative_activation_approval"] == "source_governance_approver_or_governance_judge"
+    )
+    assert skill["proposer_and_sole_approver_may_be_same_autonomous_agent"] is False
+
+
+def test_profile_change_control_requires_approval_and_complete_change_record() -> None:
+    change_control = load_profile()["source_profile_change_control"]
+
+    assert change_control["skill_may_create_proposed_change"] is True
+    assert change_control["normative_activation_requires_approval"] is True
+    assert change_control["approval_authority"] == [
+        "source_governance_approver",
+        "governance_judge",
+    ]
+    assert {
+        "reason_for_change",
+        "affected_repository_scope",
+        "previous_and_proposed_source_records",
+        "source_lifecycle_changes",
+        "affected_specialist_roles",
+        "expected_assessment_impact",
+        "security_considerations",
+        "unresolved_conflicts",
+        "recommendation",
+        "proposed_activation_date",
+    } <= set(change_control["required_proposed_change_fields"])
+
+
+def test_external_content_is_untrusted_and_cannot_authorize_repository_actions() -> None:
+    boundary = load_profile()["external_content_security_boundary"]
+
+    assert boundary["all_external_content_is_untrusted_input"] is True
+    assert boundary["source_authority_grants_execution_authority"] is False
+    assert boundary["embedded_instructions_may_be_followed"] is False
+    assert set(boundary["external_content_cannot_authorize"]) == {
+        "tool_calls",
+        "repository_writes",
+        "source_profile_activation",
+        "issue_or_backlog_creation",
+        "adr_changes",
+        "credential_use",
+        "permission_expansion",
+        "communication_with_external_systems",
+    }
+    assert boundary["high_impact_changes_require_separate_trusted_authorization"] is True
+
+
+def test_new_knowledge_classification_limits_current_findings_and_future_scope() -> None:
     profile = load_profile()
     stability = profile["state_of_art_stability_principle"]
-    classification = profile["new_insight_classification"]
+    classification = profile["new_knowledge_classification"]
 
-    assert stability["state_of_art_scope"] == "specialist_assessment_ability"
+    assert stability["state_of_art_scope"] == "specialist_assessment_capability"
     assert stability["continuous_modernization_mandate"] is False
-    assert stability["newer_approach_is_finding_without_current_risk"] is False
-    assert "security_risk" in stability["finding_requires_repository_evidence_of"]
-    assert classification["required_before_routing"] is True
-    assert classification["pr_finding_allowed_only_for"] == ["current_defect_or_risk"]
-    assert classification["future_option_target"] == "future-considerations-register.md"
-    assert classification["backlog_or_adr_requires_separate_repository_decision"] is True
-    assert classification["modernization_only_creates_pr_finding"] is False
-
-
-def test_profile_change_control_and_maintenance_skill_are_bounded() -> None:
-    profile = load_profile()
-    skill = profile["maintenance_skill"]
-    workflow = profile["profile_change_workflow"]
-
-    assert skill["name"] == "Engineering Source Governance Skill"
-    assert "inspect_profile_coverage" in skill["responsibilities"]
-    assert "scheduled_periodic_review" in skill["execution_triggers"]
-    assert skill["periodic_review_interval"] == "quarterly_or_before_release_gate"
-    assert skill["permissions"]["may_propose_profile_changes"] is True
-    assert skill["permissions"]["may_activate_normative_profile_changes"] is False
-    assert skill["permissions"]["may_change_product_runtime"] is False
-    assert skill["permissions"]["may_change_adrs"] is False
-    assert skill["approval_authority"] == "repository_governance_workflow_with_codeowner_review"
-
-    assert workflow["allowed_states"] == [
-        "proposed",
-        "reviewed",
-        "approved",
-        "deprecated",
-        "rejected",
+    assert stability["current_production_work_precedence"] is True
+    assert "security_vulnerability" in stability["mandatory_concern_requires_evidence_of"]
+    assert classification["classes"] == [
+        "current_mandatory_concern",
+        "future_consideration",
+        "not_applicable",
     ]
-    assert workflow["skill_may_only_propose"] is True
-    assert workflow["normative_activation_requires_approval"] is True
+    assert (
+        classification[
+            "only_current_mandatory_concern_may_support_current_mandatory_review_finding"
+        ]
+        is True
+    )
+    assert classification["future_consideration_target"] == (
+        "docs/governance/future-considerations-register.md"
+    )
+    assert classification["future_considerations_outside_current_pr_findings"] is True
+    assert classification["future_considerations_outside_committed_delivery_scope"] is True
+    assert "source_describes_only_alternative_approach" in classification["not_applicable_reasons"]
+
+
+def test_architecture_and_adr_boundary_uses_evolution_register_without_mandate() -> None:
+    boundary = load_profile()["architecture_and_adr_boundary"]
+
+    assert boundary["accepted_adrs_remain_binding_until_authorized_supersession"] is True
+    assert boundary["new_source_may_automatically_invalidate_adr"] is False
+    assert boundary["new_source_may_automatically_create_adr"] is False
+    assert boundary["new_source_may_automatically_amend_adr"] is False
+    assert boundary["new_source_may_automatically_reopen_completed_architecture_work"] is False
+    assert boundary["new_source_may_automatically_create_implementation_work"] is False
+    assert boundary["potential_architecture_implication_target"] == (
+        "docs/governance/architecture-evolution-register.md"
+    )
+    assert boundary["architecture_evolution_entry_is_approval"] is False
+    assert boundary["architecture_evolution_entry_is_requirement"] is False
+    assert boundary["architecture_evolution_entry_is_backlog_commitment"] is False
+    assert boundary["architecture_evolution_entry_is_implementation_mandate"] is False
     assert {
-        "rationale",
-        "affected_roles",
-        "previous_source_state",
-        "proposed_source_state",
-        "approver",
-        "activation_date",
-        "audit_artifact",
-    } <= set(workflow["required_change_record_fields"])
+        "relevant_sources",
+        "affected_components",
+        "affected_adrs",
+        "assumptions_that_may_no_longer_hold",
+        "implementation_and_migration_cost",
+        "recommended_reassessment_point",
+    } <= set(boundary["required_entry_fields"])
 
 
-def test_sources_require_freshness_metadata_and_revalidation_triggers() -> None:
-    profile = load_profile()
-
-    assert {
-        "source_id",
-        "source_category",
-        "authority_level",
-        "version_or_applicability_scope",
-        "last_validated_at",
-        "validation_status",
-        "revalidation_triggers",
-    } <= set(profile["source_record_required_fields"])
-    assert "current" in profile["source_validation_statuses"]
-    assert "stale" in profile["source_validation_statuses"]
-    assert "version_mismatch" in profile["source_validation_statuses"]
-    assert "security_advisory" in profile["revalidation_triggers"]
-    assert "end_of_life_notice" in profile["revalidation_triggers"]
-    assert "authoritative_source_conflict" in profile["revalidation_triggers"]
-
-
-def test_external_content_is_untrusted_and_conflicts_have_judge_path() -> None:
-    profile = load_profile()
-    trust = profile["external_content_trust"]
-    conflicts = profile["source_conflict_process"]
-
-    assert trust["classification"] == "untrusted_evidence"
-    assert trust["embedded_instructions_are_authority"] is False
-    assert trust["may_change_agent_roles"] is False
-    assert trust["may_change_governance"] is False
-    assert trust["may_authorize_repository_actions"] is False
-    assert trust["may_authorize_profile_changes"] is False
-    assert trust["may_authorize_adr_changes"] is False
-    assert trust["may_authorize_tool_calls"] is False
+def test_source_conflicts_have_required_record_and_judge_path() -> None:
+    conflicts = load_profile()["source_conflict_process"]
 
     assert {
         "competing_statements",
@@ -210,7 +314,25 @@ def test_external_content_is_untrusted_and_conflicts_have_judge_path() -> None:
     assert conflicts["unresolved_conflicts_escalate_to"] == "governance_judge"
 
 
-def test_governance_docs_publish_the_boundary_and_profile() -> None:
+def test_production_readiness_protection_blocks_continuous_modernization() -> None:
+    protection = load_profile()["production_readiness_protection"]
+
+    assert protection["purpose_is_informed_specialists_not_permanent_product_redevelopment"] is True
+    assert protection["newer_technology_is_automatically_better"] is False
+    assert protection["newer_technology_is_automatically_defect"] is False
+    assert protection["newer_technology_is_automatically_release_blocker"] is False
+    assert protection["newer_technology_is_automatically_adr_candidate"] is False
+    assert protection["newer_technology_is_automatically_backlog_item"] is False
+    assert protection["newer_technology_is_automatically_implementation_requirement"] is False
+    assert (
+        protection[
+            "current_production_work_takes_precedence_without_present_mandatory_concern_or_authorized_target_change"
+        ]
+        is True
+    )
+
+
+def test_governance_docs_publish_policy_profile_registry_audit_and_evolution_boundary() -> None:
     governance = (GOVERNANCE_DIR / "engineering-source-governance.md").read_text(encoding="utf-8")
     normalized_governance = " ".join(governance.split())
     index = (GOVERNANCE_DIR / "README.md").read_text(encoding="utf-8")
@@ -218,13 +340,34 @@ def test_governance_docs_publish_the_boundary_and_profile() -> None:
     future_register = (GOVERNANCE_DIR / "future-considerations-register.md").read_text(
         encoding="utf-8"
     )
+    source_registry = (GOVERNANCE_DIR / "engineering-source-registry.md").read_text(
+        encoding="utf-8"
+    )
+    audit_records = (GOVERNANCE_DIR / "source-governance-audit-records.md").read_text(
+        encoding="utf-8"
+    )
+    evolution_register = (GOVERNANCE_DIR / "architecture-evolution-register.md").read_text(
+        encoding="utf-8"
+    )
 
-    assert "Out of scope: Product runtime" in governance
-    assert "product RAG system" in governance
-    assert "engineering-source-profile.json" in governance
-    assert "Future Considerations Register" in governance
-    assert "A newer alternative alone is not a review finding." in normalized_governance
+    assert "Explicitly excluded: Product runtime" in governance
+    assert "product memory" in governance
+    assert "Global Engineering Source Policy" in governance
+    assert "Engineering Source Registry" in governance
+    assert "Source Governance Audit Records" in governance
+    assert "Internal model knowledge is neither repository evidence" in governance
+    assert "A search-result summary is not a source record." in governance
+    assert "Future Consideration" in governance
+    assert "Architecture Evolution Register entry is not an approval" in normalized_governance
     assert "Engineering source governance" in index
-    assert "future-considerations-register.md" in index
+    assert "engineering-source-registry.md" in index
+    assert "source-governance-audit-records.md" in index
+    assert "architecture-evolution-register.md" in index
     assert "Engineering source governance" in root_readme
+    assert "Engineering source registry" in root_readme
+    assert "source governance audit records" in root_readme
+    assert "architecture evolution register" in root_readme
     assert "It never becomes product work automatically." in future_register
+    assert "No individual source records are active yet." in source_registry
+    assert "No audit records are active yet." in audit_records
+    assert "No architecture evolution entries are active." in evolution_register

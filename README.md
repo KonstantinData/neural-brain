@@ -318,6 +318,9 @@ evidence; it is not executable truth.
   [repository governance](docs/governance/README.md)
 - [Engineering source governance](docs/governance/engineering-source-governance.md)
   and [Neural Brain source profile](docs/governance/engineering-source-profile.json)
+- [Engineering source registry](docs/governance/engineering-source-registry.md),
+  [source governance audit records](docs/governance/source-governance-audit-records.md),
+  and [architecture evolution register](docs/governance/architecture-evolution-register.md)
 - [Operational runbooks](docs/runbooks/README.md) and
   [release evidence](docs/runbooks/release-artifacts.md)
 
