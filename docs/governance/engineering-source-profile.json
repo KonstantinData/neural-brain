@@ -1,0 +1,196 @@
+{
+  "document_type": "engineering_source_profile",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "repository": "KonstantinData/neural-brain",
+  "repository_path_hint": "D:/Git-GitHub/Repositories/condata/neural-brain",
+  "governed_layer": "engineering_knowledge_base",
+  "applies_to": [
+    "development_agents",
+    "review_agents",
+    "judge_agents",
+    "repository_maintainers",
+    "architecture_reviewers",
+    "security_reviewers",
+    "quality_engineering_reviewers",
+    "operations_reviewers"
+  ],
+  "does_not_apply_to": [
+    "product_runtime",
+    "product_user_features",
+    "product_data_processing",
+    "product_knowledge_base",
+    "runtime_retrieval",
+    "runtime_web_search",
+    "runtime_source_crawling",
+    "runtime_rag"
+  ],
+  "knowledge_layers": [
+    {
+      "id": "repository_evidence",
+      "description": "Code, tests, migrations, configuration, ADRs, contracts, commits, pull requests, release artifacts, and traceability records.",
+      "governed_by_this_profile": false,
+      "authority": "durable_technical_source_of_truth"
+    },
+    {
+      "id": "engineering_knowledge_base",
+      "description": "External and repository-local technical sources used by development, review, maintenance, operations, and governance agents.",
+      "governed_by_this_profile": true,
+      "authority": "engineering_review_input"
+    },
+    {
+      "id": "product_knowledge_and_data",
+      "description": "Information Neural Brain processes, stores, retrieves, or presents as product behavior.",
+      "governed_by_this_profile": false,
+      "authority": "product_runtime_scope"
+    }
+  ],
+  "runtime_non_effects": {
+    "creates_product_web_search": false,
+    "creates_product_source_crawler": false,
+    "creates_product_rag": false,
+    "creates_product_knowledge_store": false,
+    "allows_runtime_external_research": false,
+    "allows_engineering_sources_to_be_ingested_into_product_memory": false,
+    "automatically_changes_product_behavior": false,
+    "automatically_changes_adrs": false
+  },
+  "source_categories": [
+    {
+      "id": "repository_current_state",
+      "allowed_sources": [
+        "active_checkout",
+        "git_history",
+        "pull_requests",
+        "ci_runs",
+        "versioned_traceability_records"
+      ],
+      "quality_rules": [
+        "must_match_active_repository_and_branch",
+        "must_not_be_replaced_by_external_claims"
+      ]
+    },
+    {
+      "id": "language_and_runtime",
+      "allowed_sources": [
+        "official_python_documentation",
+        "official_packaging_and_uv_documentation",
+        "pinned_runtime_release_notes"
+      ],
+      "quality_rules": [
+        "must_match_pinned_versions",
+        "prefer_primary_sources"
+      ]
+    },
+    {
+      "id": "dependencies_and_frameworks",
+      "allowed_sources": [
+        "official_dependency_documentation",
+        "official_release_notes",
+        "official_migration_guides",
+        "package_metadata"
+      ],
+      "quality_rules": [
+        "must_match_locked_dependency_versions",
+        "record_version_mismatch_as_uncertainty"
+      ]
+    },
+    {
+      "id": "security_and_privacy",
+      "allowed_sources": [
+        "vendor_security_advisories",
+        "cve_records",
+        "owasp_guidance",
+        "github_security_advisories",
+        "official_platform_security_documentation"
+      ],
+      "quality_rules": [
+        "prefer_current_primary_security_sources",
+        "fail_closed_on_unknown_or_unreviewed_credential_risk"
+      ]
+    },
+    {
+      "id": "ci_cd_and_operations",
+      "allowed_sources": [
+        "official_github_actions_documentation",
+        "official_docker_documentation",
+        "official_postgresql_documentation",
+        "platform_operations_documentation"
+      ],
+      "quality_rules": [
+        "must_match_configured_platform",
+        "must_not_weaken_repository_governance"
+      ]
+    },
+    {
+      "id": "architecture_and_cognitive_evaluation",
+      "allowed_sources": [
+        "repository_adrs_and_contracts",
+        "primary_research_sources",
+        "accepted_standards",
+        "official_evaluation_methodology_sources"
+      ],
+      "quality_rules": [
+        "repository_claims_require_repository_evidence",
+        "scientific_claims_require_primary_or_peer_reviewed_sources"
+      ]
+    }
+  ],
+  "role_coverage": {
+    "software_and_system_architect": [
+      "repository_current_state",
+      "architecture_and_cognitive_evaluation",
+      "dependencies_and_frameworks"
+    ],
+    "data_engineer": [
+      "repository_current_state",
+      "dependencies_and_frameworks",
+      "ci_cd_and_operations"
+    ],
+    "python_backend_specialist": [
+      "repository_current_state",
+      "language_and_runtime",
+      "dependencies_and_frameworks"
+    ],
+    "security_specialist": [
+      "repository_current_state",
+      "security_and_privacy",
+      "dependencies_and_frameworks"
+    ],
+    "test_quality_engineer": [
+      "repository_current_state",
+      "language_and_runtime",
+      "ci_cd_and_operations"
+    ],
+    "devops_ci_cd_specialist": [
+      "repository_current_state",
+      "ci_cd_and_operations",
+      "security_and_privacy"
+    ],
+    "observability_operations_specialist": [
+      "repository_current_state",
+      "ci_cd_and_operations",
+      "security_and_privacy"
+    ],
+    "governance_adr_maintainer": [
+      "repository_current_state",
+      "architecture_and_cognitive_evaluation",
+      "security_and_privacy"
+    ],
+    "review_judge_repository_agent": [
+      "repository_current_state",
+      "architecture_and_cognitive_evaluation",
+      "security_and_privacy",
+      "language_and_runtime",
+      "dependencies_and_frameworks",
+      "ci_cd_and_operations"
+    ]
+  },
+  "evidence_rules": {
+    "repository_claims": "must_be_grounded_in_repository_evidence",
+    "external_claims": "must_identify_source_class_and_version_or_freshness_when_material",
+    "conflicts": "repository_evidence_and_accepted_adrs_control_current_behavior; external_sources_create_findings_or_options",
+    "stale_or_unknown_freshness": "record_uncertainty_and_do_not_use_as_sole_normative_basis",
+    "new_technical_knowledge": "route_as_review_input_backlog_option_or_adr_proposal_before_product_change"
+  }
+}

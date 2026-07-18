@@ -10,6 +10,15 @@ additional independence evidence for memory separation-of-duties-sensitive
 changes.
 Unknown or unverifiable governance state fails closed.
 
+Engineering source governance is defined in
+[`engineering-source-governance.md`](engineering-source-governance.md). It sets
+the source-governance boundary for development, review, maintenance, operations,
+and governance agents. Its machine-readable repository source profile is
+[`engineering-source-profile.json`](engineering-source-profile.json). This
+governance is an engineering work aid only; it does not create product runtime
+retrieval, web search, crawling, RAG, product knowledge stores, or automatic ADR
+changes.
+
 `@KonstantinData` and `@KonstantinCondata` are the declared code owners. Each
 account must retain accepted repository write access. A pending invitation or
 read-only access does not establish CODEOWNER eligibility. For any change, the

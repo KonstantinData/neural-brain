@@ -316,6 +316,8 @@ evidence; it is not executable truth.
 - [Machine-readable contracts](docs/architecture/contracts/README.md),
   [threat model](docs/architecture/threat-model.md), and
   [repository governance](docs/governance/README.md)
+- [Engineering source governance](docs/governance/engineering-source-governance.md)
+  and [Neural Brain source profile](docs/governance/engineering-source-profile.json)
 - [Operational runbooks](docs/runbooks/README.md) and
   [release evidence](docs/runbooks/release-artifacts.md)
 
