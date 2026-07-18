@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import importlib
 import json
 from pathlib import Path
 from typing import Any
@@ -7,6 +8,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[2]
 GOVERNANCE_DIR = ROOT / "docs" / "governance"
 PROFILE_PATH = GOVERNANCE_DIR / "engineering-source-profile.json"
+SOURCE_RECORDS_PATH = GOVERNANCE_DIR / "engineering-source-records.json"
 
 
 def load_profile() -> dict[str, Any]:
@@ -21,6 +23,16 @@ def load_registry_schema() -> dict[str, Any]:
     )
     assert isinstance(value, dict)
     return value
+
+
+def load_source_records() -> list[dict[str, Any]]:
+    value: object = json.loads(SOURCE_RECORDS_PATH.read_text(encoding="utf-8"))
+    assert isinstance(value, list)
+    records: list[dict[str, Any]] = []
+    for item in value:
+        assert isinstance(item, dict)
+        records.append(item)
+    return records
 
 
 def test_engineering_source_profile_is_repo_scoped_and_not_runtime_scoped() -> None:
@@ -227,6 +239,56 @@ def test_source_registry_schema_is_deterministic_and_claim_level() -> None:
         "permitted_evidence_use",
         "known_limitations",
     } <= set(claim_schema["required"])
+
+
+def test_source_records_validate_against_registry_schema() -> None:
+    schema = load_registry_schema()
+    jsonschema: Any = importlib.import_module("jsonschema")
+    validator = jsonschema.Draft202012Validator(
+        schema,
+        format_checker=jsonschema.FormatChecker(),
+    )
+    records = load_source_records()
+
+    assert len(records) == 14
+    identifiers = [record["source_identifier"] for record in records]
+    assert len(identifiers) == len(set(identifiers))
+    for record in records:
+        errors = sorted(validator.iter_errors(record), key=lambda error: error.json_path)
+        assert errors == []
+        assert record["approval_status"] == "approved"
+        assert record["internal_registry_status"] == record["lifecycle_state"] == "approved"
+        assert record["external_publication_status"] == "final"
+        assert record["freshness_status"] == "current"
+        assert record["conflict_status"] == "none"
+        assert record["claims"]
+
+
+def test_profile_active_source_references_resolve_to_valid_records_and_claims() -> None:
+    profile = load_profile()
+    records = {record["source_identifier"]: record for record in load_source_records()}
+    references = profile["active_source_references"]
+
+    assert profile["source_record_collection"] == {
+        "artifact": "docs/governance/engineering-source-records.json",
+        "record_schema": "docs/governance/engineering-source-registry.schema.json",
+        "record_count": 14,
+        "activation_audit_record": "sgaudit-20260718-initial-source-baseline-0001",
+    }
+    assert len(references) == 14
+    assert {reference["source_identifier"] for reference in references} == set(records)
+
+    for reference in references:
+        record = records[reference["source_identifier"]]
+        record_claim_ids = {claim["claim_id"] for claim in record["claims"]}
+        assert set(reference["claim_ids"]) <= record_claim_ids
+        assert reference["permitted_evidence_use"] == record["permitted_evidence_use"]
+        assert reference["role_coverage"]
+        assert reference["repository_scope"]
+        if reference["permitted_evidence_use"] == "normative":
+            assert record["internal_registry_status"] == "approved"
+            assert record["permitted_evidence_use"] == "normative"
+            assert record["external_publication_status"] == "final"
 
 
 def test_profile_reference_integrity_blocks_invalid_normative_source_references() -> None:
@@ -513,8 +575,12 @@ def test_governance_docs_publish_policy_profile_registry_audit_and_evolution_bou
     assert "source governance audit records" in root_readme
     assert "architecture evolution register" in root_readme
     assert "It never becomes product work automatically." in future_register
-    assert "No individual source records are active yet." in source_registry
-    assert "No governance audit events have been recorded yet." in audit_records
+    assert "engineering-source-records.json" in index
+    assert "engineering-source-records.json" in source_registry
+    assert "sgaudit-20260718-initial-source-baseline-0001" in source_registry
+    assert "engsrc-python-314-docs-0001" in source_registry
+    assert "engsrc-postgresql-18-docs-0009" in source_registry
+    assert "sgaudit-20260718-initial-source-baseline-0001" in audit_records
     assert "No architecture evolution entries are active." in evolution_register
     assert "External publication status never creates internal approval." in source_registry
     assert "append-only" in audit_records

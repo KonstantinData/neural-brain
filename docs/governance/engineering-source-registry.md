@@ -21,6 +21,11 @@ Every registry record must validate against the versioned JSON Schema
 [`engineering-source-registry.schema.json`](engineering-source-registry.schema.json)
 before activation or source-profile reference.
 
+The active machine-readable record collection is
+[`engineering-source-records.json`](engineering-source-records.json). Each item
+in that collection is an individual Source Record and must validate against the
+record schema before it may be referenced by the active profile.
+
 ## Source Record Template
 
 Each source record must contain:
@@ -90,4 +95,22 @@ use, `watch_only`, or `prohibited` records as normative evidence.
 
 ## Current Source Records
 
-No individual source records are active yet.
+The initial active source baseline was approved through audit record
+`sgaudit-20260718-initial-source-baseline-0001`.
+
+| Source ID | Evidence use | Scope |
+| --- | --- | --- |
+| `engsrc-python-314-docs-0001` | normative | CPython 3.14 runtime and language behavior |
+| `engsrc-uv-docs-0002` | normative | uv dependency and environment workflow |
+| `engsrc-ruff-docs-0003` | normative | Ruff formatting and linting |
+| `engsrc-mypy-docs-0004` | normative | strict mypy typing |
+| `engsrc-pytest-docs-0005` | normative | pytest test execution |
+| `engsrc-hypothesis-docs-0006` | normative | property-based testing |
+| `engsrc-pydantic-v2-docs-0007` | normative | Pydantic v2 validation boundaries |
+| `engsrc-psycopg3-docs-0008` | normative | Psycopg 3 PostgreSQL client behavior |
+| `engsrc-postgresql-18-docs-0009` | normative | PostgreSQL 18 ledger, roles, and migrations |
+| `engsrc-docker-compose-spec-docs-0010` | normative | Docker Compose file review |
+| `engsrc-github-actions-workflow-docs-0011` | normative | GitHub Actions workflows and CI/CD checks |
+| `engsrc-github-security-advisories-docs-0012` | supporting | dependency advisory monitoring |
+| `engsrc-json-schema-2020-12-0013` | normative | JSON Schema Draft 2020-12 validation |
+| `engsrc-owasp-asvs-5-0014` | supporting | application-security verification vocabulary |

@@ -162,6 +162,112 @@
   ],
   "source_registry_schema": "docs/governance/engineering-source-registry.schema.json",
   "source_registry_schema_version": "1.0.0",
+  "source_record_collection": {
+    "artifact": "docs/governance/engineering-source-records.json",
+    "record_schema": "docs/governance/engineering-source-registry.schema.json",
+    "record_count": 14,
+    "activation_audit_record": "sgaudit-20260718-initial-source-baseline-0001"
+  },
+  "active_source_references": [
+    {
+      "source_identifier": "engsrc-python-314-docs-0001",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-python-314-docs-001"],
+      "repository_scope": ["Python runtime", "standard library", "language behavior"],
+      "role_coverage": ["python_backend_specialist", "test_quality_engineer", "review_judge_repository_agent"]
+    },
+    {
+      "source_identifier": "engsrc-uv-docs-0002",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-uv-docs-001"],
+      "repository_scope": ["dependency management", "locked environment reproduction", "quality commands"],
+      "role_coverage": ["python_backend_specialist", "devops_ci_cd_specialist", "toolchain_quality_reviewer"]
+    },
+    {
+      "source_identifier": "engsrc-ruff-docs-0003",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-ruff-docs-001"],
+      "repository_scope": ["formatting", "linting", "Python style policy"],
+      "role_coverage": ["python_backend_specialist", "test_quality_engineer", "toolchain_quality_reviewer"]
+    },
+    {
+      "source_identifier": "engsrc-mypy-docs-0004",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-mypy-docs-001"],
+      "repository_scope": ["static typing", "type-checker configuration", "type-safety review"],
+      "role_coverage": ["python_backend_specialist", "test_quality_engineer", "toolchain_quality_reviewer"]
+    },
+    {
+      "source_identifier": "engsrc-pytest-docs-0005",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-pytest-docs-001"],
+      "repository_scope": ["test execution", "fixtures", "assertions", "test configuration"],
+      "role_coverage": ["test_quality_engineer", "python_backend_specialist", "review_judge_repository_agent"]
+    },
+    {
+      "source_identifier": "engsrc-hypothesis-docs-0006",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-hypothesis-docs-001"],
+      "repository_scope": ["property-based tests", "invariant testing", "regression exploration"],
+      "role_coverage": ["test_quality_engineer", "python_backend_specialist", "review_judge_repository_agent"]
+    },
+    {
+      "source_identifier": "engsrc-pydantic-v2-docs-0007",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-pydantic-v2-docs-001"],
+      "repository_scope": ["boundary validation", "typed data contracts", "untrusted input parsing"],
+      "role_coverage": ["python_backend_specialist", "security_specialist", "review_judge_repository_agent"]
+    },
+    {
+      "source_identifier": "engsrc-psycopg3-docs-0008",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-psycopg3-docs-001"],
+      "repository_scope": ["PostgreSQL client", "transactions", "data access boundaries"],
+      "role_coverage": ["python_backend_specialist", "data_engineer", "security_specialist"]
+    },
+    {
+      "source_identifier": "engsrc-postgresql-18-docs-0009",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-postgresql-18-docs-001"],
+      "repository_scope": ["PostgreSQL ledger", "migrations", "roles", "constraints"],
+      "role_coverage": ["data_engineer", "security_specialist", "observability_operations_specialist"]
+    },
+    {
+      "source_identifier": "engsrc-docker-compose-spec-docs-0010",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-docker-compose-spec-docs-001"],
+      "repository_scope": ["compose.yaml", "local services", "development database orchestration"],
+      "role_coverage": ["devops_ci_cd_specialist", "observability_operations_specialist", "test_quality_engineer"]
+    },
+    {
+      "source_identifier": "engsrc-github-actions-workflow-docs-0011",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-github-actions-workflow-docs-001"],
+      "repository_scope": ["GitHub Actions", "CI/CD workflows", "required checks"],
+      "role_coverage": ["devops_ci_cd_specialist", "security_specialist", "toolchain_quality_reviewer"]
+    },
+    {
+      "source_identifier": "engsrc-github-security-advisories-docs-0012",
+      "permitted_evidence_use": "supporting",
+      "claim_ids": ["claim-github-security-advisories-docs-001"],
+      "repository_scope": ["dependency advisories", "vulnerability monitoring", "security review support"],
+      "role_coverage": ["security_specialist", "devops_ci_cd_specialist", "review_judge_repository_agent"]
+    },
+    {
+      "source_identifier": "engsrc-json-schema-2020-12-0013",
+      "permitted_evidence_use": "normative",
+      "claim_ids": ["claim-json-schema-2020-12-001"],
+      "repository_scope": ["governance schema", "contract validation", "JSON Schema dialect"],
+      "role_coverage": ["software_and_system_architect", "test_quality_engineer", "governance_adr_maintainer"]
+    },
+    {
+      "source_identifier": "engsrc-owasp-asvs-5-0014",
+      "permitted_evidence_use": "supporting",
+      "claim_ids": ["claim-owasp-asvs-5-001"],
+      "repository_scope": ["security review vocabulary", "security-control assessment support"],
+      "role_coverage": ["security_specialist", "software_and_system_architect", "governance_adr_maintainer"]
+    }
+  ],
   "search_result_summary_is_source_record": false,
   "profile_reference_integrity": {
     "active_profile_may_reference_unknown_source_ids": false,

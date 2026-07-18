@@ -22,7 +22,9 @@ Modernization-only source insights that do not prove a current repository defect
 or risk remain in the controlled
 [`future-considerations-register.md`](future-considerations-register.md).
 Individual external source records belong in
-[`engineering-source-registry.md`](engineering-source-registry.md) and must
+[`engineering-source-registry.md`](engineering-source-registry.md). Their
+machine-readable records are maintained in
+[`engineering-source-records.json`](engineering-source-records.json) and must
 validate against
 [`engineering-source-registry.schema.json`](engineering-source-registry.schema.json).
 Source profile validations, conflicts, approvals, rejections, and supersession
