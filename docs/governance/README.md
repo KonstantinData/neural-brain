@@ -18,6 +18,9 @@ and governance agents. Its machine-readable repository source profile is
 governance is an engineering work aid only; it does not create product runtime
 retrieval, web search, crawling, RAG, product knowledge stores, or automatic ADR
 changes.
+Modernization-only source insights that do not prove a current repository defect
+or risk remain in the controlled
+[`future-considerations-register.md`](future-considerations-register.md).
 
 `@KonstantinData` and `@KonstantinCondata` are the declared code owners. Each
 account must retain accepted repository write access. A pending invitation or
