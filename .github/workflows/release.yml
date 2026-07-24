@@ -115,7 +115,8 @@ jobs:
               for field in required
           ):
               raise SystemExit("invalid migration validation evidence")
-          print("\\n".join(evidence[field] for field in required))
+          for field in required:
+              print(evidence[field])
           ')"
           plan_sha256="$(printf '%s\n' "$migration_fields" | sed -n '1p')"
           fresh_schema_sha256="$(printf '%s\n' "$migration_fields" | sed -n '2p')"

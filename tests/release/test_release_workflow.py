@@ -76,5 +76,7 @@ def test_migration_evidence_parsing_requires_structured_digests() -> None:
     assert 'evidence.get("status") != "passed"' in migration_step
     assert 're.fullmatch(r"[0-9a-f]{64}", evidence[field])' in migration_step
     assert "invalid migration validation evidence" in migration_step
+    assert "for field in required:\n              print(evidence[field])" in migration_step
+    assert 'print("\\\\n".join' not in migration_step
     assert "s/^plan-sha256:" not in migration_step
     assert "s/^fresh-schema-sha256:" not in migration_step
