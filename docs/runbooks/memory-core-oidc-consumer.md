@@ -125,3 +125,8 @@ another scope.
 | `NB-MC-INVALID-CYCLE` | The requested atomic cycle violates the Memory Core contract. | Correct the client payload and observation-to-memory linkage; do not bypass the Memory Gate. |
 | `NB-MC-PERSISTENCE-FAILED` | A protected persistence operation could not complete. | Preserve the request identifier, inspect audited database health, and reconcile before any retry. |
 | `NB-MC-DREAMING-UNAVAILABLE` | Dreaming lacks its required gates. | Do not retry; Dreaming is not an available runtime operation. |
+
+`tools/dev.ps1 memory-demo` returns exit code `1` on every failure and writes a
+secret-free JSON envelope such as `{"code":"NB-MC-STALE-WORKING-MEMORY","status":"failed"}`
+to standard error. It never emits the exception text, database DSN, token, or
+trusted scope values. Unexpected failures map to `NB-MC-INTERNAL`.
