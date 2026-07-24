@@ -8,7 +8,9 @@ import pytest
 
 from tools.validate_migrations import (
     DATABASE_PREFIX,
+    ValidationResult,
     discover_migrations,
+    main,
     migration_plan_digest,
     validate_disposable_database_name,
 )
@@ -129,3 +131,45 @@ def test_migration_runbook_describes_the_nonempty_memory_and_cognition_plan() ->
     assert "Empty migration plans are no longer accepted" in normalized
     assert "--allow-empty" not in normalized
     assert "pytest tests/database" in WORKFLOW
+
+
+def test_cli_emits_structured_secret_free_validation_evidence(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Operators receive the migration evidence without a DSN or SQL payload."""
+
+    result = ValidationResult(
+        migration_count=2,
+        plan_sha256="a" * 64,
+        fresh_schema_sha256="b" * 64,
+        upgraded_schema_sha256="c" * 64,
+    )
+    monkeypatch.setattr("tools.validate_migrations.validate_migrations", lambda *_: result)
+
+    assert (
+        main(["--admin-dsn", "postgresql://secret@invalid", "--migrations-dir", str(FIXTURES)]) == 0
+    )
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert '"status": "passed"' in captured.out
+    assert '"migration_count": 2' in captured.out
+    assert "secret" not in captured.out
+
+
+def test_cli_redacts_migration_validation_failure(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A failed validator cannot render a credential-bearing failure detail."""
+
+    def fail_validation(*_: object) -> ValidationResult:
+        raise RuntimeError("failed with postgresql://secret@invalid")
+
+    monkeypatch.setattr("tools.validate_migrations.validate_migrations", fail_validation)
+
+    assert (
+        main(["--admin-dsn", "postgresql://secret@invalid", "--migrations-dir", str(FIXTURES)]) == 1
+    )
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == '{"code": "NB-MC-MIGRATION-VALIDATION-FAILED", "status": "failed"}\n'
+    assert "secret" not in captured.err

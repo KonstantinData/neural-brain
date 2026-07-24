@@ -44,6 +44,22 @@ suite. It stops at the first failed command. Invoking `tools/quality.py` without
 the explicit locked-invocation guard is rejected; the guard does not replace
 the required `uv --locked` option.
 
+## Migration validation evidence
+
+The existing migration validator proves a clean-schema and a previous-schema
+upgrade path in disposable PostgreSQL 18 databases. It requires an
+operator-supplied administrative DSN and emits one secret-free JSON envelope:
+
+```text
+uv run --locked --all-groups python tools/validate_migrations.py \
+  --admin-dsn <operator-supplied-dsn> --migrations-dir migrations
+```
+
+Success includes the migration count plus plan, fresh-schema, and upgraded-schema
+digests. Every failure returns exit code `1` with
+`NB-MC-MIGRATION-VALIDATION-FAILED`; no DSN, SQL payload, or exception detail is
+emitted.
+
 ## Codex development model routing
 
 At a safe development-task start, select and record the process route with a

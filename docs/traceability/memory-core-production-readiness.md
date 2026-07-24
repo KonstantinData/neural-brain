@@ -19,7 +19,7 @@ Active coordination record:
 | Config and secrets | OIDC library configuration available | Random ignored `.local/dev.env`, operator-mounted public JWKS, issuer/audience validation, redacted failures | Define deployed secret injection, JWKS rotation, and issuer revocation operations. |
 | Observability/logging | Partial | Atomic `memory_audit.events`, secret-free demo result output, and structured local PostgreSQL verification | Add deployed health/readiness, structured logs, metrics, audit query, and alerting. |
 | Error handling | Partial | Typed fail-closed domain errors, documented recovery actions, and a secret-free stable JSON error envelope from `tools/dev.ps1 memory-demo` | Expose equivalent safe errors from a separately deployed application runtime. |
-| Data migration | Local forward path available | Advisory lock, per-migration transaction, ordered SHA-256 ledger, drift denial | Prove production upgrade orchestration and compatibility windows. |
+| Data migration | Local forward path available | Advisory lock, per-migration transaction, ordered SHA-256 ledger, drift denial, and structured disposable fresh/upgrade validation evidence | Prove production upgrade orchestration and compatibility windows. |
 | Migration rollback | Open | No downgrade command; runbook refuses silent adoption or rewrite | Define backup-before-upgrade, restore, and rollback evidence. |
 | Backup/restore | Open release stop | No verified backup or restore workflow | Implement scheduled backup, restore drill, reconciliation, and evidence. |
 | LICENSE | MIT license declared | `LICENSE`; package metadata; security-policy license inventory | Keep package metadata and released artifacts aligned with the license text. |

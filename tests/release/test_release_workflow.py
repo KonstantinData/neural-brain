@@ -63,3 +63,20 @@ def test_workflow_builds_versioned_traceable_evidence() -> None:
     assert WORKFLOW.index("tools/bootstrap_database_roles.py") < WORKFLOW.index(
         "tools/validate_migrations.py"
     )
+
+
+def test_migration_evidence_parsing_requires_structured_digests() -> None:
+    """Release evidence rejects malformed or failed migration-validation output."""
+
+    migration_step = WORKFLOW.split(
+        "- name: Validate migrations and capture authoritative schema digest", 1
+    )[1].split("- name: Build deterministic versioned evidence bundle", 1)[0]
+
+    assert "json.load(sys.stdin)" in migration_step
+    assert 'evidence.get("status") != "passed"' in migration_step
+    assert 're.fullmatch(r"[0-9a-f]{64}", evidence[field])' in migration_step
+    assert "invalid migration validation evidence" in migration_step
+    assert "for field in required:\n              print(evidence[field])" in migration_step
+    assert 'print("\\\\n".join' not in migration_step
+    assert "s/^plan-sha256:" not in migration_step
+    assert "s/^fresh-schema-sha256:" not in migration_step

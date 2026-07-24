@@ -409,13 +409,27 @@ def main(argv: list[str] | None = None) -> int:
         )
         result = validate_migrations(arguments.admin_dsn, migrations)
     except (OSError, ValueError, RuntimeError, psycopg.Error) as error:
-        print(f"migration validation failed: {error}", file=sys.stderr)
+        del error
+        print(
+            json.dumps(
+                {"code": "NB-MC-MIGRATION-VALIDATION-FAILED", "status": "failed"},
+                sort_keys=True,
+            ),
+            file=sys.stderr,
+        )
         return 1
-    print(f"migrations: {result.migration_count}")
-    print(f"plan-sha256: {result.plan_sha256}")
-    print(f"fresh-schema-sha256: {result.fresh_schema_sha256}")
-    print(f"upgraded-schema-sha256: {result.upgraded_schema_sha256}")
-    print("migration validation: passed")
+    print(
+        json.dumps(
+            {
+                "fresh_schema_sha256": result.fresh_schema_sha256,
+                "migration_count": result.migration_count,
+                "plan_sha256": result.plan_sha256,
+                "status": "passed",
+                "upgraded_schema_sha256": result.upgraded_schema_sha256,
+            },
+            sort_keys=True,
+        )
+    )
     return 0
 
 
