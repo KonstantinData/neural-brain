@@ -207,6 +207,9 @@ tempCodeRunnerFile.py
 # Ruff stuff:
 .ruff_cache/
 
+# Local retrospective learning artifacts
+docs/learning/*
+
 # PyPI configuration file
 .pypirc
 

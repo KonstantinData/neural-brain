@@ -1,0 +1,696 @@
+{
+  "document_type": "engineering_source_record_collection",
+  "schema_version": "1.0.0",
+  "status": "approved",
+  "repository": "KonstantinData/neural-brain",
+  "record_schema": "docs/governance/engineering-source-registry.schema.json",
+  "activation_audit_record": "sgaudit-20260718-initial-source-baseline-0001",
+  "records": [
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-python-314-docs-0001",
+    "lifecycle_state": "approved",
+    "title": "Python 3.14 Documentation",
+    "issuing_organization": "Python Software Foundation",
+    "canonical_document_reference": "https://docs.python.org/3.14/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Python 3.14 documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "0e3bb7b0057adc809bd72e546f681be6fbe64b307064f216df4fb69c71b66413"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "CPython",
+        "version_range": "3.14.*"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Python runtime, language behavior, packaging compatibility, and standard library use",
+        "roles": ["python_backend_specialist", "test_quality_engineer", "review_judge_repository_agent"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-python-314-docs-001",
+        "section_or_fragment_reference": "Python 3.14 documentation index and linked language/library references",
+        "summarized_external_statement": "The Python 3.14 documentation is the official reference baseline for Python language and standard-library behavior in the pinned runtime family.",
+        "applicable_technology_and_version": "CPython 3.14.*",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Rolling documentation page; content hash and retrieval timestamp identify the assessed snapshot."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "CPython minor upgrade, CPython security advisory, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-uv-docs-0002",
+    "lifecycle_state": "approved",
+    "title": "uv Documentation",
+    "issuing_organization": "Astral",
+    "canonical_document_reference": "https://docs.astral.sh/uv/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "uv documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "c0e06c9b3c7d79ceddd30b72ee70de293ab1ddb6b2999aa6ef8a15b9a76dd7f6"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "uv",
+        "version_range": "0.11.*"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Locked dependency resolution, environment reproduction, and quality-command execution",
+        "roles": ["python_backend_specialist", "devops_ci_cd_specialist", "toolchain_quality_reviewer"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-uv-docs-001",
+        "section_or_fragment_reference": "uv documentation index and linked project, lockfile, and command references",
+        "summarized_external_statement": "The uv documentation is the official baseline for interpreting uv project, lockfile, sync, run, and tool execution behavior.",
+        "applicable_technology_and_version": "uv 0.11.*",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Rolling documentation page; use with the repository-pinned uv version only."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "uv version change, lockfile policy change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-ruff-docs-0003",
+    "lifecycle_state": "approved",
+    "title": "Ruff Documentation",
+    "issuing_organization": "Astral",
+    "canonical_document_reference": "https://docs.astral.sh/ruff/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Ruff documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "d58b4250748acadcd8a1828a149561dd5a0da84c21f1ae0479c2b99976ff49b9"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "Ruff",
+        "version_range": ">=0.12,<1"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Formatting, linting, import hygiene, and Python style enforcement",
+        "roles": ["python_backend_specialist", "test_quality_engineer", "toolchain_quality_reviewer"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-ruff-docs-001",
+        "section_or_fragment_reference": "Ruff documentation index and linked formatter/linter/configuration references",
+        "summarized_external_statement": "The Ruff documentation is the official baseline for Ruff formatter, linter, rule, and configuration behavior.",
+        "applicable_technology_and_version": "Ruff >=0.12,<1",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Rolling documentation page; verify exact rule behavior against the pinned installed version when diagnosing failures."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "Ruff version change, rule-policy change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-mypy-docs-0004",
+    "lifecycle_state": "approved",
+    "title": "mypy Documentation",
+    "issuing_organization": "mypy project",
+    "canonical_document_reference": "https://mypy.readthedocs.io/en/stable/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Stable mypy documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "53a07a22339ffd4d73d4020e930075d453ae7eeae573d8aab13015fd3f9ffcda"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "mypy",
+        "version_range": ">=2,<3"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Strict static typing, type-checker configuration, and type-safety review",
+        "roles": ["python_backend_specialist", "test_quality_engineer", "toolchain_quality_reviewer"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-mypy-docs-001",
+        "section_or_fragment_reference": "Stable mypy documentation index and linked configuration/type-checking references",
+        "summarized_external_statement": "The stable mypy documentation is the authoritative baseline for mypy static type-checking behavior and configuration semantics.",
+        "applicable_technology_and_version": "mypy >=2,<3",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["ReadTheDocs stable alias is rolling; use the content hash and retrieval timestamp for snapshot identity."]
+      }
+    ],
+    "source_authority_assessment": "authoritative",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "mypy version change, Python target change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-pytest-docs-0005",
+    "lifecycle_state": "approved",
+    "title": "pytest Documentation",
+    "issuing_organization": "pytest project",
+    "canonical_document_reference": "https://docs.pytest.org/en/stable/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Stable pytest documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "96781e73a1f051ae4f2edbb67386e38be9d3aece38ac6d4b15bc7e0a2e190857"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "pytest",
+        "version_range": ">=9,<10"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Automated test execution, fixtures, assertions, and test configuration",
+        "roles": ["test_quality_engineer", "python_backend_specialist", "review_judge_repository_agent"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-pytest-docs-001",
+        "section_or_fragment_reference": "Stable pytest documentation index and linked fixture/assertion/configuration references",
+        "summarized_external_statement": "The pytest documentation is the official baseline for pytest test discovery, fixtures, assertions, marks, and configuration behavior.",
+        "applicable_technology_and_version": "pytest >=9,<10",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Stable documentation is rolling; check exact installed version for edge-case behavior."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "pytest version change, test policy change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-hypothesis-docs-0006",
+    "lifecycle_state": "approved",
+    "title": "Hypothesis Documentation",
+    "issuing_organization": "Hypothesis project",
+    "canonical_document_reference": "https://hypothesis.readthedocs.io/en/latest/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Latest Hypothesis documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "25ecd444c0133c76858744c658aa3c5d7ba0b28565dce470edea07b1f2457763"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "Hypothesis",
+        "version_range": ">=6,<7"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Property-based test generation, invariants, and regression exploration",
+        "roles": ["test_quality_engineer", "python_backend_specialist", "review_judge_repository_agent"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-hypothesis-docs-001",
+        "section_or_fragment_reference": "Hypothesis documentation index and linked strategies/settings references",
+        "summarized_external_statement": "The Hypothesis documentation is the authoritative baseline for property-based test strategies, generated examples, settings, and shrinking behavior.",
+        "applicable_technology_and_version": "Hypothesis >=6,<7",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Latest documentation is rolling; verify exact installed behavior for reproducibility-sensitive tests."]
+      }
+    ],
+    "source_authority_assessment": "authoritative",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "Hypothesis version change, generated-test policy change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-pydantic-v2-docs-0007",
+    "lifecycle_state": "approved",
+    "title": "Pydantic Documentation",
+    "issuing_organization": "Pydantic",
+    "canonical_document_reference": "https://docs.pydantic.dev/latest/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Pydantic v2 documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "8de102f2de42f6a95a991a2424f0829c919d84da899a3838dc5314f3e01b88f3"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "Pydantic",
+        "version_range": ">=2,<3"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Boundary validation, typed data contracts, and untrusted input parsing",
+        "roles": ["python_backend_specialist", "security_specialist", "review_judge_repository_agent"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-pydantic-v2-docs-001",
+        "section_or_fragment_reference": "Pydantic documentation index and linked validation/model references",
+        "summarized_external_statement": "The Pydantic documentation is the official baseline for Pydantic v2 validation, model configuration, and data parsing behavior.",
+        "applicable_technology_and_version": "Pydantic >=2,<3",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Latest documentation is rolling; major-version applicability is restricted to Pydantic v2."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "Pydantic major/minor upgrade, validation-boundary ADR change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-psycopg3-docs-0008",
+    "lifecycle_state": "approved",
+    "title": "Psycopg 3 Documentation",
+    "issuing_organization": "Psycopg project",
+    "canonical_document_reference": "https://www.psycopg.org/psycopg3/docs/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Psycopg 3 documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "085ed1af70a4683e8b53f1e9bbc20ad02f87fcf6f591445d5f87584515ddd994"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "Psycopg",
+        "version_range": ">=3,<4"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "PostgreSQL client behavior, transactions, parameters, and data access boundaries",
+        "roles": ["python_backend_specialist", "data_engineer", "security_specialist"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-psycopg3-docs-001",
+        "section_or_fragment_reference": "Psycopg 3 documentation index and linked usage/transaction/parameter references",
+        "summarized_external_statement": "The Psycopg 3 documentation is the authoritative baseline for PostgreSQL client usage, transaction behavior, parameter handling, and connection semantics.",
+        "applicable_technology_and_version": "Psycopg >=3,<4",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Documentation snapshot must be interpreted with the installed Psycopg 3 version and repository transaction policy."]
+      }
+    ],
+    "source_authority_assessment": "authoritative",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "Psycopg version change, database adapter change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-postgresql-18-docs-0009",
+    "lifecycle_state": "approved",
+    "title": "PostgreSQL 18 Documentation",
+    "issuing_organization": "PostgreSQL Global Development Group",
+    "canonical_document_reference": "https://www.postgresql.org/docs/18/",
+    "source_class": "language_framework_library_database_platform_tool_documentation",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "PostgreSQL 18 documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "46a324c0f037629774a422f8532c535a6040ef6168965a4bb662d1075bd2ca77"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "PostgreSQL",
+        "version_range": "18.*"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Transactional ledger, migrations, permissions, constraints, and database runtime expectations",
+        "roles": ["data_engineer", "security_specialist", "observability_operations_specialist"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-postgresql-18-docs-001",
+        "section_or_fragment_reference": "PostgreSQL 18 documentation index and linked SQL, administration, security, and migration references",
+        "summarized_external_statement": "The PostgreSQL 18 documentation is the official baseline for database behavior, SQL semantics, transactions, roles, privileges, and administration in the pinned major version.",
+        "applicable_technology_and_version": "PostgreSQL 18.*",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Documentation is major-version scoped; patch-level release notes or advisories may be needed for vulnerability-specific findings."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "PostgreSQL major/minor upgrade, migration policy change, advisory, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-docker-compose-spec-docs-0010",
+    "lifecycle_state": "approved",
+    "title": "Docker Compose File Reference",
+    "issuing_organization": "Docker",
+    "canonical_document_reference": "https://docs.docker.com/reference/compose-file/",
+    "source_class": "operations_and_deployment",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Docker Compose file reference snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "94a56a272b95cb1ddecdbe643754cc2ceac4e02879606eaaf85508d75dd50ded"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "Docker Compose file format",
+        "version_range": "repository compose.yaml syntax"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Local PostgreSQL development services and compose.yaml review",
+        "roles": ["devops_ci_cd_specialist", "observability_operations_specialist", "test_quality_engineer"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-docker-compose-spec-docs-001",
+        "section_or_fragment_reference": "Docker Compose file reference and linked services/configuration references",
+        "summarized_external_statement": "The Docker Compose file reference is the official baseline for reviewing Compose service declarations, networks, volumes, environment fields, and local orchestration syntax.",
+        "applicable_technology_and_version": "Repository compose.yaml",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Compose runtime behavior can also depend on installed Docker Engine and Compose plugin versions."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "Compose file change, Docker runtime upgrade, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-github-actions-workflow-docs-0011",
+    "lifecycle_state": "approved",
+    "title": "GitHub Actions Workflow Syntax Documentation",
+    "issuing_organization": "GitHub",
+    "canonical_document_reference": "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax",
+    "source_class": "operations_and_deployment",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "GitHub Actions workflow syntax documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "3e993bad1c2f6f5d45d02dd8d464ce1efa3bb5d422ca7db31729c35c6fbc82a2"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "GitHub Actions workflows",
+        "version_range": "repository .github/workflows/*.yml"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "CI/CD workflow syntax, trigger behavior, permissions, jobs, and required checks",
+        "roles": ["devops_ci_cd_specialist", "security_specialist", "toolchain_quality_reviewer"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-github-actions-workflow-docs-001",
+        "section_or_fragment_reference": "GitHub Actions workflow syntax reference",
+        "summarized_external_statement": "The GitHub Actions workflow syntax documentation is the official baseline for repository workflow structure, triggers, jobs, steps, permissions, and expressions.",
+        "applicable_technology_and_version": "Repository GitHub Actions workflows",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Platform behavior may also depend on organization, repository, and runner configuration outside this file."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "workflow change, GitHub Actions platform change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-github-security-advisories-docs-0012",
+    "lifecycle_state": "approved",
+    "title": "GitHub Security Advisories Documentation",
+    "issuing_organization": "GitHub",
+    "canonical_document_reference": "https://docs.github.com/en/code-security/security-advisories",
+    "source_class": "security_advisories",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "supporting",
+    "document_or_specification_version": "GitHub Security Advisories documentation snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "190de0b3f6b0630545c727bd945e7f0482640dedbc60ef6a12ae623fe718ff41"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "GitHub Security Advisories",
+        "version_range": "repository dependency and advisory monitoring"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Dependency vulnerability monitoring and security review support",
+        "roles": ["security_specialist", "devops_ci_cd_specialist", "review_judge_repository_agent"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-github-security-advisories-docs-001",
+        "section_or_fragment_reference": "GitHub Security Advisories documentation",
+        "summarized_external_statement": "GitHub Security Advisories are an approved support source for dependency and ecosystem advisory monitoring in repository reviews.",
+        "applicable_technology_and_version": "Repository dependency ecosystem",
+        "permitted_evidence_use": "supporting",
+        "known_limitations": ["Advisory presence alone must be linked to an affected dependency version before it can support a current mandatory concern."]
+      }
+    ],
+    "source_authority_assessment": "official",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "new relevant advisory, dependency change, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-json-schema-2020-12-0013",
+    "lifecycle_state": "approved",
+    "title": "JSON Schema Draft 2020-12",
+    "issuing_organization": "JSON Schema",
+    "canonical_document_reference": "https://json-schema.org/draft/2020-12",
+    "source_class": "standards_and_specifications",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "normative",
+    "document_or_specification_version": "Draft 2020-12",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "cdb98e8d91051a9160c364cb2e378c2c027d331fa3d2b831de81f57fff63c668"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "JSON Schema",
+        "version_range": "Draft 2020-12"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Machine-readable governance schemas and contract validation",
+        "roles": ["software_and_system_architect", "test_quality_engineer", "governance_adr_maintainer"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-json-schema-2020-12-001",
+        "section_or_fragment_reference": "Draft 2020-12 specification landing page and linked specification documents",
+        "summarized_external_statement": "JSON Schema Draft 2020-12 is the normative baseline for the repository's governance schema vocabulary and validation semantics.",
+        "applicable_technology_and_version": "JSON Schema Draft 2020-12",
+        "permitted_evidence_use": "normative",
+        "known_limitations": ["Schema validators may implement optional format checks differently unless format validation is explicitly enabled."]
+      }
+    ],
+    "source_authority_assessment": "primary",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "schema dialect change, validator change, new draft adoption, or 2026-10-18"
+  },
+  {
+    "schema_version": "1.0.0",
+    "source_identifier": "engsrc-owasp-asvs-5-0014",
+    "lifecycle_state": "approved",
+    "title": "OWASP Application Security Verification Standard",
+    "issuing_organization": "OWASP Foundation",
+    "canonical_document_reference": "https://owasp.org/www-project-application-security-verification-standard/",
+    "source_class": "standards_and_specifications",
+    "external_publication_status": "final",
+    "internal_registry_status": "approved",
+    "permitted_evidence_use": "supporting",
+    "document_or_specification_version": "ASVS project page snapshot retrieved 2026-07-18",
+    "publication_date": "2026-07-18",
+    "retrieval_date": "2026-07-18T12:37:05+02:00",
+    "content_hash": {
+      "algorithm": "sha256",
+      "value": "82f649376622e31bc83f2660059c947ee8d91d8955f9c5024bd74583f0d2377a"
+    },
+    "applicable_technology_and_version_range": [
+      {
+        "technology": "Application security verification",
+        "version_range": "repository security review baseline"
+      }
+    ],
+    "repository_scope_mapping": [
+      {
+        "repository_area": "Security review support for authentication, authorization, input handling, and operational controls",
+        "roles": ["security_specialist", "software_and_system_architect", "governance_adr_maintainer"]
+      }
+    ],
+    "claims": [
+      {
+        "claim_id": "claim-owasp-asvs-5-001",
+        "section_or_fragment_reference": "OWASP ASVS project page",
+        "summarized_external_statement": "OWASP ASVS is an approved supporting baseline for application-security verification categories and review vocabulary.",
+        "applicable_technology_and_version": "Repository security review surfaces",
+        "permitted_evidence_use": "supporting",
+        "known_limitations": ["Supporting use only; concrete findings must still cite exact repository evidence and a directly applicable requirement or advisory."]
+      }
+    ],
+    "source_authority_assessment": "authoritative",
+    "freshness_status": "current",
+    "conflict_status": "none",
+    "validator": "Codex engineering-source-governance review",
+    "approval_status": "approved",
+    "superseded_sources": [],
+    "superseding_sources": [],
+    "next_review_trigger_or_review_date": "security-baseline update, ASVS version change, or 2026-10-18"
+  }
+  ]
+}
