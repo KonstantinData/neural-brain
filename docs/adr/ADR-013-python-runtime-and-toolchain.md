@@ -5,6 +5,13 @@
 - Decision owner: Konstantin Milonas
 - Notion record: https://app.notion.com/p/39e1c1ac5ec081049f97e82c17f6b120
 - Related task: FND-01.5
+- Authority: current
+- Theme: runtime_and_inference
+- Applies to stages: NB-0, NB-1, NB-2, NB-3, NB-4, NB-5, NB-6, NB-7, NB-8
+- Supersedes: none
+- Superseded by: none
+- Amends: none
+- Amended by: ADR-015, ADR-018
 
 ## Amendment by ADR-018
 

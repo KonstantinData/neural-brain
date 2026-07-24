@@ -5,6 +5,13 @@
 - Decision owner: Konstantin Milonas
 - Notion source: https://app.notion.com/p/39e1c1ac5ec0810e862de4ffe00a0acb
 - Notion page ID: `39e1c1ac-5ec0-810e-862d-e4ffe00a0acb`
+- Authority: current
+- Theme: scope_and_isolation
+- Applies to stages: NB-0, NB-1, NB-2, NB-3, NB-4, NB-5, NB-6, NB-7, NB-8
+- Supersedes: none
+- Superseded by: none
+- Amends: ADR-002, ADR-015
+- Amended by: ADR-018
 
 ## Amendment by ADR-018
 

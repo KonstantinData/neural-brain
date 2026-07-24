@@ -4,6 +4,13 @@
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081b7953ec18893f35c35
 - Notion page ID: `39d1c1ac-5ec0-81b7-953e-c18893f35c35`
+- Authority: retained_subsystem
+- Theme: memory_lifecycle
+- Applies to stages: MS-0, MS-1, MS-2, MS-3, MS-4
+- Supersedes: none
+- Superseded by: ADR-018
+- Amends: none
+- Amended by: ADR-015, ADR-017, ADR-018
 
 ## Supersession by ADR-018
 

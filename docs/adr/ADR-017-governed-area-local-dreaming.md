@@ -5,6 +5,13 @@
 - Decision owner: Konstantin Milonas
 - Notion source: https://app.notion.com/p/39e1c1ac5ec081c1b2d4e1f86d8c7061
 - Notion page ID: `39e1c1ac-5ec0-81c1-b2d4-e1f86d8c7061`
+- Authority: current
+- Theme: memory_lifecycle
+- Applies to stages: MS-1, MS-2, MS-3, MS-4
+- Supersedes: none
+- Superseded by: none
+- Amends: ADR-010, ADR-012, ADR-014, ADR-015
+- Amended by: ADR-018
 
 ## Amendment by ADR-018
 

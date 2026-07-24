@@ -27,6 +27,19 @@ suite. It stops at the first failed command. Invoking `tools/quality.py` without
 the explicit locked-invocation guard is rejected; the guard does not replace
 the required `uv --locked` option.
 
+## ADR authority validation
+
+The ADR cleanup guard checks that `docs/adr/` has a continuous decision
+sequence, a matching `adr-authority.json` inventory, a canonical `STATUS.md`,
+indexed records, valid status metadata, uniform authority headers, required
+decision sections, and reciprocal supersession or amendment references:
+
+```text
+python tools/validate_adrs.py
+```
+
+The same validator is exercised by `tests/architecture/test_accepted_adrs.py`.
+
 ## NB-1 offline training evidence
 
 The bounded EVAL-01 v3 grid search is an offline evidence builder, not a runtime
