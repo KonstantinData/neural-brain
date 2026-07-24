@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from neural_brain.memory import StaleWorkingMemoryVersionError
 from tools.install_memory_core import _verify_applied_prefix
 from tools.memory_demo import FixedLocalContextProvider, main, read_local_environment
 from tools.validate_migrations import Migration
@@ -92,9 +93,31 @@ def test_cli_redacts_failure_details(
     assert main(["--environment-file", str(environment_file)]) == 1
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert captured.err == "memory demo failed: RuntimeError\n"
+    assert captured.err == '{"code": "NB-MC-INTERNAL", "status": "failed"}\n'
     assert secret not in captured.err
     assert "runtime-secret" not in captured.err
+
+
+def test_cli_emits_stable_memory_error_code(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """A known Memory Core failure is actionable without exposing its payload."""
+
+    environment_file = tmp_path / "dev.env"
+    environment_file.write_text(_environment_text(), encoding="utf-8")
+
+    def fail_with_stale_memory(
+        admin_dsn: str, runtime_dsn: str, runtime_role: str
+    ) -> dict[str, object]:
+        del admin_dsn, runtime_dsn, runtime_role
+        raise StaleWorkingMemoryVersionError("version 7 with sensitive context")
+
+    monkeypatch.setattr("tools.memory_demo.run_memory_demo", fail_with_stale_memory)
+
+    assert main(["--environment-file", str(environment_file)]) == 1
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err == '{"code": "NB-MC-STALE-WORKING-MEMORY", "status": "failed"}\n'
 
 
 def test_migration_prefix_rejects_checksum_drift(tmp_path: Path) -> None:

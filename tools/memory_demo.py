@@ -16,7 +16,12 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 from psycopg.conninfo import make_conninfo
 
-from neural_brain.consumer import OidcJwtAuthenticator, OidcJwtConfiguration, OidcMemoryCoreConsumer
+from neural_brain.consumer import (
+    OidcAuthenticationError,
+    OidcJwtAuthenticator,
+    OidcJwtConfiguration,
+    OidcMemoryCoreConsumer,
+)
 from neural_brain.memory import (
     CheckpointRequest,
     MemoryKernelError,
@@ -229,6 +234,14 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _operator_error_code(error: Exception) -> str:
+    """Map an expected boundary failure to its stable, secret-free operator code."""
+
+    if isinstance(error, (MemoryKernelError, OidcAuthenticationError)):
+        return error.code
+    return MemoryKernelError.code
+
+
 def main(argv: list[str] | None = None) -> int:
     """Run the demo without exposing connection strings or credentials."""
 
@@ -241,7 +254,10 @@ def main(argv: list[str] | None = None) -> int:
             environment["NEURAL_BRAIN_DEV_USER"],
         )
     except (OSError, ValueError, RuntimeError, psycopg.Error, MemoryKernelError) as error:
-        print(f"memory demo failed: {type(error).__name__}", file=sys.stderr)
+        print(
+            json.dumps({"code": _operator_error_code(error), "status": "failed"}, sort_keys=True),
+            file=sys.stderr,
+        )
         return 1
     print(json.dumps(result, sort_keys=True))
     return 0
