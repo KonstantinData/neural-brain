@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import argparse
+import json
+import sys
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -107,14 +109,29 @@ def _parse_args(arguments: Sequence[str] | None = None) -> argparse.Namespace:
 def main(arguments: Sequence[str] | None = None) -> int:
     """Verify development and test databases without exposing credentials."""
 
-    args = _parse_args(arguments)
-    environment = _read_environment(args.environment_file)
-    for scope in ("dev", "test"):
-        version = _verify_database(environment, scope)
+    try:
+        args = _parse_args(arguments)
+        environment = _read_environment(args.environment_file)
+        verified_scopes = [
+            {"postgresql_version": _verify_database(environment, scope), "scope": scope}
+            for scope in ("dev", "test")
+        ]
+    except OSError, ValueError, RuntimeError, psycopg.Error:
         print(
-            f"{scope}: PostgreSQL {version}; autocommit, explicit commit, "
-            "and explicit rollback verified"
+            json.dumps({"code": "NB-MC-INTERNAL", "status": "failed"}, sort_keys=True),
+            file=sys.stderr,
         )
+        return 1
+    print(
+        json.dumps(
+            {
+                "status": "passed",
+                "transaction_boundaries_verified": True,
+                "verified_scopes": verified_scopes,
+            },
+            sort_keys=True,
+        )
+    )
     return 0
 
 

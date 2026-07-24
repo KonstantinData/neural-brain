@@ -53,7 +53,9 @@ Verification connects through synchronous Psycopg 3 with `autocommit=True`,
 checks PostgreSQL 18.4, rejects superuser application/test roles, exercises
 explicit commit and rollback transaction blocks with transaction-scoped
 session settings, and proves each probe returns to idle transaction status. It
-never prints credentials.
+prints one secret-free JSON result with the fixed `dev` and `test` scopes only.
+Failures return exit code `1` and the stable `NB-MC-INTERNAL` error envelope;
+neither connection details nor exception text are emitted.
 
 ## Run the Local Memory Core Slice
 
@@ -87,8 +89,9 @@ local workflow:
 Success output is one JSON object containing `"status": "passed"`,
 `"working_memory_version": 1`, `"audit_committed": true`, and
 `"checkpoint_readback": true`. The command accepts no principal, Tenant, Area,
-Project, or Session override. Errors print only the exception class; DSNs and
-credentials are never included.
+Project, or Session override. Failures return exit code `1` and print only a
+secret-free JSON error envelope with a stable operator code; DSNs, credentials,
+tokens, scope values, and exception text are never included.
 
 The persistent migration ledger is stored in the protected
 `neural_brain_install.schema_migrations` table. If product schemas exist without
