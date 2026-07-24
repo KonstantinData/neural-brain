@@ -62,6 +62,7 @@ class AtomicMemoryRepository:
     """MS-1 test double with CAS, idempotency, scope, checkpoint, and audit semantics."""
 
     def __init__(self) -> None:
+        self.observations: dict[tuple[ScopeKey, str], ObservationRecord] = {}
         self.working: dict[tuple[ScopeKey, str], WorkingMemoryRecord] = {}
         self.checkpoints: dict[tuple[ScopeKey, str], CheckpointRecord] = {}
         self.receipts: dict[tuple[ScopeKey, str], tuple[str, MemoryCycleResult]] = {}
@@ -123,6 +124,7 @@ class AtomicMemoryRepository:
                 audit_committed=True,
             )
             self.working[working_key] = working_record
+            self.observations[(key, observation.observation_id)] = observation_record
             self.checkpoints[(key, checkpoint.checkpoint_id)] = checkpoint_record
             self.receipts[receipt_key] = (signature, result)
             self.audit_ids.append(transition_request_id)
@@ -134,6 +136,22 @@ class AtomicMemoryRepository:
         record = self.checkpoints.get((self._key(context), checkpoint_id))
         if record is None:
             raise CheckpointUnavailableError("checkpoint unavailable")
+        return record
+
+    def read_observation(
+        self, *, context: RuntimeContext, observation_id: OpaqueId
+    ) -> ObservationRecord:
+        record = self.observations.get((self._key(context), observation_id))
+        if record is None:
+            raise CheckpointUnavailableError("observation unavailable")
+        return record
+
+    def read_working_memory(
+        self, *, context: RuntimeContext, working_memory_id: OpaqueId
+    ) -> WorkingMemoryRecord:
+        record = self.working.get((self._key(context), working_memory_id))
+        if record is None:
+            raise CheckpointUnavailableError("working memory unavailable")
         return record
 
     def execute_dreaming_dry_run(

@@ -1,6 +1,7 @@
 """Psycopg 3 adapter for the protected MS-1 memory and Dreaming gates."""
 
 from collections.abc import Mapping
+from datetime import datetime
 from typing import Literal, Never
 
 import psycopg
@@ -17,6 +18,7 @@ from neural_brain.memory.errors import (
 from neural_brain.memory.models import (
     CheckpointRecord,
     CheckpointRequest,
+    DataClassification,
     DreamingRequest,
     DreamingResult,
     MemoryCycleResult,
@@ -151,6 +153,43 @@ class PostgresMemoryRepository:
             scope=self._session_scope(context),
         )
 
+    def read_observation(
+        self, *, context: RuntimeContext, observation_id: OpaqueId
+    ) -> ObservationRecord:
+        """Read one observation only through authenticated session scope."""
+        document = self._read_document(
+            context, "SELECT memory_gate.read_observation(%s)", observation_id
+        )
+        occurred_at = self._timestamp(document, "occurred_at")
+        return ObservationRecord(
+            observation_id=self._string(document, "observation_id"),
+            source_kind=self._string(document, "source_kind"),
+            source_ref=self._string(document, "source_ref"),
+            classification=self._classification(document),
+            purpose=self._string(document, "purpose"),
+            content=self._string(document, "content"),
+            occurred_at=occurred_at,
+            scope=self._session_scope(context),
+        )
+
+    def read_working_memory(
+        self, *, context: RuntimeContext, working_memory_id: OpaqueId
+    ) -> WorkingMemoryRecord:
+        """Read one current working-memory value through authenticated session scope."""
+        document = self._read_document(
+            context, "SELECT memory_gate.read_working_memory(%s)", working_memory_id
+        )
+        value = self._object(document, "value")
+        raw_entries = value.get("entries")
+        if not isinstance(raw_entries, list):
+            raise AtomicPersistenceError("working memory entries are not a JSON array")
+        return WorkingMemoryRecord(
+            working_memory_id=self._string(document, "working_memory_id"),
+            version=self._integer(document, "version"),
+            entries=tuple(WorkingMemoryEntryRequest.model_validate(item) for item in raw_entries),
+            scope=self._session_scope(context),
+        )
+
     def execute_dreaming_dry_run(
         self, *, context: RuntimeContext, request: DreamingRequest
     ) -> DreamingResult:
@@ -194,6 +233,23 @@ class PostgresMemoryRepository:
             raise AtomicPersistenceError("database gate returned no result")
         return PostgresMemoryRepository._mapping(row[0], "database gate result")
 
+    def _read_document(
+        self, context: RuntimeContext, query: str, identifier: OpaqueId
+    ) -> dict[str, object]:
+        if context.project_id is None or context.session_id is None:
+            raise ScopeIsolationError("memory read requires project and session scope")
+        try:
+            with (
+                psycopg.connect(self._conninfo, autocommit=True) as connection,
+                connection.transaction(),
+                connection.cursor() as cursor,
+            ):
+                self._set_context(cursor, context, "neural_brain_reader")
+                cursor.execute(query, (identifier,))
+                return self._single_json_result(cursor)
+        except psycopg.Error as error:
+            self._raise_domain_error(error)
+
     @staticmethod
     def _mapping(value: object, label: str) -> dict[str, object]:
         if not isinstance(value, Mapping):
@@ -222,6 +278,32 @@ class PostgresMemoryRepository:
         if not isinstance(value, int) or isinstance(value, bool):
             raise AtomicPersistenceError(f"{key} is not an integer")
         return value
+
+    @staticmethod
+    def _timestamp(document: Mapping[str, object], key: str) -> datetime:
+        value = document.get(key)
+        if not isinstance(value, str):
+            raise AtomicPersistenceError(f"{key} is not a timestamp string")
+        try:
+            timestamp = datetime.fromisoformat(value)
+        except ValueError as error:
+            raise AtomicPersistenceError(f"{key} is malformed") from error
+        if timestamp.tzinfo is None or timestamp.utcoffset() is None:
+            raise AtomicPersistenceError(f"{key} has no timezone")
+        return timestamp
+
+    @staticmethod
+    def _classification(document: Mapping[str, object]) -> DataClassification:
+        classification = PostgresMemoryRepository._string(document, "classification")
+        if classification == "public":
+            return "public"
+        if classification == "internal":
+            return "internal"
+        if classification == "confidential":
+            return "confidential"
+        if classification == "restricted":
+            return "restricted"
+        raise AtomicPersistenceError("classification is invalid")
 
     @staticmethod
     def _false(document: Mapping[str, object], key: str) -> Literal[False]:

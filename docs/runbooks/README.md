@@ -13,3 +13,6 @@ their accepted gates and may not be documented as model-controlled shortcuts.
 
 - [`release-artifacts.md`](release-artifacts.md) defines deterministic release
   evidence, SBOM generation, and GitHub OIDC artifact attestation.
+- [`memory-core-oidc-consumer.md`](memory-core-oidc-consumer.md) deploys the
+  authenticated Memory Core consumer library and its externally managed OIDC
+  configuration.

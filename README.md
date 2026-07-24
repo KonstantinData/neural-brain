@@ -352,10 +352,13 @@ result. A successful result contains `"status": "passed"`,
 command verifies the applied migration checksums and records a new isolated
 cycle without resetting prior development data.
 
-This is a local operator demonstration, not production authentication,
-production deployment, or a stable consumer API. Scope values are fixed by the
-entrypoint and cannot be supplied by the caller. See the
-[local-development runbook](docs/runbooks/local-development.md) and the
+This is a local operator demonstration, not a production deployment. It uses a
+real in-memory RS256 OIDC token and the documented consumer-library entrypoint;
+the caller cannot supply trusted scope values. A production operator must mount
+an externally managed public JWKS file, configure the approved issuer and
+audience, and provision the database principal binding. See the
+[OIDC consumer runbook](docs/runbooks/memory-core-oidc-consumer.md),
+[local-development runbook](docs/runbooks/local-development.md), and the
 [production-readiness ledger](docs/traceability/memory-core-production-readiness.md).
 
 The locked development and quality environment is also executable.

@@ -33,6 +33,9 @@ DEMO_AREA_ID: Final = "area-local-demo"
 DEMO_PROJECT_ID: Final = "project-local-demo"
 DEMO_SESSION_ID: Final = "session-local-demo"
 DEMO_PRINCIPAL_ID: Final = "principal-local-demo"
+DEMO_OIDC_PRINCIPAL_ID: Final = "principal-local-oidc-demo"
+DEMO_OIDC_ISSUER: Final = "https://local.demo.invalid"
+DEMO_OIDC_SUBJECT: Final = "operator-local-demo"
 
 
 def _verify_postgresql_18(connection: psycopg.Connection[tuple[object, ...]]) -> None:
@@ -532,6 +535,15 @@ def verify_product_acl_contract(admin_dsn: str, runtime_role: str) -> None:
                 ("memory_gate", "read_cognitive_checkpoint", role_name, "EXECUTE", False)
                 for role_name in RUNTIME_ROLES
             ]
+            + [
+                ("brain_security", "resolve_authenticated_principal", role_name, "EXECUTE", False)
+                for role_name in RUNTIME_ROLES
+            ]
+            + [
+                ("memory_gate", function_name, role_name, "EXECUTE", False)
+                for function_name in ("read_observation", "read_working_memory")
+                for role_name in RUNTIME_ROLES
+            ]
         )
         if cursor.fetchall() != expected_function_acls:
             raise RuntimeError("A Memory Core function has an untrusted ACL")
@@ -604,6 +616,29 @@ def provision_local_demo_scope(admin_dsn: str) -> str:
     return transition_request_id
 
 
+def provision_local_oidc_demo_subject(admin_dsn: str) -> None:
+    """Bind the fixed local demo Principal to its fixed local OIDC identity."""
+
+    with (
+        psycopg.connect(admin_dsn, autocommit=True) as connection,
+        connection.transaction(),
+        connection.cursor() as cursor,
+    ):
+        cursor.execute("SELECT brain_security.provision_local_oidc_demo_subject()")
+        row = cursor.fetchone()
+    if row is None or not isinstance(row[0], Mapping):
+        raise RuntimeError("The local OIDC demo provisioning gate returned malformed evidence")
+    expected = {
+        "principal_id": DEMO_OIDC_PRINCIPAL_ID,
+        "issuer": DEMO_OIDC_ISSUER,
+        "subject": DEMO_OIDC_SUBJECT,
+    }
+    if any(row[0].get(key) != value for key, value in expected.items()):
+        raise RuntimeError("The local OIDC demo provisioning gate returned conflicting identity")
+    if not isinstance(row[0].get("authenticated_admin"), str):
+        raise RuntimeError("The local OIDC demo provisioning gate omitted its authenticated actor")
+
+
 def install_local_memory_core(admin_dsn: str, runtime_role: str, migrations_dir: Path) -> int:
     """Install migrations, least-privilege runtime grants, and the fixed local demo scope."""
 
@@ -619,6 +654,7 @@ def install_local_memory_core(admin_dsn: str, runtime_role: str, migrations_dir:
             grant_runtime_roles(admin_dsn, runtime_role)
             verify_product_acl_contract(admin_dsn, runtime_role)
             provision_local_demo_scope(admin_dsn)
+            provision_local_oidc_demo_subject(admin_dsn)
             return migration_count
         finally:
             cursor.execute("SELECT pg_catalog.pg_advisory_unlock(%s)", (PROVISIONING_LOCK_ID,))

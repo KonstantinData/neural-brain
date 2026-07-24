@@ -10,6 +10,7 @@ import pytest
 
 from neural_brain.memory import (
     CheckpointRequest,
+    CheckpointUnavailableError,
     DreamingRequest,
     DreamingUnavailableError,
     MemoryService,
@@ -85,6 +86,39 @@ def test_psycopg_adapter_commits_and_reads_the_atomic_cycle(database_dsn: str) -
 
     assert result.checkpoint_id == checkpoint.checkpoint_id
     assert service.read_checkpoint(checkpoint) == result
+    observation = service.read_observation("observation-adapter")
+    working_memory = service.read_working_memory("primary")
+
+    assert observation.source_ref == "consumer-message-adapter"
+    assert observation.content == "Adapter evidence"
+    assert working_memory.working_memory_id == "primary"
+    assert working_memory.version == 1
+    assert working_memory.entries[0].source_observation_id == "observation-adapter"
+
+
+def test_psycopg_adapter_denies_direct_reads_outside_the_authenticated_scope(
+    database_dsn: str,
+) -> None:
+    """Observation and Working Memory reads cannot cross a protected Area boundary."""
+    source_service = _service(database_dsn)
+    _record_cycle(source_service, "foreign-read")
+    foreign_service = MemoryService(
+        context_provider=FixedContextProvider(
+            RuntimeContext(
+                actor_id="principal-b",
+                tenant_id="tenant-a",
+                area_id="area-b",
+                project_id="project-b",
+                session_id="session-b",
+            )
+        ),
+        repository=PostgresMemoryRepository(database_dsn),
+    )
+
+    with pytest.raises(CheckpointUnavailableError):
+        foreign_service.read_observation("observation-foreign-read")
+    with pytest.raises(CheckpointUnavailableError):
+        foreign_service.read_working_memory("primary")
 
 
 def test_psycopg_adapter_rejects_dreaming_without_persisting_any_output(
