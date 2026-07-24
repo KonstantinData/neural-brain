@@ -121,6 +121,24 @@ class InMemoryMemoryRepository:
         except KeyError as error:
             raise CheckpointUnavailableError("checkpoint unavailable") from error
 
+    def read_observation(
+        self, *, context: RuntimeContext, observation_id: OpaqueId
+    ) -> ObservationRecord:
+        """Return absent for both missing and cross-scope observations."""
+        try:
+            return self.observations[(self._scope_key(context), observation_id)]
+        except KeyError as error:
+            raise CheckpointUnavailableError("observation unavailable") from error
+
+    def read_working_memory(
+        self, *, context: RuntimeContext, working_memory_id: OpaqueId
+    ) -> WorkingMemoryRecord:
+        """Return absent for both missing and cross-scope working-memory values."""
+        try:
+            return self.working_memories[(self._scope_key(context), working_memory_id)]
+        except KeyError as error:
+            raise CheckpointUnavailableError("working memory unavailable") from error
+
     def execute_dreaming_dry_run(
         self, *, context: RuntimeContext, request: DreamingRequest
     ) -> DreamingResult:

@@ -8,9 +8,11 @@ from neural_brain.memory.models import (
     DreamingRequest,
     DreamingResult,
     MemoryCycleResult,
+    ObservationRecord,
     ObservationRequest,
     OpaqueId,
     RuntimeContext,
+    WorkingMemoryRecord,
     WorkingMemoryRequest,
 )
 
@@ -42,6 +44,18 @@ class MemoryRepository(Protocol):
         self, *, context: RuntimeContext, checkpoint_id: OpaqueId
     ) -> CheckpointRecord:
         """Read one checkpoint only within authenticated operational scope."""
+        ...
+
+    def read_observation(
+        self, *, context: RuntimeContext, observation_id: OpaqueId
+    ) -> ObservationRecord:
+        """Read one observation only within authenticated session scope."""
+        ...
+
+    def read_working_memory(
+        self, *, context: RuntimeContext, working_memory_id: OpaqueId
+    ) -> WorkingMemoryRecord:
+        """Read one current working-memory value within authenticated session scope."""
         ...
 
     def execute_dreaming_dry_run(

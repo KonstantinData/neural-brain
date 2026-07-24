@@ -17,11 +17,11 @@ ready:
 
 `install_memory_core.py` owns guarded role bootstrap, checksum-ledger migration
 application, least-privilege runtime grants, and audited fixed local scope
-provisioning. `memory_demo.py` calls the public Memory Core service and
-PostgreSQL gates for one atomic write/read round-trip. Use the PowerShell
-entrypoint so the pinned uv release and source path are applied consistently.
-Neither Python tool is a production identity provider or unrestricted scope
-administration interface.
+provisioning. `memory_demo.py` generates an in-memory RS256 local-demo token and
+uses the OIDC consumer library plus PostgreSQL gates for one atomic write and
+scoped read round-trip. Use the PowerShell entrypoint so the pinned uv release
+and source path are applied consistently. Neither Python tool is a production
+identity provider or unrestricted scope-administration interface.
 
 ## Locked quality gate
 

@@ -12,9 +12,11 @@ from neural_brain.memory.models import (
     DreamingResult,
     MemoryCycleResult,
     MemoryScope,
+    ObservationRecord,
     ObservationRequest,
     OpaqueId,
     RuntimeContext,
+    WorkingMemoryRecord,
     WorkingMemoryRequest,
 )
 from neural_brain.memory.ports import MemoryRepository, RuntimeContextProvider
@@ -71,6 +73,24 @@ class MemoryService:
         )
         self._assert_scope(context, checkpoint.scope)
         return checkpoint
+
+    def read_observation(self, observation_id: OpaqueId) -> ObservationRecord:
+        """Read one observation without accepting scope from the caller."""
+        context = self._context_provider.current_context()
+        observation = self._repository.read_observation(
+            context=context, observation_id=observation_id
+        )
+        self._assert_scope(context, observation.scope)
+        return observation
+
+    def read_working_memory(self, working_memory_id: OpaqueId) -> WorkingMemoryRecord:
+        """Read current working memory without accepting scope from the caller."""
+        context = self._context_provider.current_context()
+        working_memory = self._repository.read_working_memory(
+            context=context, working_memory_id=working_memory_id
+        )
+        self._assert_scope(context, working_memory.scope)
+        return working_memory
 
     def run_dreaming_dry_run(self, request: DreamingRequest) -> DreamingResult:
         """Reject Dreaming until its persistent safety prerequisites are implemented."""

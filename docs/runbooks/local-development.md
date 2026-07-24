@@ -98,11 +98,12 @@ downgrade command. Preserve the development volume and restore from a verified
 backup if rollback is required; production backup and restore remain a release
 stop.
 
-The fixed local Principal is not a production identity provider. The database
-login authenticates the local process, while the entrypoint attaches a fixed
-pre-provisioned context and the database independently checks its authority.
-Do not expose the local database port beyond loopback or use this demo as a
-production service.
+The fixed local OIDC Principal is not a production identity provider. The
+entrypoint creates an in-memory RSA key and a signed RS256 token for the fixed
+demo issuer and scope, resolves the subject to a pre-provisioned database
+principal, and the database independently checks its authority. No private key
+or bearer token is written to disk or printed. Do not expose the local database
+port beyond loopback or use this demo as a production service.
 
 ## Reset Only Disposable Test Data
 
