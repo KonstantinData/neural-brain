@@ -102,9 +102,24 @@ jobs:
             --admin-dsn "$MIGRATION_ADMIN_DSN" \
             --migrations-dir migrations)"
           printf '%s\n' "$output"
-          plan_sha256="$(printf '%s\n' "$output" | sed -n 's/^plan-sha256: //p')"
-          fresh_schema_sha256="$(printf '%s\n' "$output" | sed -n 's/^fresh-schema-sha256: //p')"
-          upgraded_schema_sha256="$(printf '%s\n' "$output" | sed -n 's/^upgraded-schema-sha256: //p')"
+          migration_fields="$(printf '%s\n' "$output" | uv run --frozen python -c '
+          import json
+          import re
+          import sys
+
+          evidence = json.load(sys.stdin)
+          required = ("plan_sha256", "fresh_schema_sha256", "upgraded_schema_sha256")
+          if evidence.get("status") != "passed" or any(
+              not isinstance(evidence.get(field), str)
+              or re.fullmatch(r"[0-9a-f]{64}", evidence[field]) is None
+              for field in required
+          ):
+              raise SystemExit("invalid migration validation evidence")
+          print("\\n".join(evidence[field] for field in required))
+          ')"
+          plan_sha256="$(printf '%s\n' "$migration_fields" | sed -n '1p')"
+          fresh_schema_sha256="$(printf '%s\n' "$migration_fields" | sed -n '2p')"
+          upgraded_schema_sha256="$(printf '%s\n' "$migration_fields" | sed -n '3p')"
           test -n "$plan_sha256"
           test "$fresh_schema_sha256" = "$upgraded_schema_sha256"
           printf 'plan_sha256=%s\n' "$plan_sha256" >> "$GITHUB_OUTPUT"
