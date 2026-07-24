@@ -4,6 +4,13 @@
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec0817b97d2dacdbedbd1d9
 - Notion page ID: `39d1c1ac-5ec0-817b-97d2-dacdbedbd1d9`
+- Authority: historical
+- Theme: protected_control
+- Applies to stages: none
+- Supersedes: none
+- Superseded by: ADR-015
+- Amends: none
+- Amended by: none
 
 ## Supersession
 

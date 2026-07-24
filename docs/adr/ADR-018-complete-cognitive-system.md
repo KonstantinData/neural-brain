@@ -3,7 +3,13 @@
 - Status: Accepted
 - Date: 2026-07-16
 - Decision record: https://app.notion.com/p/39f1c1ac5ec0814cbefff9a5a41887b8
+- Authority: current
+- Theme: product_boundary
+- Applies to stages: NB-0, NB-1, NB-2, NB-3, NB-4, NB-5, NB-6, NB-7, NB-8
 - Supersedes: ADR-015
+- Superseded by: none
+- Amends: ADR-001, ADR-003, ADR-005, ADR-010, ADR-013, ADR-014, ADR-016, ADR-017
+- Amended by: none
 
 ## Context
 

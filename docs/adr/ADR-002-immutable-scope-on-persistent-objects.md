@@ -4,6 +4,13 @@
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec0817cb442c04a40a6cffd
 - Notion page ID: `39d1c1ac-5ec0-817c-b442-c04a40a6cffd`
+- Authority: current
+- Theme: scope_and_isolation
+- Applies to stages: NB-0, NB-1, NB-2, NB-3, NB-4, NB-5, NB-6, NB-7, NB-8
+- Supersedes: none
+- Superseded by: none
+- Amends: none
+- Amended by: ADR-015, ADR-016
 
 ## Amendment by ADR-015 and ADR-016
 

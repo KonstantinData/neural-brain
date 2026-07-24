@@ -4,6 +4,13 @@
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec0813488b7e9b58c91d563
 - Notion page ID: `39d1c1ac-5ec0-8134-88b7-e9b58c91d563`
+- Authority: current
+- Theme: ledger_and_evidence
+- Applies to stages: NB-0, NB-1, NB-2, NB-3, NB-4, NB-5, NB-6, NB-7, NB-8
+- Supersedes: none
+- Superseded by: none
+- Amends: none
+- Amended by: ADR-015, ADR-018
 
 ## Amendment by ADR-018
 

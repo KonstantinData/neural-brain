@@ -5,6 +5,13 @@
 - Decision owner: Konstantin Milonas
 - Notion source: https://app.notion.com/p/39e1c1ac5ec081c28b2af5439d510529
 - Notion page ID: `39e1c1ac-5ec0-81c2-8b2a-f5439d510529`
+- Authority: retained_subsystem
+- Theme: product_boundary
+- Applies to stages: MS-0, MS-1, MS-2, MS-3, MS-4
+- Supersedes: ADR-004, ADR-006, ADR-007, ADR-008, ADR-009, ADR-011
+- Superseded by: ADR-018
+- Amends: ADR-001, ADR-002, ADR-003, ADR-005, ADR-010, ADR-012, ADR-013, ADR-014
+- Amended by: ADR-016, ADR-017, ADR-018
 
 ## Supersession by ADR-018
 

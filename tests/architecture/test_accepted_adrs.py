@@ -2,6 +2,8 @@ from pathlib import Path
 
 import pytest
 
+from tools.validate_adrs import validate
+
 REPOSITORY_ROOT = Path(__file__).parents[2]
 ADR_DIRECTORY = REPOSITORY_ROOT / "docs" / "adr"
 
@@ -47,6 +49,24 @@ def test_adr_index_records_complete_continuous_sequence() -> None:
         assert f"[ADR-{number:03d}]" in index
     assert "continuous decision sequence from ADR-001 through\nADR-018" in index
     assert "ADR-018 governs the complete cognitive-system boundary" in index
+    assert "## Current Authority" in index
+    assert "## Thematic Map" in index
+    assert "## Supersession Matrix" in index
+    assert "[`STATUS.md`](STATUS.md)" in index
+
+
+def test_adr_status_records_current_clean_authority_model() -> None:
+    status = (ADR_DIRECTORY / "STATUS.md").read_text(encoding="utf-8")
+    assert "## Current Baseline" in status
+    assert "## Clean Authority Model" in status
+    assert "## Active Revalidation Queue" in status
+    assert "ADR-018" in status
+    assert "ADR-010, ADR-015" in status
+    assert "ADR-004, ADR-006, ADR-007, ADR-008, ADR-009, ADR-011" in status
+
+
+def test_adr_authority_inventory_is_consistent() -> None:
+    validate()
 
 
 def test_adr_018_is_current_complete_system_boundary_decision() -> None:

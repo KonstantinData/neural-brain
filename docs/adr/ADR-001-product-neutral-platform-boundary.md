@@ -4,6 +4,13 @@
 - Date: 2026-07-15
 - Notion source: https://app.notion.com/p/39d1c1ac5ec081828924ca258ee85602
 - Notion page ID: `39d1c1ac-5ec0-8182-8924-ca258ee85602`
+- Authority: current
+- Theme: product_boundary
+- Applies to stages: NB-0, NB-1, NB-2, NB-3, NB-4, NB-5, NB-6, NB-7, NB-8
+- Supersedes: none
+- Superseded by: none
+- Amends: none
+- Amended by: ADR-015, ADR-018
 
 ## Amendment by ADR-018
 
