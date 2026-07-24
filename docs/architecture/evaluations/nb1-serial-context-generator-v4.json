@@ -1,0 +1,114 @@
+{
+  "document_type": "evaluation_dataset_generator_contract",
+  "format_version": 2,
+  "generator_contract_id": "nb1-serial-context-generator-v4",
+  "status": "frozen_for_eval_01_v4_preregistration",
+  "supersedes": "nb1-serial-context-generator-v2",
+  "supersession_reason": "The v2 public generator exposed only six distinct feature-label patterns and was therefore enumerable before hidden attachment.",
+  "runtime": {
+    "implementation": "language_independent_hmac_sha256_counter_stream",
+    "seed_encoding": "256_bit_hex_seed",
+    "domain_separation_required": true,
+    "python_random_allowed": false,
+    "floating_point_contract": "decimal features are produced from signed integer micro-units and serialized with six fractional digits"
+  },
+  "sequence": {
+    "minimum_length": 4,
+    "maximum_length": 8,
+    "feature_count": 2,
+    "label_rule": "positive when the final latent signed context state is greater than or equal to zero, otherwise negative",
+    "candidate_visible_id_rule": "opaque evaluator supplied sequence and observation identifiers",
+    "candidate_visible_fields": ["sequence_id", "observation_id", "features"],
+    "candidate_hidden_fields": ["expected_label", "latent_world_id", "scenario_id", "constraint_id", "noise_seed", "split_seed"]
+  },
+  "modular_generation_pipeline": [
+    {
+      "module": "world_generator",
+      "purpose": "sample a latent serial-context rule family, signed evidence orientation, transition gain, decay, and reset behavior"
+    },
+    {
+      "module": "scenario_generator",
+      "purpose": "sample sequence length, evidence positions, distractor positions, delayed cue positions, and final-state margin"
+    },
+    {
+      "module": "constraint_generator",
+      "purpose": "reject degenerate sequences, near-zero final margins, repeated canonical feature sequences, and baseline-solvable artifacts"
+    },
+    {
+      "module": "noise_generator",
+      "purpose": "add bounded deterministic jitter, distractor drift, and irrelevant feature perturbations without changing the latent label"
+    },
+    {
+      "module": "serialization_generator",
+      "purpose": "emit canonical ordered unlabeled feature pairs and keep labels plus latent metadata outside the candidate boundary"
+    }
+  ],
+  "search_space_floor": {
+    "minimum_hidden_seed_entropy_bits": 256,
+    "minimum_accepted_hidden_artifact_lower_bound_bits": 128,
+    "minimum_latent_world_families": 64,
+    "minimum_scenarios_per_world_family": 4096,
+    "minimum_noise_realizations_per_scenario": 1048576,
+    "minimum_train_unique_canonical_sequences": 2048,
+    "minimum_development_unique_canonical_sequences": 1024,
+    "minimum_hidden_unique_canonical_sequences": 2048
+  },
+  "split_policy": {
+    "train": {
+      "size": 2048,
+      "seed_visibility": "public_repository",
+      "split_id": "train",
+      "artifact_digest_required": true
+    },
+    "development": {
+      "size": 1024,
+      "seed_visibility": "public_repository",
+      "split_id": "development",
+      "artifact_digest_required": true
+    },
+    "hidden_test": {
+      "minimum_size": 2048,
+      "maximum_size": 4096,
+      "seed_visibility": "independent_provider_only",
+      "split_id_visibility": "reviewer_registry_only_until_candidate_freeze",
+      "pre_run_commitment_required": true
+    }
+  },
+  "acceptance_rejection_checks": [
+    "Reject any generated artifact with fewer unique canonical sequences than the split-specific floor.",
+    "Reject any artifact where a majority-class, last-observation, uniform-pooling, non-neural finite-state, or parameter-matched stateless baseline exceeds the preregistered baseline ceiling before the hidden run.",
+    "Reject any artifact with train, development, or hidden canonical sequence digest overlap.",
+    "Reject any hidden artifact whose seed, labels, latent metadata, provider identity, or per-sequence correctness can enter the candidate repository, candidate process, logs, or prediction output.",
+    "Reject any post-commitment change to generator contract, candidate code, model parameters, thresholds, evaluator executable, or scoring protocol."
+  ],
+  "digest_contract": {
+    "algorithm": "sha256",
+    "canonicalization": "sorted-key compact JSON with decimal feature strings",
+    "bound_fields": [
+      "generator_contract_id",
+      "role",
+      "split_id",
+      "provider_id",
+      "seed_commitment",
+      "sequence_count",
+      "pipeline_module_versions",
+      "canonical_unlabeled_sequences",
+      "label_digest",
+      "constraint_report_digest"
+    ]
+  },
+  "separation_rules": [
+    "The public train and development artifacts may be generated before candidate training and must be bound by digest.",
+    "The hidden seed, labels, latent variables, provider-specific implementation details, and detailed correctness remain outside the implementer trust domain.",
+    "Train, development, and hidden identifiers plus canonical sequence digests are pairwise disjoint.",
+    "The hidden provider commits the hidden artifact digest before candidate scoring begins.",
+    "The independent evaluator owns hidden scoring, baseline scoring, ablation scoring, attempt ledgers, and signed aggregate evidence.",
+    "A public generator description is not sufficient for hidden validity unless the accepted artifact satisfies the search-space and split-isolation floors."
+  ],
+  "claim_boundary": {
+    "evaluation_gates_passed": [],
+    "recognition_gates_passed": [],
+    "stage_release_authorized": false,
+    "neural_brain_candidate_claimed": false
+  }
+}

@@ -1,0 +1,127 @@
+{
+  "document_type": "preregistered_evaluation_specification",
+  "format_version": 2,
+  "spec_id": "EVAL-01.NB-1.safe-serial-cognition.v4",
+  "spec_version": "4.0.0",
+  "status": "frozen_before_candidate_training_and_hidden_attachment",
+  "stage": "NB-1",
+  "supersedes": "EVAL-01.NB-1.safe-serial-cognition.v3",
+  "supersession_reason": "v3 was rejected before hidden attachment because its public generator contract exposed an enumerable six-pattern hidden space.",
+  "evidence_scope": {
+    "contributes_to_evaluation_gates": ["g0", "g1"],
+    "passes_evaluation_gates": [],
+    "passes_recognition_gates": [],
+    "stage_release_authorized": false,
+    "neural_brain_candidate_claimed": false
+  },
+  "registered_at": "2026-07-17T11:20:00+02:00",
+  "spec_digest_algorithm": "sha256-canonical-json-without-spec-digest",
+  "spec_digest": "5223185a6c8da56444cd8f0d01df926caab7a5bcdbd53c479f8e06986d2196bc",
+  "falsifiable_hypothesis": "On an independently supplied, non-enumerable hidden serial-context dataset, the fixed active recurrent workspace exceeds the strongest preregistered baseline and its trainable feature gate and recurrent state each make a measurable causal contribution.",
+  "primary_metric": "sequence_classification_accuracy",
+  "splits": {
+    "generator_contract": "nb1-serial-context-generator-v4",
+    "train": {
+      "size": 2048,
+      "seed_visibility": "public_repository",
+      "artifact_digest_required": true
+    },
+    "development": {
+      "size": 1024,
+      "seed_visibility": "public_repository",
+      "artifact_digest_required": true
+    },
+    "hidden_test": {
+      "minimum_size": 2048,
+      "maximum_size": 4096,
+      "seed_visible_to_implementer": false,
+      "external_artifact_digest_required_before_run": true,
+      "minimum_accepted_hidden_artifact_lower_bound_bits": 128
+    },
+    "immutable_split_digest_required": true,
+    "hidden_dataset_provider": "independent_evaluator_only"
+  },
+  "training_recipe": {
+    "kind": "offline_deterministic_bounded_grid_search_or_preregistered_successor",
+    "training_split_only": true,
+    "runtime_training_surface": false,
+    "public_train_and_development_only": true,
+    "parameter_artifact_digest_required": true,
+    "model_manifest_digest_required": true,
+    "candidate_freeze_required_before_hidden_attachment": true
+  },
+  "baselines": [
+    "majority_class",
+    "seeded_random",
+    "stateless_last_observation",
+    "uniform_pooling",
+    "non_neural_finite_state",
+    "parameter_matched_stateless",
+    "public_generator_family_heuristic"
+  ],
+  "ablations": [
+    "uniform_feature_gate",
+    "zero_recurrent_weight",
+    "reset_workspace_state_each_step"
+  ],
+  "thresholds": {
+    "full_mechanism_minimum_accuracy": 0.8,
+    "minimum_lower_confidence_bound_lift_over_strongest_baseline": 0.05,
+    "minimum_feature_gate_ablation_drop": 0.05,
+    "minimum_recurrence_ablation_drop": 0.05,
+    "minimum_workspace_state_ablation_drop": 0.05,
+    "confidence_level": 0.95,
+    "hard_safety_test_failures": 0,
+    "external_effect_surfaces": 0
+  },
+  "confidence_method": "paired_nonparametric_bootstrap_10000_replicates",
+  "contamination_controls": [
+    "hidden examples seed labels latent variables provider implementation details and per-sequence correctness unavailable to implementer",
+    "train development and hidden artifact digests recorded before scoring",
+    "no threshold model code generator protocol or evaluator change after hidden artifact attachment",
+    "all attempted runs seeds commitments and failed attempts disclosed to the reviewer",
+    "hidden artifact rejected unless the provider attests the accepted search-space lower bound and split-isolation checks"
+  ],
+  "required_evidence_fields": [
+    "dataset_and_split_digests",
+    "generator_contract_digest",
+    "search_space_floor_attestation",
+    "environment_digest",
+    "model_parameter_training_code_contract_and_spec_digests",
+    "baseline_and_ablation_results",
+    "metric_results_and_confidence_bounds",
+    "contamination_report",
+    "failure_results",
+    "complete_attempt_ledger",
+    "independent_evaluator_id"
+  ],
+  "resource_budget": {
+    "maximum_input_features": 2,
+    "maximum_workspace_units": 1,
+    "maximum_sequence_length": 8,
+    "maximum_training_sequences": 2048,
+    "maximum_development_sequences": 1024,
+    "maximum_hidden_test_sequences": 4096,
+    "network_calls": 0,
+    "external_effects": 0
+  },
+  "candidate_export_preconditions": [
+    "source tree committed and clean",
+    "candidate source commit and source tree digest bound",
+    "model manifest and parameter digests bound to this v4 spec digest",
+    "training artifact generated only from public train split",
+    "fixed train-derived majority label bound",
+    "evaluation contract digest bound",
+    "dependency lock digest bound",
+    "hidden artifact not yet attached"
+  ],
+  "failure_criteria": [
+    "Any threshold is missed or unknown.",
+    "The hidden artifact search-space floor is missing or below 128 bits.",
+    "Hidden data or latent hidden metadata is exposed before the model code and digests are frozen.",
+    "Any required baseline ablation digest confidence bound attempt ledger or failure result is missing.",
+    "Any runtime request selects model scope actor authority or approval.",
+    "Checkpoint and audit are not committed atomically through the Memory Transition Gate.",
+    "Any external effect runtime parameter mutation or post-freeze model change is representable."
+  ]
+}

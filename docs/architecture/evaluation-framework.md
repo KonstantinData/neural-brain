@@ -37,9 +37,11 @@ Post-hoc threshold edits invalidate the evidence rather than improving it.
 `EVAL-01.NB-1.safe-serial-cognition.v1` is retained as immutable historical
 evidence but was rejected before evaluation because it did not satisfy the
 normative G0/G1 evidence contract. Version 2 was also rejected because its
-recorded registration time followed its actual Git commit. Version 3 supersedes
-both. Version 3 defines only partial evidence contributions toward `g0` and `g1`; it passes no
-evaluation or recognition gate and does not release NB-1.
+recorded registration time followed its actual Git commit. Version 3 superseded
+both but was rejected before hidden attachment after its generator proved
+enumerable. Version 4 is the active preregistered replacement specification.
+It defines only partial evidence contributions toward `g0` and `g1`; it passes
+no evaluation or recognition gate and does not release NB-1.
 
 The EVAL-01 v3 implementation includes a deterministic 27-candidate
 offline grid search over the fixed 512-sequence public training split. Its
@@ -50,11 +52,15 @@ public generator was shown to contain only six distinct feature/label patterns.
 Version 3 is therefore retained unchanged but rejected: its hidden examples are
 enumerable by the implementer and its contamination control cannot pass.
 
-The replacement boundary exposes only unlabeled observations to the candidate,
-binds source, model, training, contract, lockfile, and fixed training-baseline
-evidence in a candidate freeze receipt, and accepts aggregate external evidence
-only with an Ed25519 signature from a reviewer-supplied trusted registry. Hidden
-seeds, labels, detailed correctness, scoring, evaluator code, and signing keys
+The v4 generator contract replaces the six-pattern public generator with a
+modular world/scenario/constraint/noise/serialization pipeline, 256-bit hidden
+seed custody, explicit split-isolation checks, and an accepted hidden-artifact
+search-space floor of at least 128 bits. The replacement boundary exposes only
+unlabeled observations to the candidate, binds source, model, training,
+contract, lockfile, and fixed training-baseline evidence in a candidate freeze
+receipt, and accepts aggregate external evidence only with an Ed25519 signature
+from a reviewer-supplied trusted registry. Hidden seeds, labels, latent
+metadata, detailed correctness, scoring, evaluator code, and signing keys
 remain outside this repository. The intake validates evidence structure and
 authenticity but never grants G0, G1, G8, stage release, or recognition.
 

@@ -21,7 +21,9 @@ implementation trust domain does not satisfy this separation.
 ## Preconditions
 
 1. The evaluation specification and generator contract are frozen before any
-   hidden artifact is attached.
+   hidden artifact is attached. The active replacement pair is
+   `EVAL-01.NB-1.safe-serial-cognition.v4` and
+   `nb1-serial-context-generator-v4`.
 2. The source tree is committed and clean.
 3. The model manifest, parameters, training artifact, candidate code, contract,
    lockfile, source commit, tree digest, fixed training-derived majority label,
@@ -34,10 +36,11 @@ Unknown or missing preconditions stop the run.
 
 ## Candidate export stop
 
-There is currently no exportable candidate. The checked-in model is bound to
-rejected EVAL-01 v3. The export command fails closed for that digest and may
-only become operational after a replacement specification, generator, training
-artifact, and candidate have been frozen and accepted.
+There is currently no exportable v4 candidate. The checked-in model is bound
+to rejected EVAL-01 v3. The export command fails closed for that digest and
+may only become operational after a v4 public train/development artifact,
+training artifact, model manifest, parameters, and candidate freeze receipt
+have been generated and accepted.
 
 When unblocked, the command must reject a dirty worktree. Its output may contain
 learned parameters and public provenance but no hidden example, label, seed,
