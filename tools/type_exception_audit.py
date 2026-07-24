@@ -68,18 +68,42 @@ def _cast_findings(path: Path, tree: ast.AST) -> list[Finding]:
                 if imported.name in typing_modules
             )
 
+    def is_cast_reference(node: ast.AST) -> bool:
+        return (isinstance(node, ast.Name) and node.id in cast_names) or (
+            isinstance(node, ast.Attribute)
+            and node.attr == "cast"
+            and isinstance(node.value, ast.Name)
+            and node.value.id in typing_aliases
+        )
+
+    changed = True
+    while changed:
+        changed = False
+        for node in ast.walk(tree):
+            target_names: list[str] = []
+            value: ast.AST | None = None
+            if isinstance(node, ast.Assign):
+                value = node.value
+                target_names.extend(
+                    target.id for target in node.targets if isinstance(target, ast.Name)
+                )
+            elif isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+                value = node.value
+                target_names.append(node.target.id)
+
+            if value is None or not target_names or not is_cast_reference(value):
+                continue
+
+            for name in target_names:
+                if name not in cast_names:
+                    cast_names.add(name)
+                    changed = True
+
     findings: list[Finding] = []
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
             continue
-        is_named_cast = isinstance(node.func, ast.Name) and node.func.id in cast_names
-        is_attribute_cast = (
-            isinstance(node.func, ast.Attribute)
-            and node.func.attr == "cast"
-            and isinstance(node.func.value, ast.Name)
-            and node.func.value.id in typing_aliases
-        )
-        if is_named_cast or is_attribute_cast:
+        if is_cast_reference(node.func):
             findings.append(Finding(_relative(path), node.lineno, "cast"))
     return findings
 

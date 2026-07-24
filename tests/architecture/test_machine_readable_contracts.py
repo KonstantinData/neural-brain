@@ -92,9 +92,10 @@ def test_scope_and_memory_core_invariants_remain_explicit() -> None:
     contract = _load("system-boundary.json")
     scope = contract["scope"]
     assert isinstance(scope, dict)
-    assert scope["object_hierarchy"] == ["brain", "tenant", "area", "project", "session", "goal"]
+    assert scope["object_hierarchy"] == ["brain", "tenant", "area", "project", "session"]
     assert scope["isolation_scope_order"] == ["brain", "tenant", "area", "project", "session"]
     assert scope["goal_is_scope_dimension"] is False
+    assert scope["session_bound_protected_aggregates"] == ["goal"]
     assert scope["trusted_source"] == "authenticated runtime context"
 
     memory = contract["memory_core"]

@@ -35,12 +35,16 @@ if ($DockerArguments[0] -eq "volume" -and $DockerArguments[1] -eq "ls") {
     if ($env:FAKE_DOCKER_MODE -eq "list-failure") {
         exit 2
     }
-    Write-Output "neural-brain-postgres-test-data"
+    Write-Output $env:FAKE_DOCKER_VOLUME
     exit 0
 }
 if ($DockerArguments[0] -eq "volume" -and $DockerArguments[1] -eq "inspect") {
     if ($env:FAKE_DOCKER_MODE -eq "inspect-failure") {
         exit 2
+    }
+    if ($env:FAKE_DOCKER_MODE -eq "valid") {
+        Write-Output $env:FAKE_DOCKER_VALID_INSPECT
+        exit 0
     }
     Write-Output '[{"Labels":{"com.docker.compose.project":"untrusted","com.docker.compose.volume":"postgres_test_data"}}]'
     exit 0
@@ -60,6 +64,9 @@ def _write_environment(path: Path, *, test_database: str) -> None:
                 "NEURAL_BRAIN_DEV_USER=neural_brain_dev",
                 "NEURAL_BRAIN_DEV_PASSWORD=test-only-dev-secret",
                 "NEURAL_BRAIN_DEV_PORT=55432",
+                "NEURAL_BRAIN_COMPOSE_PROJECT=neural-brain-test-abcdef123456",
+                "NEURAL_BRAIN_POSTGRES_ADMIN_USER=postgres",
+                "NEURAL_BRAIN_POSTGRES_ADMIN_PASSWORD=test-only-admin-secret",
                 f"NEURAL_BRAIN_TEST_DB={test_database}",
                 "NEURAL_BRAIN_TEST_USER=neural_brain_test",
                 "NEURAL_BRAIN_TEST_PASSWORD=test-only-test-secret",
@@ -81,6 +88,11 @@ def _run_reset(tmp_path: Path, *, mode: str, test_database: str) -> tuple[int, s
     _write_environment(environment_file, test_database=test_database)
     log_file = tmp_path / "docker.log"
     environment = os.environ.copy()
+    environment["FAKE_DOCKER_VOLUME"] = "neural-brain-test-abcdef123456-postgres-test-data"
+    environment["FAKE_DOCKER_VALID_INSPECT"] = (
+        '[{"Labels":{"com.docker.compose.project":"neural-brain-test-abcdef123456",'
+        '"com.docker.compose.volume":"postgres_test_data"}}]'
+    )
     environment["FAKE_DOCKER_LOG"] = str(log_file)
     environment["FAKE_DOCKER_MODE"] = mode
 
@@ -116,11 +128,13 @@ def test_reset_rejects_non_disposable_database_before_volume_removal(
     )
 
     assert returncode != 0
+    assert "stop postgres-test" not in log
+    assert "rm --force postgres-test" not in log
     assert "volume rm" not in log
 
 
 @pytest.mark.parametrize("mode", ("wrong-labels", "list-failure", "inspect-failure"))
-def test_reset_never_removes_volume_when_ownership_cannot_be_proven(
+def test_reset_does_not_mutate_docker_state_when_ownership_cannot_be_proven(
     tmp_path: Path,
     mode: str,
 ) -> None:
@@ -131,4 +145,25 @@ def test_reset_never_removes_volume_when_ownership_cannot_be_proven(
     )
 
     assert returncode != 0
+    assert "stop postgres-test" not in log
+    assert "rm --force postgres-test" not in log
     assert "volume rm" not in log
+
+
+def test_reset_removes_test_volume_only_after_successful_preflight(tmp_path: Path) -> None:
+    returncode, log = _run_reset(
+        tmp_path,
+        mode="valid",
+        test_database="neural_brain_test",
+    )
+
+    assert returncode == 0
+    assert (
+        "volume ls --quiet --filter name=^neural-brain-test-abcdef123456-postgres-test-data$" in log
+    )
+    assert "volume inspect neural-brain-test-abcdef123456-postgres-test-data" in log
+    assert log.index("volume inspect") < log.index("stop postgres-test")
+    assert log.index("rm --force postgres-test") < log.index(
+        "volume rm neural-brain-test-abcdef123456-postgres-test-data"
+    )
+    assert "up --detach --wait postgres-test" in log
