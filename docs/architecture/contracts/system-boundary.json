@@ -59,9 +59,10 @@
     ]
   },
   "scope": {
-    "object_hierarchy": ["brain", "tenant", "area", "project", "session", "goal"],
+    "object_hierarchy": ["brain", "tenant", "area", "project", "session"],
     "isolation_scope_order": ["brain", "tenant", "area", "project", "session"],
     "goal_is_scope_dimension": false,
+    "session_bound_protected_aggregates": ["goal"],
     "trusted_source": "authenticated runtime context",
     "untrusted_sources": [
       "prompts",

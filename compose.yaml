@@ -1,4 +1,4 @@
-name: neural-brain
+name: ${NEURAL_BRAIN_COMPOSE_PROJECT:?local environment not initialized}
 
 x-postgres-base: &postgres-base
   image: docker.io/library/postgres:18.4-bookworm@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
@@ -13,14 +13,18 @@ services:
   postgres-dev:
     <<: *postgres-base
     environment:
-      POSTGRES_DB: ${NEURAL_BRAIN_DEV_DB:?local environment not initialized}
-      POSTGRES_USER: ${NEURAL_BRAIN_DEV_USER:?local environment not initialized}
-      POSTGRES_PASSWORD: ${NEURAL_BRAIN_DEV_PASSWORD:?local environment not initialized}
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${NEURAL_BRAIN_POSTGRES_ADMIN_USER:?local environment not initialized}
+      POSTGRES_PASSWORD: ${NEURAL_BRAIN_POSTGRES_ADMIN_PASSWORD:?local environment not initialized}
       POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+      NEURAL_BRAIN_SCOPE_DB: ${NEURAL_BRAIN_DEV_DB:?local environment not initialized}
+      NEURAL_BRAIN_SCOPE_USER: ${NEURAL_BRAIN_DEV_USER:?local environment not initialized}
+      NEURAL_BRAIN_SCOPE_PASSWORD: ${NEURAL_BRAIN_DEV_PASSWORD:?local environment not initialized}
     ports:
       - 127.0.0.1:${NEURAL_BRAIN_DEV_PORT:?local environment not initialized}:5432
     volumes:
       - postgres_dev_data:/var/lib/postgresql
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 2s
@@ -31,14 +35,18 @@ services:
   postgres-test:
     <<: *postgres-base
     environment:
-      POSTGRES_DB: ${NEURAL_BRAIN_TEST_DB:?local environment not initialized}
-      POSTGRES_USER: ${NEURAL_BRAIN_TEST_USER:?local environment not initialized}
-      POSTGRES_PASSWORD: ${NEURAL_BRAIN_TEST_PASSWORD:?local environment not initialized}
+      POSTGRES_DB: postgres
+      POSTGRES_USER: ${NEURAL_BRAIN_POSTGRES_ADMIN_USER:?local environment not initialized}
+      POSTGRES_PASSWORD: ${NEURAL_BRAIN_POSTGRES_ADMIN_PASSWORD:?local environment not initialized}
       POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256 --auth-local=scram-sha-256
+      NEURAL_BRAIN_SCOPE_DB: ${NEURAL_BRAIN_TEST_DB:?local environment not initialized}
+      NEURAL_BRAIN_SCOPE_USER: ${NEURAL_BRAIN_TEST_USER:?local environment not initialized}
+      NEURAL_BRAIN_SCOPE_PASSWORD: ${NEURAL_BRAIN_TEST_PASSWORD:?local environment not initialized}
     ports:
       - 127.0.0.1:${NEURAL_BRAIN_TEST_PORT:?local environment not initialized}:5432
     volumes:
       - postgres_test_data:/var/lib/postgresql
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 2s
@@ -48,6 +56,6 @@ services:
 
 volumes:
   postgres_dev_data:
-    name: neural-brain-postgres-dev-data
+    name: ${NEURAL_BRAIN_COMPOSE_PROJECT:?local environment not initialized}-postgres-dev-data
   postgres_test_data:
-    name: neural-brain-postgres-test-data
+    name: ${NEURAL_BRAIN_COMPOSE_PROJECT:?local environment not initialized}-postgres-test-data

@@ -15,10 +15,11 @@
 
 ## Amendment by ADR-018
 
-ADR-018 extends the complete protected-object hierarchy with a session-bound
-Goal aggregate while retaining this ADR's authenticated isolation scope through
-Session. The original decision below remains the accepted historical scope
-record for the Memory Core.
+ADR-018 adds complete-system Goal state as a session-bound protected aggregate
+while retaining this ADR's catalog hierarchy and authenticated isolation scope
+through Session. Goal is not a catalog entry or isolation dimension. The
+original decision below remains the accepted historical scope record for the
+Memory Core.
 
 ## Context
 

@@ -19,12 +19,25 @@ $EnvironmentFile = if ([string]::IsNullOrWhiteSpace($LocalEnvironmentFile)) {
 else {
     [System.IO.Path]::GetFullPath($LocalEnvironmentFile)
 }
-$TestVolume = "neural-brain-postgres-test-data"
 
 function New-RandomSecret {
     $bytes = [byte[]]::new(32)
     [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
     return [Convert]::ToHexString($bytes).ToLowerInvariant()
+}
+
+function New-LocalProjectName {
+    $sha256 = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $normalizedRoot = $Root.ToLowerInvariant()
+        $bytes = [System.Text.Encoding]::UTF8.GetBytes($normalizedRoot)
+        $hash = $sha256.ComputeHash($bytes)
+        $suffix = -join ($hash[0..5] | ForEach-Object { $_.ToString("x2") })
+        return "neural-brain-$suffix"
+    }
+    finally {
+        $sha256.Dispose()
+    }
 }
 
 function Protect-LocalSecretFile {
@@ -66,6 +79,27 @@ function Protect-LocalSecretFile {
     }
 }
 
+function Set-LocalValueIfMissing {
+    param(
+        [Parameter(Mandatory)][string]$Name,
+        [Parameter(Mandatory)][string]$Value
+    )
+
+    $prefix = "$Name="
+    $existing = Get-Content -LiteralPath $EnvironmentFile |
+        Where-Object { $_.StartsWith($prefix, [StringComparison]::Ordinal) } |
+        Select-Object -First 1
+    if ($null -ne $existing) {
+        return
+    }
+
+    [System.IO.File]::AppendAllText(
+        $EnvironmentFile,
+        "$Name=$Value$([System.Environment]::NewLine)",
+        [System.Text.UTF8Encoding]::new($false)
+    )
+}
+
 function Assert-DockerAvailable {
     if ($null -eq (Get-Command $DockerCommand -ErrorAction SilentlyContinue)) {
         throw "Docker is required for the local PostgreSQL environment."
@@ -79,6 +113,9 @@ function Assert-DockerAvailable {
 
 function Ensure-LocalEnvironment {
     if (Test-Path -LiteralPath $EnvironmentFile -PathType Leaf) {
+        Set-LocalValueIfMissing -Name "NEURAL_BRAIN_COMPOSE_PROJECT" -Value (New-LocalProjectName)
+        Set-LocalValueIfMissing -Name "NEURAL_BRAIN_POSTGRES_ADMIN_USER" -Value "postgres"
+        Set-LocalValueIfMissing -Name "NEURAL_BRAIN_POSTGRES_ADMIN_PASSWORD" -Value (New-RandomSecret)
         Protect-LocalSecretFile
         return
     }
@@ -99,6 +136,9 @@ function Ensure-LocalEnvironment {
         $lines,
         [System.Text.UTF8Encoding]::new($false)
     )
+    Set-LocalValueIfMissing -Name "NEURAL_BRAIN_COMPOSE_PROJECT" -Value (New-LocalProjectName)
+    Set-LocalValueIfMissing -Name "NEURAL_BRAIN_POSTGRES_ADMIN_USER" -Value "postgres"
+    Set-LocalValueIfMissing -Name "NEURAL_BRAIN_POSTGRES_ADMIN_PASSWORD" -Value (New-RandomSecret)
     Protect-LocalSecretFile
 }
 
@@ -115,10 +155,17 @@ function Get-LocalValue {
     return $line.Substring($prefix.Length)
 }
 
+function Get-TestVolumeName {
+    $composeProject = Get-LocalValue -Name "NEURAL_BRAIN_COMPOSE_PROJECT"
+    return "$composeProject-postgres-test-data"
+}
+
 function Invoke-Compose {
     param([Parameter(Mandatory)][string[]]$Arguments)
 
+    $composeProject = Get-LocalValue -Name "NEURAL_BRAIN_COMPOSE_PROJECT"
     & $DockerCommand compose `
+        --project-name $composeProject `
         --project-directory $Root `
         --env-file $EnvironmentFile `
         --file $ComposeFile `
@@ -155,7 +202,8 @@ switch ($Command) {
         Invoke-Compose -Arguments @("up", "--detach", "--wait")
         & uvx --from "uv==0.11.28" uv `
             --project $Root `
-            run --locked python (Join-Path $Root "tools/postgres_smoke.py")
+            run --locked python (Join-Path $Root "tools/postgres_smoke.py") `
+            --environment-file $EnvironmentFile
         if ($LASTEXITCODE -ne 0) {
             throw "PostgreSQL smoke verification failed."
         }
@@ -168,30 +216,35 @@ switch ($Command) {
             throw "Refusing reset because the configured database is not disposable test data."
         }
 
-        Invoke-Compose -Arguments @("stop", "postgres-test")
-        Invoke-Compose -Arguments @("rm", "--force", "postgres-test")
+        $composeProject = Get-LocalValue -Name "NEURAL_BRAIN_COMPOSE_PROJECT"
+        $testVolume = Get-TestVolumeName
 
         $existingVolumes = @(
-            & $DockerCommand volume ls --quiet --filter "name=^$TestVolume$"
+            & $DockerCommand volume ls --quiet --filter "name=^$testVolume$"
         )
         if ($LASTEXITCODE -ne 0) {
             throw "Cannot determine whether the isolated test volume exists."
         }
 
-        if ($existingVolumes -contains $TestVolume) {
-            $volumeJson = & $DockerCommand volume inspect $TestVolume
+        if ($existingVolumes -contains $testVolume) {
+            $volumeJson = & $DockerCommand volume inspect $testVolume
             if ($LASTEXITCODE -ne 0) {
                 throw "Cannot verify the isolated test volume ownership."
             }
             $volume = @($volumeJson | ConvertFrom-Json)[0]
             if (
-                $volume.Labels."com.docker.compose.project" -ne "neural-brain" -or
+                $volume.Labels."com.docker.compose.project" -ne $composeProject -or
                 $volume.Labels."com.docker.compose.volume" -ne "postgres_test_data"
             ) {
                 throw "Refusing reset because the test volume ownership labels do not match."
             }
+        }
 
-            & $DockerCommand volume rm $TestVolume | Out-Null
+        Invoke-Compose -Arguments @("stop", "postgres-test")
+        Invoke-Compose -Arguments @("rm", "--force", "postgres-test")
+
+        if ($existingVolumes -contains $testVolume) {
+            & $DockerCommand volume rm $testVolume | Out-Null
             if ($LASTEXITCODE -ne 0) {
                 throw "Failed to remove the isolated test volume."
             }

@@ -86,7 +86,7 @@ historical inputs that require explicit revalidation before implementation.
 | [ADR-013](ADR-013-python-runtime-and-toolchain.md) | Accepted, amended by ADR-018 | Current | Runtime and inference | Current Python baseline with later-stage runtime choices gated |
 | [ADR-014](ADR-014-local-ollama-only-inference.md) | Accepted, amended by ADR-018 | Current | Runtime and inference | Local Ollama inference as an untrusted bounded dependency |
 | [ADR-015](ADR-015-memory-system-not-agent-runtime.md) | Superseded as product boundary by ADR-018; retained for Memory Core | Retained subsystem | Product boundary | Governed memory-system boundary retained for Memory Core |
-| [ADR-016](ADR-016-hierarchy-catalog-and-operational-memory-scope.md) | Accepted, amended by ADR-018 | Current | Scope and isolation | Brain-to-Goal hierarchy; isolation ends at Session |
+| [ADR-016](ADR-016-hierarchy-catalog-and-operational-memory-scope.md) | Accepted, amended by ADR-018 | Current | Scope and isolation | Brain-to-Session catalog hierarchy; Goal is a session-bound aggregate |
 | [ADR-017](ADR-017-governed-area-local-dreaming.md) | Accepted, amended by ADR-018 | Current | Memory lifecycle | Governed Area-local offline Memory Core Dreaming |
 | [ADR-018](ADR-018-complete-cognitive-system.md) | Accepted | Current | Product boundary | Neural Brain is a complete protected cognitive system |
 

@@ -316,6 +316,15 @@ evidence; it is not executable truth.
 - [Machine-readable contracts](docs/architecture/contracts/README.md),
   [threat model](docs/architecture/threat-model.md), and
   [repository governance](docs/governance/README.md)
+- [Repository agent context](docs/governance/repository-agent-context.md)
+  for applying global Codex skills inside Neural Brain
+- [Engineering source governance](docs/governance/engineering-source-governance.md)
+  and [Neural Brain source profile](docs/governance/engineering-source-profile.json)
+- [Engineering source registry](docs/governance/engineering-source-registry.md),
+  [engineering source records](docs/governance/engineering-source-records.json),
+  [source record schema](docs/governance/engineering-source-registry.schema.json),
+  [source governance audit records](docs/governance/source-governance-audit-records.md),
+  and [architecture evolution register](docs/governance/architecture-evolution-register.md)
 - [Operational runbooks](docs/runbooks/README.md) and
   [release evidence](docs/runbooks/release-artifacts.md)
 

@@ -22,7 +22,8 @@ ADR-017.
 
 ## Memory Core contracts
 
-- `scope-catalog.json`: strict Brain-to-Goal object lineage; Goal is not an isolation dimension.
+- `scope-catalog.json`: strict Brain-to-Session catalog lineage; Goal is a
+  session-bound protected aggregate, not a catalog entry or isolation dimension.
 - `envelopes.json`: authenticated memory requests and records.
 - `memory-lifecycle.json`: Memory Gate operations and lifecycle.
 - `memory-stage-capabilities.json`: cumulative, separately namespaced MS-0

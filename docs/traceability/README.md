@@ -80,6 +80,14 @@ The checkbox is an assertion backed by its adjacent evidence, not a substitute
 for a test. Failed or unexecuted checks remain explicit and prevent completion
 when they are required by the acceptance criteria.
 
+## Versioned Evidence Records
+
+- [`FND-01-foundation-baseline.md`](FND-01-foundation-baseline.md): historical
+  PR #1 Foundation baseline evidence and remediation mapping.
+- [`neural-brain-capability-matrix.md`](neural-brain-capability-matrix.md):
+  current capability-to-evidence matrix for the Foundation and first NB-1
+  implementation slice.
+
 ## Reconciliation Rules
 
 Before a pull request or final handoff:
