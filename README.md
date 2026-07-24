@@ -361,6 +361,21 @@ audience, and provision the database principal binding. See the
 [local-development runbook](docs/runbooks/local-development.md), and the
 [production-readiness ledger](docs/traceability/memory-core-production-readiness.md).
 
+### Build the consumer library
+
+The authenticated consumer library is distributable as a source archive and
+wheel. From a clean checkout with uv 0.11.28:
+
+```powershell
+uvx --from uv==0.11.28 uv build --offline --out-dir dist --clear
+```
+
+The command creates `dist/neural_brain-0.0.0.tar.gz` and a matching wheel. The
+artifact contains the typed `neural_brain.consumer` entrypoint but no OIDC
+configuration, JWKS, database DSN, bearer token, Principal binding, or runtime
+service. Configure those values through the external operator path documented
+in the OIDC consumer runbook.
+
 The locked development and quality environment is also executable.
 
 Prerequisite: uv 0.11.28.

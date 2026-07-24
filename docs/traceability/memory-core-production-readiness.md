@@ -14,8 +14,8 @@ Active coordination record:
 
 | Readiness item | State | Repository evidence | Next production gap |
 | --- | --- | --- | --- |
-| Runnable entrypoint | Authenticated library and local demo available | `tools/dev.ps1 memory-demo`; `neural_brain.consumer.OidcMemoryCoreConsumer`; unit and live PostgreSQL tests | Package and deploy an application runtime separately from the library. |
-| Deployment/runtime | Local PostgreSQL slice available | `compose.yaml`; `tools/dev.ps1`; clean-database round-trip test | Package and deploy the application runtime separately from its database. |
+| Runnable entrypoint | Authenticated library, local demo, and installable artifacts available | `tools/dev.ps1 memory-demo`; `neural_brain.consumer.OidcMemoryCoreConsumer`; `uv build --offline`; unit and live PostgreSQL tests | Deploy an application runtime separately from the library. |
+| Deployment/runtime | Reproducible library distribution available | `uv_build`; offline sdist/wheel test; `compose.yaml`; `tools/dev.ps1` | Deploy an application runtime separately from its database. |
 | Config and secrets | OIDC library configuration available | Random ignored `.local/dev.env`, operator-mounted public JWKS, issuer/audience validation, redacted failures | Define deployed secret injection, JWKS rotation, and issuer revocation operations. |
 | Observability/logging | Partial | Atomic `memory_audit.events` and secret-free result output | Add health/readiness, structured logs, metrics, audit query, and alerting. |
 | Error handling | Partial | Typed fail-closed domain errors; checksum and ambiguous-state rejection; nonzero CLI exit | Define stable operator error codes and recovery actions. |
@@ -48,6 +48,8 @@ evidence also proves repeatable installation and fail-closed checksum drift.
 - The local Compose stack is not a production deployment.
 - The consumer library is not an HTTP service endpoint and does not fetch JWKS
   keys over the network.
+- A buildable wheel is not a hosted runtime, a registry publication, or a
+  deployment rollout.
 - The demonstrated Memory Core slice does not complete MS-1, NB-1, or any
   Neural Brain recognition gate.
 - No external effect, Dreaming execution, model promotion, or cognition-stage

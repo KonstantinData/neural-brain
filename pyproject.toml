@@ -10,6 +10,10 @@ dependencies = [
     "pydantic>=2,<3",
 ]
 
+[build-system]
+requires = ["uv_build>=0.11.28,<0.12"]
+build-backend = "uv_build"
+
 [dependency-groups]
 dev = [
     "hypothesis>=6,<7",
@@ -21,7 +25,7 @@ dev = [
 
 [tool.uv]
 required-version = "==0.11.28"
-package = false
+package = true
 python-preference = "only-managed"
 
 [tool.ruff]
