@@ -310,9 +310,13 @@ def apply_migrations(admin_dsn: str, migrations_dir: Path) -> int:
 
 
 def harden_local_database_ownership(admin_dsn: str, runtime_role: str) -> None:
-    """Move database ownership to the fixed NOLOGIN owner and restrict the runtime login."""
+    """Atomically move ownership and restrict the runtime login without a CONNECT gap."""
 
-    with psycopg.connect(admin_dsn, autocommit=True) as connection, connection.cursor() as cursor:
+    with (
+        psycopg.connect(admin_dsn, autocommit=True) as connection,
+        connection.transaction(),
+        connection.cursor() as cursor,
+    ):
         _verify_postgresql_18(connection)
         cursor.execute(
             "SELECT current_database(), pg_catalog.pg_get_userbyid(datdba) "
@@ -377,9 +381,8 @@ def _read_fixed_role_memberships(
         "FROM pg_catalog.pg_auth_members AS membership "
         "JOIN pg_catalog.pg_roles AS granted ON granted.oid = membership.roleid "
         "JOIN pg_catalog.pg_roles AS member ON member.oid = membership.member "
-        "WHERE granted.rolname = ANY(%s) OR member.rolname = ANY(%s) "
-        "OR member.rolname = %s ORDER BY granted.rolname, member.rolname",
-        (list(ROLE_NAMES), list(ROLE_NAMES), runtime_role),
+        "WHERE member.rolname = %s ORDER BY granted.rolname, member.rolname",
+        (runtime_role,),
     )
     return cursor.fetchall()
 
@@ -403,7 +406,8 @@ def validate_fixed_role_graph(admin_dsn: str, runtime_role: str) -> None:
         _verify_postgresql_18(connection)
         _verify_runtime_role(cursor, runtime_role)
         expected = set(_expected_fixed_role_memberships(runtime_role))
-        if not set(_read_fixed_role_memberships(cursor, runtime_role)).issubset(expected):
+        memberships = set(_read_fixed_role_memberships(cursor, runtime_role))
+        if not memberships.issubset(expected):
             raise RuntimeError("The fixed role memberships are not least-privilege")
 
 
