@@ -75,4 +75,8 @@ def test_postgresql_scope_roles_are_not_superusers() -> None:
     assert "NOCREATEDB" in POSTGRES_INIT
     assert "NOCREATEROLE" in POSTGRES_INIT
     assert "NOREPLICATION" in POSTGRES_INIT
-    assert 'CREATE DATABASE :"scope_db" OWNER :"scope_user"' in POSTGRES_INIT
+    assert 'CREATE DATABASE :"scope_db" OWNER neural_brain_owner' in POSTGRES_INIT
+    assert "CREATE ROLE neural_brain_owner" in POSTGRES_INIT
+    assert 'GRANT CONNECT ON DATABASE :"scope_db" TO :"scope_user"' in POSTGRES_INIT
+    assert "TEMPORARY" not in POSTGRES_INIT
+    assert 'REVOKE ALL ON SCHEMA public FROM :"scope_user"' in POSTGRES_INIT

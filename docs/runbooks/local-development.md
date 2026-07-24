@@ -51,9 +51,58 @@ Both ports bind only to loopback. Host authentication uses SCRAM-SHA-256.
 
 Verification connects through synchronous Psycopg 3 with `autocommit=True`,
 checks PostgreSQL 18.4, rejects superuser application/test roles, exercises
-explicit commit and rollback transaction blocks with temporary writes, and
-proves each probe returns to idle transaction status. It never prints
-credentials.
+explicit commit and rollback transaction blocks with transaction-scoped
+session settings, and proves each probe returns to idle transaction status. It
+never prints credentials.
+
+## Run the Local Memory Core Slice
+
+From a clean checkout with Docker Desktop running:
+
+```powershell
+.\tools\dev.ps1 memory-demo
+```
+
+The command normally completes in under ten minutes and performs one bounded
+local workflow:
+
+1. generate owner-protected random local database credentials if absent;
+2. start the loopback-only PostgreSQL 18.4 development service;
+3. create or harden the fixed `NOLOGIN` Memory Core roles;
+4. apply pending repository migrations one transaction at a time while holding
+   an installation advisory lock;
+5. reject any applied migration whose name or SHA-256 digest differs from the
+   current checkout;
+6. keep database ownership on the fixed `NOLOGIN` owner and grant the local
+   non-superuser login only connection plus Memory Gate ingest/read access;
+7. provision the fixed local demo hierarchy and Principal binding through the
+   authenticated administrative provisioning gate with append-only audit
+   evidence;
+8. commit one observation, Working Memory version, checkpoint, transition
+   receipt, and audit event through `MemoryService` and the protected PostgreSQL
+   gate; and
+9. read the checkpoint back through the reader gate and print only non-secret
+   result identifiers and booleans.
+
+Success output is one JSON object containing `"status": "passed"`,
+`"working_memory_version": 1`, `"audit_committed": true`, and
+`"checkpoint_readback": true`. The command accepts no principal, Tenant, Area,
+Project, or Session override. Errors print only the exception class; DSNs and
+credentials are never included.
+
+The persistent migration ledger is stored in the protected
+`neural_brain_install.schema_migrations` table. If product schemas exist without
+that ledger, or an applied checksum differs, installation fails closed instead
+of adopting or rewriting the database. This first operator slice has no
+downgrade command. Preserve the development volume and restore from a verified
+backup if rollback is required; production backup and restore remain a release
+stop.
+
+The fixed local Principal is not a production identity provider. The database
+login authenticates the local process, while the entrypoint attaches a fixed
+pre-provisioned context and the database independently checks its authority.
+Do not expose the local database port beyond loopback or use this demo as a
+production service.
 
 ## Reset Only Disposable Test Data
 

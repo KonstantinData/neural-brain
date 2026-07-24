@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("up", "down", "status", "verify", "reset-test")]
+    [ValidateSet("up", "down", "status", "verify", "memory-demo", "reset-test")]
     [string]$Command = "status",
     [string]$DockerCommand = "docker",
     [string]$LocalEnvironmentFile = ""
@@ -22,8 +22,14 @@ else {
 
 function New-RandomSecret {
     $bytes = [byte[]]::new(32)
-    [System.Security.Cryptography.RandomNumberGenerator]::Fill($bytes)
-    return [Convert]::ToHexString($bytes).ToLowerInvariant()
+    $generator = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+    try {
+        $generator.GetBytes($bytes)
+    }
+    finally {
+        $generator.Dispose()
+    }
+    return -join ($bytes | ForEach-Object { $_.ToString("x2") })
 }
 
 function New-LocalProjectName {
@@ -40,6 +46,13 @@ function New-LocalProjectName {
     }
 }
 
+function Get-LocalFileSecurity {
+    $sections = [System.Security.AccessControl.AccessControlSections]::Owner -bor `
+        [System.Security.AccessControl.AccessControlSections]::Access
+    return New-Object System.Security.AccessControl.FileSecurity `
+        -ArgumentList $EnvironmentFile, $sections
+}
+
 function Protect-LocalSecretFile {
     if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
         $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
@@ -47,7 +60,7 @@ function Protect-LocalSecretFile {
             throw "Cannot determine the current Windows identity for local secret protection."
         }
 
-        $security = Get-Acl -LiteralPath $EnvironmentFile
+        $security = Get-LocalFileSecurity
         $owner = $security.GetOwner([System.Security.Principal.SecurityIdentifier])
         if ($owner -ne $identity) {
             throw "Refusing to change a local secret file owned by another identity."
@@ -59,12 +72,15 @@ function Protect-LocalSecretFile {
             throw "Failed to restrict the generated local secret file to its owner."
         }
 
-        $protectedAcl = Get-Acl -LiteralPath $EnvironmentFile
+        $protectedAcl = Get-LocalFileSecurity
+        $accessRules = $protectedAcl.GetAccessRules(
+            $true,
+            $true,
+            [System.Security.Principal.SecurityIdentifier]
+        )
         $unexpectedRules = @(
-            $protectedAcl.Access | Where-Object {
-                $_.IdentityReference.Translate(
-                    [System.Security.Principal.SecurityIdentifier]
-                ) -ne $identity -or $_.IsInherited
+            $accessRules | Where-Object {
+                $_.IdentityReference -ne $identity -or $_.IsInherited
             }
         )
         if (-not $protectedAcl.AreAccessRulesProtected -or $unexpectedRules.Count -gt 0) {
@@ -206,6 +222,27 @@ switch ($Command) {
             --environment-file $EnvironmentFile
         if ($LASTEXITCODE -ne 0) {
             throw "PostgreSQL smoke verification failed."
+        }
+    }
+    "memory-demo" {
+        Assert-DockerAvailable
+        Ensure-LocalEnvironment
+        Invoke-Compose -Arguments @("up", "--detach", "--wait", "postgres-dev")
+        $previousPythonPath = [Environment]::GetEnvironmentVariable("PYTHONPATH", "Process")
+        try {
+            [Environment]::SetEnvironmentVariable(
+                "PYTHONPATH", (Join-Path $Root "src"), "Process"
+            )
+            & uvx --from "uv==0.11.28" uv `
+                --project $Root `
+                run --locked python -m tools.memory_demo `
+                --environment-file $EnvironmentFile
+            if ($LASTEXITCODE -ne 0) {
+                throw "Local Memory Core demo failed."
+            }
+        }
+        finally {
+            [Environment]::SetEnvironmentVariable("PYTHONPATH", $previousPythonPath, "Process")
         }
     }
     "reset-test" {
