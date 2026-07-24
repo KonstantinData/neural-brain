@@ -27,6 +27,40 @@ suite. It stops at the first failed command. Invoking `tools/quality.py` without
 the explicit locked-invocation guard is rejected; the guard does not replace
 the required `uv --locked` option.
 
+## Codex development model routing
+
+At a safe development-task start, select and record the process route with a
+declared token and attempt limit:
+
+```text
+uv run --locked --all-groups python tools/select_codex_model.py \
+  --task-id NB-ROUTING-EXAMPLE \
+  --rationale-code routine_bounded_task \
+  --budget-limit 120000 \
+  --attempt-limit 2 \
+  --task-phase safe_task_start
+```
+
+The standard result is GPT-5.6 Terra with medium reasoning. Add one or more
+`--trigger` values only when a versioned escalation condition actually holds;
+two or more `--failed-attempts` derive the repeated-attempt trigger
+automatically. The command prints secret-free JSON and appends the same record
+to ignored `.local/codex-model-routing.jsonl`.
+
+Task-specific justification uses the enumerated `--rationale-code`; arbitrary
+free text is intentionally rejected so the evidence path cannot receive a
+copied credential or token. A Sol rationale code must match at least one active
+Sol trigger. The versioned policy supplies the corresponding human-readable
+reason.
+
+The command automates policy validation, deterministic selection, attempt-limit
+blocking, safe-start deferral, and evidence recording. It does not reconfigure
+the Codex runtime. An external task launcher or operator must apply and verify
+the selected model and reasoning depth. Without that verification, the record
+is `external_runtime_application_required` or
+`deferred_to_next_safe_task_start`, never falsely `applied`. Routing evidence
+cannot change Memory/Tenant boundaries, approvals, authority, or Human Gates.
+
 ## ADR authority validation
 
 The ADR cleanup guard checks that `docs/adr/` has a continuous decision

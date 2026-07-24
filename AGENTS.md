@@ -42,6 +42,30 @@ evidence, and review gates. If a global skill conflicts with repository-local
 governance, the local Neural Brain rule wins unless an authorized repository
 decision changes it.
 
+## Codex Development Model Routing
+
+Codex development work in this repository uses the executable, versioned
+process policy in `docs/governance/codex-model-routing-v1.json` through
+`tools/select_codex_model.py`. This policy governs development-agent routing;
+it does not select or authorize a Neural Brain product-runtime model and does
+not amend ADR-014.
+
+- The standard route is GPT-5.6 Terra with medium reasoning depth.
+- GPT-5.6 Sol with high reasoning depth is selected only for a security
+  contract, a major architecture decision, a conflict with an accepted Claude
+  alignment, repeated unsuccessful solution attempts, or high context
+  complexity.
+- Every selection records policy version, task ID, model, reasoning depth,
+  trigger, rationale, budget limit, attempt limit, task phase, and application
+  status in the ignored local append-only evidence log.
+- The repository tool selects and records a route but cannot apply it to the
+  Codex runtime. If the active runtime cannot switch during an in-progress
+  task, the record must defer application to the next safe task start. Never
+  claim a route was applied without externally verified runtime evidence.
+- A routing decision is advisory process evidence only. It never changes
+  authenticated scope, Tenant or Area boundaries, authority, approvals,
+  Memory Gates, Human Gates, or any protected product state.
+
 ## Language and Durable Artifacts
 
 - Write code, identifiers, docstrings, commit messages, tests, technical docs,

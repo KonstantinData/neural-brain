@@ -1,0 +1,36 @@
+{
+  "policy_id": "neural-brain-codex-development-model-routing",
+  "version": 1,
+  "record_schema_version": 1,
+  "default_route": {
+    "model": "gpt-5.6-terra",
+    "reasoning_depth": "medium"
+  },
+  "escalation_route": {
+    "model": "gpt-5.6-sol",
+    "reasoning_depth": "high"
+  },
+  "failed_attempts_threshold": 2,
+  "escalation_triggers": [
+    {
+      "code": "security_contract",
+      "rationale": "The task changes or validates a security contract."
+    },
+    {
+      "code": "major_architecture_decision",
+      "rationale": "The task requires a large, durable architecture decision."
+    },
+    {
+      "code": "claude_alignment_conflict",
+      "rationale": "The task conflicts with an accepted Claude alignment."
+    },
+    {
+      "code": "repeated_unsuccessful_attempts",
+      "rationale": "The bounded standard-route attempts were repeatedly unsuccessful."
+    },
+    {
+      "code": "high_context_complexity",
+      "rationale": "The task context is too complex for the standard route."
+    }
+  ]
+}
