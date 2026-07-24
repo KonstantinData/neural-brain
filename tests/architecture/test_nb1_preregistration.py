@@ -9,7 +9,7 @@ from pydantic import TypeAdapter
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT_PATH = ROOT / "docs/architecture/contracts/nb1-safe-serial-cognition.json"
-SPEC_PATH = ROOT / "docs/architecture/evaluations/nb1-safe-serial-cognition-v3.json"
+SPEC_PATH = ROOT / "docs/architecture/evaluations/nb1-safe-serial-cognition-v4.json"
 JSON_OBJECT = TypeAdapter(dict[str, Any])
 
 
@@ -40,19 +40,25 @@ def test_nb1_contract_is_internal_serial_and_effect_free() -> None:
     assert contract["serial_cycle"][-1] == "commit_next_checkpoint_and_evidence"
 
 
-def test_nb1_evaluation_specification_is_frozen_and_self_consistent() -> None:
+def test_nb1_v4_evaluation_specification_is_frozen_and_self_consistent() -> None:
     specification = _load(SPEC_PATH)
 
-    assert specification["status"] == "frozen_before_hidden_evaluation"
+    assert specification["status"] == "frozen_before_candidate_training_and_hidden_attachment"
     assert specification["stage"] == "NB-1"
-    assert specification["supersedes"] == "EVAL-01.NB-1.safe-serial-cognition.v2"
+    assert specification["supersedes"] == "EVAL-01.NB-1.safe-serial-cognition.v3"
     assert specification["evidence_scope"]["contributes_to_evaluation_gates"] == ["g0", "g1"]
     assert specification["evidence_scope"]["passes_evaluation_gates"] == []
     assert specification["evidence_scope"]["passes_recognition_gates"] == []
+    assert specification["evidence_scope"]["neural_brain_candidate_claimed"] is False
     assert specification["spec_digest"] == _canonical_digest(specification)
     assert specification["thresholds"]["external_effect_surfaces"] == 0
     assert specification["resource_budget"]["network_calls"] == 0
+    assert specification["resource_budget"]["maximum_sequence_length"] == 8
     assert len(specification["ablations"]) == 3
     assert specification["evidence_scope"]["stage_release_authorized"] is False
     assert specification["splits"]["hidden_test"]["seed_visible_to_implementer"] is False
+    assert (
+        specification["splits"]["hidden_test"]["minimum_accepted_hidden_artifact_lower_bound_bits"]
+        >= 128
+    )
     assert len(specification["baselines"]) >= 6

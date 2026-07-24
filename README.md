@@ -101,6 +101,10 @@ The current implementation includes early, reusable prerequisites:
 - a label-free candidate interface, complete candidate freeze receipt, and
   Ed25519-signed external-evidence intake that keep hidden labels, scoring, and
   evaluator key custody outside this repository and never grant a gate;
+- the preregistered `EVAL-01.NB-1.safe-serial-cognition.v4` replacement
+  specification plus `nb1-serial-context-generator-v4`, which replace the
+  rejected enumerable v3 hidden space before any v4 candidate or hidden
+  artifact exists;
 - a dedicated PostgreSQL cognitive checkpoint adapter and migration that keep
   CAS, transition evidence, trusted training/model provenance, receipt, and
   audit inside one existing Memory Transition Gate transaction;
@@ -365,8 +369,9 @@ are documented in the [local-development runbook](docs/runbooks/local-developmen
 Passing repository tests proves only the tested Foundation, Memory Core, and
 first NB-1 implementation surfaces. EVAL-01 v3 cannot supply accepted hidden
 evidence because its enumerable generator violates its own contamination
-boundary. A replacement specification and candidate must be frozen before an
-independent provider attaches any hidden artifact;
+boundary. EVAL-01 v4 is now only a preregistered replacement specification and
+generator contract. A v4-bound candidate must still be trained and frozen
+before an independent provider attaches any hidden artifact;
 neither repository tests nor that evaluation alone complete NB-1, satisfy
 Neural Brain recognition, or authorize production use.
 

@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT = ROOT / "docs" / "architecture" / "contracts" / "nb1-hidden-evaluation.json"
-GENERATOR = ROOT / "docs" / "architecture" / "evaluations" / "nb1-serial-context-generator-v2.json"
+GENERATOR = ROOT / "docs" / "architecture" / "evaluations" / "nb1-serial-context-generator-v4.json"
 REJECTION = (
     ROOT / "docs" / "architecture" / "evaluations" / "nb1-safe-serial-cognition-v3-rejection.json"
 )
@@ -19,7 +19,13 @@ def _load(path: Path) -> dict[str, object]:
 
 def test_candidate_boundary_never_accepts_hidden_labels_or_gate_decisions() -> None:
     contract = _load(CONTRACT)
-    assert contract["evaluation_spec"] == "replacement_required_before_operation"
+    assert contract["evaluation_spec"] == "EVAL-01.NB-1.safe-serial-cognition.v4"
+    assert (
+        contract["evaluation_spec_status"]
+        == "frozen_before_candidate_training_and_hidden_attachment"
+    )
+    assert contract["generator_contract"] == "nb1-serial-context-generator-v4"
+    assert contract["candidate_export_status"] == "blocked_until_v4_candidate_freeze_receipt_exists"
     assert contract["rejected_historical_spec"] == "EVAL-01.NB-1.safe-serial-cognition.v3"
     candidate = contract["candidate_boundary"]
     assert isinstance(candidate, dict)
@@ -43,9 +49,27 @@ def test_external_evaluator_owns_labels_scoring_and_complete_attempt_ledger() ->
     assert evaluator["candidate_external_effects"] == 0
 
 
-def test_generator_contract_freezes_public_splits_and_hides_hidden_seed() -> None:
+def test_v4_generator_contract_is_modular_non_enumerable_and_hides_hidden_seed() -> None:
     generator = _load(GENERATOR)
-    splits = generator["splits"]
+    assert generator["generator_contract_id"] == "nb1-serial-context-generator-v4"
+    runtime = generator["runtime"]
+    assert isinstance(runtime, dict)
+    assert runtime["python_random_allowed"] is False
+    modules = generator["modular_generation_pipeline"]
+    assert isinstance(modules, list)
+    assert {module["module"] for module in modules if isinstance(module, dict)} == {
+        "world_generator",
+        "scenario_generator",
+        "constraint_generator",
+        "noise_generator",
+        "serialization_generator",
+    }
+    floor = generator["search_space_floor"]
+    assert isinstance(floor, dict)
+    assert floor["minimum_hidden_seed_entropy_bits"] >= 256
+    assert floor["minimum_accepted_hidden_artifact_lower_bound_bits"] >= 128
+    assert floor["minimum_train_unique_canonical_sequences"] >= 2048
+    splits = generator["split_policy"]
     assert isinstance(splits, dict)
     train = splits["train"]
     development = splits["development"]
@@ -54,11 +78,16 @@ def test_generator_contract_freezes_public_splits_and_hides_hidden_seed() -> Non
     assert isinstance(development, dict)
     assert isinstance(hidden, dict)
 
-    assert train == {"size": 512, "seed": 1931, "split_id": "train"}
-    assert development == {"size": 256, "seed": 7727, "split_id": "development"}
-    assert hidden["minimum_size"] == 512
+    assert train["size"] == 2048
+    assert train["seed_visibility"] == "public_repository"
+    assert development["size"] == 1024
+    assert development["seed_visibility"] == "public_repository"
+    assert hidden["minimum_size"] == 2048
     assert hidden["maximum_size"] == 4096
-    assert hidden["seed_visibility"] == "independent_evaluator_only"
+    assert hidden["seed_visibility"] == "independent_provider_only"
+    sequence = generator["sequence"]
+    assert isinstance(sequence, dict)
+    assert "expected_label" in sequence["candidate_hidden_fields"]
 
 
 def test_contract_explicitly_denies_self_certified_independence_or_gate_passes() -> None:

@@ -3,7 +3,7 @@
 - Status: Implementation plan
 - Governing decision: ADR-018
 - Parent milestone: NB-1
-- Evaluation specification: `EVAL-01.NB-1.safe-serial-cognition.v3`
+- Evaluation specification: `EVAL-01.NB-1.safe-serial-cognition.v4`
 
 ## Boundary
 
@@ -27,12 +27,12 @@ NB-1 stage release evidence or authorization to use `Neural Brain Candidate`.
 
 | Work package | Current evidence | Remaining before package completion |
 | --- | --- | --- |
-| NB-1.1 | v1-v3 are immutable evaluation history; v3 was rejected before hidden attachment after its generator was proven enumerable | Freeze and independently accept a replacement specification, generator, and complete stage harness before hidden attachment |
-| NB-1.2 | One-unit recurrent mechanism, bounded trainable feature gate, deterministic train-only grid search, self-verifying offline bundle, label-free candidate boundary, candidate freeze receipt, and signed external-evidence intake implemented | EVAL-01 v3 is rejected because generator v2 has only six enumerable patterns; freeze a replacement specification and candidate, then obtain an external hidden artifact, independent run, contamination report, threshold review, and accepted evidence |
+| NB-1.1 | v1-v3 are immutable evaluation history; v3 was rejected before hidden attachment after its generator was proven enumerable; v4 replacement specification and generator contract are preregistered | Independently accept the v4 specification/generator and complete stage harness before hidden attachment |
+| NB-1.2 | One-unit recurrent mechanism, bounded trainable feature gate, deterministic train-only grid search, self-verifying offline bundle, label-free candidate boundary, candidate freeze receipt, and signed external-evidence intake implemented for the rejected v3 candidate | Generate public v4 train/development artifacts, train and freeze a v4-bound candidate, then obtain an external hidden artifact, independent run, contamination report, threshold review, and accepted evidence |
 | NB-1.3 | Dedicated PostgreSQL cognition adapter and migration keep checkpoint, transition envelope, trusted training/model evidence, receipt, and audit inside one Memory Transition Gate transaction; PostgreSQL 18 evidence covers CAS, replay, scope, corruption, restart, and rollback | Complete through merged PR #8; broader NB-1 release remains gated |
 | NB-1.4 | Internal Goal and Plan proposals implemented without an action or effect surface | Separate causal executive-control evidence |
 | NB-1.5 | `continue` and `ask` activation-ambiguity proposals implemented | Calibrated uncertainty plus reachable `defer`, `stop`, and recovery behavior |
-| NB-1.6 | Six baselines, three ablations, confidence intervals, deterministic development evaluation, training/environment hashes, label-free candidate output, and signed evidence intake implemented | Replacement preregistration, independent hidden artifact and run, contamination report, complete safety results, and gate review |
+| NB-1.6 | Six baselines, three ablations, confidence intervals, deterministic development evaluation, training/environment hashes, label-free candidate output, signed evidence intake, and v4 replacement preregistration implemented | v4-bound candidate freeze, independent hidden artifact and run, contamination report, complete safety results, and gate review |
 
 ## Acceptance rule
 

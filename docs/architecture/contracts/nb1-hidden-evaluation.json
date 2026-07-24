@@ -5,8 +5,11 @@
   "contract_version": "1.0.0",
   "status": "implementation_boundary",
   "decision": "ADR-018",
-  "evaluation_spec": "replacement_required_before_operation",
+  "evaluation_spec": "EVAL-01.NB-1.safe-serial-cognition.v4",
+  "evaluation_spec_status": "frozen_before_candidate_training_and_hidden_attachment",
+  "generator_contract": "nb1-serial-context-generator-v4",
   "rejected_historical_spec": "EVAL-01.NB-1.safe-serial-cognition.v3",
+  "candidate_export_status": "blocked_until_v4_candidate_freeze_receipt_exists",
   "candidate_boundary": {
     "allowed_inputs": [
       "opaque_run_id",
