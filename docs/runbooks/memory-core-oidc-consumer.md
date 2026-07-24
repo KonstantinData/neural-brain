@@ -108,3 +108,20 @@ database DSN rotation as deployment changes. Verify them in a disposable
 database before rollout with `pytest` and the quality gates. A hosted service,
 health endpoint, structured runtime observability, backups, and production
 deployment automation remain separate readiness items in the ledger.
+
+## Stable operator failures
+
+Catch the typed library errors and present their `code`, never a database or
+token exception chain. The codes below are stable operator-facing contracts;
+they do not disclose whether an unavailable record is absent or belongs to
+another scope.
+
+| Code | Meaning | Operator recovery |
+| --- | --- | --- |
+| `NB-MC-AUTHENTICATION-FAILED` | The bearer token, JWKS, issuer, audience, or principal mapping was rejected. | Verify the mounted public JWKS, issuer, audience, clock, token claims, and active principal binding; do not retry with changed scope claims. |
+| `NB-MC-SCOPE-DENIED` | The authenticated principal lacks the required protected scope or authority. | Review the authenticated principal binding and required tenant/Area authority; do not use request values to alter scope. |
+| `NB-MC-RECORD-UNAVAILABLE` | A checkpoint, Observation, or Working Memory value is unavailable in the authenticated scope. | Confirm the identifier and authenticated Project/Session; treat cross-scope absence as unavailable. |
+| `NB-MC-STALE-WORKING-MEMORY` | The supplied Working Memory version is stale. | Read the current protected value, reconcile the caller state, and submit a new bounded cycle. |
+| `NB-MC-INVALID-CYCLE` | The requested atomic cycle violates the Memory Core contract. | Correct the client payload and observation-to-memory linkage; do not bypass the Memory Gate. |
+| `NB-MC-PERSISTENCE-FAILED` | A protected persistence operation could not complete. | Preserve the request identifier, inspect audited database health, and reconcile before any retry. |
+| `NB-MC-DREAMING-UNAVAILABLE` | Dreaming lacks its required gates. | Do not retry; Dreaming is not an available runtime operation. |

@@ -3,3 +3,5 @@
 
 class OidcAuthenticationError(RuntimeError):
     """Raised when a bearer token cannot establish trusted runtime context."""
+
+    code = "NB-MC-AUTHENTICATION-FAILED"

@@ -22,6 +22,7 @@ from neural_brain.memory import (
     ObservationRequest,
     OpaqueId,
     RuntimeContext,
+    ScopeIsolationError,
     StaleWorkingMemoryVersionError,
     WorkingMemoryEntryRequest,
     WorkingMemoryRecord,
@@ -456,3 +457,13 @@ def test_postgres_repository_rejects_dreaming_before_opening_a_connection(
                 requested_reason="direct adapter call",
             ),
         )
+
+
+def test_memory_errors_expose_stable_operator_codes() -> None:
+    """Operator codes preserve fail-closed categories without parsing messages."""
+    assert InvalidMemoryCycleError.code == "NB-MC-INVALID-CYCLE"
+    assert ScopeIsolationError.code == "NB-MC-SCOPE-DENIED"
+    assert StaleWorkingMemoryVersionError.code == "NB-MC-STALE-WORKING-MEMORY"
+    assert CheckpointUnavailableError.code == "NB-MC-RECORD-UNAVAILABLE"
+    assert AtomicPersistenceError.code == "NB-MC-PERSISTENCE-FAILED"
+    assert DreamingUnavailableError.code == "NB-MC-DREAMING-UNAVAILABLE"

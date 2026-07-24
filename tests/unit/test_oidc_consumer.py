@@ -247,3 +247,8 @@ def test_issuer_configuration_rejects_non_https_and_ambiguous_values() -> None:
         OidcJwtConfiguration(issuer="http://issuer.example.test", audience=_AUDIENCE)
     with pytest.raises(ValueError):
         OidcJwtConfiguration(issuer=f"{_ISSUER}/", audience=_AUDIENCE)
+
+
+def test_oidc_authentication_failure_exposes_a_stable_operator_code() -> None:
+    """Token diagnostics remain typed without exposing a raw bearer token."""
+    assert OidcAuthenticationError.code == "NB-MC-AUTHENTICATION-FAILED"
