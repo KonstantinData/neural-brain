@@ -87,6 +87,9 @@ when they are required by the acceptance criteria.
 - [`neural-brain-capability-matrix.md`](neural-brain-capability-matrix.md):
   current capability-to-evidence matrix for the Foundation and first NB-1
   implementation slice.
+- [`memory-core-production-readiness.md`](memory-core-production-readiness.md):
+  current operator-readiness gaps and verified progress for the first deployable
+  Memory Core milestone.
 
 ## Reconciliation Rules
 

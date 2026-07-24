@@ -334,8 +334,31 @@ evidence; it is not executable truth.
 
 ## Quick Start
 
-There is no production Neural Brain service to start. The locked development
-and quality environment is executable.
+There is no production Neural Brain service yet. The first runnable local
+Memory Core slice installs the protected schema, provisions one fixed local
+authenticated scope, commits an observation-backed Working Memory checkpoint
+with audit evidence, and reads the checkpoint back:
+
+```powershell
+.\tools\dev.ps1 memory-demo
+```
+
+From a clean checkout with Docker Desktop running, this one command creates an
+owner-protected `.local/dev.env`, starts PostgreSQL 18.4 on loopback, applies
+checksum-verified migrations under an advisory lock, grants only the ingest and
+read gate roles to the local non-superuser login, and prints a secret-free JSON
+result. A successful result contains `"status": "passed"`,
+`"audit_committed": true`, and `"checkpoint_readback": true`. Re-running the
+command verifies the applied migration checksums and records a new isolated
+cycle without resetting prior development data.
+
+This is a local operator demonstration, not production authentication,
+production deployment, or a stable consumer API. Scope values are fixed by the
+entrypoint and cannot be supplied by the caller. See the
+[local-development runbook](docs/runbooks/local-development.md) and the
+[production-readiness ledger](docs/traceability/memory-core-production-readiness.md).
+
+The locked development and quality environment is also executable.
 
 Prerequisite: uv 0.11.28.
 

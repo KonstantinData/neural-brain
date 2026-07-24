@@ -36,36 +36,30 @@ def _verify_application_role(cursor: psycopg.Cursor[tuple[object, ...]]) -> None
         raise RuntimeError("Local scope role must not be a PostgreSQL superuser.")
 
 
-def _verify_transaction_mutation(connection: psycopg.Connection[tuple[object, ...]]) -> None:
-    with connection.cursor() as cursor:
-        cursor.execute(
-            "CREATE TEMPORARY TABLE neural_brain_smoke_probe "
-            "(marker text PRIMARY KEY) ON COMMIT PRESERVE ROWS"
-        )
-
+def _verify_transaction_boundaries(connection: psycopg.Connection[tuple[object, ...]]) -> None:
     with connection.transaction(), connection.cursor() as cursor:
-        cursor.execute("INSERT INTO neural_brain_smoke_probe (marker) VALUES ('commit')")
+        cursor.execute("SET application_name = 'neural-brain-commit-probe'")
     if connection.info.transaction_status is not TransactionStatus.IDLE:
         raise RuntimeError("The explicit commit probe left an open transaction.")
     with connection.cursor() as cursor:
-        cursor.execute("SELECT COUNT(*) FROM neural_brain_smoke_probe WHERE marker = 'commit'")
+        cursor.execute("SHOW application_name")
         row = cursor.fetchone()
-    if row != (1,):
-        raise RuntimeError("The explicit commit probe did not persist its write.")
+    if row != ("neural-brain-commit-probe",):
+        raise RuntimeError("The explicit commit probe did not persist its session setting.")
 
     try:
         with connection.transaction(), connection.cursor() as cursor:
-            cursor.execute("INSERT INTO neural_brain_smoke_probe (marker) VALUES ('rollback')")
+            cursor.execute("SET application_name = 'neural-brain-rollback-probe'")
             raise _RollbackProbe
     except _RollbackProbe:
         pass
     if connection.info.transaction_status is not TransactionStatus.IDLE:
         raise RuntimeError("The explicit rollback probe left an open transaction.")
     with connection.cursor() as cursor:
-        cursor.execute("SELECT COUNT(*) FROM neural_brain_smoke_probe WHERE marker = 'rollback'")
+        cursor.execute("SHOW application_name")
         row = cursor.fetchone()
-    if row != (0,):
-        raise RuntimeError("The explicit rollback probe persisted a rolled-back write.")
+    if row != ("neural-brain-commit-probe",):
+        raise RuntimeError("The explicit rollback probe persisted its session setting.")
 
 
 def _verify_database(environment: dict[str, str], scope: str) -> str:
@@ -95,7 +89,7 @@ def _verify_database(environment: dict[str, str], scope: str) -> str:
         if connection.info.transaction_status is not TransactionStatus.IDLE:
             raise RuntimeError("The smoke query left an open database transaction.")
 
-        _verify_transaction_mutation(connection)
+        _verify_transaction_boundaries(connection)
         return version
 
 

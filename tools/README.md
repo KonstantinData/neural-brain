@@ -6,6 +6,23 @@ maintenance commands for the repository.
 Tools must fail safely, require explicit scope where applicable, and must not
 provide unrestricted mutation paths around protected state or audit controls.
 
+## Local Memory Core round-trip
+
+Run the first bounded operator slice from a clean checkout with Docker Desktop
+ready:
+
+```powershell
+.\tools\dev.ps1 memory-demo
+```
+
+`install_memory_core.py` owns guarded role bootstrap, checksum-ledger migration
+application, least-privilege runtime grants, and audited fixed local scope
+provisioning. `memory_demo.py` calls the public Memory Core service and
+PostgreSQL gates for one atomic write/read round-trip. Use the PowerShell
+entrypoint so the pinned uv release and source path are applied consistently.
+Neither Python tool is a production identity provider or unrestricted scope
+administration interface.
+
 ## Locked quality gate
 
 Local development and CI use the same commands and the same `uv.lock`. The

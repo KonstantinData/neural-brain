@@ -12,14 +12,20 @@ requires them.
 
 FND-03 established the migration validation mechanism. The current ordered plan
 contains the MS-1 hierarchy, scoped memory kernel, reserved Dreaming schema,
-and protected NB-1 cognitive checkpoint evidence in migrations `0001` through
-`0004`. Migration `0003` deliberately grants no
+protected NB-1 cognitive checkpoint evidence, and the fixed local administrative
+provisioning gate in migrations `0001` through `0005`. Migration `0003` deliberately grants no
 productive Dreaming execute capability and its function fails closed until the
 persistent lease, immutable snapshot, and independent validation prerequisites
 exist. Migration `0004` adds scope-bound immutable cognitive transition evidence
 and dedicated Memory Transition Gate functions; it does not grant table-write
 access or create a second protected-state writer. Empty migration plans are no
 longer accepted by repository CI or release evidence.
+
+Migration `0005` adds only the fixed local demo provisioning function. It runs
+with the authenticated administrative invoker's authority, accepts no scope or
+principal input, verifies the complete fixed hierarchy, records the database
+administrator as actor and the runtime Principal as subject, and has no runtime
+role grant. It is not a general production provisioning API.
 
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
