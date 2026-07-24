@@ -3,6 +3,7 @@ name = "neural-brain"
 version = "0.0.0"
 description = "A product-neutral, safety-constrained integrated neural cognitive system."
 readme = "README.md"
+license = "MIT"
 requires-python = "==3.14.*"
 dependencies = [
     "cryptography>=48.0.1,<49",

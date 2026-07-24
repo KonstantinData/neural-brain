@@ -432,6 +432,4 @@ its own accepted ADR, contracts, baselines, ablations, and evaluation evidence.
 
 ## License and Reuse
 
-This repository currently contains no license file. Do not assume permission to
-copy, redistribute, or reuse its contents beyond rights explicitly granted by
-the repository owner.
+This repository is licensed under the [MIT License](LICENSE).

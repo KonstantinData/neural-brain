@@ -22,7 +22,7 @@ Active coordination record:
 | Data migration | Local forward path available | Advisory lock, per-migration transaction, ordered SHA-256 ledger, drift denial | Prove production upgrade orchestration and compatibility windows. |
 | Migration rollback | Open | No downgrade command; runbook refuses silent adoption or rewrite | Define backup-before-upgrade, restore, and rollback evidence. |
 | Backup/restore | Open release stop | No verified backup or restore workflow | Implement scheduled backup, restore drill, reconciliation, and evidence. |
-| LICENSE | Open immediate item | Repository has no `LICENSE` | Owner must select and add the intended license. |
+| LICENSE | MIT license declared | `LICENSE`; package metadata; security-policy license inventory | Keep package metadata and released artifacts aligned with the license text. |
 | `SECURITY.md` | Open immediate item | Repository has no vulnerability-reporting policy | Owner must define the private reporting and response path. |
 
 ## Proven Local Behavior
