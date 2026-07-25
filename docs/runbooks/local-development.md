@@ -101,6 +101,30 @@ downgrade command. Preserve the development volume and restore from a verified
 backup if rollback is required; production backup and restore remain a release
 stop.
 
+## Prove a Local Backup and Restore Drill
+
+After `memory-demo` has installed and exercised the local development ledger,
+run:
+
+```powershell
+.\tools\dev.ps1 backup-restore
+```
+
+The command creates a PostgreSQL custom-format logical archive and a SHA-256
+manifest under the owner-restricted, Git-ignored `.local/backups/` directory.
+It then creates one randomly named `neural_brain_restore_drill_<hex>` database
+inside the local development PostgreSQL container, restores the archive with no
+owner or privilege replay, verifies that the immutable migration ledger count
+matches the source, and forcibly drops only that generated drill database. Success prints
+one secret-free JSON object with the archive filename, digest, manifest
+filename, and restored migration count.
+
+The command never uses customer data, external storage, a production schedule,
+or a production recovery target. It is local evidence only: retain a copy in an
+operator-approved backup location, define encryption, retention, access,
+recovery objectives, and a production restore/reconciliation drill before a
+production release.
+
 The fixed local OIDC Principal is not a production identity provider. The
 entrypoint creates an in-memory RSA key and a signed RS256 token for the fixed
 demo issuer and scope, resolves the subject to a pre-provisioned database

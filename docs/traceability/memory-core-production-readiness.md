@@ -21,7 +21,7 @@ Active coordination record:
 | Error handling | Partial | Typed fail-closed domain errors, documented recovery actions, and a secret-free stable JSON error envelope from `tools/dev.ps1 memory-demo` | Expose equivalent safe errors from a separately deployed application runtime. |
 | Data migration | Local forward path available | Advisory lock, per-migration transaction, ordered SHA-256 ledger, drift denial, and structured disposable fresh/upgrade validation evidence | Prove production upgrade orchestration and compatibility windows. |
 | Migration rollback | Open | No downgrade command; runbook refuses silent adoption or rewrite | Define backup-before-upgrade, restore, and rollback evidence. |
-| Backup/restore | Open release stop | No verified backup or restore workflow | Implement scheduled backup, restore drill, reconciliation, and evidence. |
+| Backup/restore | Local evidence available; production release stop remains | `tools/dev.ps1 backup-restore`; owner-restricted Git-ignored custom archive plus SHA-256 manifest; disposable PostgreSQL restore drill verifies the immutable migration ledger | Define production backup storage, encryption, retention, RPO/RTO, reconciliation, schedule, alerting, and an independently witnessed restore drill. |
 | LICENSE | MIT license declared | `LICENSE`; package metadata; security-policy license inventory | Keep package metadata and released artifacts aligned with the license text. |
 | `SECURITY.md` | Open immediate item | Repository has no vulnerability-reporting policy | Owner must define the private reporting and response path. |
 

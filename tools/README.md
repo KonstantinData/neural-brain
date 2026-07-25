@@ -23,6 +23,22 @@ scoped read round-trip. Use the PowerShell entrypoint so the pinned uv release
 and source path are applied consistently. Neither Python tool is a production
 identity provider or unrestricted scope-administration interface.
 
+## Local Backup and Restore Evidence
+
+After the local Memory Core demo has run, prove one backup and disposable
+restore drill with:
+
+```powershell
+.\tools\dev.ps1 backup-restore
+```
+
+The PowerShell entrypoint uses the pinned local PostgreSQL 18 container client,
+stores a custom-format archive and SHA-256 manifest only in owner-restricted
+Git-ignored `.local/backups/`, and verifies the restored immutable migration
+ledger in a generated disposable database. It never receives a customer scope,
+customer data, production target, external backup location, or secret on its
+command line. See the local-development runbook for recovery limits.
+
 ## Locked quality gate
 
 Local development and CI use the same commands and the same `uv.lock`. The
