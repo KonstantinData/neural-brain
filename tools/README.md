@@ -39,6 +39,11 @@ ledger in a generated disposable database. It never receives a customer scope,
 customer data, production target, external backup location, or secret on its
 command line. See the local-development runbook for recovery limits.
 
+Pass `-VerifyMigrationRollback` to run the additional disposable rollback
+probe. It proves archive recovery removes a synthetic post-backup schema change
+and restores the source migration-ledger count; it does not add a downgrade
+migration path or mutate the development ledger.
+
 ## Locked quality gate
 
 Local development and CI use the same commands and the same `uv.lock`. The

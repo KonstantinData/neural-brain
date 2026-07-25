@@ -4,7 +4,8 @@ param(
     [ValidateSet("up", "down", "status", "verify", "memory-demo", "backup-restore", "reset-test")]
     [string]$Command = "status",
     [string]$DockerCommand = "docker",
-    [string]$LocalEnvironmentFile = ""
+    [string]$LocalEnvironmentFile = "",
+    [switch]$VerifyMigrationRollback
 )
 
 Set-StrictMode -Version Latest
@@ -305,6 +306,7 @@ switch ($Command) {
         $createdRestoreDatabase = $false
         $failed = $false
         $archiveHash = ""
+        $rollbackVerified = $false
 
         try {
             Invoke-Compose -Arguments @(
@@ -364,6 +366,56 @@ switch ($Command) {
             if ($migrationCount -ne $sourceMigrationCount) {
                 throw "Restore drill did not prove the expected immutable migration ledger."
             }
+            if ($VerifyMigrationRollback) {
+                $probeTable = "migration_rollback_probe_$suffix"
+                Invoke-Compose -Arguments @(
+                    "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--set", "ON_ERROR_STOP=1",
+                    "--username", "postgres", "--dbname", $restoreDatabase, "--command",
+                    "CREATE TABLE public.$probeTable (probe_id boolean NOT NULL)"
+                ) | Out-Null
+                $probeExists = @(
+                    Invoke-Compose -Arguments @(
+                        "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--tuples-only",
+                        "--no-align", "--set", "ON_ERROR_STOP=1", "--username", "postgres", "--dbname",
+                        $restoreDatabase, "--command", "SELECT to_regclass('public.$probeTable') IS NOT NULL"
+                    )
+                ) | Select-Object -Last 1
+                if ($probeExists -ne "t") {
+                    throw "Disposable upgrade probe was not applied."
+                }
+                Remove-RestoreDrillDatabase -DatabaseName $restoreDatabase | Out-Null
+                $createdRestoreDatabase = $false
+                Invoke-Compose -Arguments @(
+                    "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--set", "ON_ERROR_STOP=1",
+                    "--username", "postgres", "--dbname", "postgres", "--command",
+                    "CREATE DATABASE $restoreDatabase WITH TEMPLATE template0 ENCODING 'UTF8'"
+                ) | Out-Null
+                $createdRestoreDatabase = $true
+                Invoke-Compose -Arguments @(
+                    "exec", "-T", "--user", "postgres", "postgres-dev", "pg_restore", "--exit-on-error",
+                    "--no-owner", "--no-privileges", "--username", "postgres", "--dbname", $restoreDatabase,
+                    "/backups/$archiveName"
+                )
+                $probeRemoved = @(
+                    Invoke-Compose -Arguments @(
+                        "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--tuples-only",
+                        "--no-align", "--set", "ON_ERROR_STOP=1", "--username", "postgres", "--dbname",
+                        $restoreDatabase, "--command", "SELECT to_regclass('public.$probeTable') IS NULL"
+                    )
+                ) | Select-Object -Last 1
+                $rolledBackMigrationCount = @(
+                    Invoke-Compose -Arguments @(
+                        "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--tuples-only",
+                        "--no-align", "--set", "ON_ERROR_STOP=1", "--username", "postgres", "--dbname",
+                        $restoreDatabase, "--command",
+                        "SELECT count(*) FROM neural_brain_install.schema_migrations"
+                    )
+                ) | Select-Object -Last 1
+                if ($probeRemoved -ne "t" -or $rolledBackMigrationCount -ne $sourceMigrationCount) {
+                    throw "Restore rollback did not recover the pre-upgrade migration ledger."
+                }
+                $rollbackVerified = $true
+            }
         }
         catch {
             $failed = $true
@@ -387,6 +439,7 @@ switch ($Command) {
                 archive_name = $archiveName
                 archive_sha256 = $archiveHash
                 manifest_name = [System.IO.Path]::GetFileName($manifestPath)
+                rollback_verified = $rollbackVerified
                 restored_migration_count = [int]$sourceMigrationCount
                 status = "passed"
             } | ConvertTo-Json -Compress)

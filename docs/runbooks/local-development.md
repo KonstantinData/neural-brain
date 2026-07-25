@@ -125,6 +125,20 @@ operator-approved backup location, define encryption, retention, access,
 recovery objectives, and a production restore/reconciliation drill before a
 production release.
 
+To additionally prove the local recovery mechanics required before a migration
+upgrade, run:
+
+```powershell
+.\tools\dev.ps1 backup-restore -VerifyMigrationRollback
+```
+
+The drill applies a uniquely named synthetic table only inside the generated
+restore database, replaces only that generated database, and restores the same
+pre-upgrade archive. It proves that the synthetic upgrade is absent and that the
+protected migration ledger matches the source again. This is deliberately not a
+downgrade-migration mechanism and never changes the development database or
+applied repository migrations.
+
 The fixed local OIDC Principal is not a production identity provider. The
 entrypoint creates an in-memory RSA key and a signed RS256 token for the fixed
 demo issuer and scope, resolves the subject to a pre-provisioned database
