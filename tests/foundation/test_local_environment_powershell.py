@@ -91,3 +91,7 @@ def test_backup_restore_entrypoint_is_local_and_fail_closed() -> None:
     assert "DROP DATABASE $DatabaseName WITH (FORCE)" in source
     assert "neural_brain_install.schema_migrations" in source
     assert "NB-MC-BACKUP-RESTORE-FAILED" in source
+    assert "VerifyMigrationRollback" in source
+    assert "migration_rollback_probe_" in source
+    assert "Remove-RestoreDrillDatabase -DatabaseName $restoreDatabase" in source
+    assert "rollback_verified" in source
