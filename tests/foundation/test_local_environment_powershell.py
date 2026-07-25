@@ -71,3 +71,23 @@ def test_clean_environment_generation_runs_under_windows_powershell_51(tmp_path:
         assert re.fullmatch(r"[0-9a-f]{64}", values[name]) is not None
         assert values[name] not in result.stdout
         assert values[name] not in result.stderr
+
+
+def test_backup_restore_entrypoint_is_local_and_fail_closed() -> None:
+    """The drill writes only local evidence and deletes only generated databases."""
+
+    source = DEV_TOOL.read_text(encoding="utf-8")
+    compose = (ROOT / "compose.yaml").read_text(encoding="utf-8")
+
+    assert '"backup-restore"' in source
+    assert 'Join-Path $LocalDirectory "backups"' in source
+    assert "./.local/backups:/backups" in compose
+    assert "--format=custom" in source
+    assert "--no-owner" in source
+    assert "--no-privileges" in source
+    assert "archive_sha256" in source
+    assert "neural_brain_restore_drill_" in source
+    assert "^neural_brain_restore_drill_[0-9a-f]{16}$" in source
+    assert "DROP DATABASE $DatabaseName WITH (FORCE)" in source
+    assert "neural_brain_install.schema_migrations" in source
+    assert "NB-MC-BACKUP-RESTORE-FAILED" in source

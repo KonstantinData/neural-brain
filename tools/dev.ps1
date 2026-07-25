@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [Parameter(Position = 0)]
-    [ValidateSet("up", "down", "status", "verify", "memory-demo", "reset-test")]
+    [ValidateSet("up", "down", "status", "verify", "memory-demo", "backup-restore", "reset-test")]
     [string]$Command = "status",
     [string]$DockerCommand = "docker",
     [string]$LocalEnvironmentFile = ""
@@ -13,6 +13,7 @@ $ErrorActionPreference = "Stop"
 $Root = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot "..")).Path
 $ComposeFile = Join-Path $Root "compose.yaml"
 $LocalDirectory = Join-Path $Root ".local"
+$BackupDirectory = Join-Path $LocalDirectory "backups"
 $EnvironmentFile = if ([string]::IsNullOrWhiteSpace($LocalEnvironmentFile)) {
     Join-Path $LocalDirectory "dev.env"
 }
@@ -95,6 +96,30 @@ function Protect-LocalSecretFile {
     }
 }
 
+function Protect-LocalBackupDirectory {
+    if (-not (Test-Path -LiteralPath $BackupDirectory -PathType Container)) {
+        [System.IO.Directory]::CreateDirectory($BackupDirectory) | Out-Null
+    }
+
+    if ([System.Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) {
+        $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent().User
+        if ($null -eq $identity) {
+            throw "Cannot determine the current Windows identity for local backup protection."
+        }
+
+        & icacls $BackupDirectory /inheritance:r /grant:r "*$($identity.Value):(OI)(CI)(F)" | Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "Failed to restrict the local backup directory to its owner."
+        }
+        return
+    }
+
+    & chmod 700 $BackupDirectory
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to restrict the local backup directory to its owner."
+    }
+}
+
 function Set-LocalValueIfMissing {
     param(
         [Parameter(Mandatory)][string]$Name,
@@ -133,6 +158,7 @@ function Ensure-LocalEnvironment {
         Set-LocalValueIfMissing -Name "NEURAL_BRAIN_POSTGRES_ADMIN_USER" -Value "postgres"
         Set-LocalValueIfMissing -Name "NEURAL_BRAIN_POSTGRES_ADMIN_PASSWORD" -Value (New-RandomSecret)
         Protect-LocalSecretFile
+        Protect-LocalBackupDirectory
         return
     }
 
@@ -156,6 +182,7 @@ function Ensure-LocalEnvironment {
     Set-LocalValueIfMissing -Name "NEURAL_BRAIN_POSTGRES_ADMIN_USER" -Value "postgres"
     Set-LocalValueIfMissing -Name "NEURAL_BRAIN_POSTGRES_ADMIN_PASSWORD" -Value (New-RandomSecret)
     Protect-LocalSecretFile
+    Protect-LocalBackupDirectory
 }
 
 function Get-LocalValue {
@@ -174,6 +201,24 @@ function Get-LocalValue {
 function Get-TestVolumeName {
     $composeProject = Get-LocalValue -Name "NEURAL_BRAIN_COMPOSE_PROJECT"
     return "$composeProject-postgres-test-data"
+}
+
+function New-RestoreDrillDatabaseName {
+    $suffix = New-RandomSecret
+    return "neural_brain_restore_drill_$($suffix.Substring(0, 16))"
+}
+
+function Remove-RestoreDrillDatabase {
+    param([Parameter(Mandatory)][string]$DatabaseName)
+
+    if ($DatabaseName -notmatch '^neural_brain_restore_drill_[0-9a-f]{16}$') {
+        throw "Refusing cleanup outside the restore-drill database namespace."
+    }
+    Invoke-Compose -Arguments @(
+        "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--set", "ON_ERROR_STOP=1",
+        "--username", "postgres", "--dbname", "postgres", "--command",
+        "DROP DATABASE $DatabaseName WITH (FORCE)"
+    )
 }
 
 function Invoke-Compose {
@@ -244,6 +289,107 @@ switch ($Command) {
         finally {
             [Environment]::SetEnvironmentVariable("PYTHONPATH", $previousPythonPath, "Process")
         }
+    }
+    "backup-restore" {
+        Assert-DockerAvailable
+        Ensure-LocalEnvironment
+        Invoke-Compose -Arguments @("up", "--detach", "--wait", "postgres-dev")
+
+        $developmentDatabase = Get-LocalValue -Name "NEURAL_BRAIN_DEV_DB"
+        $timestamp = [DateTimeOffset]::UtcNow.ToString("yyyyMMddTHHmmssZ")
+        $suffix = (New-RandomSecret).Substring(0, 16)
+        $archiveName = "memory-core-$timestamp-$suffix.dump"
+        $archivePath = Join-Path $BackupDirectory $archiveName
+        $manifestPath = "$archivePath.json"
+        $restoreDatabase = New-RestoreDrillDatabaseName
+        $createdRestoreDatabase = $false
+        $failed = $false
+        $archiveHash = ""
+
+        try {
+            Invoke-Compose -Arguments @(
+                "exec", "-T", "--user", "postgres", "postgres-dev", "pg_dump", "--format=custom",
+                "--no-owner", "--no-privileges", "--username", "postgres", "--dbname", $developmentDatabase,
+                "--file", "/backups/$archiveName"
+            )
+            if (-not (Test-Path -LiteralPath $archivePath -PathType Leaf)) {
+                throw "Backup command completed without creating the expected archive."
+            }
+
+            $archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+            $manifest = [ordered]@{
+                archive_name = $archiveName
+                archive_sha256 = $archiveHash
+                created_at = [DateTimeOffset]::UtcNow.ToString("o")
+                format = "pg_dump_custom_no_owner_no_privileges"
+                status = "backup_created"
+            }
+            [System.IO.File]::WriteAllText(
+                $manifestPath,
+                ($manifest | ConvertTo-Json -Compress),
+                [System.Text.UTF8Encoding]::new($false)
+            )
+
+            $sourceMigrationCount = @(
+                Invoke-Compose -Arguments @(
+                    "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--tuples-only",
+                    "--no-align", "--set", "ON_ERROR_STOP=1", "--username", "postgres", "--dbname",
+                    $developmentDatabase, "--command",
+                    "SELECT count(*) FROM neural_brain_install.schema_migrations"
+                )
+            ) | Select-Object -Last 1
+            if ($sourceMigrationCount -notmatch '^[1-9][0-9]*$') {
+                throw "Backup source has no immutable migration ledger."
+            }
+
+            Invoke-Compose -Arguments @(
+                "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--set", "ON_ERROR_STOP=1",
+                "--username", "postgres", "--dbname", "postgres", "--command",
+                "CREATE DATABASE $restoreDatabase WITH TEMPLATE template0 ENCODING 'UTF8'"
+            ) | Out-Null
+            $createdRestoreDatabase = $true
+            Invoke-Compose -Arguments @(
+                "exec", "-T", "--user", "postgres", "postgres-dev", "pg_restore", "--exit-on-error",
+                "--no-owner", "--no-privileges", "--username", "postgres", "--dbname", $restoreDatabase,
+                "/backups/$archiveName"
+            )
+            $migrationCount = @(
+                Invoke-Compose -Arguments @(
+                    "exec", "-T", "--user", "postgres", "postgres-dev", "psql", "--tuples-only",
+                    "--no-align", "--set", "ON_ERROR_STOP=1", "--username", "postgres", "--dbname",
+                    $restoreDatabase, "--command",
+                    "SELECT count(*) FROM neural_brain_install.schema_migrations"
+                )
+            ) | Select-Object -Last 1
+            if ($migrationCount -ne $sourceMigrationCount) {
+                throw "Restore drill did not prove the expected immutable migration ledger."
+            }
+        }
+        catch {
+            $failed = $true
+        }
+        finally {
+            if ($createdRestoreDatabase) {
+                try {
+                    Remove-RestoreDrillDatabase -DatabaseName $restoreDatabase | Out-Null
+                }
+                catch {
+                    $failed = $true
+                }
+            }
+        }
+
+        if ($failed) {
+            Write-Output '{"code":"NB-MC-BACKUP-RESTORE-FAILED","status":"failed"}'
+            exit 1
+        }
+        Write-Output (@{
+                archive_name = $archiveName
+                archive_sha256 = $archiveHash
+                manifest_name = [System.IO.Path]::GetFileName($manifestPath)
+                restored_migration_count = [int]$sourceMigrationCount
+                status = "passed"
+            } | ConvertTo-Json -Compress)
     }
     "reset-test" {
         Assert-DockerAvailable
