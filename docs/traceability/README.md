@@ -129,6 +129,11 @@ when they are required by the acceptance criteria.
   product, incident, release, approval-authority, independence, and escalation
   governance; it fails closed and cannot assign a real role, grant authority,
   approve release, or bypass a Protected Control Plane gate.
+- [`FND-04.10-reassessment-triggers.md`](FND-04.10-reassessment-triggers.md):
+  fail-closed reported-change intake and linked reassessment-work template for
+  future legal, guidance, model, supplier, purpose, data, and deployment
+  changes; it neither polls sources nor decides law, release, authority, or
+  runtime behavior.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
