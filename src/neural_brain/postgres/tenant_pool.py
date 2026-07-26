@@ -166,7 +166,11 @@ def _default_pool_factory(
     """Create a tenant pool with bounded capacity and deterministic reset."""
     try:
         pool = _PsycopgTenantPool(endpoint, max_size)
-    except TypeError, ValueError, OSError:
+    except (
+        TypeError,
+        ValueError,
+        OSError,
+    ):
         raise TenantPoolUnavailableError("tenant database pool could not be created") from None
     return pool
 

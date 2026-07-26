@@ -543,7 +543,11 @@ def verify_signed_hidden_evidence(
         elif public_key is not None:
             public_key.verify(signature, canonical_payload)
             signature_valid = True
-    except binascii.Error, InvalidSignature, ValueError:
+    except (
+        binascii.Error,
+        InvalidSignature,
+        ValueError,
+    ):
         reasons.append("invalid_signature")
 
     if (
