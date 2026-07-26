@@ -16,6 +16,12 @@ Accepted identity-boundary decision:
 The earlier decision issue is resolved by Tenant-bound credentials and pools;
 general cryptographic context attestation is not selected.
 
+NB-275 records the bounded evaluation of workload- or channel-bound routing
+attestation in
+[`ADR-019 Routing-Attestation Evaluation`](../governance/adr-019-routing-attestation-evaluation.md).
+It defers that additional control pending a separate accepted ADR; it makes no
+FND-06 or release-gate change and is not implementation or recognition evidence.
+
 ## Current State
 
 | Readiness item | State | Repository evidence | Next production gap |
