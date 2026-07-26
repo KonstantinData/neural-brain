@@ -110,6 +110,10 @@ when they are required by the acceptance criteria.
   authenticated, Gate-owned separation-decision prerequisite for candidate
   promotion, retrieval assessment, incident resolution, and future action roles;
   it records a blocker and does not implement a role or approval channel.
+- [`S1-03.2-migration-reconciliation.md`](S1-03.2-migration-reconciliation.md):
+  Foundation reconciliation from clean-database migration validation to
+  least-privilege Runtime-role DDL and direct-write denial evidence; it adds no
+  runtime capability.
 
 ## Reconciliation Rules
 
