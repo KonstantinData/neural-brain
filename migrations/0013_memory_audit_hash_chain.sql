@@ -109,7 +109,11 @@ BEGIN
     END IF;
 
     PERFORM pg_advisory_xact_lock(
-        hashtextextended(NEW.tenant_id || chr(0) || NEW.area_id, 0)
+        hashtextextended(
+            length(NEW.tenant_id)::text || ':' || NEW.tenant_id
+            || length(NEW.area_id)::text || ':' || NEW.area_id,
+            0
+        )
     );
     SELECT * INTO prior_head
     FROM memory_audit.chain_heads AS head
