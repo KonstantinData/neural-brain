@@ -79,6 +79,7 @@ def test_requirement_catalog_has_complete_scoped_release_stop_and_transition_cov
         "MLT",
         "ADR019-IDENTITY",
         "TARGET-NB1-CYCLE",
+        "TARGET-GOAL-GATE-PREREQUISITE",
         "TARGET-EVALUATION",
         "TARGET-RECOGNITION",
     }

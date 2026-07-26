@@ -1,0 +1,93 @@
+{
+  "document_type": "neural_brain_goal_transition_gate_prerequisite_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.goal-transition-gate",
+  "contract_version": "1.0.0",
+  "status": "nb1_prerequisite_contract_not_runtime_authorization",
+  "governing_decisions": ["ADR-018", "ADR-019"],
+  "historical_inputs_requiring_revalidation": ["ADR-004", "ADR-007", "ADR-011"],
+  "purpose": "Define the bounded, product-neutral field and stage contract required to revalidate a future Goal Transition Gate. This contract does not create a Goal runtime, protected goal table, migration, gate implementation, authority, approval, budget reservation, resource claim, verification result, action, external effect, or maturity claim.",
+  "aggregate_boundary": {
+    "aggregate": "goal",
+    "isolation_dimension": false,
+    "binding": "session_bound_protected_aggregate",
+    "sole_protected_state_writer": "Goal Transition Gate",
+    "requesters": ["Cognitive Plane", "Goal Runtime"],
+    "trusted_context_source": "authenticated_runtime_context",
+    "untrusted_context_sources": ["prompt", "observation", "model_output", "memory_content", "tool_output", "request_payload"],
+    "default_on_unknown_or_missing": "deny_before_protected_transition"
+  },
+  "immutable_authenticated_scope_fields": ["tenant_id", "area_id", "project_id", "session_id"],
+  "identity_and_lineage_fields": {
+    "required": ["goal_id", "origin_ref", "creator_principal_id", "creator_request_ref", "parent_goal_id_or_root_marker"],
+    "invariants": [
+      "Goal identity, origin, creator, parent lineage, and authenticated scope are immutable after admission.",
+      "A parent goal is a lineage reference and never an isolation scope, authority source, approval, or execution permission.",
+      "Untrusted content may describe a proposed goal but cannot set or alter identity, scope, origin, creator, parent lineage, or principal facts."
+    ]
+  },
+  "required_evidence_reference_fields": ["authority_snapshot_ref", "success_criterion_ref", "proposal_provenance_ref", "audit_evidence_ref"],
+  "bounded_timing_budget_and_checkpoint_fields": [
+    {
+      "field": "deadline_ref_or_null",
+      "nb1_semantics": "Not authorized for protected runtime admission in the current NB-1 slice. If a future NB-1 revalidation permits it, it may reference an immutable internal planning deadline only and must not schedule execution or override policy, authority, approval, safety, or a later-stage gate.",
+      "minimum_authorization": "explicit_accepted_nb1_revalidation"
+    },
+    {
+      "field": "budget_ref_or_null",
+      "nb1_semantics": "Not authorized for protected runtime admission in the current NB-1 slice. An internal planning estimate is not a reservation, allocation, claim, release, or authority; budget reservation for effects remains a later Action Gate concern.",
+      "minimum_authorization": "explicit_accepted_nb1_revalidation"
+    },
+    {
+      "field": "checkpoint_ref_or_null",
+      "nb1_semantics": "May reference the exact authenticated, immutable cognitive checkpoint that produced an internal proposal only. It is neither a protected Goal-state checkpoint nor a transition authorization.",
+      "minimum_authorization": "nb1_internal_proposal_only"
+    }
+  ],
+  "transition_requirements": [
+    "Only the Goal Transition Gate may commit a protected Goal state change and its atomic audit evidence.",
+    "The Gate must resolve immutable authenticated scope and principal facts independently of the request payload before any future transition.",
+    "Authority snapshot, success criterion, provenance, and audit references are evidence bindings; none independently creates authority or success.",
+    "Only a future revalidated Goal Transition Gate may write Achieved, and only after independent verification, complete evidence, and quiescence.",
+    "Unknown, stale, conflicting, missing, scope-mismatched, or unverifiable identity, lineage, authority, criterion, checkpoint, or audit evidence denies the transition."
+  ],
+  "stage_boundary_map": [
+    {
+      "stage": "NB-0",
+      "allowed": ["versioned prerequisite contract", "contract and traceability tests"],
+      "prohibited": ["Goal runtime", "Goal migration", "protected Goal-state mutation", "Goal Transition Gate implementation"]
+    },
+    {
+      "stage": "NB-1",
+      "allowed": ["internal goal proposal", "internal plan proposal", "checkpoint-bound proposal provenance"],
+      "prohibited": ["protected Goal lifecycle runtime without accepted revalidation", "action execution", "external effect", "approval claim", "budget reservation", "resource locking", "Achieved transition", "independent effect or goal verification runtime"]
+    },
+    {
+      "stage": "NB-5",
+      "allowed_only_after_earlier_gates": ["single-goal bounded action in simulation and controlled tool sandboxes", "post-action observation", "independent effect and goal verification"],
+      "still_required": ["separate Action Gate contract", "authenticated authority", "policy decision", "required approval", "budget reservation", "resource claims", "fence", "kill switch", "sandbox", "atomic audit"]
+    },
+    {
+      "stage": "NB-7",
+      "allowed_only_after_earlier_gates": ["hierarchical goals", "preemption", "fair scheduling", "resource arbitration"],
+      "prohibited": ["retroactive mutation of scope, lineage, authority, or safety invariants"]
+    }
+  ],
+  "explicit_exclusions": [
+    "action execution or tool invocation",
+    "Action Gate decision or Action Intent commitment",
+    "approval claim issuance, validation, or consumption",
+    "budget reservation, resource locking, claim release, or fence issuance",
+    "independent effect or goal verification runtime",
+    "external effect, dispatch, retry, reconciliation, or quiescence implementation",
+    "Goal runtime, protected Goal table, migration, or database writer",
+    "implementation, maturity, recognition, release, or production-autonomy claim"
+  ],
+  "implementation_blocker": {
+    "status": "blocked_pending_accepted_complete_system_goal_gate_revalidation",
+    "reason": "ADR-004, ADR-007, and ADR-011 are historical and ADR-018 requires a new complete-system ADR or explicit revalidation before Goal and Action gate runtime implementation. The current NB-1 capability boundary permits internal proposals only.",
+    "owner": "Protected Control Plane architecture owner",
+    "unblock_condition": "An accepted ADR or explicit ADR-018 revalidation defines the complete Goal Transition Gate state model, actor separation, authenticated identity and scope, authority and policy inputs, required approvals, audit atomicity, independent verification and quiescence, recovery, concurrency, and stage-specific acceptance tests.",
+    "next_step": "Use this prerequisite contract to create the revalidation record and its bounded implementation package; do not add a Goal runtime or migration before that record is accepted."
+  }
+}

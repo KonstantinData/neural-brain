@@ -13,6 +13,10 @@ ADR-017.
   recorded or synthetic observations, bounded learned attention, a fixed-version
   recurrent workspace, internal proposals, deterministic checkpoints, and no
   external effects.
+- `goal-transition-gate-v1.json`: bounded prerequisite contract for a future
+  Goal Transition Gate. It binds a session-scoped aggregate, immutable
+  authenticated scope and lineage, evidence references, and stage boundaries;
+  it does not authorize a Goal runtime, migration, action, or external effect.
 - `nb1-hidden-evaluation.json`: label-free candidate boundary, candidate freeze
   receipt, external evaluator custody, and signed evidence intake for EVAL-01 v4.
 - `stage-capabilities.json`: cumulative NB-0 through NB-8 delivery contract.
