@@ -115,6 +115,10 @@ when they are required by the acceptance criteria.
   pre-production use-case and scope intake for future deployments; it is
   evidence input only, fails closed, and cannot supply trusted runtime context,
   authority, release, or enablement.
+- [`FND-04.7-ai-act-risk-classification.md`](FND-04.7-ai-act-risk-classification.md):
+  qualified-review input for a future deployment-specific EU AI Act risk
+  classification; it fails closed and neither classifies a real deployment nor
+  authorizes authority, release, or enablement.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
