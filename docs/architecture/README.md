@@ -15,6 +15,9 @@ distinct.
   gates, baselines, ablations, transfer, robustness, and safety evaluation.
 - [`delivery-roadmap.md`](delivery-roadmap.md) defines NB-0 through NB-8 and
   their hard dependencies.
+- [`ledger-conventions-v1.md`](ledger-conventions-v1.md) fixes PostgreSQL
+  representation conventions for protected keys, scope, time, exact amounts,
+  naming, and structured payloads.
 - [`architecture-directive-v3.0.md`](architecture-directive-v3.0.md) is the
   superseded Memory Core baseline retained as historical evidence.
 - v2.0 and v1.1 remain earlier superseded baselines.

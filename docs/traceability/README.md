@@ -82,6 +82,8 @@ when they are required by the acceptance criteria.
 
 ## Versioned Evidence Records
 
+- [`../architecture/ledger-conventions-v1.md`](../architecture/ledger-conventions-v1.md):
+  S1-03.1 normative representation conventions with architecture-test evidence.
 - [`FND-01-foundation-baseline.md`](FND-01-foundation-baseline.md): historical
   PR #1 Foundation baseline evidence and remediation mapping.
 - [`neural-brain-capability-matrix.md`](neural-brain-capability-matrix.md):
