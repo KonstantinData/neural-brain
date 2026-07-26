@@ -26,6 +26,9 @@ ADR-017.
   classification of immutable prohibited and currently unsupported uses. It has
   no allow, activation, or release outcome and never replaces the Security
   Floor, qualified legal review, authority, or required human approval.
+- `ai-act-role-assessment-v1.json`: neutral, per-deployment evidence template
+  for qualified EU AI Act operator-role review. It never assigns a role,
+  determines applicability or lawfulness, or authorizes a release.
 
 ## Memory Core contracts
 

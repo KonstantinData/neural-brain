@@ -103,6 +103,10 @@ when they are required by the acceptance criteria.
 - [`FND-04.3-prohibited-unsupported-uses.md`](FND-04.3-prohibited-unsupported-uses.md):
   deterministic, fail-closed prohibited and unsupported-use classification;
   it has no authorization or activation outcome.
+- [`FND-04.5-ai-act-role-assessment.md`](FND-04.5-ai-act-role-assessment.md):
+  deployment-specific EU AI Act operator-role assessment template; it is
+  evidence input only and fails closed without verified deployment facts and
+  qualified review.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
