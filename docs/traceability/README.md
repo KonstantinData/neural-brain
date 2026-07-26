@@ -100,6 +100,9 @@ when they are required by the acceptance criteria.
 - [`FND-04.2-intended-purpose.md`](FND-04.2-intended-purpose.md): stable
   intended-purpose and future-deployment assessment-template evidence; it does
   not make a deployment, legal, or compliance determination.
+- [`FND-04.3-prohibited-unsupported-uses.md`](FND-04.3-prohibited-unsupported-uses.md):
+  deterministic, fail-closed prohibited and unsupported-use classification;
+  it has no authorization or activation outcome.
 
 ## Reconciliation Rules
 

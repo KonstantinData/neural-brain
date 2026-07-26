@@ -22,6 +22,10 @@ ADR-017.
 - `intended-purpose.json`: stable product- and domain-neutral intended-purpose
   statement plus a versioned future-deployment assessment input. It neither
   authorizes a release nor supplies a legal or compliance conclusion.
+- `prohibited-unsupported-use-v1.json`: deterministic, fail-closed
+  classification of immutable prohibited and currently unsupported uses. It has
+  no allow, activation, or release outcome and never replaces the Security
+  Floor, qualified legal review, authority, or required human approval.
 
 ## Memory Core contracts
 

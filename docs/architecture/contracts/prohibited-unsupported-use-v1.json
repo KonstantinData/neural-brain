@@ -1,0 +1,117 @@
+{
+  "document_type": "neural_brain_prohibited_and_unsupported_use_contract",
+  "contract_id": "neural-brain.prohibited-unsupported-use",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Define deterministic, fail-closed repository-governance classification semantics for proposed uses without deciding law, approving a deployment, granting authority, or enabling a runtime capability.",
+  "classification_outcomes": {
+    "prohibited": {
+      "decision": "deny_unconditionally",
+      "activation": "never_authorized_by_policy_or_approval",
+      "meaning": "The proposed use conflicts with a non-overridable Security Floor prohibition or another accepted non-waivable architecture constraint."
+    },
+    "unsupported": {
+      "decision": "disabled_and_deployment_activation_denied",
+      "activation": "requires_separate_future_classification_and_all_required_evidence",
+      "meaning": "The proposed use is not authorized by this repository contract, including when its classification, lawful-operation evidence where applicable, authority, controls, evidence, or required human approval is absent, unknown, stale, or incomplete."
+    }
+  },
+  "immutable_prohibitions": [
+    {
+      "id": "PF-01",
+      "proposed_use": "override_or_weaken_security_floor_with_policy_or_approval",
+      "classification": "prohibited",
+      "invariant": "Security Floor prohibitions are non-overridable; approval never creates missing authority.",
+      "authority": ["ADR-005", "ADR-018", "architecture-directive-v4.0"]
+    },
+    {
+      "id": "PF-02",
+      "proposed_use": "derive_or_expand_trusted_scope_or_authority_from_untrusted_content",
+      "classification": "prohibited",
+      "invariant": "Only authenticated runtime context supplies scope, principal, authority, policy, approval, and kill-switch state.",
+      "authority": ["ADR-018", "architecture-directive-v4.0"]
+    },
+    {
+      "id": "PF-03",
+      "proposed_use": "mutate_protected_state_outside_its_named_transition_gate",
+      "classification": "prohibited",
+      "invariant": "Goal, Action, Memory, and Learning or Model Promotion Gates are the sole writers of their protected state.",
+      "authority": ["ADR-018", "architecture-directive-v4.0"]
+    },
+    {
+      "id": "PF-04",
+      "proposed_use": "cause_external_effect_without_all_action_gate_preconditions",
+      "classification": "prohibited",
+      "invariant": "No external effect occurs without committed intent, authenticated immutable scope, authority, policy, required approval, budget, claims, fence, kill switch, sandbox, and atomic audit evidence.",
+      "authority": ["ADR-018", "architecture-directive-v4.0"]
+    },
+    {
+      "id": "PF-05",
+      "proposed_use": "allow_productive_model_self_mutation_or_self_modification_of_controls",
+      "classification": "prohibited",
+      "invariant": "The active Brain cannot mutate its productive model, authority, Security Floor, policy, evaluation definitions, kill switches, or promotion rules in place.",
+      "authority": ["ADR-018", "architecture-directive-v4.0"]
+    },
+    {
+      "id": "PF-06",
+      "proposed_use": "claim_recognition_or_maturity_without_all_non_compensatory_evidence_gates",
+      "classification": "prohibited",
+      "invariant": "Unknown or failed recognition, safety, privacy, authority, or control evidence cannot be compensated by later results.",
+      "authority": ["ADR-018", "neural-brain-recognition-standard"]
+    }
+  ],
+  "unsupported_use_categories": [
+    {
+      "id": "UF-01",
+      "category": "unclassified_or_incomplete_proposed_use",
+      "classification": "unsupported",
+      "required_before_any_future_reassessment": ["complete_classification_record", "exact_intended_purpose_version", "accountable_owner", "scope_and_data_class_model", "identified_evidence_gaps_and_release_stops"]
+    },
+    {
+      "id": "UF-02",
+      "category": "sensitive_high_impact_or_high_risk_use",
+      "classification": "unsupported",
+      "required_before_any_future_reassessment": ["separately_accepted_risk_and_use_classification", "qualified_applicable_law_and_lawful_operation_evidence_where_required", "authenticated_authority", "scoped_controls", "complete_evidence_gates", "required_independent_human_approval"]
+    },
+    {
+      "id": "UF-03",
+      "category": "deployment_specific_or_domain_specific_use_without_accepted_scoped_integration",
+      "classification": "unsupported",
+      "required_before_any_future_reassessment": ["accepted_scoped_integration_decision", "deployment_specific_assessment", "protected_control_plane_evidence", "release_decision_by_separate_authority"]
+    },
+    {
+      "id": "UF-04",
+      "category": "capability_or_delivery_stage_not_implemented_and_proven",
+      "classification": "unsupported",
+      "required_before_any_future_reassessment": ["delivery_stage_dependencies", "implementation_and_held_out_evidence", "security_and_control_evidence", "separately_governed_activation"]
+    }
+  ],
+  "deterministic_classification_order": [
+    "If a proposed use matches any immutable_prohibition, classify prohibited and deny unconditionally.",
+    "Otherwise, if any required classification input is missing, unknown, stale, scope-mismatched, or unaccepted, classify unsupported and deny activation.",
+    "Otherwise, if the use is sensitive, high-impact, high-risk, deployment-specific, domain-specific, or depends on a capability not implemented and proven, classify unsupported and deny activation until separately governed future reassessment completes.",
+    "Otherwise, classify unsupported: this contract has no allow or release outcome and cannot activate a use."
+  ],
+  "classification_request_template": {
+    "required_fields": ["proposed_use_identifier", "proposed_use_description", "intended_purpose_contract_id", "intended_purpose_contract_version", "affected_capability_stages", "scope_model", "data_classes", "external_effect_boundary", "risk_or_impact_classification", "evidence_references", "accountable_owner", "assessment_timestamp"],
+    "unknown_or_missing_required_field": "unsupported",
+    "stale_or_scope_mismatched_evidence": "unsupported",
+    "unaccepted_domain_specific_extension": "unsupported"
+  },
+  "authority_boundary": {
+    "contract_is": "a versioned repository-governance classification and traceability input",
+    "contract_is_not": ["a legal determination", "a regulatory classification", "a finding of lawfulness", "a compliance certification", "a deployment or release approval", "an authority grant", "a policy decision", "a human approval", "a runtime capability enablement", "an implementation, maturity, recognition, or safety claim"],
+    "no_allow_outcome": true,
+    "policy_and_approval_boundary": "Policy and human approval may not override a prohibited outcome and do not convert an unsupported outcome into authorization."
+  },
+  "validation_semantics": {
+    "unknown_fails_closed": true,
+    "prohibition_precedes_all_other_assessment": true,
+    "prohibition_is_non_overridable": true,
+    "unsupported_is_not_authorization": true,
+    "absence_of_catalog_entry_is_not_permission": true,
+    "legal_or_regulatory_conclusion_is_not_automatic": true,
+    "productive_activation_is_not_authorized": true
+  }
+}
