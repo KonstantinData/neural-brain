@@ -46,6 +46,12 @@ and the migration neither changes Memory Transition Gate sole-writer ownership
 nor releases retrieval, disclosure, promotion, deletion, Goal, Action, or
 external-effect capabilities.
 
+Migration `0010` adds canonical context, request, and snapshot digests to the
+immutable `0009` evidence record. It fails closed if unexpected snapshot rows
+exist, because digest values must never be fabricated for historical evidence;
+such rows require audited reconciliation in a separately authorized operation.
+It does not change Memory Gate ownership or release any lifecycle capability.
+
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
 a new migration rather than changing an applied file. A migration must not
