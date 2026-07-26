@@ -1,0 +1,98 @@
+{
+    "document_type": "neural_brain_gdpr_role_assessment_contract",
+    "contract_id": "neural-brain.gdpr-role-assessment",
+    "contract_version": "1.0.0",
+    "status": "normative_foundation_governance_template",
+    "governing_decisions": ["ADR-001", "ADR-018"],
+    "purpose": "Provide a versioned, deployment-specific evidence-input template for recording a qualified assessment of GDPR role relationships. The template is product- and domain-neutral and does not determine a role, lawfulness, authorization, or release outcome.",
+    "scope": {
+        "current_repository_state": "No customer, production deployment, or deployment-specific processing relationship is established by this repository.",
+        "product_boundary": "The Memory Core is a protected internal subsystem, not the product boundary.",
+        "assessment_unit": "One immutable proposed deployment and its documented processing relationships."
+    },
+    "deployment_role_assessment_template": {
+        "required_fields": [
+            "deployment_identifier",
+            "artifact_version_or_digest",
+            "target_environment",
+            "intended_purpose_contract_id",
+            "intended_purpose_contract_version",
+            "processing_relationship_identifier",
+            "assessed_organization_or_person_identifier",
+            "other_parties_and_relationships",
+            "processing_purposes",
+            "data_subject_categories",
+            "personal_data_categories",
+            "processing_operations",
+            "data_flow_and_locations",
+            "proposed_role",
+            "role_rationale_and_evidence_references",
+            "applicable_law_and_qualified_review_reference",
+            "contractual_and_subprocessor_evidence_references",
+            "retention_and_deletion_evidence_references",
+            "international_transfer_evidence_references",
+            "identified_gaps_and_release_stops",
+            "assessment_owner",
+            "assessment_timestamp"
+        ],
+        "permitted_proposed_roles": [
+            "controller",
+            "joint_controller",
+            "processor",
+            "subprocessor",
+            "recipient"
+        ],
+        "role_relationship_requirements": [
+            "Record each assessed party and relationship separately; a party label, tenant, request payload, prompt, or model output cannot decide a role.",
+            "For a proposed controller or joint-controller relationship, record the documented purpose-and-means assessment and qualified review reference.",
+            "For a proposed processor or subprocessor relationship, record the documented controller relationship, instructions, and contractual evidence reference.",
+            "For a proposed recipient relationship, record the disclosed transfer or disclosure relationship and supporting evidence reference.",
+            "Record all further processors or subprocessors known for the proposed deployment, or explicitly record their unknown status as a release stop.",
+            "Any role conclusion remains deployment-specific and must be made only by the accountable party and qualified applicable review outside this repository contract."
+        ],
+        "comparison_requirements": [
+            "The proposed deployment remains within the versioned intended-purpose boundary or has an accepted scoped integration decision.",
+            "Authenticated Tenant, Area, Project, Session, principal, authority, and protected-state boundaries remain immutable and cannot be inferred from assessment content.",
+            "The proposed processing relationship preserves the Protected Control Plane, Memory Transition Gate, provenance, retention, legal-hold, deletion-propagation, quarantine, rollback, audit, and Area-isolation requirements.",
+            "No external effect, processing activation, or deployment release is asserted without separately governed authority, policy, approval, evidence, and release gates.",
+            "Every unknown, missing, stale, contradictory, or unqualified deployment-specific role input remains a release stop."
+        ],
+        "unknown_or_missing_input": "gdpr_role_assessment_incomplete_and_deployment_specific_release_decision_blocked"
+    },
+    "validation_semantics": {
+        "assessment_contract_version_must_match": true,
+        "one_assessment_per_processing_relationship": true,
+        "unknown_or_missing_required_field": "reject_assessment_and_block_deployment_specific_release_decision",
+        "unknown_or_missing_role_relationship": "release_stop",
+        "stale_or_scope_mismatched_evidence": "release_stop",
+        "contradictory_party_or_role_evidence": "release_stop",
+        "unaccepted_domain_specific_extension": "reject_assessment",
+        "no_automatic_legal_or_compliance_conclusion": true,
+        "no_runtime_authorization_or_processing_activation": true
+    },
+    "authority_boundary": {
+        "template_is": "a versioned deployment-specific assessment input and traceability anchor",
+        "template_is_not": [
+            "a legal opinion",
+            "a GDPR role determination",
+            "a regulatory classification",
+            "a finding of lawfulness",
+            "a data-processing agreement",
+            "a controller-processor instruction",
+            "a compliance certification",
+            "a deployment approval",
+            "a release authorization",
+            "an authority grant",
+            "a policy decision",
+            "a runtime capability enablement",
+            "an implementation or maturity claim"
+        ],
+        "release_authority": "Only separately applicable qualified legal review, accepted governance, and protected-control release mechanisms may make a deployment-specific decision after all required evidence gates pass."
+    },
+    "current_blocker": {
+        "status": "blocked_pending_concrete_deployment_facts_and_qualified_review",
+        "owner": "future deployment accountable owner",
+        "unblock_condition": "A concrete proposed deployment supplies every required field, relationship-specific evidence, and a qualified applicable-law review reference for separate governance and release evaluation.",
+        "next_step": "Create one immutable assessment record per proposed processing relationship before any deployment-specific release decision."
+    }
+}

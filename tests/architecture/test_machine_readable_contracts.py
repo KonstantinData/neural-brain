@@ -30,6 +30,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "dreaming.json",
         "envelopes.json",
         "evaluation-gates.json",
+        "gdpr-role-assessment-v1.json",
         "inference-provider.json",
         "intended-purpose.json",
         "ledger-invariants.json",

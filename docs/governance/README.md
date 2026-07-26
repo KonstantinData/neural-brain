@@ -15,6 +15,11 @@ defines the stable, product- and domain-neutral intended-purpose assessment
 input for future deployments. It is not a legal, regulatory, compliance, or
 release determination.
 
+[`gdpr-role-assessment-v1.md`](gdpr-role-assessment-v1.md) defines a
+relationship-specific, fail-closed input template for a future qualified GDPR
+role assessment. It does not determine a role or authorize processing,
+deployment, or release.
+
 The contract requires task branches under `codex/`, Conventional Commit
 headers, pull-request review, blocking quality checks, CODEOWNERS review, and
 additional independence evidence for memory separation-of-duties-sensitive

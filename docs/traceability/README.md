@@ -107,6 +107,10 @@ when they are required by the acceptance criteria.
   deployment-specific EU AI Act operator-role assessment template; it is
   evidence input only and fails closed without verified deployment facts and
   qualified review.
+- [`FND-04.4-gdpr-role-assessment.md`](FND-04.4-gdpr-role-assessment.md):
+  deployment-specific GDPR role-assessment evidence input; it names the
+  concrete fact and qualified-review blocker, and neither makes a role
+  conclusion nor enables processing, deployment, or release.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
