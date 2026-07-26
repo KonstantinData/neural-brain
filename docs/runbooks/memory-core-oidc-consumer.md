@@ -122,6 +122,17 @@ Runtime login, pool, or fallback is prohibited for productive customer data.
 The legacy single-DSN local demonstration is development evidence only and is
 not an accepted production compatibility path.
 
+## Approval-evidence boundary
+
+The current library has no authenticated operator approval channel and no
+per-operation approval persistence. `MemoryOperationApproval` is a strict,
+immutable evidence contract for a future Protected Control Plane channel; it
+must be bound to the exact authenticated request, authority snapshot, policy
+decision, reviewer role, and expiry. It never substitutes for the separately
+required current-authority and policy validation, and it cannot write Memory
+Core state or prove an atomic audit. Do not treat its construction or digest as
+a release, authorization, or transition success signal.
+
 ## Security boundaries and operations
 
 This slice has no external-effect surface. It does not create Action authority,
