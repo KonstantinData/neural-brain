@@ -19,6 +19,9 @@ ADR-017.
 - `recognition-gates.json`: all-required recognition criteria.
 - `evaluation-gates.json`: ordered, non-compensatory G0 through G8 evidence.
 - `release-stops.json`: non-waivable complete-system release stops.
+- `intended-purpose.json`: stable product- and domain-neutral intended-purpose
+  statement plus a versioned future-deployment assessment input. It neither
+  authorizes a release nor supplies a legal or compliance conclusion.
 
 ## Memory Core contracts
 
