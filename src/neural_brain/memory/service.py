@@ -20,6 +20,7 @@ from neural_brain.memory.models import (
     WorkingMemoryRequest,
 )
 from neural_brain.memory.ports import MemoryRepository, RuntimeContextProvider
+from neural_brain.security import MemoryOperation, authorize_memory_operation
 
 
 class MemoryService:
@@ -49,10 +50,7 @@ class MemoryService:
             )
 
         context = self._context_provider.current_context()
-        if context.project_id is None or context.session_id is None:
-            raise ScopeIsolationError(
-                "MS-1 memory cycles require authenticated project and session scope"
-            )
+        authorize_memory_operation(context, MemoryOperation.INGEST)
         result = self._repository.commit_memory_cycle(
             context=context,
             transition_request_id=transition_request_id,
@@ -68,6 +66,7 @@ class MemoryService:
     def read_checkpoint(self, request: CheckpointRequest) -> CheckpointRecord:
         """Read back a checkpoint without accepting scope from the caller."""
         context = self._context_provider.current_context()
+        authorize_memory_operation(context, MemoryOperation.READ)
         checkpoint = self._repository.read_checkpoint(
             context=context, checkpoint_id=request.checkpoint_id
         )
@@ -77,6 +76,7 @@ class MemoryService:
     def read_observation(self, observation_id: OpaqueId) -> ObservationRecord:
         """Read one observation without accepting scope from the caller."""
         context = self._context_provider.current_context()
+        authorize_memory_operation(context, MemoryOperation.READ)
         observation = self._repository.read_observation(
             context=context, observation_id=observation_id
         )
@@ -86,6 +86,7 @@ class MemoryService:
     def read_working_memory(self, working_memory_id: OpaqueId) -> WorkingMemoryRecord:
         """Read current working memory without accepting scope from the caller."""
         context = self._context_provider.current_context()
+        authorize_memory_operation(context, MemoryOperation.READ)
         working_memory = self._repository.read_working_memory(
             context=context, working_memory_id=working_memory_id
         )
