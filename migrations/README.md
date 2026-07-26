@@ -38,6 +38,14 @@ the existing `principal_scope_bindings` operation-capability boundary: a Role
 or Service Identity never creates authority without an active, valid,
 scope-matching Principal binding and the owning gate checks.
 
+Migration `0009` adds issuer-bound, scope-bound, operation-, resource-,
+classification-, purpose-, environment-, and validity-bounded Memory Core
+authority grants plus immutable authorization snapshots. It is a catalog and
+evidence primitive only: a Consumer or integration cannot create authority,
+and the migration neither changes Memory Transition Gate sole-writer ownership
+nor releases retrieval, disclosure, promotion, deletion, Goal, Action, or
+external-effect capabilities.
+
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
 a new migration rather than changing an applied file. A migration must not
