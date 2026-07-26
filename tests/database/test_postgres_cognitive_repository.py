@@ -211,10 +211,24 @@ def test_corrupt_checkpoint_is_denied_during_recovery(
 
     with psycopg.connect(database_dsn, autocommit=True) as connection:
         with connection.transaction(), connection.cursor() as cursor:
+            # Model privileged physical corruption explicitly.  Normal table DML
+            # is rejected by the S1-03.4 immutability trigger; this isolated
+            # PostgreSQL test disables that trigger only to prove recovery still
+            # fails closed if storage is tampered with outside the interface.
             cursor.execute(
-                "UPDATE memory_core.checkpoints SET snapshot = %s WHERE checkpoint_id = %s",
-                (Jsonb({"corrupt": True}), "nb1:cycle-corrupt"),
+                "ALTER TABLE memory_core.checkpoints "
+                "DISABLE TRIGGER checkpoints_are_immutable"
             )
+            try:
+                cursor.execute(
+                    "UPDATE memory_core.checkpoints SET snapshot = %s WHERE checkpoint_id = %s",
+                    (Jsonb({"corrupt": True}), "nb1:cycle-corrupt"),
+                )
+            finally:
+                cursor.execute(
+                    "ALTER TABLE memory_core.checkpoints "
+                    "ENABLE TRIGGER checkpoints_are_immutable"
+                )
 
     with pytest.raises(CognitiveRuntimeError):
         _repository(tenant_pool_resolver).load_checkpoint(
