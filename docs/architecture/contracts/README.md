@@ -22,6 +22,10 @@ ADR-017.
 - `intended-purpose.json`: stable product- and domain-neutral intended-purpose
   statement plus a versioned future-deployment assessment input. It neither
   authorizes a release nor supplies a legal or compliance conclusion.
+- `gdpr-role-assessment-v1.json`: deployment-specific evidence-input template
+  for controller, joint-controller, processor, subprocessor, and recipient
+  relationships. It makes no role conclusion, processing authorization, or
+  deployment/release decision.
 - `prohibited-unsupported-use-v1.json`: deterministic, fail-closed
   classification of immutable prohibited and currently unsupported uses. It has
   no allow, activation, or release outcome and never replaces the Security
