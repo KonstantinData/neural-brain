@@ -72,6 +72,14 @@ authorized, audited reconciliation before this migration may apply. It neither
 changes Memory Gate ownership nor introduces Goal, Action, or external-effect
 capabilities.
 
+Migration `0014` redacts every future Audit event before its `0013` hash-chain
+append. It preserves typed actor and immutable scope columns, an explicit
+decision and result, and only typed evidence references. It rejects known
+sensitive-content fields and unknown event types, and records that no general
+policy-decision runtime exists rather than manufacturing policy evidence. It
+does not modify prior immutable evidence, introduce another writer, or enable a
+Goal, Action, approval, deletion, or external-effect capability.
+
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
 a new migration rather than changing an applied file. A migration must not
