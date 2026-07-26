@@ -33,6 +33,10 @@ ADR-017.
 - `ai-act-role-assessment-v1.json`: neutral, per-deployment evidence template
   for qualified EU AI Act operator-role review. It never assigns a role,
   determines applicability or lawfulness, or authorizes a release.
+- `ai-act-risk-classification-assessment-v1.json`: neutral, per-deployment
+  evidence template for qualified EU AI Act risk-classification review. It
+  records prohibited, high-risk, transparency, and other/minimal-risk review
+  inputs only; it never classifies a real deployment or authorizes a release.
 
 ## Memory Core contracts
 

@@ -1,0 +1,108 @@
+{
+  "document_type": "neural_brain_ai_act_risk_classification_assessment_template",
+  "contract_id": "neural-brain.ai-act-risk-classification-assessment",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Define a versioned, deterministic and fail-closed evidence template for qualified, deployment-specific EU AI Act risk-classification review. The template does not determine law, classify a real deployment, authorize processing, release, authority, or runtime operation.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2024/1689",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "classification_reference": "Articles 5, 6, 50 and Annexes I and III; applicability and classification conclusions require qualified deployment-specific review."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete deployment, intended deployment population, jurisdictional nexus, market availability, operating entity, or enabled use case.",
+      "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether a specific deployment is within the scope of Regulation (EU) 2024/1689",
+      "whether a concrete use is prohibited, high-risk, transparency-obligated, minimal-risk, exempt, or otherwise classified",
+      "actual intended purpose, users, affected persons, operational context, and sector",
+      "applicable Annex I or Annex III facts, substantial-modification facts, or an exemption",
+      "whether a concrete system may be placed on the market, put into service, deployed, released, or operated"
+    ]
+  },
+  "assessment_template": {
+    "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment, intended purpose, and authenticated Tenant, Area, and Project scope combination.",
+    "required_fields": [
+      "assessment_identifier",
+      "assessment_timestamp",
+      "assessment_owner_and_accountable_owner",
+      "qualified_reviewer_and_review_date",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdictions",
+      "intended_purpose_contract_id_and_version",
+      "concrete_use_case_and_operational_context",
+      "actual_users_affected_people_and_reasonably_foreseeable_misuse",
+      "model_supplier_data_and_external_effect_boundary",
+      "authenticated_tenant_area_project_scope_model",
+      "article_5_prohibition_review_evidence",
+      "article_6_and_annex_i_high_risk_review_evidence",
+      "annex_iii_high_risk_review_evidence",
+      "article_50_transparency_review_evidence",
+      "other_or_minimal_risk_review_evidence",
+      "applicable_law_and_qualified_review_references",
+      "classification_rationale_and_evidence_references",
+      "identified_gaps_release_stops_and_evidence_expiry",
+      "required_controls_and_independent_release_decision_reference",
+      "reassessment_triggers_and_next_review_date"
+    ],
+    "candidate_classification_labels_for_review_only": [
+      "prohibited_candidate",
+      "high_risk_candidate",
+      "transparency_obligation_candidate",
+      "minimal_or_other_risk_candidate",
+      "not_assessed"
+    ],
+    "deterministic_review_order": [
+      "Verify every required field, immutable artifact, scope binding, evidence freshness, accountable owner, qualified reviewer, review date, rationale, and reassessment trigger; any missing, unknown, stale, contradictory, or scope-mismatched fact is incomplete.",
+      "Review Article 5 prohibition evidence before every other candidate label; a qualified prohibition conclusion is a non-overridable release stop.",
+      "Review Article 6 and Annex I, then Annex III, for high-risk evidence; no exemption, control, approval, or favorable later assessment may silently replace missing facts.",
+      "Review Article 50 transparency evidence independently; it neither creates authority nor compensates for a prohibited, high-risk, unknown, or failed gate.",
+      "Record any remaining or minimal-risk candidate only after all preceding evidence is qualified and complete; the label is review output only and never an allow, legal, compliance, authority, deployment, or release outcome."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_or_model_supplier_change",
+      "intended_purpose_or_enabled_operation_change",
+      "deployment_context_jurisdiction_or_affected_people_change",
+      "data_class_scope_or_external_effect_boundary_change",
+      "legal_or_regulatory_change",
+      "control_or_evidence_expiry_failure_or_contradiction",
+      "incident_complaint_or_material_misuse_signal"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "stale_scope_mismatched_or_contradictory_evidence": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "missing_qualified_reviewer_date_rationale_or_reassessment_trigger": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "unverified_prohibition_or_high_risk_fact": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "qualified_prohibition_conclusion": "non_overridable_release_stop",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_risk_classification": true,
+    "no_runtime_authorization_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability input for separately governed qualified review",
+    "template_is_not": [
+      "a legal opinion, applicability determination, or compliance certification",
+      "a classification of a real deployment or system",
+      "a finding of lawfulness or a determination of an exemption",
+      "a deployment, productive-use, or release approval",
+      "an authority grant, policy decision, human approval, or Security Floor override",
+      "an authenticated Tenant, Area, Project, Session, or principal context",
+      "a protected-state transition request, gate decision, or runtime capability enablement",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately authorized release governance, qualified applicable review, and all Protected Control Plane, transition-gate, evaluation, recognition, and evidence requirements may decide a concrete deployment. This template cannot activate a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_deployment_facts_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, immutable artifact and scope evidence, qualified review, rationale, controls, reassessment triggers, and independent release decision for separate governance evaluation.",
+    "next_step": "Create one immutable assessment record per proposed deployment and reassess it whenever a mandatory trigger occurs before any deployment-specific release decision."
+  }
+}
