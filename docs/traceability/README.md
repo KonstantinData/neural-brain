@@ -92,6 +92,11 @@ when they are required by the acceptance criteria.
 - [`memory-core-production-readiness.md`](memory-core-production-readiness.md):
   current operator-readiness gaps and verified progress for the first deployable
   Memory Core milestone.
+- [`requirement-to-test-catalog-v1.json`](requirement-to-test-catalog-v1.json):
+  bounded, versioned mapping from active normative release-stop and Memory Core
+  transition requirements to concrete tests. It records explicit N/A entries
+  for target-only capabilities and is not a global implementation or release
+  claim.
 
 ## Reconciliation Rules
 
