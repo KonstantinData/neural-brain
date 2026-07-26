@@ -259,6 +259,75 @@ def test_transition_history_is_immutable_and_committed_receipts_are_terminal(
     assert _count(database_dsn, "memory_core.transition_receipts") == 1
 
 
+def _verify_audit_chain(runtime_dsn: str, context: Context) -> bool:
+    with psycopg.connect(runtime_dsn, autocommit=True) as connection, connection.transaction():
+        with connection.cursor() as cursor:
+            cursor.execute("SET LOCAL ROLE neural_brain_reader")
+            _set_context(cursor, context)
+            cursor.execute("SELECT memory_gate.verify_memory_audit_chain()")
+            row = cursor.fetchone()
+            assert row is not None
+            return bool(row[0])
+
+
+@pytest.mark.parametrize("tamper", ("changed", "removed", "reordered"))
+def test_audit_hash_chain_detects_changed_removed_and_reordered_events(
+    database_dsn: str,
+    runtime_database_access: RuntimeDatabaseAccess,
+    tamper: str,
+) -> None:
+    """Canonical chain verification rejects changed, removed, and reordered evidence."""
+
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
+    _call_cycle(
+        runtime_database_access.dsn,
+        AREA_A,
+        _cycle_arguments(
+            request_id="request-chain-second",
+            observation_id="observation-chain-second",
+            checkpoint_id="checkpoint-chain-second",
+            expected_version=1,
+        ),
+    )
+    assert _verify_audit_chain(runtime_database_access.dsn, AREA_A) is True
+
+    with (
+        psycopg.connect(database_dsn, autocommit=True) as connection,
+        connection.cursor() as cursor,
+    ):
+        cursor.execute(
+            "ALTER TABLE memory_audit.events DISABLE TRIGGER audit_events_are_append_only"
+        )
+        try:
+            if tamper == "changed":
+                cursor.execute(
+                    "UPDATE memory_audit.events SET evidence = jsonb_build_object('tampered', true) "
+                    "WHERE tenant_id = 'tenant-a' AND area_id = 'area-a' "
+                    "AND audit_sequence = (SELECT min(audit_sequence) FROM memory_audit.events "
+                    "WHERE tenant_id = 'tenant-a' AND area_id = 'area-a')"
+                )
+            elif tamper == "removed":
+                cursor.execute(
+                    "DELETE FROM memory_audit.events WHERE tenant_id = 'tenant-a' "
+                    "AND area_id = 'area-a' AND audit_sequence = (SELECT max(audit_sequence) "
+                    "FROM memory_audit.events WHERE tenant_id = 'tenant-a' AND area_id = 'area-a')"
+                )
+            else:
+                cursor.execute(
+                    "UPDATE memory_audit.events SET audit_sequence = audit_sequence + 1000 "
+                    "WHERE tenant_id = 'tenant-a' AND area_id = 'area-a' "
+                    "AND audit_sequence = (SELECT min(audit_sequence) FROM memory_audit.events "
+                    "WHERE tenant_id = 'tenant-a' AND area_id = 'area-a')"
+                )
+        finally:
+            cursor.execute(
+                "ALTER TABLE memory_audit.events ENABLE TRIGGER audit_events_are_append_only"
+            )
+
+    with pytest.raises(psycopg.errors.ObjectNotInPrerequisiteState):
+        _verify_audit_chain(runtime_database_access.dsn, AREA_A)
+
+
 def test_stale_version_and_changed_replay_fail_without_partial_state(
     database_dsn: str,
     runtime_database_access: RuntimeDatabaseAccess,
