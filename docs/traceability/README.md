@@ -103,6 +103,9 @@ when they are required by the acceptance criteria.
 - [`FND-04.3-prohibited-unsupported-uses.md`](FND-04.3-prohibited-unsupported-uses.md):
   deterministic, fail-closed prohibited and unsupported-use classification;
   it has no authorization or activation outcome.
+- [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
+  current, Gate-owned approval-claim prerequisite and verification boundary;
+  it records a blocker and does not implement approval consumption.
 
 ## Reconciliation Rules
 
