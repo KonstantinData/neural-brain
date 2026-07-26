@@ -119,6 +119,11 @@ when they are required by the acceptance criteria.
   qualified-review input for a future deployment-specific EU AI Act risk
   classification; it fails closed and neither classifies a real deployment nor
   authorizes authority, release, or enablement.
+- [`FND-04.8-gdpr-applicability-screening.md`](FND-04.8-gdpr-applicability-screening.md):
+  qualified-review input for future deployment-specific GDPR applicability,
+  special-category, automated-decision, and DPIA screening; it records article
+  candidates, risk triggers, assessments, evidence, and release blockers but
+  cannot determine lawfulness or authorize processing, release, or enablement.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.

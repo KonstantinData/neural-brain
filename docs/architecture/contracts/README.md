@@ -26,6 +26,11 @@ ADR-017.
   for controller, joint-controller, processor, subprocessor, and recipient
   relationships. It makes no role conclusion, processing authorization, or
   deployment/release decision.
+- `gdpr-applicability-screening-v1.json`: neutral, per-deployment evidence
+  template for qualified GDPR applicability, special-category,
+  automated-decision, and DPIA screening. It records article candidates, risk
+  triggers, required assessments, evidence, and release blockers only; it
+  never determines lawfulness or authorizes processing or release.
 - `prohibited-unsupported-use-v1.json`: deterministic, fail-closed
   classification of immutable prohibited and currently unsupported uses. It has
   no allow, activation, or release outcome and never replaces the Security

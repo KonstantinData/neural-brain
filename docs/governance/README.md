@@ -20,6 +20,12 @@ relationship-specific, fail-closed input template for a future qualified GDPR
 role assessment. It does not determine a role or authorize processing,
 deployment, or release.
 
+[`gdpr-applicability-screening-v1.md`](gdpr-applicability-screening-v1.md)
+defines a fail-closed input template for qualified GDPR applicability,
+special-category, automated-decision, and DPIA screening. It does not determine
+lawfulness, a GDPR obligation, DPIA necessity, or authorize processing,
+deployment, or release.
+
 The contract requires task branches under `codex/`, Conventional Commit
 headers, pull-request review, blocking quality checks, CODEOWNERS review, and
 additional independence evidence for memory separation-of-duties-sensitive
