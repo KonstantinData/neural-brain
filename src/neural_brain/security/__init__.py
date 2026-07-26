@@ -22,6 +22,10 @@ from neural_brain.security.floor import (
     SecurityFloorDeniedError,
     authorize_memory_operation,
 )
+from neural_brain.security.memory_request_evidence import (
+    MemoryRequestEvidenceDeniedError,
+    validate_memory_request_evidence,
+)
 from neural_brain.security.memory_risk import (
     MEMORY_RISK_CONTRACT_VERSION,
     MemoryLifecycleOperation,
@@ -53,6 +57,7 @@ __all__ = [
     "MemoryAuthoritySnapshot",
     "MemoryLifecycleOperation",
     "MemoryOperation",
+    "MemoryRequestEvidenceDeniedError",
     "MemoryRiskClass",
     "MemoryRiskDecision",
     "MemoryRiskOutcome",
@@ -71,4 +76,5 @@ __all__ = [
     "canonical_policy_json",
     "compile_policy",
     "decide_memory_risk",
+    "validate_memory_request_evidence",
 ]

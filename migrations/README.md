@@ -48,6 +48,10 @@ external-effect capabilities.
 
 Migration `0010` adds canonical context, request, and snapshot digests to the
 immutable `0009` evidence record. It fails closed if unexpected snapshot rows
+exist pending audited reconciliation. Migration `0011` binds the trusted
+checkpoint identifier required by the current policy-decision contract to the
+same immutable authority evidence. It likewise refuses an unreconciled legacy
+snapshot instead of inventing a checkpoint reference.
 exist, because digest values must never be fabricated for historical evidence;
 such rows require audited reconciliation in a separately authorized operation.
 It does not change Memory Gate ownership or release any lifecycle capability.

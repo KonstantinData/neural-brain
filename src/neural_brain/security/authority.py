@@ -113,6 +113,7 @@ class TrustedMemoryAuthorityRequest(_StrictAuthorityModel):
     area_id: str = Field(min_length=1, max_length=128)
     project_id: str = Field(min_length=1, max_length=128)
     session_id: str = Field(min_length=1, max_length=128)
+    checkpoint_id: str = Field(min_length=1, max_length=128)
     operation: MemoryLifecycleOperation
     resource: str = Field(min_length=1, max_length=256)
     data_class: DataClassification

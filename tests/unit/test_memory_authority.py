@@ -27,6 +27,7 @@ def _request(**changes: object) -> TrustedMemoryAuthorityRequest:
         "area_id": "area-a",
         "project_id": "project-a",
         "session_id": "session-a",
+        "checkpoint_id": "checkpoint-a",
         "operation": MemoryLifecycleOperation.INTAKE,
         "resource": "memory_core/observations/42",
         "data_class": "internal",

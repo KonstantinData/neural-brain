@@ -2,7 +2,7 @@
   "document_type": "memory_authority_grants_contract",
   "format_version": 1,
   "contract_id": "neural-brain.memory-authority-grants",
-  "contract_version": "1.1.0",
+  "contract_version": "1.2.0",
   "status": "normative",
   "decisions": ["ADR-018", "ADR-019"],
   "scope": "Memory Core protected subsystem",
@@ -30,6 +30,9 @@
     "The Authority Resolver admits only an authenticated issuer and an exact, catalogued set of grant identifiers; unknown, ambiguous, or issuer-mismatched catalog input is denied.",
     "Derived contexts may preserve or reduce authenticated grant identifiers but may not change authenticated principal or Tenant, Area, Project, or Session scope.",
     "Snapshot request, context, grant, and evidence digests use canonical JSON and bind deterministic immutable evidence; an unreconciled legacy snapshot is never assigned an invented digest.",
+    "A Memory Core request evidence check re-resolves current authority and binds the immutable snapshot to the exact policy decision, checkpoint, and required policy-activation approval role; digest, expiry, revocation, actor, scope, approval, or audit-obligation mismatch denies.",
+    "The existing policy-activation approval attests only four-eyes policy activation and never creates per-request authority; no Memory Transition Gate approval contract is introduced by this evidence check.",
+    "The existing audit obligation is required before a future transition; only the Memory Transition Gate can commit and prove atomic audit evidence.",
     "Payload metadata is not an Authority Resolver input and cannot supply identity, scope, issuer, grant identifiers, or authority.",
     "Memory Transition Gate remains the sole writer of protected Memory Core state.",
     "A grant never releases MS-2 retrieval, candidate promotion, Goal or Action runtime, or external effects."
