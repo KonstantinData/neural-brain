@@ -9,9 +9,6 @@ from __future__ import annotations
 
 from enum import StrEnum
 
-from neural_brain.memory.errors import ScopeIsolationError
-from neural_brain.memory.models import RuntimeContext
-
 SECURITY_FLOOR_VERSION = "security-floor-v1"
 
 
@@ -22,7 +19,7 @@ class MemoryOperation(StrEnum):
     READ = "memory_read"
 
 
-class SecurityFloorDeniedError(ScopeIsolationError):
+class SecurityFloorDeniedError(PermissionError):
     """Raised when a non-overridable runtime safety invariant is not met."""
 
 
@@ -34,9 +31,20 @@ def authorize_memory_operation(context: object, operation: object) -> None:
     boundary; database gates remain independent enforcement layers.
     """
 
-    if not isinstance(context, RuntimeContext):
+    if not _has_runtime_identity(context):
         raise SecurityFloorDeniedError("security floor requires authenticated runtime context")
     if not isinstance(operation, MemoryOperation):
         raise SecurityFloorDeniedError("security floor denies unknown memory operation")
-    if context.project_id is None or context.session_id is None:
+    if getattr(context, "project_id", None) is None or getattr(context, "session_id", None) is None:
         raise SecurityFloorDeniedError("security floor requires complete session scope")
+
+
+def _has_runtime_identity(context: object) -> bool:
+    """Accept only the immutable-context shape without importing Memory Core."""
+
+    required_values = tuple(
+        getattr(context, attribute, None) for attribute in ("actor_id", "tenant_id", "area_id")
+    )
+    return all(
+        isinstance(value, str) and value.strip() == value and value for value in required_values
+    )
