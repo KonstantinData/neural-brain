@@ -96,6 +96,16 @@ Use the same `consumer` object for `record_observation_and_checkpoint`,
 request identity input. Do not accept tenant, Area, Project, Session, principal,
 approval, or authority values from the consumer request.
 
+The PostgreSQL runtime login authenticates this deployed consumer service; it
+does not authenticate each OIDC Principal. The database independently checks
+that the current Principal has valid authority for the current Tenant and Area,
+but it cannot reconstruct which bearer token the application validated before
+setting transaction-local context. Never expose `RuntimeContext` construction
+or `PostgresMemoryRepository` as an untrusted request surface. If the deployment
+threat model requires cross-Tenant containment after a compromised or faulty
+trusted runtime, use an accepted tenant/principal-bound database credential or
+cryptographic context-attestation design before admitting customer data.
+
 ## Security boundaries and operations
 
 This slice has no external-effect surface. It does not create Action authority,
