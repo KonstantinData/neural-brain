@@ -1,5 +1,6 @@
 """Non-overridable runtime security boundaries."""
 
+from neural_brain.security.envelopes import TrustSurface, UntrustedPayloadEnvelope
 from neural_brain.security.floor import (
     SECURITY_FLOOR_VERSION,
     MemoryOperation,
@@ -38,6 +39,8 @@ __all__ = [
     "PolicyCompilationError",
     "PolicyDocument",
     "SecurityFloorDeniedError",
+    "TrustSurface",
+    "UntrustedPayloadEnvelope",
     "authorize_memory_operation",
     "canonical_policy_json",
     "compile_policy",
