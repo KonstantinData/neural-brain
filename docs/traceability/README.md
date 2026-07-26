@@ -106,6 +106,10 @@ when they are required by the acceptance criteria.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
+- [`S1-06.6-separation-of-duties-blocker.md`](S1-06.6-separation-of-duties-blocker.md):
+  authenticated, Gate-owned separation-decision prerequisite for candidate
+  promotion, retrieval assessment, incident resolution, and future action roles;
+  it records a blocker and does not implement a role or approval channel.
 
 ## Reconciliation Rules
 
