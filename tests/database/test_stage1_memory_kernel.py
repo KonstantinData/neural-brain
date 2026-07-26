@@ -326,7 +326,7 @@ def test_audit_redaction_rejects_sensitive_payload_and_cross_scope_read(
         connection.cursor() as cursor,
     ):
         with pytest.raises(
-            psycopg.errors.DataException, match=r"prohibited sensitive.*payload field"
+            psycopg.errors.InvalidParameterValue, match=r"prohibited sensitive.*payload field"
         ):
             cursor.execute(
                 "INSERT INTO memory_audit.events (tenant_id, area_id, event_type, principal_id, "
