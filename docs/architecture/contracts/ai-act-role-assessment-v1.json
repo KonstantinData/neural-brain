@@ -1,0 +1,80 @@
+{
+  "document_type": "neural_brain_ai_act_role_assessment_template",
+  "contract_id": "neural-brain.ai-act-role-assessment",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Define a versioned, evidence-backed, deployment-specific assessment input for possible EU AI Act operator-role review without determining applicability, assigning a legal role, finding lawfulness, approving a deployment, granting authority, or enabling a capability.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2024/1689",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "official_commission_explanatory_url": "https://digital-strategy.ec.europa.eu/en/faqs/navigating-ai-act",
+    "role_definition_reference": "Article 3; applicability and role conclusions require deployment-specific qualified review."
+  },
+  "repository_facts_at_template_creation": {
+    "evidence_sources": ["README.md", "docs/architecture/contracts/intended-purpose.json", "docs/architecture/contracts/prohibited-unsupported-use-v1.json"],
+    "verified_facts": [
+      "The repository is product- and domain-neutral and records no accepted scoped customer or domain integration.",
+      "The documented current runtime is a Python library and protected PostgreSQL memory kernel; no stable service API or production deployment is claimed.",
+      "The current implementation has no action execution, external effects, autonomous operation, or inference adapter ready for deployment.",
+      "The public repository metadata alone is not evidence of a deployed artifact, EU market placement, putting into service, an operating legal entity, brand use, or an operator role."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether a specific deployment exists",
+      "artifact distribution, market placement, or putting into service",
+      "jurisdictions and Union-output nexus",
+      "operating or accountable legal entity",
+      "name or trademark under which a system is made available",
+      "actual users, customer relationship, and authority over use",
+      "applicable AI Act scope, risk classification, exemption, or operator role"
+    ]
+  },
+  "assessment_template": {
+    "purpose": "A separate record is required for each immutable deployment artifact and operating context. It is evidence input only.",
+    "required_fields": [
+      "assessment_identifier",
+      "assessment_timestamp",
+      "assessment_owner_and_qualified_reviewer",
+      "deployment_identifier",
+      "immutable_artifact_version_or_digest",
+      "target_environment_and_jurisdictions",
+      "operating_legal_entity_and_contact",
+      "brand_or_trademark_used_for_availability",
+      "availability_or_putting_into_service_evidence",
+      "actual_users_and_person_exposure",
+      "authority_over_operation_and_use_evidence",
+      "intended_purpose_contract_id_and_version",
+      "enabled_operations_and_external_effect_boundary",
+      "model_and_supplier_chain",
+      "data_classes_and_tenant_area_scope_model",
+      "eu_output_or_market_nexus_evidence",
+      "applicable_law_review_evidence",
+      "role_analysis_evidence",
+      "identified_gaps_release_stops_and_expiry",
+      "independent_release_decision_reference"
+    ],
+    "candidate_role_labels_for_review_only": ["provider", "deployer", "other_or_combined_role", "not_assessed"],
+    "required_comparisons": [
+      "Compare the immutable artifact and actual operating facts with the exact intended-purpose contract version.",
+      "Establish the legal entity, name or trademark, availability or putting-into-service facts, and authority over use from independently reviewable evidence rather than repository metadata or self-description.",
+      "Establish the relevant territorial and output facts without inferring an EU nexus from source-code location, repository visibility, contributor identity, or intended future use.",
+      "Keep any role analysis separate from product maturity, capability, security, release, authority, and protected-control decisions.",
+      "Confirm that no deployment-specific release may bypass the Protected Control Plane, security floor, delivery-stage gates, or non-compensatory evidence requirements."
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "stale_or_scope_mismatched_evidence": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "unverified_deployment_or_operator_fact": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "no_automatic_role_assignment": true,
+    "no_automatic_ai_act_applicability_conclusion": true,
+    "no_automatic_lawfulness_or_compliance_conclusion": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "public_repository_or_branding_metadata_is_insufficient": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability input for qualified deployment-specific review",
+    "template_is_not": ["legal advice", "a legal or regulatory determination", "a provider or deployer assignment", "an AI Act applicability conclusion", "a lawfulness or compliance finding", "a deployment or release approval", "an authority grant", "a policy decision", "a runtime capability enablement", "an implementation, maturity, recognition, safety, or production-autonomy claim"],
+    "release_boundary": "Only separately authorized release governance and all applicable protected-control, evidence, and legal-review requirements may decide a concrete deployment. This template has no allow outcome."
+  }
+}
