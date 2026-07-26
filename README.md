@@ -422,13 +422,11 @@ Neural Brain recognition, or authorize production use.
 - Ruff, strict mypy, pytest, Hypothesis, and JSON Schema validation
 - Pydantic v2 for untrusted runtime boundaries
 - synchronous Psycopg 3 and PostgreSQL as the transactional ledger
-- Ollama is the only architecturally approved future local inference adapter
-  under ADR-014; no inference adapter or inference deployment is implemented
-  or ready.
+- no inference adapter or inference deployment is implemented or ready.
 
-Ollama is an approved future adapter boundary, not a current runtime dependency
-and not proof of neural integration. Any future cognitive substrate requires
-its own accepted ADR, contracts, baselines, ablations, and evaluation evidence.
+Any future inference adapter is not a current runtime dependency and not proof
+of neural integration. Any future cognitive substrate requires its own accepted
+ADR, contracts, baselines, ablations, and evaluation evidence.
 
 ## License and Reuse
 
