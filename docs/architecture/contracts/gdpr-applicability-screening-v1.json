@@ -1,0 +1,75 @@
+{
+  "document_type": "neural_brain_gdpr_applicability_screening_template",
+  "contract_id": "neural-brain.gdpr-applicability-screening",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Define a versioned, deterministic, and fail-closed evidence template for qualified, deployment-specific GDPR applicability, special-category, automated-decision, and DPIA screening. The template does not determine law, lawfulness, an Article 9 condition, an Article 22 outcome, DPIA necessity, authority, processing activation, release, or runtime operation.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2016/679",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "screening_references": "Articles 2, 3, 5, 6, 9, 10, 13, 14, 22, 25, 30, 32, 35, and 44; all applicability and legal conclusions require qualified deployment-specific review."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete controller, processor, deployment, data-subject population, jurisdictional nexus, processing operation, or intended use.",
+      "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether GDPR applies to a concrete deployment or processing operation",
+      "whether personal data, special-category data, criminal-offence data, profiling, or automated individual decision-making are processed",
+      "whether an Article 6 legal basis, Article 9 condition, Article 10 condition, transparency requirement, transfer mechanism, or other legal requirement applies",
+      "whether a concrete processing operation is likely to result in high risk and requires a DPIA",
+      "whether a concrete system may process personal data, be deployed, released, or operated"
+    ]
+  },
+  "screening_template": {
+    "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment and processing operation, intended purpose, and authenticated Tenant, Area, and Project scope combination.",
+    "required_fields": [
+      "screening_identifier", "screening_timestamp", "screening_owner_and_accountable_owner", "qualified_reviewer_and_review_date", "immutable_artifact_version_or_digest", "deployment_identifier_target_environment_and_jurisdictions", "intended_purpose_contract_id_and_version", "concrete_use_case_processing_operations_and_operational_context", "authenticated_tenant_area_project_scope_model", "data_subject_categories_personal_data_categories_and_data_sources", "recipients_processors_locations_and_international_transfer_screening", "article_2_and_3_applicability_review_evidence", "article_5_and_6_principles_and_lawfulness_review_evidence", "article_9_special_category_and_article_10_criminal_data_screening_evidence", "article_13_and_14_transparency_screening_evidence", "article_22_automated_individual_decision_and_profiling_screening_evidence", "article_25_30_32_design_records_and_security_screening_evidence", "article_35_dpia_risk_trigger_and_required_assessment_evidence", "article_44_international_transfer_screening_evidence", "applicable_articles_for_qualified_review_only", "risk_triggers_required_assessments_and_release_blockers", "screening_rationale_and_verified_evidence_references", "independent_release_decision_reference", "reassessment_triggers_and_next_review_date"
+    ],
+    "deterministic_screening_order": [
+      "Verify every required field, immutable artifact, authenticated scope binding, accountable owner, qualified reviewer, review date, rationale, verified evidence reference, and reassessment trigger; any missing, unknown, stale, contradictory, or scope-mismatched fact is incomplete.",
+      "Record Article 2 and Article 3 applicability evidence without reaching an applicability conclusion; absent or unresolved scope, establishment, offering, monitoring, or processing facts remain release blockers.",
+      "Screen special-category and criminal-offence data facts under Articles 9 and 10 before relying on a general processing description; unknown data classification or condition evidence remains a release blocker.",
+      "Screen profiling and solely automated individual decision facts under Article 22 independently; it neither creates authority nor compensates for missing privacy, security, control, recognition, or release evidence.",
+      "Screen Article 35 DPIA risk triggers and required assessments after the processing facts are complete; any unresolved high-risk trigger, missing qualified review, or missing required assessment remains a release blocker.",
+      "Record applicable-article candidates, required assessments, controls, transfer evidence, and release blockers for qualified review only; no completed screen is an allow, legal, compliance, authority, processing, deployment, or release outcome."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_or_model_supplier_change", "intended_purpose_or_processing_operation_change", "data_subject_category_data_class_source_recipient_or_location_change", "special_category_criminal_data_profiling_or_automated_decision_change", "tenant_area_project_scope_or_deployment_jurisdiction_change", "security_control_retention_deletion_or_transfer_boundary_change", "legal_regulatory_or_qualified_review_change", "evidence_expiry_incident_complaint_or_material_misuse_signal"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "screening_incomplete_and_deployment_specific_release_blocked",
+    "stale_scope_mismatched_or_contradictory_evidence": "screening_incomplete_and_deployment_specific_release_blocked",
+    "missing_qualified_reviewer_date_rationale_verified_evidence_or_reassessment_trigger": "screening_incomplete_and_deployment_specific_release_blocked",
+    "unresolved_applicability_special_category_automated_decision_or_dpia_risk_trigger": "screening_incomplete_and_deployment_specific_release_blocked",
+    "missing_required_assessment_or_release_blocker_disposition": "screening_incomplete_and_deployment_specific_release_blocked",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_gdpr_applicability_or_dpia_determination": true,
+    "no_runtime_authorization_processing_activation_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability input for separately governed qualified privacy review",
+    "template_is_not": [
+      "a legal opinion, GDPR applicability determination, or compliance certification",
+      "a determination of lawfulness, Article 6 legal basis, Article 9 condition, Article 10 condition, Article 22 outcome, or DPIA necessity",
+      "a deployment, processing, productive-use, or release approval",
+      "an authority grant, policy decision, human approval, or Security Floor override",
+      "an authenticated Tenant, Area, Project, Session, or principal context",
+      "a protected-state transition request, gate decision, or runtime capability enablement",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately authorized release governance, qualified applicable privacy review, and all Protected Control Plane, transition-gate, evaluation, recognition, and evidence requirements may decide a concrete processing operation or deployment. This template cannot activate a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_processing_facts_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, immutable artifact and scope evidence, qualified reviewer and rationale, verified evidence references, risk-trigger dispositions, required assessments, reassessment triggers, and independent release decision for separate governance evaluation.",
+    "next_step": "Create one immutable screening record per proposed deployment artifact, processing operation, and Tenant, Area, and Project scope combination before any processing-specific or deployment-specific release decision."
+  }
+}
