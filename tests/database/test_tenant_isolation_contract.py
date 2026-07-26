@@ -173,6 +173,36 @@ def _protected_relations(database_dsn: str) -> list[tuple[str, str, str]]:
             return [(str(row[0]), str(row[1]), str(row[2])) for row in cursor.fetchall()]
 
 
+def test_every_operational_domain_table_has_authenticated_scope_columns(database_dsn: str) -> None:
+    """Future operational tables cannot silently omit Tenant or Area scope."""
+
+    with psycopg.connect(database_dsn, autocommit=True) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "SELECT namespace.nspname, relation.relname, "
+                "array_agg(attribute.attname ORDER BY attribute.attname) "
+                "FROM pg_catalog.pg_class AS relation "
+                "JOIN pg_catalog.pg_namespace AS namespace "
+                "ON namespace.oid = relation.relnamespace "
+                "JOIN pg_catalog.pg_attribute AS attribute "
+                "ON attribute.attrelid = relation.oid "
+                "AND attribute.attnum > 0 AND NOT attribute.attisdropped "
+                "WHERE namespace.nspname IN ('memory_core', 'memory_audit', 'memory_gate') "
+                "AND relation.relkind IN ('r', 'p') "
+                "GROUP BY namespace.nspname, relation.relname "
+                "ORDER BY namespace.nspname, relation.relname"
+            )
+            relations = cursor.fetchall()
+
+    assert relations
+    missing_scope = [
+        (str(schema), str(relation), columns)
+        for schema, relation, columns in relations
+        if not {"tenant_id", "area_id"}.issubset(set(columns))
+    ]
+    assert not missing_scope
+
+
 def test_every_memory_table_enables_and_forces_row_level_security(database_dsn: str) -> None:
     """A future unprotected Memory Core or audit table must fail this CI guard."""
 
