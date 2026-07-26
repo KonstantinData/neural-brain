@@ -32,6 +32,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "inference-provider.json",
         "ledger-invariants.json",
         "memory-lifecycle.json",
+        "memory-authority-grants.json",
         "memory-release-stops.json",
         "memory-stage-capabilities.json",
         "nb1-hidden-evaluation.json",
@@ -42,6 +43,30 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "stage-capabilities.json",
         "system-boundary.json",
     }
+
+
+def test_memory_authority_grants_are_evidence_only_and_fail_closed() -> None:
+    contract = _load("memory-authority-grants.json")
+    assert contract["decisions"] == ["ADR-018", "ADR-019"]
+    assert contract["scope"] == "Memory Core protected subsystem"
+    assert {
+        "issuer_id",
+        "resource_pattern",
+        "data_class",
+        "purpose",
+        "environment",
+        "valid_until",
+    } <= set(_strings(contract["grant_fields"]))
+    invariants = set(_strings(contract["invariants"]))
+    assert (
+        "Memory Transition Gate remains the sole writer of protected Memory Core state."
+        in invariants
+    )
+    assert any("consumer, integration" in invariant for invariant in invariants)
+    boundary = contract["current_operation_boundary"]
+    assert isinstance(boundary, dict)
+    assert boundary["implemented_security_floor_operations"] == ["intake"]
+    assert "retrieval" in boundary["not_released"]
 
 
 def test_system_boundary_declares_target_and_honest_current_maturity() -> None:

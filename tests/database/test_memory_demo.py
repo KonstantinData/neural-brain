@@ -25,6 +25,7 @@ from tools.install_memory_core import (
     verify_product_acl_contract,
 )
 from tools.memory_demo import ROOT, run_memory_demo
+from tools.validate_migrations import discover_migrations
 
 DATABASE_PREFIX = "neural_brain_memory_demo_test_"
 ROLE_PREFIX = "neural_brain_memory_demo_test_"
@@ -159,7 +160,7 @@ def test_clean_concurrent_install_round_trip_and_fail_closed_guards(
                 sql.Identifier(INSTALL_SCHEMA)
             )
         )
-        assert cursor.fetchone() == (8,)
+        assert cursor.fetchone() == (len(discover_migrations(ROOT / "migrations")),)
         cursor.execute(
             "SELECT pg_catalog.pg_get_userbyid(datdba) FROM pg_catalog.pg_database "
             "WHERE datname = current_database()"

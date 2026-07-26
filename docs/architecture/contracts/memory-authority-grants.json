@@ -1,0 +1,37 @@
+{
+  "document_type": "memory_authority_grants_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.memory-authority-grants",
+  "contract_version": "1.0.0",
+  "status": "normative",
+  "decisions": ["ADR-018", "ADR-019"],
+  "scope": "Memory Core protected subsystem",
+  "grant_fields": [
+    "issuer_id",
+    "principal_id",
+    "tenant_id",
+    "area_id",
+    "project_id",
+    "session_id",
+    "operation",
+    "resource_pattern",
+    "data_class",
+    "purpose",
+    "environment",
+    "valid_from",
+    "valid_until",
+    "status"
+  ],
+  "invariants": [
+    "Authority originates only from authenticated Protected Control Plane runtime context and an issuer-bound catalog grant.",
+    "Unknown, revoked, expired, inactive, mismatched, or payload-widened grants are denied.",
+    "A consumer, integration, model response, prompt, observation, or payload never grants an operation, record scope, disclosure, promotion, or deletion.",
+    "An authority snapshot is immutable evidence and never creates, renews, or widens authority.",
+    "Memory Transition Gate remains the sole writer of protected Memory Core state.",
+    "A grant never releases MS-2 retrieval, candidate promotion, Goal or Action runtime, or external effects."
+  ],
+  "current_operation_boundary": {
+    "implemented_security_floor_operations": ["intake"],
+    "not_released": ["retrieval", "disclosure", "promotion", "correction", "retention", "deletion"]
+  }
+}
