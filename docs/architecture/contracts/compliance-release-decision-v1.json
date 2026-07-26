@@ -1,0 +1,88 @@
+{
+  "document_type": "neural_brain_compliance_release_decision_record_template",
+  "contract_id": "neural-brain.compliance-release-decision-record",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Define a versioned, deterministic, fail-closed, signed-evidence record template for a separately governed, deployment-specific compliance release decision. The template neither signs a record nor determines law, compliance, authority, policy, deployment, productive enablement, or runtime operation.",
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete deployment, signer, authority, approval, GDPR finding, EU AI Act finding, non-applicability basis, or productive enablement.",
+      "The protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether a concrete GDPR or EU AI Act review is applicable, complete, approved, or legally sufficient",
+      "whether a concrete signer has authority, independence, qualification, or a valid signature",
+      "whether a concrete deployment may be released, enabled, operated, process data, or cause an external effect"
+    ]
+  },
+  "release_decision_record_template": {
+    "record_unit": "One immutable record version or digest per concrete proposed deployment artifact, intended purpose, authenticated Tenant, Area, and Project scope combination, and signed decision attempt.",
+    "required_fields": [
+      "release_decision_identifier_and_record_timestamp",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdictions",
+      "intended_purpose_contract_id_and_version",
+      "authenticated_tenant_area_project_scope_model",
+      "decision_status_and_effective_window",
+      "accountable_release_owner_and_qualified_independent_reviewer",
+      "signer_authenticated_identity_reference_signature_evidence_and_signing_timestamp",
+      "pre_existing_authority_snapshot_reference_policy_decision_reference_and_required_approval_evidence",
+      "gdpr_qualified_approved_finding_reference_or_explicit_qualified_non_applicability_basis",
+      "ai_act_qualified_approved_finding_reference_or_explicit_qualified_non_applicability_basis",
+      "compliance_raci_assessment_reference_and_independence_evidence",
+      "reassessment_trigger_intake_references_open_work_and_current_evidence_freshness",
+      "identified_release_stops_exceptions_and_non_bypass_disposition",
+      "decision_rationale_evidence_references_expiry_and_next_reassessment_date"
+    ],
+    "permitted_decision_statuses": ["approved", "blocked", "rejected", "expired", "revoked", "indeterminate"],
+    "decision_rules": [
+      "Record approved only after every required field is complete, authenticated scope is immutable and matched, the signer identity and signature evidence are verifiable by separately governed means, pre-existing authority and required approval evidence are current, and both the GDPR and EU AI Act requirement each have either a qualified approved finding or an explicit qualified non-applicability basis.",
+      "An explicit non-applicability basis must identify its qualified reviewer, immutable evidence reference, scope, rationale, expiry, and reassessment trigger; unknown, unqualified, stale, contradictory, or scope-mismatched non-applicability evidence is incomplete.",
+      "Any open, overdue, incomplete, stale, conflicting, or scope-mismatched reassessment-trigger work, release stop, authority, approval, signature, finding, non-applicability basis, or evidence reference records blocked or indeterminate and prevents approved.",
+      "A release-decision record is immutable evidence of a separately governed decision attempt. Correction, expiry, revocation, or reassessment creates a new linked record and never edits, reactivates, or silently supersedes a prior record.",
+      "Approved is evidence status only. It cannot create missing authority, approve an Action, Goal, Memory, or Model Promotion transition, activate policy, satisfy a Security Floor prohibition, enable a runtime path, authorize processing, or dispatch an external effect."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_or_model_supplier_change",
+      "intended_purpose_enabled_operation_or_deployment_environment_change",
+      "tenant_area_project_scope_jurisdiction_or_data_boundary_change",
+      "gdpr_or_ai_act_finding_non_applicability_basis_authority_approval_or_signer_evidence_change",
+      "reassessment_trigger_intake_incident_complaint_material_misuse_or_indeterminate_effect_signal",
+      "policy_control_security_floor_or_protected_control_plane_gate_change",
+      "evidence_expiry_conflict_revocation_or_qualified_review_change"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "release_decision_incomplete_and_productive_enablement_blocked",
+    "stale_scope_mismatched_or_contradictory_evidence": "release_decision_incomplete_and_productive_enablement_blocked",
+    "missing_or_unverifiable_signer_identity_signature_authority_policy_or_approval_evidence": "release_decision_incomplete_and_productive_enablement_blocked",
+    "missing_gdpr_or_ai_act_approved_finding_and_explicit_qualified_non_applicability_basis": "release_decision_incomplete_and_productive_enablement_blocked",
+    "open_or_unresolved_reassessment_release_stop_or_non_bypass_exception": "release_decision_incomplete_and_productive_enablement_blocked",
+    "indeterminate_or_ambiguous_decision_or_effect": "indeterminate_and_productive_enablement_blocked_pending_authoritative_reconciliation",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_signature_or_authority_verification_service": true,
+    "no_runtime_authorization_or_enablement": true,
+    "no_protected_state_mutation": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability record template for separately authorized, qualified, signed compliance-release decision evidence",
+    "template_is_not": [
+      "a signing service, signature-verification service, legal opinion, compliance certification, or factual GDPR or EU AI Act conclusion",
+      "a deployment, productive-use, processing, or release approval",
+      "an authority grant, policy decision, human approval, delegation, Security Floor override, or exception mechanism",
+      "an authenticated Tenant, Area, Project, Session, or principal context",
+      "a protected-state transition request, Gate decision, runtime capability enablement, or external-effect authorization",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "non_authorization_boundary": "Even a separately governed signed approved record cannot waive, compensate for, reorder, or satisfy any Protected Control Plane gate, transition gate, independent verification, evaluation or recognition gate, Security Floor prohibition, delivery-stage gate, kill switch, sandbox, budget, resource claim, fence, atomic audit requirement, or release stop. Productive enablement remains denied until every independently applicable control is satisfied by its owning authority."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_deployment_scope_qualified_findings_and_separately_authorized_signing_evidence",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies one immutable scope-matched record with every required field, qualified current GDPR and EU AI Act approved findings or explicit qualified non-applicability bases, independently verifiable signer and signature evidence, pre-existing authority, policy, and approval references, closed reassessment evidence, and all separately applicable Protected Control Plane and release requirements.",
+    "next_step": "For each concrete proposed productive deployment, preserve the scoped evidence and create a separate immutable release-decision record before any productive-enablement consideration."
+  }
+}

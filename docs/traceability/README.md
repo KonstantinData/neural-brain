@@ -134,6 +134,10 @@ when they are required by the acceptance criteria.
   future legal, guidance, model, supplier, purpose, data, and deployment
   changes; it neither polls sources nor decides law, release, authority, or
   runtime behavior.
+- [`FND-04.11-compliance-release-decision.md`](FND-04.11-compliance-release-decision.md):
+  signed-evidence record template for a separately governed compliance-release
+  decision; it requires current scope-matched GDPR and EU AI Act evidence or
+  qualified non-applicability bases and cannot authorize runtime enablement.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
