@@ -31,7 +31,9 @@ package = true
 python-preference = "only-managed"
 
 [tool.ruff]
-target-version = "py314"
+# CPython 3.14 rejects comma-separated exception handlers without parentheses.
+# Keep formatter output compatible with the required runtime until its grammar supports PEP 758.
+target-version = "py313"
 line-length = 100
 extend-exclude = [".local"]
 

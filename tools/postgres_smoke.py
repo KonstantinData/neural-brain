@@ -116,7 +116,12 @@ def main(arguments: Sequence[str] | None = None) -> int:
             {"postgresql_version": _verify_database(environment, scope), "scope": scope}
             for scope in ("dev", "test")
         ]
-    except OSError, ValueError, RuntimeError, psycopg.Error:
+    except (
+        OSError,
+        ValueError,
+        RuntimeError,
+        psycopg.Error,
+    ):
         print(
             json.dumps({"code": "NB-MC-INTERNAL", "status": "failed"}, sort_keys=True),
             file=sys.stderr,
