@@ -1,5 +1,11 @@
 """Non-overridable runtime security boundaries."""
 
+from neural_brain.security.activation import (
+    IndependentPolicyApproval,
+    PolicyActivationDeniedError,
+    PolicyRegressionEvidence,
+    authorize_policy_activation,
+)
 from neural_brain.security.envelopes import TrustSurface, UntrustedPayloadEnvelope
 from neural_brain.security.floor import (
     SECURITY_FLOOR_VERSION,
@@ -30,18 +36,22 @@ __all__ = [
     "POLICY_SCHEMA_VERSION",
     "SECURITY_FLOOR_VERSION",
     "CompiledPolicy",
+    "IndependentPolicyApproval",
     "MemoryLifecycleOperation",
     "MemoryOperation",
     "MemoryRiskClass",
     "MemoryRiskDecision",
     "MemoryRiskOutcome",
     "MemoryRiskRequest",
+    "PolicyActivationDeniedError",
     "PolicyCompilationError",
     "PolicyDocument",
+    "PolicyRegressionEvidence",
     "SecurityFloorDeniedError",
     "TrustSurface",
     "UntrustedPayloadEnvelope",
     "authorize_memory_operation",
+    "authorize_policy_activation",
     "canonical_policy_json",
     "compile_policy",
     "decide_memory_risk",
