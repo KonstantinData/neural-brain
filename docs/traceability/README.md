@@ -114,6 +114,10 @@ when they are required by the acceptance criteria.
   Foundation reconciliation from clean-database migration validation to
   least-privilege Runtime-role DDL and direct-write denial evidence; it adds no
   runtime capability.
+- [`S1-03.3-core-schema-reconciliation.md`](S1-03.3-core-schema-reconciliation.md):
+  MS-1 Memory Core source/observation, checkpoint, transition, provenance,
+  lifecycle-boundary, and recovery mapping; it introduces no schema or early
+  Goal, Action, or external-effect capability.
 
 ## Reconciliation Rules
 
