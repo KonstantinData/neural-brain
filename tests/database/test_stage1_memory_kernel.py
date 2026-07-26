@@ -286,6 +286,26 @@ def _read_redacted_audit_event(
             return row[0]
 
 
+def _read_scoped_audit_timeline(
+    runtime_dsn: str,
+    context: Context,
+    after_audit_sequence: int = 0,
+    maximum_events: int = 100,
+) -> dict[str, object]:
+    with psycopg.connect(runtime_dsn, autocommit=True) as connection, connection.transaction():
+        with connection.cursor() as cursor:
+            cursor.execute("SET LOCAL ROLE neural_brain_reader")
+            _set_context(cursor, context)
+            cursor.execute(
+                "SELECT memory_gate.read_scoped_memory_audit_timeline(%s, %s)",
+                (after_audit_sequence, maximum_events),
+            )
+            row = cursor.fetchone()
+            assert row is not None
+            assert isinstance(row[0], dict)
+            return row[0]
+
+
 def test_redacted_audit_event_has_only_references_and_hash_evidence(
     runtime_database_access: RuntimeDatabaseAccess,
 ) -> None:
@@ -339,6 +359,68 @@ def test_audit_redaction_rejects_sensitive_payload_and_cross_scope_read(
     _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
     with pytest.raises(psycopg.errors.NoData, match="unavailable in the trusted scope"):
         _read_redacted_audit_event(runtime_database_access.dsn, AREA_B, 1)
+
+
+def test_scoped_audit_timeline_reconstructs_redacted_evidence_only(
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
+    """Timeline readback remains ordered evidence, never a raw-memory query surface."""
+
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
+    _call_cycle(
+        runtime_database_access.dsn,
+        AREA_A,
+        _cycle_arguments(
+            request_id="request-timeline-second",
+            observation_id="observation-timeline-second",
+            checkpoint_id="checkpoint-timeline-second",
+            expected_version=1,
+        ),
+    )
+
+    timeline = _read_scoped_audit_timeline(runtime_database_access.dsn, AREA_A)
+
+    assert timeline["timeline_schema_version"] == "s1-03-8-v1"
+    assert timeline["tenant_id"] == "tenant-a"
+    assert timeline["area_id"] == "area-a"
+    assert timeline["integrity"] == {"audit_hash_chain": "verified"}
+    entries = timeline["entries"]
+    assert isinstance(entries, list)
+    assert [entry["audit_sequence"] for entry in entries] == [1, 2]
+    first = entries[0]
+    assert first["principal_id"] == "principal-a"
+    assert first["transition_request_id"] == "request-1"
+    assert first["subject"] == {"kind": "checkpoint", "reference_id": "checkpoint-1"}
+    assert first["decision"] == "memory_cycle_committed"
+    assert first["result"] == "committed"
+    assert first["policy"] == {"state": "not_implemented"}
+    assert first["provenance_references"] == [
+        {"kind": "transition_request", "reference_id": "request-1"},
+        {"kind": "checkpoint", "reference_id": "checkpoint-1"},
+    ]
+    assert isinstance(first["event_hash"], str)
+    assert "consumer-message-1" not in str(timeline)
+    assert "snapshot" not in str(timeline)
+
+
+def test_scoped_audit_timeline_denies_cross_scope_and_invalid_bounds(
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
+    """Unrelated Areas and unbounded requests cannot obtain protected evidence."""
+
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
+
+    cross_scope = _read_scoped_audit_timeline(runtime_database_access.dsn, AREA_B)
+    assert cross_scope["tenant_id"] == "tenant-a"
+    assert cross_scope["area_id"] == "area-b"
+    assert cross_scope["entries"] == []
+
+    with pytest.raises(psycopg.errors.InvalidParameterValue, match="cursor must be non-negative"):
+        _read_scoped_audit_timeline(runtime_database_access.dsn, AREA_A, -1)
+    with pytest.raises(
+        psycopg.errors.InvalidParameterValue, match="maximum_events must be between 1 and 100"
+    ):
+        _read_scoped_audit_timeline(runtime_database_access.dsn, AREA_A, maximum_events=101)
 
 
 @pytest.mark.parametrize("tamper", ("changed", "removed", "reordered"))
