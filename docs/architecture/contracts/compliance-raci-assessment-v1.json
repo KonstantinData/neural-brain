@@ -1,0 +1,124 @@
+{
+  "document_type": "neural_brain_compliance_raci_assessment_template",
+  "contract_id": "neural-brain.compliance-raci-assessment",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Define a versioned, deterministic, fail-closed responsibility, approval-authority, independence, and escalation evidence template for a qualified, deployment-specific governance review. This template does not assign a real person or entity, determine law, grant authority, approve a deployment, or enable runtime operation.",
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete provider, deployer, controller, processor, operating entity, incident responder, release authority, or deployment.",
+      "The protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "the legal or operational responsibility of a concrete person, organization, provider, deployer, or deployment",
+      "the authority, qualification, availability, independence, or delegation of any concrete approver, policy author, policy activator, incident responder, or release authority",
+      "whether a concrete deployment may process data, be released, operated, or have any external effect"
+    ]
+  },
+  "assessment_template": {
+    "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment, intended purpose, authenticated Tenant, Area, and Project scope combination, and responsibility assignment version.",
+    "required_fields": [
+      "assessment_identifier",
+      "assessment_timestamp",
+      "assessment_owner_and_accountable_owner",
+      "qualified_governance_reviewer_and_review_date",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdictions",
+      "intended_purpose_contract_id_and_version",
+      "authenticated_tenant_area_project_scope_model",
+      "provider_responsibility_assignment_and_evidence",
+      "deployer_responsibility_assignment_and_evidence",
+      "privacy_responsibility_assignment_and_evidence",
+      "security_responsibility_assignment_and_evidence",
+      "product_responsibility_assignment_and_evidence",
+      "incident_responsibility_assignment_and_evidence",
+      "release_responsibility_assignment_and_evidence",
+      "approval_authority_matrix_and_authority_source_references",
+      "independence_and_separation_of_duties_evidence",
+      "escalation_paths_acknowledgement_and_control_plane_gate_references",
+      "identified_gaps_release_stops_and_evidence_expiry",
+      "independent_release_decision_reference",
+      "reassessment_triggers_and_next_review_date"
+    ],
+    "responsibility_dimensions": [
+      "provider",
+      "deployer",
+      "privacy",
+      "security",
+      "product",
+      "incident",
+      "release"
+    ],
+    "required_assignment_attributes": [
+      "accountable_owner",
+      "responsible_operator_or_function",
+      "consulted_functions",
+      "informed_functions",
+      "evidence_reference",
+      "scope_and_expiry"
+    ],
+    "approval_authority_rules": [
+      "Every proposed approval must cite a pre-existing authenticated authority source, immutable scope, operation, policy decision, required approval type, expiry, and independent evidence reference.",
+      "Approval records are evidence of a separately governed decision only; approval cannot create missing authority, expand scope, substitute a policy decision, remove a Security Floor prohibition, or enable a protected-state transition or external effect.",
+      "A requester may not be the sole approver for elevated-risk work, and a policy author may not be the sole policy activator; any exception is invalid unless separately authorized by an accepted control-plane contract and independently evidenced.",
+      "Release accountability cannot substitute an Action, Goal, Memory, or Model Promotion Gate, independent verification, kill switch, sandbox, budget, resource claim, fence, or atomic audit requirement."
+    ],
+    "required_independence_boundaries": [
+      "requester_vs_approver_for_elevated_risk_operation",
+      "policy_author_vs_sole_policy_activator",
+      "planner_vs_executor",
+      "executor_vs_independent_verifier",
+      "learning_candidate_producer_vs_model_promoter",
+      "brain_self_monitoring_vs_independent_safety_supervisor",
+      "brain_runtime_vs_kill_switch_and_credential_revocation",
+      "automatic_reconciliation_vs_human_incident_resolution"
+    ],
+    "escalation_rules": [
+      "Escalation records a concern, owner, evidence, deadline, and next review action; it is not an approval, authority grant, policy activation, release decision, or runtime command.",
+      "An escalation cannot bypass, waive, reorder, or satisfy a Protected Control Plane gate, Security Floor prohibition, independent-review requirement, delivery-stage gate, recognition gate, or release stop.",
+      "Unknown, unavailable, conflicted, expired, or non-independent responsibility, approval, or escalation evidence keeps the proposed deployment-specific release decision blocked.",
+      "Incident escalation preserves indeterminate-effect handling: ambiguous external effects require authoritative reconciliation before retry or resource release."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_or_model_supplier_change",
+      "intended_purpose_or_enabled_operation_change",
+      "tenant_area_project_scope_or_deployment_jurisdiction_change",
+      "responsibility_authority_independence_or_delegation_change",
+      "policy_control_or_security_floor_change",
+      "incident_complaint_material_misuse_or_indeterminate_effect_signal",
+      "evidence_expiry_conflict_or_qualified_review_change"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "stale_scope_mismatched_or_contradictory_evidence": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "missing_accountable_owner_qualified_reviewer_independence_or_reassessment_trigger": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "missing_pre_existing_authenticated_authority_or_control_plane_gate_reference": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "escalation_that_claims_or_attempts_a_bypass": "assessment_incomplete_and_deployment_specific_release_blocked",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_responsibility_or_authority_assignment": true,
+    "no_runtime_authorization_or_enablement": true,
+    "no_automatic_release_or_approval_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability input for separately governed qualified review",
+    "template_is_not": [
+      "a legal opinion, compliance certification, or factual assignment of a real provider, deployer, privacy, security, product, incident, or release role",
+      "a deployment, processing, productive-use, or release approval",
+      "an authority grant, policy decision, human approval, delegation, or Security Floor override",
+      "an authenticated Tenant, Area, Project, Session, or principal context",
+      "a protected-state transition request, Gate decision, or runtime capability enablement",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately authorized release governance, qualified applicable review, and every applicable Protected Control Plane, transition-gate, evaluation, recognition, and evidence requirement may decide a concrete deployment. This template cannot activate a runtime path or replace an independent control-plane decision."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_deployment_facts_and_qualified_governance_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, immutable artifact and scope evidence, qualified governance review, unambiguous responsibility assignments, authenticated authority sources, independence evidence, gate-preserving escalation paths, reassessment triggers, and an independent release decision for separate governance evaluation.",
+    "next_step": "Create one immutable responsibility assessment record per proposed deployment artifact and authenticated scope before any deployment-specific release decision."
+  }
+}

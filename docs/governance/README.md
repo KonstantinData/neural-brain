@@ -26,6 +26,11 @@ special-category, automated-decision, and DPIA screening. It does not determine
 lawfulness, a GDPR obligation, DPIA necessity, or authorize processing,
 deployment, or release.
 
+[`compliance-raci-assessment-v1.md`](compliance-raci-assessment-v1.md) defines
+a fail-closed input template for qualified deployment-specific responsibility,
+approval-authority, independence, and escalation review. It does not assign a
+real role, grant authority, approve a release, or enable runtime operation.
+
 The contract requires task branches under `codex/`, Conventional Commit
 headers, pull-request review, blocking quality checks, CODEOWNERS review, and
 additional independence evidence for memory separation-of-duties-sensitive

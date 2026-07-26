@@ -124,6 +124,11 @@ when they are required by the acceptance criteria.
   special-category, automated-decision, and DPIA screening; it records article
   candidates, risk triggers, assessments, evidence, and release blockers but
   cannot determine lawfulness or authorize processing, release, or enablement.
+- [`FND-04.9-compliance-raci.md`](FND-04.9-compliance-raci.md): qualified-review
+  input for future deployment-specific provider, deployer, privacy, security,
+  product, incident, release, approval-authority, independence, and escalation
+  governance; it fails closed and cannot assign a real role, grant authority,
+  approve release, or bypass a Protected Control Plane gate.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
