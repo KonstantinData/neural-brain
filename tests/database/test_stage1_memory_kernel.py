@@ -270,6 +270,77 @@ def _verify_audit_chain(runtime_dsn: str, context: Context) -> bool:
             return bool(row[0])
 
 
+def _read_redacted_audit_event(
+    runtime_dsn: str, context: Context, audit_sequence: int
+) -> dict[str, object]:
+    with psycopg.connect(runtime_dsn, autocommit=True) as connection, connection.transaction():
+        with connection.cursor() as cursor:
+            cursor.execute("SET LOCAL ROLE neural_brain_reader")
+            _set_context(cursor, context)
+            cursor.execute(
+                "SELECT memory_gate.read_redacted_memory_audit_event(%s)", (audit_sequence,)
+            )
+            row = cursor.fetchone()
+            assert row is not None
+            assert isinstance(row[0], dict)
+            return row[0]
+
+
+def test_redacted_audit_event_has_only_references_and_hash_evidence(
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
+    """Audit readback proves decision evidence without copying observation content."""
+
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
+
+    event = _read_redacted_audit_event(runtime_database_access.dsn, AREA_A, 1)
+    assert event["tenant_id"] == "tenant-a"
+    assert event["area_id"] == "area-a"
+    assert event["principal_id"] == "principal-a"
+    assert event["transition_request_id"] == "request-1"
+    assert isinstance(event["event_hash"], str)
+    evidence = event["evidence"]
+    assert isinstance(evidence, dict)
+    assert evidence == {
+        "audit_schema_version": "s1-03-7-v1",
+        "policy": {"state": "not_implemented"},
+        "decision": "memory_cycle_committed",
+        "result": "committed",
+        "evidence_references": [
+            {"kind": "transition_request", "reference_id": "request-1"},
+            {"kind": "checkpoint", "reference_id": "checkpoint-1"},
+        ],
+    }
+    assert "consumer-message-1" not in str(evidence)
+    assert _verify_audit_chain(runtime_database_access.dsn, AREA_A) is True
+
+
+def test_audit_redaction_rejects_sensitive_payload_and_cross_scope_read(
+    database_dsn: str,
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
+    """Sensitive raw fields never append, and redacted reads cannot cross Area scope."""
+
+    with (
+        psycopg.connect(database_dsn, autocommit=True) as connection,
+        connection.cursor() as cursor,
+    ):
+        with pytest.raises(
+            psycopg.errors.DataException, match="prohibited sensitive payload field"
+        ):
+            cursor.execute(
+                "INSERT INTO memory_audit.events (tenant_id, area_id, event_type, principal_id, "
+                "transition_request_id, subject_kind, subject_id, evidence) VALUES "
+                "('tenant-a', 'area-a', 'memory_cycle_committed', 'principal-a', 'request-secret', "
+                "'checkpoint', 'checkpoint-secret', jsonb_build_object('token', 'do-not-store'))"
+            )
+    assert _count(database_dsn, "memory_audit.events") == 0
+
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
+    with pytest.raises(psycopg.errors.NoData, match="unavailable in the trusted scope"):
+        _read_redacted_audit_event(runtime_database_access.dsn, AREA_B, 1)
+
+
 @pytest.mark.parametrize("tamper", ("changed", "removed", "reordered"))
 def test_audit_hash_chain_detects_changed_removed_and_reordered_events(
     database_dsn: str,
