@@ -93,16 +93,21 @@ def test_persistent_fixture_is_scoped_idempotent_and_rejects_cross_scope_read() 
         checkpoint=inputs.checkpoint,
     )
 
-    assert repository.commit_memory_cycle(
-        context=_context(),
-        transition_request_id=inputs.transition_request_id,
-        observation=inputs.observation,
-        working_memory=inputs.working_memory,
-        checkpoint=inputs.checkpoint,
-    ) == result
+    assert (
+        repository.commit_memory_cycle(
+            context=_context(),
+            transition_request_id=inputs.transition_request_id,
+            observation=inputs.observation,
+            working_memory=inputs.working_memory,
+            checkpoint=inputs.checkpoint,
+        )
+        == result
+    )
     assert repository.audit_ids == [inputs.transition_request_id]
     with pytest.raises(Exception, match="record unavailable"):
-        repository.read_checkpoint(context=_context(tenant_id="tenant-b"), checkpoint_id=inputs.checkpoint.checkpoint_id)
+        repository.read_checkpoint(
+            context=_context(tenant_id="tenant-b"), checkpoint_id=inputs.checkpoint.checkpoint_id
+        )
 
 
 def test_scripted_untrusted_adapter_response_cannot_widen_authenticated_scope() -> None:
