@@ -159,7 +159,7 @@ def test_clean_concurrent_install_round_trip_and_fail_closed_guards(
                 sql.Identifier(INSTALL_SCHEMA)
             )
         )
-        assert cursor.fetchone() == (7,)
+        assert cursor.fetchone() == (8,)
         cursor.execute(
             "SELECT pg_catalog.pg_get_userbyid(datdba) FROM pg_catalog.pg_database "
             "WHERE datname = current_database()"

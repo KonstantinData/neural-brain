@@ -32,6 +32,12 @@ Migration `0006` adds protected OIDC principal resolution and direct scoped
 Observation and current Working Memory read gates. It grants no table access and
 does not accept identity or scope through an untrusted memory request.
 
+Migration `0008` adds versioned human and service Principal kinds, validity
+windows, scoped Role bindings, and Service Identity records. It does not widen
+the existing `principal_scope_bindings` operation-capability boundary: a Role
+or Service Identity never creates authority without an active, valid,
+scope-matching Principal binding and the owning gate checks.
+
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
 a new migration rather than changing an applied file. A migration must not
