@@ -111,6 +111,10 @@ when they are required by the acceptance criteria.
   deployment-specific GDPR role-assessment evidence input; it names the
   concrete fact and qualified-review blocker, and neither makes a role
   conclusion nor enables processing, deployment, or release.
+- [`FND-04.6-use-case-scope-intake.md`](FND-04.6-use-case-scope-intake.md):
+  pre-production use-case and scope intake for future deployments; it is
+  evidence input only, fails closed, and cannot supply trusted runtime context,
+  authority, release, or enablement.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
