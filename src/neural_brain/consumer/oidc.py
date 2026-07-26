@@ -28,7 +28,7 @@ _MAX_IDENTIFIER_LENGTH = 200
 class AuthenticatedPrincipalResolver(Protocol):
     """Resolve a validated external subject to one active internal principal."""
 
-    def resolve_authenticated_subject(self, authenticated_subject: str) -> str:
+    def resolve_authenticated_subject(self, authenticated_subject: str, tenant_id: str) -> str:
         """Return the internal principal identifier or fail closed."""
         ...
 
@@ -128,11 +128,14 @@ class OidcJwtAuthenticator:
         subject = _required_string(claims, "sub")
         scope = _required_object(claims, "neural_brain_scope")
         authenticated_subject = canonical_authenticated_subject(self._configuration.issuer, subject)
-        actor_id = self._principal_resolver.resolve_authenticated_subject(authenticated_subject)
+        tenant_id = _required_string(scope, "tenant_id")
+        actor_id = self._principal_resolver.resolve_authenticated_subject(
+            authenticated_subject, tenant_id
+        )
         try:
             return RuntimeContext(
                 actor_id=actor_id,
-                tenant_id=_required_string(scope, "tenant_id"),
+                tenant_id=tenant_id,
                 area_id=_required_string(scope, "area_id"),
                 project_id=_required_string(scope, "project_id"),
                 session_id=_required_string(scope, "session_id"),

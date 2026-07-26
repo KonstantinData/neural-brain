@@ -10,7 +10,15 @@
 - Supersedes: none
 - Superseded by: none
 - Amends: none
-- Amended by: ADR-015, ADR-018
+- Amended by: ADR-015, ADR-018, ADR-019
+
+## Amendment by ADR-019
+
+For productive customer data, the Security Floor prohibits a shared
+cross-Tenant Runtime database login or connection pool. Policy, approval,
+configuration, request context, and writable GUC values cannot override the
+Tenant bound to immutable database session identity. RLS and FORCE remain
+mandatory but cannot substitute for that identity boundary.
 
 ## Amendment by ADR-018
 

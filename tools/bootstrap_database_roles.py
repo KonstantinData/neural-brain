@@ -16,6 +16,7 @@ ROLE_NAMES: Final[tuple[str, ...]] = (
     "neural_brain_reader",
     "neural_brain_dreamer",
 )
+PROVISIONER_ROLE: Final = "neural_brain_provisioner"
 ROLE_BOOTSTRAP_LOCK_ID: Final = 5_825_982_108_055_326_093
 ROLE_BOOTSTRAP_DATABASE: Final = "postgres"
 
@@ -59,6 +60,41 @@ def bootstrap_roles(admin_dsn: str) -> None:
                                 "NOINHERIT NOREPLICATION NOBYPASSRLS"
                             ).format(sql.Identifier(role_name))
                         )
+                cursor.execute(
+                    "SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = %s",
+                    (PROVISIONER_ROLE,),
+                )
+                provisioner_statement = "ALTER ROLE" if cursor.fetchone() else "CREATE ROLE"
+                cursor.execute(
+                    sql.SQL(
+                        provisioner_statement + " {} NOLOGIN NOSUPERUSER NOCREATEDB CREATEROLE "
+                        "INHERIT NOREPLICATION NOBYPASSRLS"
+                    ).format(sql.Identifier(PROVISIONER_ROLE))
+                )
+                for runtime_role in ("neural_brain_gate", "neural_brain_reader"):
+                    cursor.execute(
+                        sql.SQL("GRANT {} TO {} WITH ADMIN TRUE, INHERIT FALSE, SET FALSE").format(
+                            sql.Identifier(runtime_role),
+                            sql.Identifier(PROVISIONER_ROLE),
+                        )
+                    )
+                cursor.execute(
+                    sql.SQL(
+                        "GRANT pg_signal_backend TO {} WITH ADMIN FALSE, INHERIT TRUE, SET FALSE"
+                    ).format(sql.Identifier(PROVISIONER_ROLE))
+                )
+                cursor.execute(
+                    "SELECT member.rolname, granted.rolname "
+                    "FROM pg_catalog.pg_auth_members AS membership "
+                    "JOIN pg_catalog.pg_roles AS member ON member.oid = membership.member "
+                    "JOIN pg_catalog.pg_roles AS granted ON granted.oid = membership.roleid "
+                    "WHERE member.rolname = ANY(%s) ORDER BY member.rolname, granted.rolname",
+                    (list(ROLE_NAMES),),
+                )
+                if cursor.fetchall():
+                    raise RuntimeError(
+                        "Fixed Neural Brain roles must not inherit or SET any other role"
+                    )
             finally:
                 cursor.execute(
                     "SELECT pg_catalog.pg_advisory_unlock(%s)", (ROLE_BOOTSTRAP_LOCK_ID,)
@@ -80,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
     except (RuntimeError, psycopg.Error) as error:
         print(f"database role bootstrap failed: {error}", file=sys.stderr)
         return 1
-    print(f"database role bootstrap: passed ({len(ROLE_NAMES)} roles)")
+    print(f"database role bootstrap: passed ({len(ROLE_NAMES) + 1} roles)")
     return 0
 
 

@@ -29,7 +29,7 @@
       "supersedes": [],
       "superseded_by": [],
       "amends": [],
-      "amended_by": ["ADR-015", "ADR-016"]
+      "amended_by": ["ADR-015", "ADR-016", "ADR-019"]
     },
     {
       "id": "ADR-003",
@@ -43,7 +43,7 @@
       "supersedes": [],
       "superseded_by": [],
       "amends": [],
-      "amended_by": ["ADR-015", "ADR-018"]
+      "amended_by": ["ADR-015", "ADR-018", "ADR-019"]
     },
     {
       "id": "ADR-004",
@@ -71,7 +71,7 @@
       "supersedes": [],
       "superseded_by": [],
       "amends": [],
-      "amended_by": ["ADR-015", "ADR-018"]
+      "amended_by": ["ADR-015", "ADR-018", "ADR-019"]
     },
     {
       "id": "ADR-006",
@@ -183,7 +183,7 @@
       "supersedes": [],
       "superseded_by": [],
       "amends": [],
-      "amended_by": ["ADR-015", "ADR-018"]
+      "amended_by": ["ADR-015", "ADR-018", "ADR-019"]
     },
     {
       "id": "ADR-014",
@@ -211,7 +211,7 @@
       "supersedes": ["ADR-004", "ADR-006", "ADR-007", "ADR-008", "ADR-009", "ADR-011"],
       "superseded_by": ["ADR-018"],
       "amends": ["ADR-001", "ADR-002", "ADR-003", "ADR-005", "ADR-010", "ADR-012", "ADR-013", "ADR-014"],
-      "amended_by": ["ADR-016", "ADR-017", "ADR-018"]
+      "amended_by": ["ADR-016", "ADR-017", "ADR-018", "ADR-019"]
     },
     {
       "id": "ADR-016",
@@ -225,7 +225,7 @@
       "supersedes": [],
       "superseded_by": [],
       "amends": ["ADR-002", "ADR-015"],
-      "amended_by": ["ADR-018"]
+      "amended_by": ["ADR-018", "ADR-019"]
     },
     {
       "id": "ADR-017",
@@ -253,6 +253,20 @@
       "supersedes": ["ADR-015"],
       "superseded_by": [],
       "amends": ["ADR-001", "ADR-003", "ADR-005", "ADR-010", "ADR-013", "ADR-014", "ADR-016", "ADR-017"],
+      "amended_by": ["ADR-019"]
+    },
+    {
+      "id": "ADR-019",
+      "title": "Tenant-Bound Runtime Database Identities and Connection Pools",
+      "file": "ADR-019-tenant-bound-runtime-database-identities-and-pools.md",
+      "status": "Accepted",
+      "authority": "current",
+      "theme": "scope_and_isolation",
+      "scope": "Tenant-bound Runtime database login identities and Tenant-specific connection pools anchor productive Tenant scope below application context.",
+      "stage_scope": ["NB-0", "NB-1", "NB-2", "NB-3", "NB-4", "NB-5", "NB-6", "NB-7", "NB-8"],
+      "supersedes": [],
+      "superseded_by": [],
+      "amends": ["ADR-002", "ADR-003", "ADR-005", "ADR-013", "ADR-015", "ADR-016", "ADR-018"],
       "amended_by": []
     }
   ]

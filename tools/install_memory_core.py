@@ -11,7 +11,7 @@ from typing import Final
 import psycopg
 from psycopg import sql
 
-from tools.bootstrap_database_roles import ROLE_NAMES, bootstrap_roles
+from tools.bootstrap_database_roles import PROVISIONER_ROLE, ROLE_NAMES, bootstrap_roles
 from tools.validate_migrations import Migration, discover_migrations
 
 INSTALL_LOCK_ID: Final = 6_826_005_939_411_273_457
@@ -409,6 +409,16 @@ def validate_fixed_role_graph(admin_dsn: str, runtime_role: str) -> None:
         memberships = set(_read_fixed_role_memberships(cursor, runtime_role))
         if not memberships.issubset(expected):
             raise RuntimeError("The fixed role memberships are not least-privilege")
+        cursor.execute(
+            "SELECT member.rolname, granted.rolname "
+            "FROM pg_catalog.pg_auth_members AS membership "
+            "JOIN pg_catalog.pg_roles AS member ON member.oid = membership.member "
+            "JOIN pg_catalog.pg_roles AS granted ON granted.oid = membership.roleid "
+            "WHERE member.rolname = ANY(%s) ORDER BY member.rolname, granted.rolname",
+            (list(ROLE_NAMES),),
+        )
+        if cursor.fetchall():
+            raise RuntimeError("Fixed Neural Brain roles must not inherit or SET any other role")
 
 
 def grant_runtime_roles(admin_dsn: str, runtime_role: str) -> None:
@@ -449,7 +459,13 @@ def verify_product_acl_contract(admin_dsn: str, runtime_role: str) -> None:
             "WHERE database_record.datname = current_database() "
             "AND acl.grantee <> database_record.datdba ORDER BY 1, 2"
         )
-        if cursor.fetchall() != [(runtime_role, "CONNECT", False)]:
+        expected_database_acls = sorted(
+            [
+                (runtime_role, "CONNECT", False),
+                (PROVISIONER_ROLE, "CONNECT", True),
+            ]
+        )
+        if cursor.fetchall() != expected_database_acls:
             raise RuntimeError("The Memory Core database has an untrusted ACL")
         cursor.execute(
             "SELECT count(*) FROM pg_catalog.pg_namespace AS namespace "
@@ -470,13 +486,31 @@ def verify_product_acl_contract(admin_dsn: str, runtime_role: str) -> None:
             "ORDER BY 1, 2, 3",
             (list(PRODUCT_SCHEMAS),),
         )
+        actual_schema_acls = cursor.fetchall()
         expected_schema_acls = sorted(
             (schema_name, role_name, "USAGE", False)
             for schema_name in PRODUCT_SCHEMAS
             for role_name in ROLE_NAMES[1:]
         )
-        if cursor.fetchall() != expected_schema_acls:
-            raise RuntimeError("A Memory Core product schema has an untrusted ACL")
+        expected_schema_acls.extend(
+            [
+                ("brain_catalog", PROVISIONER_ROLE, "USAGE", False),
+                ("brain_security", PROVISIONER_ROLE, "USAGE", True),
+            ]
+        )
+        cursor.execute(
+            "SELECT EXISTS (SELECT 1 FROM brain_security.tenant_runtime_identities "
+            "WHERE database_role = %s AND status = 'active')",
+            (runtime_role,),
+        )
+        if cursor.fetchone() == (True,):
+            expected_schema_acls.append(("brain_security", runtime_role, "USAGE", False))
+        expected_schema_acls.sort()
+        if actual_schema_acls != expected_schema_acls:
+            raise RuntimeError(
+                "A Memory Core product schema has an untrusted ACL: "
+                f"actual={actual_schema_acls!r}, expected={expected_schema_acls!r}"
+            )
         cursor.execute(
             "SELECT namespace.nspname, relation.relname, "
             "COALESCE(grantee.rolname, 'PUBLIC'), acl.privilege_type, acl.is_grantable "
@@ -496,6 +530,21 @@ def verify_product_acl_contract(admin_dsn: str, runtime_role: str) -> None:
             for relation_name in readable_catalog_relations
             for role_name in ROLE_NAMES[1:]
         )
+        expected_relation_acls.extend(
+            [
+                ("brain_catalog", "brains", PROVISIONER_ROLE, "SELECT", False),
+                ("brain_catalog", "tenants", PROVISIONER_ROLE, "INSERT", False),
+                ("brain_catalog", "tenants", PROVISIONER_ROLE, "SELECT", False),
+                (
+                    "brain_security",
+                    "tenant_runtime_identities",
+                    PROVISIONER_ROLE,
+                    "SELECT",
+                    False,
+                ),
+            ]
+        )
+        expected_relation_acls.sort()
         if cursor.fetchall() != expected_relation_acls:
             raise RuntimeError("A Memory Core relation has an untrusted ACL")
         cursor.execute(
@@ -520,6 +569,34 @@ def verify_product_acl_contract(admin_dsn: str, runtime_role: str) -> None:
                     False,
                 )
                 for role_name in ROLE_NAMES[1:]
+            ]
+            + [
+                ("brain_security", "assert_tenant_context", role_name, "EXECUTE", False)
+                for role_name in ROLE_NAMES[1:]
+            ]
+            + [
+                (
+                    "brain_security",
+                    function_name,
+                    "PUBLIC",
+                    "EXECUTE",
+                    False,
+                )
+                for function_name in ("bound_database_identity", "bound_tenant_id")
+            ]
+            + [
+                (
+                    "brain_security",
+                    function_name,
+                    PROVISIONER_ROLE,
+                    "EXECUTE",
+                    False,
+                )
+                for function_name in (
+                    "deprovision_tenant_runtime_identity",
+                    "register_tenant_runtime_identity",
+                    "rotate_tenant_runtime_identity",
+                )
             ]
             + [("memory_gate", "commit_memory_cycle", "neural_brain_gate", "EXECUTE", False)]
             + [
@@ -643,6 +720,35 @@ def provision_local_oidc_demo_subject(admin_dsn: str) -> None:
         raise RuntimeError("The local OIDC demo provisioning gate omitted its authenticated actor")
 
 
+def bind_local_demo_runtime_identity(admin_dsn: str, runtime_role: str) -> None:
+    """Bind the explicit local demo login to the fixed local demo Tenant."""
+
+    with (
+        psycopg.connect(admin_dsn, autocommit=True) as connection,
+        connection.transaction(),
+        connection.cursor() as cursor,
+    ):
+        cursor.execute(
+            sql.SQL("GRANT USAGE ON SCHEMA brain_security TO {}").format(
+                sql.Identifier(runtime_role)
+            )
+        )
+        cursor.execute(
+            "INSERT INTO brain_security.tenant_runtime_identities "
+            "(database_role, tenant_id, status, credential_revision) "
+            "VALUES (%s, %s, 'active', 1) "
+            "ON CONFLICT (database_role) DO NOTHING",
+            (runtime_role, DEMO_TENANT_ID),
+        )
+        cursor.execute(
+            "SELECT tenant_id, status FROM brain_security.tenant_runtime_identities "
+            "WHERE database_role = %s",
+            (runtime_role,),
+        )
+        if cursor.fetchone() != (DEMO_TENANT_ID, "active"):
+            raise RuntimeError("The local demo runtime identity binding is invalid")
+
+
 def install_local_memory_core(admin_dsn: str, runtime_role: str, migrations_dir: Path) -> int:
     """Install migrations, least-privilege runtime grants, and the fixed local demo scope."""
 
@@ -658,6 +764,8 @@ def install_local_memory_core(admin_dsn: str, runtime_role: str, migrations_dir:
             grant_runtime_roles(admin_dsn, runtime_role)
             verify_product_acl_contract(admin_dsn, runtime_role)
             provision_local_demo_scope(admin_dsn)
+            bind_local_demo_runtime_identity(admin_dsn, runtime_role)
+            verify_product_acl_contract(admin_dsn, runtime_role)
             provision_local_oidc_demo_subject(admin_dsn)
             return migration_count
         finally:

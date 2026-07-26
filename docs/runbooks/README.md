@@ -16,3 +16,7 @@ their accepted gates and may not be documented as model-controlled shortcuts.
 - [`memory-core-oidc-consumer.md`](memory-core-oidc-consumer.md) deploys the
   authenticated Memory Core consumer library and its externally managed OIDC
   configuration.
+- [`tenant-database-operations.md`](tenant-database-operations.md) defines the
+  target ADR-019 operating contract for Tenant-bound database credentials,
+  dedicated pools, provisioning, rotation, revocation, recovery, and migration
+  without claiming production readiness.

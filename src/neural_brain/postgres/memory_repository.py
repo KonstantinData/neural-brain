@@ -31,13 +31,14 @@ from neural_brain.memory.models import (
     WorkingMemoryRecord,
     WorkingMemoryRequest,
 )
+from neural_brain.postgres.tenant_pool import TenantPoolError, TenantPoolResolver
 
 
 class PostgresMemoryRepository:
     """Call only SECURITY DEFINER gates through explicit short transactions."""
 
-    def __init__(self, conninfo: str) -> None:
-        self._conninfo = conninfo
+    def __init__(self, connections: TenantPoolResolver) -> None:
+        self._connections = connections
 
     def commit_memory_cycle(
         self,
@@ -60,7 +61,7 @@ class PostgresMemoryRepository:
         }
         try:
             with (
-                psycopg.connect(self._conninfo, autocommit=True) as connection,
+                self._connections.psycopg_connection(context.tenant_id) as connection,
                 connection.transaction(),
                 connection.cursor() as cursor,
             ):
@@ -83,6 +84,8 @@ class PostgresMemoryRepository:
                     ),
                 )
                 document = self._single_json_result(cursor)
+        except TenantPoolError as error:
+            raise ScopeIsolationError("Tenant database connection is unavailable") from error
         except psycopg.Error as error:
             self._raise_domain_error(error)
 
@@ -126,13 +129,15 @@ class PostgresMemoryRepository:
             raise ScopeIsolationError("checkpoint read requires project and session scope")
         try:
             with (
-                psycopg.connect(self._conninfo, autocommit=True) as connection,
+                self._connections.psycopg_connection(context.tenant_id) as connection,
                 connection.transaction(),
                 connection.cursor() as cursor,
             ):
                 self._set_context(cursor, context, "neural_brain_reader")
                 cursor.execute("SELECT memory_gate.read_checkpoint(%s)", (checkpoint_id,))
                 document = self._single_json_result(cursor)
+        except TenantPoolError as error:
+            raise ScopeIsolationError("Tenant database connection is unavailable") from error
         except psycopg.Error as error:
             self._raise_domain_error(error)
 
@@ -240,13 +245,15 @@ class PostgresMemoryRepository:
             raise ScopeIsolationError("memory read requires project and session scope")
         try:
             with (
-                psycopg.connect(self._conninfo, autocommit=True) as connection,
+                self._connections.psycopg_connection(context.tenant_id) as connection,
                 connection.transaction(),
                 connection.cursor() as cursor,
             ):
                 self._set_context(cursor, context, "neural_brain_reader")
                 cursor.execute(query, (identifier,))
                 return self._single_json_result(cursor)
+        except TenantPoolError as error:
+            raise ScopeIsolationError("Tenant database connection is unavailable") from error
         except psycopg.Error as error:
             self._raise_domain_error(error)
 
@@ -329,6 +336,6 @@ class PostgresMemoryRepository:
             raise StaleWorkingMemoryVersionError("stale working-memory version") from error
         if error.sqlstate == "02000":
             raise CheckpointUnavailableError("checkpoint unavailable") from error
-        if error.sqlstate in {"42501", "55000"}:
+        if error.sqlstate in {"28000", "42501", "55000"}:
             raise ScopeIsolationError("database gate denied trusted scope or authority") from error
         raise AtomicPersistenceError("protected PostgreSQL operation failed") from error

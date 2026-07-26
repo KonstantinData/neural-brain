@@ -19,7 +19,7 @@ from neural_brain.memory import (
     WorkingMemoryEntryRequest,
     WorkingMemoryRequest,
 )
-from neural_brain.postgres import PostgresMemoryRepository
+from neural_brain.postgres import PostgresMemoryRepository, TenantPoolResolver
 
 
 @dataclass(frozen=True)
@@ -33,7 +33,7 @@ class FixedContextProvider:
         return self.context
 
 
-def _service(database_dsn: str) -> MemoryService:
+def _service(tenant_pool_resolver: TenantPoolResolver) -> MemoryService:
     context = RuntimeContext(
         actor_id="principal-a",
         tenant_id="tenant-a",
@@ -43,7 +43,7 @@ def _service(database_dsn: str) -> MemoryService:
     )
     return MemoryService(
         context_provider=FixedContextProvider(context),
-        repository=PostgresMemoryRepository(database_dsn),
+        repository=PostgresMemoryRepository(tenant_pool_resolver),
     )
 
 
@@ -78,9 +78,11 @@ def _record_cycle(service: MemoryService, suffix: str) -> CheckpointRequest:
     return checkpoint
 
 
-def test_psycopg_adapter_commits_and_reads_the_atomic_cycle(database_dsn: str) -> None:
+def test_psycopg_adapter_commits_and_reads_the_atomic_cycle(
+    tenant_pool_resolver: TenantPoolResolver,
+) -> None:
     """The public service round-trips only through the protected database functions."""
-    service = _service(database_dsn)
+    service = _service(tenant_pool_resolver)
     checkpoint = _record_cycle(service, "adapter")
     result = service.read_checkpoint(checkpoint)
 
@@ -97,10 +99,10 @@ def test_psycopg_adapter_commits_and_reads_the_atomic_cycle(database_dsn: str) -
 
 
 def test_psycopg_adapter_denies_direct_reads_outside_the_authenticated_scope(
-    database_dsn: str,
+    tenant_pool_resolver: TenantPoolResolver,
 ) -> None:
     """Observation and Working Memory reads cannot cross a protected Area boundary."""
-    source_service = _service(database_dsn)
+    source_service = _service(tenant_pool_resolver)
     _record_cycle(source_service, "foreign-read")
     foreign_service = MemoryService(
         context_provider=FixedContextProvider(
@@ -112,7 +114,7 @@ def test_psycopg_adapter_denies_direct_reads_outside_the_authenticated_scope(
                 session_id="session-b",
             )
         ),
-        repository=PostgresMemoryRepository(database_dsn),
+        repository=PostgresMemoryRepository(tenant_pool_resolver),
     )
 
     with pytest.raises(CheckpointUnavailableError):
@@ -123,9 +125,10 @@ def test_psycopg_adapter_denies_direct_reads_outside_the_authenticated_scope(
 
 def test_psycopg_adapter_rejects_dreaming_without_persisting_any_output(
     database_dsn: str,
+    tenant_pool_resolver: TenantPoolResolver,
 ) -> None:
     """Service and direct adapter calls fail before any Dreaming persistence."""
-    service = _service(database_dsn)
+    service = _service(tenant_pool_resolver)
     _record_cycle(service, "dreaming")
 
     with psycopg.connect(database_dsn, autocommit=True) as connection:
@@ -145,7 +148,7 @@ def test_psycopg_adapter_rejects_dreaming_without_persisting_any_output(
     with pytest.raises(DreamingUnavailableError):
         service.run_dreaming_dry_run(request)
     with pytest.raises(DreamingUnavailableError):
-        PostgresMemoryRepository(database_dsn).execute_dreaming_dry_run(
+        PostgresMemoryRepository(tenant_pool_resolver).execute_dreaming_dry_run(
             context=RuntimeContext(
                 actor_id="principal-a",
                 tenant_id="tenant-a",

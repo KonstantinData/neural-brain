@@ -11,7 +11,16 @@
 - Supersedes: none
 - Superseded by: none
 - Amends: none
-- Amended by: ADR-015, ADR-018
+- Amended by: ADR-015, ADR-018, ADR-019
+
+## Amendment by ADR-019
+
+The synchronous Psycopg baseline uses one Tenant-specific Runtime connection
+pool per Tenant. Every connection is authenticated by a database login bound to
+that Tenant and may never switch Tenant. Pool acquisition verifies the immutable
+session identity before protected work; mismatch, revocation, or rotation
+evicts the connection instead of repairing it through `SET ROLE` or a GUC.
+Explicit short transaction boundaries remain unchanged.
 
 ## Amendment by ADR-018
 

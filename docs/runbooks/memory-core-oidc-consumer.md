@@ -21,8 +21,8 @@ From a clean checkout with Docker Desktop running:
 .\tools\dev.ps1 memory-demo
 ```
 
-The command starts the loopback-only PostgreSQL Compose stack, applies the six
-migrations, provisions the fixed local demo principal, creates an in-memory RSA
+The command starts the loopback-only PostgreSQL Compose stack, applies the
+ordered migrations, provisions the fixed local demo principal, creates an in-memory RSA
 key and signed token, then prints redacted proof fields including
 `authentication: oidc_rs256_local_demo`, `audit_committed`, and the three
 scoped readbacks. It never writes or prints the key or bearer token.
@@ -34,13 +34,17 @@ The deployment operator supplies these trusted values outside request payloads:
 - an exact HTTPS issuer without a trailing slash;
 - the required audience;
 - a read-only mounted public JWKS JSON file; and
-- `NEURAL_BRAIN_MEMORY_DSN` from the deployment secret manager.
+- a deployment `SecretProvider` that resolves exactly one versioned
+  `TenantDatabaseEndpoint` for the authenticated Tenant from the approved
+  secret store.
 
 The JWKS must contain only unambiguous RSA signing keys used by this consumer:
 `kty: RSA`, `alg: RS256`, a unique `kid`, and at least a 2048-bit modulus. Key
 rotation is external: mount the revised public JWKS atomically, then restart or
-recreate the consumer object. Never put a private signing key, bearer token, or
-database DSN in source control, logs, or this runbook.
+recreate the consumer object. Database credential rotation is separate and must
+follow [`tenant-database-operations.md`](tenant-database-operations.md). Never
+put a private signing key, bearer token, database credential, or DSN in source
+control, logs, or this runbook.
 
 Each token must include signed `iss`, `aud`, `sub`, and `exp` claims and a
 `neural_brain_scope` object with all four immutable identifiers: `tenant_id`,
@@ -62,7 +66,6 @@ configuration, not user input:
 
 ```python
 from pathlib import Path
-import os
 
 from neural_brain.consumer import (
     OidcJwtAuthenticator,
@@ -70,20 +73,31 @@ from neural_brain.consumer import (
     OidcMemoryCoreConsumer,
     load_jwks_file,
 )
-from neural_brain.postgres import PostgresMemoryRepository, PostgresOidcPrincipalResolver
+from neural_brain.postgres import (
+    PostgresMemoryRepository,
+    PostgresOidcPrincipalResolver,
+    TenantPoolResolver,
+)
 
-dsn = os.environ["NEURAL_BRAIN_MEMORY_DSN"]
+# deployment_secret_provider is a deployment-owned SecretProvider adapter.
+# It reads one Tenant endpoint generation from the approved secret store and
+# never accepts a DSN or Tenant override from the request.
+pools = TenantPoolResolver(
+    secret_provider=deployment_secret_provider,
+    max_cached_pools=deployment_pool_limit,
+    pool_max_size=deployment_connections_per_tenant,
+)
 authenticator = OidcJwtAuthenticator(
     configuration=OidcJwtConfiguration(
         issuer="https://issuer.example.invalid",
         audience="neural-brain-memory-core",
     ),
     jwks=load_jwks_file(Path("/run/config/oidc-jwks.json")),
-    principal_resolver=PostgresOidcPrincipalResolver(dsn),
+    principal_resolver=PostgresOidcPrincipalResolver(pools),
 )
 consumer = OidcMemoryCoreConsumer(
     authenticator=authenticator,
-    repository=PostgresMemoryRepository(dsn),
+    repository=PostgresMemoryRepository(pools),
 )
 checkpoint = consumer.read_checkpoint(
     bearer_token=received_bearer_token,
@@ -96,15 +110,17 @@ Use the same `consumer` object for `record_observation_and_checkpoint`,
 request identity input. Do not accept tenant, Area, Project, Session, principal,
 approval, or authority values from the consumer request.
 
-The PostgreSQL runtime login authenticates this deployed consumer service; it
-does not authenticate each OIDC Principal. The database independently checks
-that the current Principal has valid authority for the current Tenant and Area,
-but it cannot reconstruct which bearer token the application validated before
-setting transaction-local context. Never expose `RuntimeContext` construction
-or `PostgresMemoryRepository` as an untrusted request surface. If the deployment
-threat model requires cross-Tenant containment after a compromised or faulty
-trusted runtime, use an accepted tenant/principal-bound database credential or
-cryptographic context-attestation design before admitting customer data.
+After signature and claim validation, the signed Tenant selects only that
+Tenant's secret-backed pool. PostgreSQL then derives the authoritative Tenant
+from protected state keyed by the connection's `session_user`; the requested
+Tenant must match. OIDC Principal resolution still proves the actor and its
+scope authority inside that Tenant. Neither control replaces the other.
+
+Never expose `RuntimeContext`, `PostgresMemoryRepository`, `TenantPoolResolver`,
+or `SecretProvider` as an untrusted request surface. A shared cross-Tenant
+Runtime login, pool, or fallback is prohibited for productive customer data.
+The legacy single-DSN local demonstration is development evidence only and is
+not an accepted production compatibility path.
 
 ## Security boundaries and operations
 
@@ -113,10 +129,13 @@ change Memory or Tenant boundaries, bypass the Memory Gate, or replace a Human
 Gate. Database tables remain inaccessible to the runtime roles; only protected
 functions are granted.
 
-Treat issuer, audience, JWKS replacement, database principal provisioning, and
-database DSN rotation as deployment changes. Verify them in a disposable
-database before rollout with `pytest` and the quality gates. A hosted service,
-health endpoint, structured runtime observability, backups, and production
+Treat issuer, audience, JWKS replacement, database Principal provisioning,
+Tenant Runtime provisioning, secret revisions, pool limits, and routing metadata
+as deployment changes. Verify them in a disposable database before rollout with
+`pytest` and the quality gates. Pool creation, checkout, reset, eviction,
+rotation, revocation, deprovisioning, and incident handling follow the Tenant
+database operations runbook. A hosted service, production secret store, health
+endpoint, structured Runtime observability, production backups, RPO/RTO, and
 deployment automation remain separate readiness items in the ledger.
 
 ## Stable operator failures

@@ -28,7 +28,7 @@ from neural_brain.memory import (
     WorkingMemoryRecord,
     WorkingMemoryRequest,
 )
-from neural_brain.postgres import PostgresMemoryRepository
+from neural_brain.postgres import PostgresMemoryRepository, TenantPoolResolver
 
 type ScopeKey = tuple[str, str, str | None, str | None]
 
@@ -444,7 +444,7 @@ def test_postgres_repository_rejects_dreaming_before_opening_a_connection(
     context_provider: MutableContextProvider,
 ) -> None:
     """Direct adapter use is unavailable even when callers bypass the service."""
-    repository = PostgresMemoryRepository("postgresql://must-not-be-contacted.invalid/test")
+    repository = PostgresMemoryRepository(TenantPoolResolver.__new__(TenantPoolResolver))
 
     with pytest.raises(
         DreamingUnavailableError,

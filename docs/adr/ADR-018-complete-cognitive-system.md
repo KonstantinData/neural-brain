@@ -9,7 +9,16 @@
 - Supersedes: ADR-015
 - Superseded by: none
 - Amends: ADR-001, ADR-003, ADR-005, ADR-010, ADR-013, ADR-014, ADR-016, ADR-017
-- Amended by: none
+- Amended by: ADR-019
+
+## Amendment by ADR-019
+
+The Protected Control Plane identity boundary is anchored at PostgreSQL through
+one Tenant-bound Runtime database login and connection pool per Tenant for
+productive customer data. An established Runtime connection may never switch
+Tenant. Application context may only narrow the database-bound Tenant; RLS and
+FORCE remain mandatory defense in depth. This amendment does not change the
+complete cognitive-system product boundary.
 
 ## Context
 

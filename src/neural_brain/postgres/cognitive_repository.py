@@ -31,6 +31,7 @@ from neural_brain.memory.models import (
     WorkingMemoryRecord,
 )
 from neural_brain.postgres.memory_repository import PostgresMemoryRepository
+from neural_brain.postgres.tenant_pool import TenantPoolError, TenantPoolResolver
 
 
 class PostgresCognitiveRepository:
@@ -40,11 +41,11 @@ class PostgresCognitiveRepository:
 
     def __init__(
         self,
-        conninfo: str,
+        connections: TenantPoolResolver,
         *,
         training_provenance_by_model: Mapping[str, OpaqueId],
     ) -> None:
-        self._conninfo = conninfo
+        self._connections = connections
         self._training_provenance_by_model = dict(training_provenance_by_model)
 
     def load_checkpoint(
@@ -54,7 +55,7 @@ class PostgresCognitiveRepository:
         scope = self._scope(context)
         try:
             with (
-                psycopg.connect(self._conninfo, autocommit=True) as connection,
+                self._connections.psycopg_connection(context.tenant_id) as connection,
                 connection.transaction(),
                 connection.cursor() as cursor,
             ):
@@ -64,6 +65,8 @@ class PostgresCognitiveRepository:
                     (checkpoint_id,),
                 )
                 document = self._single_json_result(cursor)
+        except TenantPoolError as error:
+            raise CognitiveScopeError("Tenant database connection is unavailable") from error
         except psycopg.Error as error:
             self._raise_domain_error(error)
 
@@ -122,7 +125,7 @@ class PostgresCognitiveRepository:
         checkpoint_id = f"nb1:{cycle_id}"
         try:
             with (
-                psycopg.connect(self._conninfo, autocommit=True) as connection,
+                self._connections.psycopg_connection(context.tenant_id) as connection,
                 connection.transaction(),
                 connection.cursor() as cursor,
             ):
@@ -144,6 +147,8 @@ class PostgresCognitiveRepository:
                     ),
                 )
                 document = self._single_json_result(cursor)
+        except TenantPoolError as error:
+            raise CognitiveScopeError("Tenant database connection is unavailable") from error
         except psycopg.Error as error:
             self._raise_domain_error(error)
 
@@ -289,6 +294,6 @@ class PostgresCognitiveRepository:
             raise StaleCognitiveCheckpointError("stale cognitive checkpoint version") from error
         if error.sqlstate == "02000":
             raise CognitiveCheckpointUnavailableError("cognitive checkpoint unavailable") from error
-        if error.sqlstate in {"42501", "55000"}:
+        if error.sqlstate in {"28000", "42501", "55000"}:
             raise CognitiveScopeError("database gate denied trusted scope or authority") from error
         raise CognitiveRuntimeError("protected PostgreSQL cognitive operation failed") from error

@@ -6,6 +6,7 @@
 - Repository: `neural-brain`
 - Scope: product- and domain-neutral integrated cognitive system and protected Memory Core
 - Related decisions: ADR-015, ADR-016, ADR-017, and ADR-018
+- Tenant identity extension: ADR-019, effective 2026-07-26
 
 ## Overview
 
@@ -40,6 +41,15 @@ catalog object carries its own identifier and ancestors, never descendants; a
 Tenant therefore carries no `area_id`. Operational memory still requires
 authenticated `tenant_id` and `area_id`. This model permits neither sentinel or
 nullable required scope nor implicit or payload-derived root scope.
+
+ADR-019 strengthens the database trust boundary for productive customer data.
+Every Runtime login and connection pool is bound to exactly one Tenant, and
+PostgreSQL derives that Tenant from protected state keyed by `session_user`.
+Application-writable context may narrow Area, Project, Session, Principal, and
+authority, but it cannot replace or expand the database-bound Tenant. RLS and
+`FORCE ROW LEVEL SECURITY` remain mandatory defense in depth. This target
+contract is not evidence that production provisioning, secret custody, pool
+operations, backup, restore, or release readiness are complete.
 
 ## Threat Model, Trust Boundaries, and Assumptions
 
@@ -149,12 +159,19 @@ flowchart LR
     end
 
     subgraph P["Authoritative transactional persistence"]
+        PoolRoute["Trusted Tenant-to-pool routing"]
+        TenantPool["Tenant-specific connection pool"]
+        TenantLogin["Tenant-bound session_user and protected mapping"]
         DB[("PostgreSQL protected state and atomic audit ledgers")]
         Recovery["Backup, restore, reconciliation, and readiness"]
     end
 
     Sensor --> Admit
     Agent --> Auth
+    Auth --> PoolRoute
+    PoolRoute --> TenantPool
+    TenantPool --> TenantLogin
+    TenantLogin --> DB
     Auth --> Admit
     Admit --> Source
     Source -->|"admitted observation"| Perception
@@ -448,6 +465,50 @@ in PostgreSQL.
 | V-24 | Reward hacking, specification gaming, prompt injection, unobserved-supervisor behavior, deception, sabotage, self-replication, and evaluation-manipulation tests. |
 | V-25 | Hidden test, baseline, ablation, contamination, calibration, independent reproduction, capability threshold, and residual-risk evidence. |
 
+## Tenant-Bound Database Identity Extension
+
+The following threats apply to ADR-019 and FND-06. They are release-critical
+for productive customer data even when all existing RLS and gate tests pass.
+
+| ID | Attacker story |
+| --- | --- |
+| TID-01 | A shared Runtime login or common fallback pool serves two Tenants, allowing a faulty or compromised Runtime to submit a fully valid foreign Principal and Tenant context that PostgreSQL cannot distinguish, compromising authenticated identity, trusted scope, PostgreSQL state, and sensitive data. |
+| TID-02 | An untrusted request field, host header, prompt, cache entry, worker message, or stale routing value selects another Tenant's pool or secret before RLS receives the request. |
+| TID-03 | A connection is returned to the wrong pool, retains session state, survives credential rotation or revocation, or is relabeled for another Tenant, allowing stale authority or context to affect PostgreSQL state and sensitive data. |
+| TID-04 | Role inheritance, `SET ROLE`, an unsafe membership edge, or use of `current_user` as the identity anchor lets one Tenant Runtime assume another Tenant or privileged role. |
+| TID-05 | An attacker or migration changes the protected login-to-Tenant mapping, weakens a Tenant-aware RLS predicate, or exploits an unsafe `SECURITY DEFINER` search path, redirecting a valid Runtime login to foreign data. |
+| TID-06 | A Tenant DSN or credential enters source control, Notion, logs, traces, metrics, test output, backups, or a broadly readable secret path, enabling replay outside the intended pool. |
+| TID-07 | Provisioning, rotation, revocation, or deprovisioning fails between PostgreSQL and the secret store, leaving a routable partial identity, stale session, orphaned grant, live old secret, or broader retry state. |
+| TID-08 | Backup, restore, failover, or migration recreates data without the exact Tenant-role mapping, credential state, RLS policy, audit continuity, or routing metadata, causing cross-Tenant service or false readiness. |
+
+| ID | Additional mitigation |
+| --- | --- |
+| TIM-01 | Bind each Runtime login to exactly one active Tenant in protected PostgreSQL state keyed by `session_user`; use one immutable Tenant-specific pool; prohibit cross-Tenant Runtime roles and fallbacks; preserve RLS and FORCE; verify role graphs, ownership, grants, policies, and secure definer paths; operate secrets, provisioning, rotation, revocation, eviction, deprovisioning, backup, restore, and database migration through fail-closed audited control-plane workflows. |
+
+| ID | Additional verification |
+| --- | --- |
+| TIV-01 | Live PostgreSQL tests with two restricted Tenant logins and pools proving same-Tenant success; foreign read/write/context/role/function denial; `session_user` anchoring across `SET ROLE` and security-definer execution; pool-key, reset, eviction, exhaustion, and missing-secret denial; role/catalog/RLS/FORCE/ownership/search-path guards; idempotent provisioning and partial-failure cleanup; credential rotation, old-session termination, revocation, and deprovisioning; isolated backup/restore and migration mapping reconciliation. |
+
+### Tenant-identity attacker stories
+
+- A valid Tenant A token is processed by a faulty worker whose cached pool key
+  points to Tenant B. The resolver must detect the authenticated Tenant, pool
+  Tenant, `session_user`, and protected database binding mismatch before any
+  protected query; it may not retry through a common pool.
+- An attacker obtains a Tenant A database password and sets every writable GUC
+  to valid Tenant B and Principal B values. The protected Tenant binding remains
+  Tenant A, so both RLS and gate authorization deny Tenant B data. The expected
+  containment is Tenant A only, assuming the provisioner, database owner,
+  superuser, host, and secret store remain uncompromised.
+- An operator rotates a password but leaves an authenticated old connection in
+  a pool. Password replacement alone does not revoke that session. The rotation
+  workflow must drain and terminate old sessions, advance the credential
+  revision, and prove the old credential and connection are unusable.
+- A shared-database restore contains several Tenants but omits the protected
+  role mapping. It remains quarantined and non-serving until migrations,
+  mappings, policies, audit continuity, retention state, and cross-Tenant tests
+  pass against the restored target.
+
 ## Release Stops
 
 Release of an affected capability stops if any of the following is possible:
@@ -509,6 +570,22 @@ Release of an affected capability stops if any of the following is possible:
     recovery is under sole Brain control.
 24. A failed or unknown cognitive, recognition, evaluation, privacy, authority,
     or safety gate is hidden by an aggregate score or a capability claim.
+25. A productive customer-data Runtime login, pool, connection, secret, or
+    fallback can serve more than one Tenant, or the database-bound Tenant is
+    derived from `current_user`, a writable GUC, or other application input
+    instead of protected state keyed by `session_user`.
+26. A pool can be selected from untrusted input, relabeled between Tenants,
+    returned after failed reset or Tenant verification, or fall back to a
+    shared credential when routing, capacity, or secret lookup fails.
+27. A Tenant Runtime role is superuser, `BYPASSRLS`, owner, migration,
+    provisioner, backup, restore, schema creator, direct table accessor, or can
+    assume another Tenant or privileged role.
+28. Provisioning, rotation, revocation, emergency containment, pool eviction,
+    or deprovisioning can leave a routable partial identity, old credential,
+    stale authenticated session, unexplained grant, or unaudited mapping.
+29. Backup, restore, failover, or migration can report ready before Tenant-role
+    mapping, credential revision, RLS and FORCE, gate authority, audit
+    continuity, retention state, and cross-Tenant negative evidence reconcile.
 
 No later stage, policy exception, operator approval, consumer convenience, or
 availability workaround may waive a release stop.
@@ -563,5 +640,6 @@ style defects and scenarios requiring total host compromise without increasing
 the attacker's existing power are not security findings.
 
 Baseline: ADR-018 complete cognitive-system boundary and Architecture Directive
-v4.0, with ADR-015 retained for the Memory Core, ADR-016 hierarchy scope, and
-ADR-017 governed Dreaming
+v4.0, with ADR-015 retained for the Memory Core, ADR-016 hierarchy scope,
+ADR-017 governed Dreaming, and ADR-019 Tenant-bound Runtime database identities
+and pools.

@@ -89,9 +89,11 @@ def _claims() -> dict[str, object]:
 class _Resolver:
     principal_id: str = "principal-a"
     subjects: list[str] = field(default_factory=list)
+    tenants: list[str] = field(default_factory=list)
 
-    def resolve_authenticated_subject(self, authenticated_subject: str) -> str:
+    def resolve_authenticated_subject(self, authenticated_subject: str, tenant_id: str) -> str:
         self.subjects.append(authenticated_subject)
+        self.tenants.append(tenant_id)
         return self.principal_id
 
 
@@ -176,6 +178,7 @@ def test_valid_rs256_token_derives_context_only_from_signed_claims(
         session_id="session-a",
     )
     assert resolver.subjects == [canonical_authenticated_subject(_ISSUER, "operator-123")]
+    assert resolver.tenants == ["tenant-a"]
 
 
 @pytest.mark.parametrize(

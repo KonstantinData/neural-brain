@@ -6,7 +6,7 @@ from __future__ import annotations
 
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
-from typing import Any, Final
+from typing import Any, Final, Protocol
 
 import psycopg
 import pytest
@@ -14,6 +14,14 @@ from psycopg import sql
 from psycopg.types.json import Jsonb
 
 type Context = dict[str, str]
+
+
+class RuntimeDatabaseAccess(Protocol):
+    @property
+    def dsn(self) -> str:
+        """Return the redacted Tenant-bound runtime DSN."""
+        ...
+
 
 AREA_A: Final[Context] = {
     "principal_id": "principal-a",
@@ -144,11 +152,12 @@ def test_catalog_hierarchy_has_no_tenant_area_and_requires_project_session(
 
 def test_gate_commits_observation_working_context_checkpoint_and_audit_atomically(
     database_dsn: str,
+    runtime_database_access: RuntimeDatabaseAccess,
 ) -> None:
     """One protected call commits the complete vertical slice and supports exact replay."""
 
-    first = _call_cycle(database_dsn, AREA_A, _cycle_arguments())
-    replay = _call_cycle(database_dsn, AREA_A, _cycle_arguments())
+    first = _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
+    replay = _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
 
     assert first == replay
     assert first["working_version"] == 1
@@ -162,12 +171,17 @@ def test_gate_commits_observation_working_context_checkpoint_and_audit_atomicall
     assert _count(database_dsn, "memory_audit.events") == 1
 
 
-def test_checkpoint_readback_is_scope_and_session_checked(database_dsn: str) -> None:
+def test_checkpoint_readback_is_scope_and_session_checked(
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
     """Direct MS-1 readback is deterministic and unavailable outside trusted scope."""
 
-    _call_cycle(database_dsn, AREA_A, _cycle_arguments())
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
 
-    with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
+    with (
+        psycopg.connect(runtime_database_access.dsn, autocommit=True) as connection,
+        connection.transaction(),
+    ):
         with connection.cursor() as cursor:
             cursor.execute("SET LOCAL ROLE neural_brain_reader")
             _set_context(cursor, AREA_A)
@@ -177,7 +191,10 @@ def test_checkpoint_readback_is_scope_and_session_checked(database_dsn: str) -> 
             second = cursor.fetchone()
             assert first == second
 
-    with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
+    with (
+        psycopg.connect(runtime_database_access.dsn, autocommit=True) as connection,
+        connection.transaction(),
+    ):
         with connection.cursor() as cursor:
             cursor.execute("SET LOCAL ROLE neural_brain_reader")
             _set_context(cursor, AREA_B)
@@ -185,10 +202,15 @@ def test_checkpoint_readback_is_scope_and_session_checked(database_dsn: str) -> 
                 cursor.execute("SELECT memory_gate.read_checkpoint(%s)", ("checkpoint-1",))
 
 
-def test_runtime_role_cannot_mutate_protected_tables_directly(database_dsn: str) -> None:
+def test_runtime_role_cannot_mutate_protected_tables_directly(
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
     """RLS is not the only barrier: the runtime role has no table DML grants."""
 
-    with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
+    with (
+        psycopg.connect(runtime_database_access.dsn, autocommit=True) as connection,
+        connection.transaction(),
+    ):
         with connection.cursor() as cursor:
             cursor.execute("SET LOCAL ROLE neural_brain_gate")
             _set_context(cursor, AREA_A)
@@ -196,14 +218,17 @@ def test_runtime_role_cannot_mutate_protected_tables_directly(database_dsn: str)
                 cursor.execute("DELETE FROM memory_core.observations")
 
 
-def test_stale_version_and_changed_replay_fail_without_partial_state(database_dsn: str) -> None:
+def test_stale_version_and_changed_replay_fail_without_partial_state(
+    database_dsn: str,
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
     """Stale compare-and-set and replay mismatch preserve the prior committed state."""
 
-    _call_cycle(database_dsn, AREA_A, _cycle_arguments())
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
 
     with pytest.raises(psycopg.errors.SerializationFailure):
         _call_cycle(
-            database_dsn,
+            runtime_database_access.dsn,
             AREA_A,
             _cycle_arguments(
                 request_id="request-stale",
@@ -214,7 +239,7 @@ def test_stale_version_and_changed_replay_fail_without_partial_state(database_ds
         )
     with pytest.raises(psycopg.errors.DataException):
         _call_cycle(
-            database_dsn,
+            runtime_database_access.dsn,
             AREA_A,
             _cycle_arguments(observation_id="observation-changed"),
         )
@@ -223,7 +248,10 @@ def test_stale_version_and_changed_replay_fail_without_partial_state(database_ds
     assert _count(database_dsn, "memory_audit.events") == 1
 
 
-def test_audit_failure_rolls_back_the_complete_transition(database_dsn: str) -> None:
+def test_audit_failure_rolls_back_the_complete_transition(
+    database_dsn: str,
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
     """An injected audit failure leaves no observation, context version, or checkpoint."""
 
     with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
@@ -239,7 +267,7 @@ def test_audit_failure_rolls_back_the_complete_transition(database_dsn: str) -> 
     try:
         with pytest.raises(psycopg.errors.RaiseException):
             _call_cycle(
-                database_dsn,
+                runtime_database_access.dsn,
                 AREA_B,
                 _cycle_arguments(
                     request_id="request-audit-fail",
@@ -262,7 +290,10 @@ def test_audit_failure_rolls_back_the_complete_transition(database_dsn: str) -> 
                 cursor.execute("DROP FUNCTION memory_audit.fail_test_insert()")
 
 
-def test_concurrent_duplicate_request_cannot_double_commit(database_dsn: str) -> None:
+def test_concurrent_duplicate_request_cannot_double_commit(
+    database_dsn: str,
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
     """A concurrent duplicate either replays or fails closed, but never commits twice."""
 
     arguments = _cycle_arguments(
@@ -274,7 +305,7 @@ def test_concurrent_duplicate_request_cannot_double_commit(database_dsn: str) ->
 
     def invoke() -> object:
         try:
-            return _call_cycle(database_dsn, AREA_B, arguments)
+            return _call_cycle(runtime_database_access.dsn, AREA_B, arguments)
         except psycopg.Error as error:
             return error
 
@@ -294,6 +325,7 @@ def test_concurrent_duplicate_request_cannot_double_commit(database_dsn: str) ->
 
 def test_dreaming_execute_is_revoked_and_creates_no_state(
     database_dsn: str,
+    runtime_database_access: RuntimeDatabaseAccess,
 ) -> None:
     """The runtime role cannot execute Dreaming or create runs, candidates, or audit."""
     with psycopg.connect(database_dsn, autocommit=True) as connection:
@@ -307,6 +339,7 @@ def test_dreaming_execute_is_revoked_and_creates_no_state(
             )
             assert cursor.fetchone() == (False,)
 
+    with psycopg.connect(runtime_database_access.dsn, autocommit=True) as connection:
         with pytest.raises(psycopg.errors.InsufficientPrivilege):
             with connection.transaction(), connection.cursor() as cursor:
                 cursor.execute("SET LOCAL ROLE neural_brain_dreamer")
@@ -316,6 +349,7 @@ def test_dreaming_execute_is_revoked_and_creates_no_state(
                     ("dream-revoked", "stage1 verification"),
                 )
 
+    with psycopg.connect(database_dsn, autocommit=True) as connection:
         with connection.cursor() as cursor:
             cursor.execute(
                 "SELECT "

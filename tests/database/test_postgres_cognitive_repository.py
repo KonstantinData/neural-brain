@@ -23,15 +23,15 @@ from neural_brain.cognition.models import (
     RecordedObservation,
 )
 from neural_brain.memory.models import RuntimeContext
-from neural_brain.postgres import PostgresCognitiveRepository
+from neural_brain.postgres import PostgresCognitiveRepository, TenantPoolResolver
 
 _DIGEST = "a" * 64
 _PROVENANCE = {"model-v1": _DIGEST}
 
 
-def _repository(database_dsn: str) -> PostgresCognitiveRepository:
+def _repository(tenant_pool_resolver: TenantPoolResolver) -> PostgresCognitiveRepository:
     return PostgresCognitiveRepository(
-        database_dsn,
+        tenant_pool_resolver,
         training_provenance_by_model=_PROVENANCE,
     )
 
@@ -138,7 +138,7 @@ def _counts(database_dsn: str) -> tuple[int, int, int, int]:
 def test_trusted_training_provenance_must_match_active_model_before_connect() -> None:
     """Trusted runtime configuration cannot contradict committed model evidence."""
     repository = PostgresCognitiveRepository(
-        "postgresql://connection-must-not-be-attempted",
+        TenantPoolResolver.__new__(TenantPoolResolver),
         training_provenance_by_model={"model-v1": "b" * 64},
     )
 
@@ -152,14 +152,17 @@ def test_trusted_training_provenance_must_match_active_model_before_connect() ->
         )
 
 
-def test_commit_replay_restart_and_recovery_are_exact(database_dsn: str) -> None:
+def test_commit_replay_restart_and_recovery_are_exact(
+    database_dsn: str,
+    tenant_pool_resolver: TenantPoolResolver,
+) -> None:
     """An exact replay is idempotent and a new adapter recovers the durable state."""
-    repository = _repository(database_dsn)
+    repository = _repository(tenant_pool_resolver)
     _commit(repository, "recover")
     first = repository.load_checkpoint(context=_context(), checkpoint_id="nb1:cycle-recover")
 
     _commit(repository, "recover")
-    restarted = _repository(database_dsn)
+    restarted = _repository(tenant_pool_resolver)
     recovered = restarted.load_checkpoint(context=_context(), checkpoint_id="nb1:cycle-recover")
 
     assert recovered == first
@@ -168,9 +171,12 @@ def test_commit_replay_restart_and_recovery_are_exact(database_dsn: str) -> None
     assert _counts(database_dsn) == (1, 1, 1, 2)
 
 
-def test_changed_replay_and_stale_compare_and_set_are_denied(database_dsn: str) -> None:
+def test_changed_replay_and_stale_compare_and_set_are_denied(
+    database_dsn: str,
+    tenant_pool_resolver: TenantPoolResolver,
+) -> None:
     """The cycle receipt rejects changed input and the session slot enforces CAS."""
-    repository = _repository(database_dsn)
+    repository = _repository(tenant_pool_resolver)
     _commit(repository, "original")
 
     with pytest.raises(CognitiveRuntimeError):
@@ -181,9 +187,12 @@ def test_changed_replay_and_stale_compare_and_set_are_denied(database_dsn: str) 
     assert _counts(database_dsn) == (1, 1, 1, 2)
 
 
-def test_missing_and_cross_scope_checkpoint_reads_fail_closed(database_dsn: str) -> None:
+def test_missing_and_cross_scope_checkpoint_reads_fail_closed(
+    database_dsn: str,
+    tenant_pool_resolver: TenantPoolResolver,
+) -> None:
     """Missing and foreign-scope identifiers are indistinguishable to callers."""
-    repository = _repository(database_dsn)
+    repository = _repository(tenant_pool_resolver)
     _commit(repository, "scoped")
 
     with pytest.raises(CognitiveCheckpointUnavailableError):
@@ -192,9 +201,12 @@ def test_missing_and_cross_scope_checkpoint_reads_fail_closed(database_dsn: str)
         repository.load_checkpoint(context=_context(area_b=True), checkpoint_id="nb1:cycle-scoped")
 
 
-def test_corrupt_checkpoint_is_denied_during_recovery(database_dsn: str) -> None:
+def test_corrupt_checkpoint_is_denied_during_recovery(
+    database_dsn: str,
+    tenant_pool_resolver: TenantPoolResolver,
+) -> None:
     """Checkpoint bytes that diverge from immutable evidence cannot be resumed."""
-    repository = _repository(database_dsn)
+    repository = _repository(tenant_pool_resolver)
     _commit(repository, "corrupt")
 
     with psycopg.connect(database_dsn, autocommit=True) as connection:
@@ -205,13 +217,14 @@ def test_corrupt_checkpoint_is_denied_during_recovery(database_dsn: str) -> None
             )
 
     with pytest.raises(CognitiveRuntimeError):
-        _repository(database_dsn).load_checkpoint(
+        _repository(tenant_pool_resolver).load_checkpoint(
             context=_context(), checkpoint_id="nb1:cycle-corrupt"
         )
 
 
 def test_audit_failure_rolls_back_the_complete_cognitive_transaction(
     database_dsn: str,
+    tenant_pool_resolver: TenantPoolResolver,
 ) -> None:
     """A failure after checkpoint creation exposes no partial cognitive state."""
     with psycopg.connect(database_dsn, autocommit=True) as connection:
@@ -231,7 +244,7 @@ def test_audit_failure_rolls_back_the_complete_cognitive_transaction(
 
     try:
         with pytest.raises(CognitiveRuntimeError):
-            _commit(_repository(database_dsn), "rollback")
+            _commit(_repository(tenant_pool_resolver), "rollback")
         assert _counts(database_dsn) == (0, 0, 0, 0)
     finally:
         with psycopg.connect(database_dsn, autocommit=True) as connection:
