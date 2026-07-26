@@ -47,6 +47,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "scope-catalog.json",
         "stage-capabilities.json",
         "system-boundary.json",
+        "use-case-scope-intake-v1.json",
     }
 
 

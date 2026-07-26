@@ -1,0 +1,90 @@
+{
+  "document_type": "neural_brain_use_case_scope_intake_contract",
+  "contract_id": "neural-brain.use-case-scope-intake",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Define a versioned, product- and domain-neutral pre-production evidence intake for a proposed Neural Brain use case and immutable Tenant, Area, and Project scope. The intake records review inputs only; it cannot determine applicable law, create authority, authorize protected-state changes or external effects, approve a release, or enable runtime operation.",
+  "scope": {
+    "current_repository_state": "No customer, production deployment, or deployment-specific use case is established by this repository.",
+    "product_boundary": "The Memory Core is a protected internal subsystem, not the product boundary.",
+    "assessment_unit": "One immutable proposed deployment artifact, use case, and authenticated Tenant, Area, and Project scope combination.",
+    "activation_precondition": "A completed intake is mandatory evidence input before a separately governed productive-use or deployment-specific release decision; it has no allow outcome."
+  },
+  "use_case_scope_intake_template": {
+    "required_fields": [
+      "intake_identifier",
+      "intake_timestamp",
+      "intake_owner_and_accountable_owner",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_and_target_environment",
+      "intended_purpose_contract_id_and_version",
+      "proposed_use_description_and_expected_benefits",
+      "explicit_limitations_and_non_goals",
+      "authenticated_tenant_area_project_scope_model",
+      "affected_people_and_impact_assessment",
+      "perception_and_observation_boundary",
+      "cognition_and_attention_boundary",
+      "memory_types_and_lifecycle_boundary",
+      "world_self_value_and_model_boundary",
+      "learning_consolidation_and_model_promotion_boundary",
+      "goals_planning_action_selection_and_external_effect_boundary",
+      "data_classes_sources_recipients_and_cross_boundary_flows",
+      "retention_legal_hold_deletion_and_recovery_evidence",
+      "principal_authority_policy_approvals_and_separation_of_duties_evidence",
+      "human_oversight_kill_switch_incident_and_escalation_evidence",
+      "risk_assessment_and_security_privacy_release_stops",
+      "evaluation_evidence_and_capability_stage_claims",
+      "applicable_law_and_qualified_review_references",
+      "independent_release_decision_reference",
+      "evidence_references_and_expiry"
+    ],
+    "required_comparisons": [
+      "Compare the immutable artifact, proposed use, and enabled operations against the exact intended-purpose contract version; a domain-specific extension requires an accepted scoped integration decision.",
+      "Confirm that proposed use does not exceed proven delivery-stage capability, recognition, safety, autonomy, or release evidence; unknown or failed evidence remains a release stop.",
+      "Confirm that authenticated Tenant, Area, Project, Session, principal, authority, policy, approval, and kill-switch state are supplied only by trusted runtime context and cannot be created or widened by the intake, prompts, observations, models, memory, tools, or request payloads.",
+      "Confirm that protected Memory, Goal, Action, and Learning or Model Promotion state remains exclusively owned by its transition gate and that an external effect has no path around committed intent, authority snapshot, policy, approval where required, budget, resource claims, fence, sandbox, independent verification, kill switch, and atomic audit evidence.",
+      "Confirm that the proposed use preserves Memory Core provenance, retention, legal hold, deletion propagation, quarantine, rollback, audit, and Area isolation without treating Memory Core as the product boundary.",
+      "Confirm that no completed intake substitutes for qualified applicable-law review, independent release governance, protected-control evidence, or all non-compensatory recognition gates."
+    ],
+    "recording_requirements": [
+      "Record proposed scope as review evidence only; it must not become authenticated runtime context or override database-bound Tenant identity.",
+      "Record every unknown, missing, stale, scope-mismatched, contradictory, or unqualified fact as a named release stop with owner, unblock condition, evidence expiry, and next review step.",
+      "Bind evidence references to the immutable artifact and proposed Tenant, Area, and Project scope; reused or broadened evidence requires separate review.",
+      "Keep legal, regulatory, security, privacy, safety, capability, and release assessments independently attributable; one favorable input cannot compensate for an unknown or failed gate."
+    ]
+  },
+  "fail_closed_semantics": {
+    "assessment_contract_version_must_match": true,
+    "unknown_or_missing_required_field": "intake_incomplete_and_productive_use_release_decision_blocked",
+    "stale_scope_mismatched_or_contradictory_evidence": "intake_incomplete_and_productive_use_release_decision_blocked",
+    "unaccepted_domain_specific_extension": "reject_intake_and_block_productive_use_release_decision",
+    "unproven_capability_or_recognition_gate": "productivity_or_capability_claim_blocked",
+    "unqualified_legal_or_regulatory_input": "deployment_specific_release_decision_blocked",
+    "no_automatic_legal_or_compliance_conclusion": true,
+    "no_runtime_authorization_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned pre-production governance and traceability input for separately governed review",
+    "template_is_not": [
+      "a legal opinion or applicability determination",
+      "a regulatory or compliance conclusion",
+      "a deployment, productive-use, or release approval",
+      "an authority grant or approval",
+      "an authenticated scope, Tenant, Area, Project, Session, or principal context",
+      "a policy decision or Security Floor override",
+      "a protected-state transition request or gate decision",
+      "a runtime capability enablement",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately authorized release governance and all applicable qualified review, Protected Control Plane, transition-gate, evaluation, recognition, and evidence requirements may decide a concrete productive use or deployment. This template never activates a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_use_case_scope_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, immutable artifact and scope evidence, named release-stop disposition, and qualified applicable review references for separate governance and release evaluation.",
+    "next_step": "Create one immutable intake record for each proposed deployment artifact and Tenant, Area, and Project scope combination before any productive-use or deployment-specific release decision."
+  }
+}
