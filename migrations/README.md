@@ -57,6 +57,13 @@ current policy-decision contract to the same immutable authority evidence. It
 likewise refuses an unreconciled legacy snapshot instead of inventing a
 checkpoint reference.
 
+Migration `0012` makes the MS-1 historical working-context versions,
+checkpoints, and committed transition receipts append-only at the database
+interface. A committed receipt is terminal evidence for its idempotent Memory
+Transition Gate operation: correction requires a new authorized transition,
+never a rewrite. It does not introduce later candidate lifecycle transitions,
+Goal or Action runtime, or external-effect execution.
+
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
 a new migration rather than changing an applied file. A migration must not

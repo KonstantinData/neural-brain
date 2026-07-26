@@ -230,6 +230,35 @@ def test_runtime_role_cannot_mutate_protected_tables_directly(
                 cursor.execute("DELETE FROM memory_core.observations")
 
 
+def test_transition_history_is_immutable_and_committed_receipts_are_terminal(
+    database_dsn: str,
+    runtime_database_access: RuntimeDatabaseAccess,
+) -> None:
+    """History cannot be rewritten, even through the administrative database interface."""
+
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
+
+    mutations = (
+        "UPDATE memory_core.working_context_versions SET value = '{}'::jsonb",
+        "DELETE FROM memory_core.working_context_versions",
+        "UPDATE memory_core.checkpoints SET slot_count = 99",
+        "DELETE FROM memory_core.checkpoints",
+        "UPDATE memory_core.transition_receipts SET operation = 'rewritten'",
+        "DELETE FROM memory_core.transition_receipts",
+    )
+    with (
+        psycopg.connect(database_dsn, autocommit=True) as connection,
+        connection.cursor() as cursor,
+    ):
+        for statement in mutations:
+            with pytest.raises(psycopg.errors.ObjectNotInPrerequisiteState):
+                cursor.execute(statement)
+
+    assert _count(database_dsn, "memory_core.working_context_versions") == 1
+    assert _count(database_dsn, "memory_core.checkpoints") == 1
+    assert _count(database_dsn, "memory_core.transition_receipts") == 1
+
+
 def test_stale_version_and_changed_replay_fail_without_partial_state(
     database_dsn: str,
     runtime_database_access: RuntimeDatabaseAccess,
