@@ -61,6 +61,18 @@ def test_catalog_enforces_singleton_brain_and_project_bound_session(database_dsn
                 "(tenant_id, area_id, project_id, session_id) VALUES (%s, %s, %s, %s)",
                 ("tenant-a", "area-a", "missing-project", "invalid-session"),
             )
+        with pytest.raises(psycopg.errors.ForeignKeyViolation):
+            cursor.execute(
+                "INSERT INTO brain_catalog.sessions "
+                "(tenant_id, area_id, project_id, session_id) VALUES (%s, %s, %s, %s)",
+                ("tenant-a", "area-a", "project-b", "cross-area-session"),
+            )
+        with pytest.raises(psycopg.errors.ForeignKeyViolation):
+            cursor.execute(
+                "INSERT INTO brain_catalog.sessions "
+                "(tenant_id, area_id, project_id, session_id) VALUES (%s, %s, %s, %s)",
+                ("tenant-b", "area-a", "project-b", "cross-tenant-session"),
+            )
 
 
 def _set_context(cursor: psycopg.Cursor[tuple[Any, ...]], context: Context) -> None:
