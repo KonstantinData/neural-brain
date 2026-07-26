@@ -10,6 +10,11 @@ deployment boundaries is [`ai-component-inventory.md`](ai-component-inventory.md
 It is deliberately fail-closed: an inventory entry does not enable a capability,
 approve a deployment, or establish Neural Brain recognition.
 
+[`intended-purpose-assessment-v1.md`](intended-purpose-assessment-v1.md)
+defines the stable, product- and domain-neutral intended-purpose assessment
+input for future deployments. It is not a legal, regulatory, compliance, or
+release determination.
+
 The contract requires task branches under `codex/`, Conventional Commit
 headers, pull-request review, blocking quality checks, CODEOWNERS review, and
 additional independence evidence for memory separation-of-duties-sensitive

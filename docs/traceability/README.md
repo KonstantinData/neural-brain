@@ -97,6 +97,9 @@ when they are required by the acceptance criteria.
   transition requirements to concrete tests. It records explicit N/A entries
   for target-only capabilities and is not a global implementation or release
   claim.
+- [`FND-04.2-intended-purpose.md`](FND-04.2-intended-purpose.md): stable
+  intended-purpose and future-deployment assessment-template evidence; it does
+  not make a deployment, legal, or compliance determination.
 
 ## Reconciliation Rules
 

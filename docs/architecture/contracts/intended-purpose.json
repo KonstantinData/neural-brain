@@ -1,0 +1,32 @@
+{
+  "document_type": "neural_brain_intended_purpose_contract",
+  "contract_id": "neural-brain.intended-purpose",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance",
+  "governing_decisions": ["ADR-001", "ADR-018"],
+  "stable_intended_purpose": {
+    "statement": "Neural Brain is a product- and domain-neutral, biologically inspired integrated cognitive-system target. It is intended to provide a protected perception-cognition-action-learning loop whose Cognitive Plane can form and submit typed proposals while an independent Protected Control Plane exclusively governs authenticated scope, authority, protected-state transitions, external effects, learning promotion, verification, recovery, and audit evidence.",
+    "current_maturity": "memory_core_foundation",
+    "current_implementation_boundary": "The current implementation is an early protected Memory Core foundation. It does not establish that perception, neural cognition, world or self models, planning, external action, continual learning, transfer, recognition, production autonomy, or any domain deployment capability is implemented, enabled, safe, or released.",
+    "product_boundary": "The Memory Core is a protected internal subsystem, not the product boundary.",
+    "non_claims": ["consciousness", "sentience", "subjective experience", "human equivalence", "biological or neurophysiological fidelity", "production autonomy", "legal, regulatory, certification, or compliance determination"]
+  },
+  "deployment_assessment_template": {
+    "purpose": "A future deployment must be assessed against this immutable intended-purpose version before any deployment-specific release decision. The completed assessment is evidence input only and does not itself authorize deployment or operation.",
+    "required_fields": ["deployment_identifier", "artifact_version_or_digest", "target_environment", "intended_purpose_contract_id", "intended_purpose_contract_version", "proposed_use_description", "affected_capability_stages", "enabled_operations", "data_classes", "tenant_and_area_scope_model", "external_effect_boundary", "evidence_references", "identified_gaps_and_release_stops", "assessment_owner", "assessment_timestamp"],
+    "required_comparisons": ["The proposed use remains product- and domain-neutral or is rejected until an accepted, scoped integration decision exists.", "The deployment does not claim a capability, maturity stage, recognition status, safety property, or autonomy level without all corresponding non-compensatory evidence gates.", "The deployment preserves the independent Protected Control Plane and does not permit the Cognitive Plane, model output, prompt, memory, observation, tool output, or request payload to create authority or bypass a transition gate.", "Any external effect remains prohibited unless the complete Action Gate prerequisites, fencing, sandboxing, independent verification, kill switch, and atomic audit evidence are implemented and proven for the deployed operation.", "The deployment keeps the Memory Core within its protected subsystem boundary and preserves authenticated scope, provenance, lifecycle, deletion, audit, and Memory Transition Gate invariants."],
+    "unknown_or_missing_input": "assessment_incomplete_and_deployment_specific_release_decision_blocked"
+  },
+  "authority_boundary": {
+    "template_is": "a versioned assessment input and traceability anchor",
+    "template_is_not": ["a legal opinion", "a regulatory classification", "a compliance certification", "a deployment approval", "a release authorization", "an authority grant", "a policy decision", "an implementation or maturity claim"],
+    "release_authority": "A deployment-specific release decision remains separately governed by accepted policy, required evidence gates, and the applicable protected control mechanisms."
+  },
+  "validation_semantics": {
+    "assessment_contract_version_must_match": true,
+    "unknown_or_missing_required_field": "reject_assessment",
+    "unaccepted_domain_specific_extension": "reject_assessment",
+    "unproven_capability_or_evidence_gate": "deployment_specific_release_blocked",
+    "no_automatic_legal_or_compliance_conclusion": true
+  }
+}
