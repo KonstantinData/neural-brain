@@ -107,6 +107,18 @@
       "evidence_state": "N/A_target_not_implemented"
     },
     {
+      "mapping_id": "TARGET-GOAL-GATE-PREREQUISITE",
+      "source": "docs/architecture/contracts/goal-transition-gate-v1.json",
+      "requirement_ids": ["GOAL-GATE-PREREQUISITE-001"],
+      "requirement": "A future Goal Transition Gate has immutable authenticated scope, lineage and evidence-reference fields, remains the sole protected Goal-state writer, and cannot be implemented before accepted ADR-018 revalidation.",
+      "test_ids": ["tests/architecture/test_goal_transition_gate_contract.py::test_goal_aggregate_is_scope_bound_gate_owned_and_fail_closed", "tests/architecture/test_goal_transition_gate_contract.py::test_historical_goal_adrs_block_runtime_and_migration_until_revalidation"],
+      "expected_state": "N/A — prerequisite contract only; no Goal runtime, migration, protected transition, action, or external effect is implemented.",
+      "ledger_effect": "N/A — the existing Memory Core audit ledger is unchanged; a future Goal Gate requires its own atomic protected-state and audit evidence.",
+      "audit_event": "N/A — no Goal transition runtime or audit event is claimed.",
+      "failure_code": "NBRS-01|NBRS-02|NBRS-03|NBRS-04|NBRS-06|NBRS-15|NBRS-16",
+      "evidence_state": "N/A_target_not_implemented"
+    },
+    {
       "mapping_id": "TARGET-EVALUATION",
       "source": "docs/architecture/contracts/evaluation-gates.json#/gates",
       "requirement_ids": ["TARGET-EVAL-G0-G8"],
