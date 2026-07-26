@@ -80,6 +80,14 @@ policy-decision runtime exists rather than manufacturing policy evidence. It
 does not modify prior immutable evidence, introduce another writer, or enable a
 Goal, Action, approval, deletion, or external-effect capability.
 
+Migration `0015` adds a bounded authenticated read Gate for a Tenant/Area's
+redacted audit timeline. It first verifies that scope's canonical hash chain,
+then projects only typed scope, actor, transition, derived-subject and
+provenance references, decision/result, order, and hash evidence. It never
+reads raw Memory Core payload tables or provides table DML. It is not a
+deletion, quarantine, lifecycle, approval, reconciliation, Goal, Action, or
+external-effect runtime.
+
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
 a new migration rather than changing an applied file. A migration must not
