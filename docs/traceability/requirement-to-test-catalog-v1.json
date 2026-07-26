@@ -1,0 +1,134 @@
+{
+  "document_type": "neural_brain_requirement_to_test_catalog",
+  "catalog_version": "1.0.0",
+  "status": "bounded_current_contract_traceability",
+  "purpose": "Maps the bounded set of current normative release-stop and protected-memory transition requirements to versioned tests without claiming that target capabilities are implemented.",
+  "authority": ["ADR-018", "ADR-019", "architecture-directive-v4.0"],
+  "scope": {
+    "included": [
+      "all criteria in contracts/release-stops.json",
+      "all criteria in contracts/memory-release-stops.json",
+      "all invariants in contracts/ledger-invariants.json",
+      "all transition_rules in contracts/memory-lifecycle.json",
+      "ADR-019 runtime Tenant identity invariants",
+      "explicit current-maturity N/A records for target-only cognitive capabilities"
+    ],
+    "excluded": [
+      "historical architecture directives and historical action or goal contracts",
+      "unaccepted Notion discussion",
+      "a claim that contract tests alone prove a capability is implemented or releasable"
+    ],
+    "current_maturity": "memory_core_foundation",
+    "coverage_semantics": "A mapping proves only that the named repository test asserts the stated contract or runtime behavior. N/A means no runtime effect is currently authorized or claimed. It is not a passed implementation claim."
+  },
+  "mappings": [
+    {
+      "mapping_id": "SYS-CP-001",
+      "source": "docs/architecture/contracts/system-boundary.json#/cognitive_plane",
+      "requirement_ids": ["SYS-CP-001", "SYS-CP-002"],
+      "requirement": "The Cognitive Plane may neither directly write protected state nor directly execute external effects.",
+      "test_ids": ["tests/architecture/test_machine_readable_contracts.py::test_cognitive_plane_cannot_bypass_protected_control_plane"],
+      "expected_state": "denied_before_protected_mutation_or_effect",
+      "ledger_effect": "N/A — this is a system-boundary contract assertion, not a protected transition.",
+      "audit_event": "N/A — no runtime Cognitive Plane implementation is claimed by this catalog.",
+      "failure_code": "NBRS-01|NBRS-03",
+      "evidence_state": "contract_asserted"
+    },
+    {
+      "mapping_id": "NBRS",
+      "source": "docs/architecture/contracts/release-stops.json#/criteria",
+      "requirement_ids": ["NBRS-01", "NBRS-02", "NBRS-03", "NBRS-04", "NBRS-05", "NBRS-06", "NBRS-07", "NBRS-08", "NBRS-09", "NBRS-10", "NBRS-11", "NBRS-12", "NBRS-13", "NBRS-14", "NBRS-15", "NBRS-16"],
+      "requirement": "Each complete-system release-stop criterion is non-waivable and blocks the affected capability when triggered.",
+      "test_ids": ["tests/architecture/test_release_stop_contract.py::test_complete_system_release_stops_are_closed_and_non_waivable", "tests/architecture/test_release_stop_contract.py::test_release_stops_cover_cognition_learning_action_and_safety", "tests/architecture/test_release_stop_contract.py::test_unknown_or_failed_evaluation_fails_closed"],
+      "expected_state": "affected_capability_release_blocked",
+      "ledger_effect": "N/A — release-stop policy is normative; later protected runtime gates must provide their own atomic ledger evidence.",
+      "audit_event": "N/A — no general Goal, Action, or Model Promotion runtime is claimed.",
+      "failure_code": "NBRS-01..NBRS-16",
+      "evidence_state": "contract_asserted_target_runtime_not_claimed"
+    },
+    {
+      "mapping_id": "MRS",
+      "source": "docs/architecture/contracts/memory-release-stops.json#/criteria",
+      "requirement_ids": ["MRS-01", "MRS-02", "MRS-03", "MRS-04", "MRS-05", "MRS-06", "MRS-07", "MRS-08", "MRS-09", "MRS-10", "MRS-11", "MRS-12", "MRS-13", "MRS-14", "MRS-15", "MRS-16", "MRS-17", "MRS-18", "MRS-19", "MRS-20", "MRS-21", "MRS-22"],
+      "requirement": "Each retained Memory Core release-stop criterion blocks the affected memory capability when triggered.",
+      "test_ids": ["tests/architecture/test_release_stop_contract.py::test_memory_core_release_stops_remain_binding_under_adr_018", "tests/architecture/test_memory_lifecycle_contract.py::test_memory_lifecycle_is_gate_owned_and_fail_closed", "tests/database/test_stage1_memory_kernel.py::test_gate_commits_observation_working_context_checkpoint_and_audit_atomically", "tests/database/test_stage1_memory_kernel.py::test_dreaming_execute_is_revoked_and_creates_no_state"],
+      "expected_state": "affected_memory_capability_release_blocked",
+      "ledger_effect": "Protected Memory Core transitions commit with their audit evidence or roll back; target-only Memory Core operations remain N/A.",
+      "audit_event": "memory transition audit for implemented gate paths; N/A for unimplemented MS-2 through MS-4 operations.",
+      "failure_code": "MRS-01..MRS-22",
+      "evidence_state": "contract_asserted_partial_foundation_runtime_evidence"
+    },
+    {
+      "mapping_id": "MLI",
+      "source": "docs/architecture/contracts/ledger-invariants.json#/invariants",
+      "requirement_ids": ["MLI-001", "MLI-002", "MLI-003", "MLI-004", "MLI-005", "MLI-006", "MLI-007", "MLI-008", "MLI-009", "MLI-010", "MLI-011", "MLI-012", "MLI-013"],
+      "requirement": "Every listed protected-memory ledger invariant is fail-closed; unavailable or target-stage behavior is never treated as runtime evidence.",
+      "test_ids": ["tests/architecture/test_ledger_invariants.py::test_transition_record_has_memory_scope_provenance_and_atomic_audit", "tests/architecture/test_ledger_invariants.py::test_memory_ledger_invariant_registry_is_exact", "tests/architecture/test_ledger_invariants.py::test_unknown_state_and_failed_audit_fail_closed", "tests/architecture/test_ledger_invariants.py::test_unknown_commit_outcome_requires_reconciliation", "tests/database/test_stage1_memory_kernel.py::test_runtime_role_cannot_mutate_protected_tables_directly", "tests/database/test_stage1_memory_kernel.py::test_audit_failure_rolls_back_the_complete_transition"],
+      "expected_state": "deny_or_rollback_and_not_ready_until_reconciled",
+      "ledger_effect": "implemented Memory Core gate paths atomically commit state version and audit, otherwise roll back; later lifecycle operations are N/A until enabled by their stage.",
+      "audit_event": "memory transition audit event on committed implemented gate path; denial or rollback leaves no partial protected transition.",
+      "failure_code": "MEMORY_UNKNOWN_STATE|MEMORY_AUDIT_FAILURE|MEMORY_RECONCILIATION_REQUIRED",
+      "evidence_state": "contract_asserted_partial_foundation_runtime_evidence"
+    },
+    {
+      "mapping_id": "MLT",
+      "source": "docs/architecture/contracts/memory-lifecycle.json#/transition_rules",
+      "requirement_ids": ["MLT-001", "MLT-002", "MLT-003", "MLT-004", "MLT-005", "MLT-006", "MLT-007", "MLT-008", "MLT-009", "MLT-010"],
+      "requirement": "Each current Memory Core lifecycle transition rule remains gate-owned, scope-bound, auditable, and fail-closed.",
+      "test_ids": ["tests/architecture/test_memory_lifecycle_contract.py::test_memory_lifecycle_is_gate_owned_and_fail_closed", "tests/architecture/test_memory_lifecycle_contract.py::test_candidate_promotion_preserves_independence_and_provenance", "tests/architecture/test_memory_lifecycle_contract.py::test_reconciliation_blocks_readiness_and_blind_retry", "tests/unit/test_memory_service.py::test_untrusted_requests_reject_actor_and_scope_fields", "tests/database/test_stage1_memory_kernel.py::test_dreaming_function_itself_fails_closed_for_privileged_direct_call"],
+      "expected_state": "deny_untrusted_or_unavailable_transition; active_state_change_only_through_memory_gate",
+      "ledger_effect": "implemented MS-1 transitions are atomic with audit; MS-2 and MS-3 lifecycle outcomes are explicit N/A target states until their stage gate is satisfied.",
+      "audit_event": "implemented gate transition audit; denied request is represented only where the runtime path provides an audit sink.",
+      "failure_code": "MEMORY_TRANSITION_DENIED|MEMORY_DREAMING_UNAVAILABLE",
+      "evidence_state": "contract_asserted_partial_foundation_runtime_evidence"
+    },
+    {
+      "mapping_id": "ADR019-IDENTITY",
+      "source": "docs/adr/ADR-019-tenant-bound-runtime-database-identities-and-pools.md#Invariants-and-Constraints",
+      "requirement_ids": ["ADR019-001", "ADR019-002", "ADR019-003", "ADR019-004", "ADR019-005", "ADR019-006", "ADR019-007", "ADR019-008", "ADR019-009", "ADR019-010"],
+      "requirement": "Productive Runtime database identity and pool ownership are Tenant-bound, non-switchable, least-privileged, and deny unknown or conflicting identity, scope, authority, credential, connection, or pool state.",
+      "test_ids": ["tests/database/test_tenant_isolation_contract.py::test_database_login_binding_cannot_be_overridden_by_tenant_context", "tests/database/test_tenant_isolation_contract.py::test_tenant_login_cannot_assume_another_tenant_login", "tests/unit/test_tenant_pool.py::test_database_identity_mismatch_is_denied_and_lease_is_returned", "tests/migrations/test_principal_roles_and_service_identities.py::test_identity_migration_requires_scoped_role_bindings"],
+      "expected_state": "deny_and_evict_on_identity_or_tenant_mismatch",
+      "ledger_effect": "no protected read or mutation on mismatch; authoritative identity and scope checks remain before gate use.",
+      "audit_event": "identity or pool rejection is audit-required by ADR-019; this catalog does not claim a specific emitted event name.",
+      "failure_code": "TENANT_IDENTITY_MISMATCH|TENANT_POOL_MISMATCH",
+      "evidence_state": "contract_and_integration_evidence"
+    },
+    {
+      "mapping_id": "TARGET-NB1-CYCLE",
+      "source": "docs/architecture/contracts/cognitive-cycle.json",
+      "requirement_ids": ["TARGET-NB1-CYCLE-001"],
+      "requirement": "The full protected serial cognitive cycle is a normative target contract.",
+      "test_ids": ["tests/architecture/test_machine_readable_contracts.py::test_contract_inventory_covers_the_complete_cognitive_system"],
+      "expected_state": "N/A — target-only cognitive cycle is not a current external-effect runtime.",
+      "ledger_effect": "N/A — no Goal or Action ledger implementation is claimed.",
+      "audit_event": "N/A — no external effect or Goal transition runtime is claimed.",
+      "failure_code": "NBRS-03|NBRS-04|NBRS-06",
+      "evidence_state": "N/A_target_not_implemented"
+    },
+    {
+      "mapping_id": "TARGET-EVALUATION",
+      "source": "docs/architecture/contracts/evaluation-gates.json#/gates",
+      "requirement_ids": ["TARGET-EVAL-G0-G8"],
+      "requirement": "G0 through G8 remain ordered and non-compensatory; absent evidence fails and stops recognition or release of the affected capability.",
+      "test_ids": ["tests/architecture/test_machine_readable_contracts.py::test_evaluation_gates_are_ordered_and_non_compensatory"],
+      "expected_state": "N/A — no complete-system capability evaluation has been claimed.",
+      "ledger_effect": "N/A — evaluation evidence ledger integration for later stages is not implemented by this catalog.",
+      "audit_event": "N/A — evaluator custody and evidence intake are target contracts.",
+      "failure_code": "EVALUATION_UNKNOWN_RELEASE_STOP",
+      "evidence_state": "N/A_target_not_implemented"
+    },
+    {
+      "mapping_id": "TARGET-RECOGNITION",
+      "source": "docs/architecture/contracts/recognition-gates.json#/gates",
+      "requirement_ids": ["TARGET-RECOGNITION-R1-R10"],
+      "requirement": "R1 through R10 are all required and non-compensatory before the Neural Brain Candidate label.",
+      "test_ids": ["tests/architecture/test_machine_readable_contracts.py::test_recognition_gates_are_all_required_and_fail_closed"],
+      "expected_state": "N/A — candidate recognition is prohibited at current maturity.",
+      "ledger_effect": "N/A — no recognition activation state is implemented or claimed.",
+      "audit_event": "N/A — independent G8 validation has not been claimed.",
+      "failure_code": "RECOGNITION_PROHIBITED",
+      "evidence_state": "N/A_target_not_implemented"
+    }
+  ]
+}
