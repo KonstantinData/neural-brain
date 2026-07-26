@@ -216,8 +216,7 @@ def test_corrupt_checkpoint_is_denied_during_recovery(
             # PostgreSQL test disables that trigger only to prove recovery still
             # fails closed if storage is tampered with outside the interface.
             cursor.execute(
-                "ALTER TABLE memory_core.checkpoints "
-                "DISABLE TRIGGER checkpoints_are_immutable"
+                "ALTER TABLE memory_core.checkpoints DISABLE TRIGGER checkpoints_are_immutable"
             )
             try:
                 cursor.execute(
@@ -226,8 +225,7 @@ def test_corrupt_checkpoint_is_denied_during_recovery(
                 )
             finally:
                 cursor.execute(
-                    "ALTER TABLE memory_core.checkpoints "
-                    "ENABLE TRIGGER checkpoints_are_immutable"
+                    "ALTER TABLE memory_core.checkpoints ENABLE TRIGGER checkpoints_are_immutable"
                 )
 
     with pytest.raises(CognitiveRuntimeError):
