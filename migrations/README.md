@@ -64,6 +64,14 @@ Transition Gate operation: correction requires a new authorized transition,
 never a rewrite. It does not introduce later candidate lifecycle transitions,
 Goal or Action runtime, or external-effect execution.
 
+Migration `0013` adds a canonical SHA-256 chain to each new `memory_audit`
+event and a scoped chain-head anchor. The authenticated read Gate verifies the
+complete chain and detects changed, removed, or reordered events. It refuses to
+invent hashes for pre-existing evidence: a populated ledger needs separately
+authorized, audited reconciliation before this migration may apply. It neither
+changes Memory Gate ownership nor introduces Goal, Action, or external-effect
+capabilities.
+
 Migration files use the exact format `NNNN_lowercase_description.sql`, begin at
 `0001`, and remain contiguous. Files are immutable after merge. Corrections use
 a new migration rather than changing an applied file. A migration must not

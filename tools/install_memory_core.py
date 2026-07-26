@@ -625,6 +625,10 @@ def verify_product_acl_contract(admin_dsn: str, runtime_role: str) -> None:
                 for function_name in ("read_observation", "read_working_memory")
                 for role_name in RUNTIME_ROLES
             ]
+            + [
+                ("memory_gate", "verify_memory_audit_chain", role_name, "EXECUTE", False)
+                for role_name in ("neural_brain_gate", "neural_brain_reader")
+            ]
         )
         if cursor.fetchall() != expected_function_acls:
             raise RuntimeError("A Memory Core function has an untrusted ACL")
