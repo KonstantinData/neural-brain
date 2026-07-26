@@ -42,6 +42,11 @@ ADR-017.
   evidence template for qualified EU AI Act risk-classification review. It
   records prohibited, high-risk, transparency, and other/minimal-risk review
   inputs only; it never classifies a real deployment or authorizes a release.
+- `compliance-release-decision-v1.json`: fail-closed, signed-evidence record
+  template for a separately governed compliance-release decision. It requires
+  scope-matched qualified GDPR and EU AI Act findings or explicit qualified
+  non-applicability bases, but it never signs, verifies, authorizes, enables,
+  or releases a deployment.
 
 ## Memory Core contracts
 
