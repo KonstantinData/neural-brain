@@ -8,13 +8,14 @@ import os
 import re
 import secrets
 from collections.abc import Iterator
+from dataclasses import dataclass
 from pathlib import Path
 from typing import override
 
 import psycopg
 import pytest
 from psycopg import sql
-from psycopg.conninfo import make_conninfo
+from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
 from tools.bootstrap_database_roles import bootstrap_roles
 from tools.validate_migrations import discover_migrations
@@ -29,6 +30,14 @@ class RedactedDsn(str):
     @override
     def __repr__(self) -> str:
         return "<redacted database dsn>"
+
+
+@dataclass(frozen=True, slots=True)
+class RuntimeDatabaseAccess:
+    """A disposable, least-privilege PostgreSQL login for live boundary tests."""
+
+    dsn: RedactedDsn
+    role_name: str
 
 
 def _database_name() -> str:
@@ -75,6 +84,55 @@ def database_dsn() -> Iterator[str]:
             cursor.execute(
                 sql.SQL("DROP DATABASE {} WITH (FORCE)").format(sql.Identifier(database_name))
             )
+
+
+@pytest.fixture
+def runtime_database_access(database_dsn: str) -> Iterator[RuntimeDatabaseAccess]:
+    """Create a real NOINHERIT runtime login with only SET membership in gate roles."""
+
+    role_name = f"neural_brain_database_test_runtime_{secrets.token_hex(8)}"
+    password = secrets.token_urlsafe(32)
+    database_name = conninfo_to_dict(database_dsn).get("dbname")
+    if not isinstance(database_name, str):
+        raise RuntimeError("Disposable database DSN has no database name")
+
+    with psycopg.connect(database_dsn, autocommit=True) as connection:
+        with connection.transaction(), connection.cursor() as cursor:
+            cursor.execute(
+                sql.SQL(
+                    "CREATE ROLE {} LOGIN PASSWORD {} NOSUPERUSER NOCREATEDB NOCREATEROLE "
+                    "NOINHERIT NOREPLICATION NOBYPASSRLS"
+                ).format(sql.Identifier(role_name), sql.Literal(password))
+            )
+            cursor.execute(
+                sql.SQL(
+                    "GRANT neural_brain_gate, neural_brain_reader TO {} "
+                    "WITH ADMIN FALSE, INHERIT FALSE, SET TRUE"
+                ).format(sql.Identifier(role_name))
+            )
+            cursor.execute(
+                sql.SQL("GRANT CONNECT ON DATABASE {} TO {}").format(
+                    sql.Identifier(database_name), sql.Identifier(role_name)
+                )
+            )
+
+    runtime_dsn = RedactedDsn(make_conninfo(database_dsn, user=role_name, password=password))
+    try:
+        yield RuntimeDatabaseAccess(dsn=runtime_dsn, role_name=role_name)
+    finally:
+        with psycopg.connect(database_dsn, autocommit=True) as connection:
+            with connection.transaction(), connection.cursor() as cursor:
+                cursor.execute(
+                    sql.SQL("REVOKE CONNECT ON DATABASE {} FROM {}").format(
+                        sql.Identifier(database_name), sql.Identifier(role_name)
+                    )
+                )
+                cursor.execute(
+                    sql.SQL("REVOKE neural_brain_gate, neural_brain_reader FROM {}").format(
+                        sql.Identifier(role_name)
+                    )
+                )
+                cursor.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role_name)))
 
 
 def _seed(database_dsn: str) -> None:
@@ -128,6 +186,7 @@ def _seed(database_dsn: str) -> None:
                 (
                     ("principal-a", "test://principal-a"),
                     ("principal-b", "test://principal-b"),
+                    ("principal-c", "test://principal-c"),
                 ),
             )
             cursor.executemany(
@@ -138,4 +197,9 @@ def _seed(database_dsn: str) -> None:
                     ("principal-a", "tenant-a", "area-a"),
                     ("principal-b", "tenant-a", "area-b"),
                 ),
+            )
+            cursor.execute(
+                "INSERT INTO brain_security.principal_scope_bindings "
+                "(principal_id, tenant_id, area_id, can_read) VALUES (%s, %s, %s, true)",
+                ("principal-c", "tenant-b", "area-a"),
             )
