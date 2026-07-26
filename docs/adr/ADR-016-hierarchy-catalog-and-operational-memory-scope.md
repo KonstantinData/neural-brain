@@ -11,7 +11,16 @@
 - Supersedes: none
 - Superseded by: none
 - Amends: ADR-002, ADR-015
-- Amended by: ADR-018
+- Amended by: ADR-018, ADR-019
+
+## Amendment by ADR-019
+
+Operational Tenant scope is anchored below application context by a Runtime
+database login bound to exactly one Tenant. PostgreSQL resolves that binding
+from protected state keyed by immutable `session_user`; `current_user` and
+writable GUC values are not identity anchors. Catalog lineage, RLS, FORCE, gate
+checks, and application guards remain required and may only narrow Area,
+Project, and Session below the bound Tenant.
 
 ## Amendment by ADR-018
 

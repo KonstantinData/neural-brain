@@ -10,7 +10,16 @@
 - Supersedes: none
 - Superseded by: none
 - Amends: none
-- Amended by: ADR-015, ADR-018
+- Amended by: ADR-015, ADR-018, ADR-019
+
+## Amendment by ADR-019
+
+PostgreSQL is authoritative for the protected mapping from Runtime database
+login identity to exactly one Tenant. Tenant-specific Runtime roles and
+connection pools, credential lifecycle, connection eviction, and evidence that
+scope is anchored to immutable `session_user` are release-critical parts of the
+ledger boundary. Shared cross-Tenant Runtime credentials are prohibited for
+productive customer data.
 
 ## Amendment by ADR-018
 

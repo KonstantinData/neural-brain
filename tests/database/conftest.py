@@ -17,6 +17,7 @@ import pytest
 from psycopg import sql
 from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
+from neural_brain.postgres.tenant_pool import TenantDatabaseEndpoint, TenantPoolResolver
 from tools.bootstrap_database_roles import bootstrap_roles
 from tools.validate_migrations import discover_migrations
 
@@ -38,6 +39,21 @@ class RuntimeDatabaseAccess:
 
     dsn: RedactedDsn
     role_name: str
+    tenant_id: str
+
+
+class _TestSecretProvider:
+    def __init__(self, accesses: dict[str, RuntimeDatabaseAccess]) -> None:
+        self._accesses = accesses
+
+    def get_database_endpoint(self, tenant_id: str) -> TenantDatabaseEndpoint:
+        access = self._accesses[tenant_id]
+        return TenantDatabaseEndpoint(
+            tenant_id=tenant_id,
+            endpoint_id="disposable-postgresql-18",
+            credential_revision="1",
+            conninfo=access.dsn,
+        )
 
 
 def _database_name() -> str:
@@ -87,52 +103,112 @@ def database_dsn() -> Iterator[str]:
 
 
 @pytest.fixture
-def runtime_database_access(database_dsn: str) -> Iterator[RuntimeDatabaseAccess]:
-    """Create a real NOINHERIT runtime login with only SET membership in gate roles."""
+def runtime_database_accesses(
+    database_dsn: str,
+) -> Iterator[dict[str, RuntimeDatabaseAccess]]:
+    """Create one distinct, mapped NOINHERIT runtime login for each test Tenant."""
 
-    role_name = f"neural_brain_database_test_runtime_{secrets.token_hex(8)}"
-    password = secrets.token_urlsafe(32)
     database_name = conninfo_to_dict(database_dsn).get("dbname")
     if not isinstance(database_name, str):
         raise RuntimeError("Disposable database DSN has no database name")
-
+    credentials = {
+        tenant_id: (
+            f"neural_brain_database_test_{tenant_id.replace('-', '_')}_{secrets.token_hex(6)}",
+            secrets.token_urlsafe(32),
+        )
+        for tenant_id in ("tenant-a", "tenant-b")
+    }
     with psycopg.connect(database_dsn, autocommit=True) as connection:
         with connection.transaction(), connection.cursor() as cursor:
-            cursor.execute(
-                sql.SQL(
-                    "CREATE ROLE {} LOGIN PASSWORD {} NOSUPERUSER NOCREATEDB NOCREATEROLE "
-                    "NOINHERIT NOREPLICATION NOBYPASSRLS"
-                ).format(sql.Identifier(role_name), sql.Literal(password))
-            )
-            cursor.execute(
-                sql.SQL(
-                    "GRANT neural_brain_gate, neural_brain_reader TO {} "
-                    "WITH ADMIN FALSE, INHERIT FALSE, SET TRUE"
-                ).format(sql.Identifier(role_name))
-            )
-            cursor.execute(
-                sql.SQL("GRANT CONNECT ON DATABASE {} TO {}").format(
-                    sql.Identifier(database_name), sql.Identifier(role_name)
-                )
-            )
-
-    runtime_dsn = RedactedDsn(make_conninfo(database_dsn, user=role_name, password=password))
-    try:
-        yield RuntimeDatabaseAccess(dsn=runtime_dsn, role_name=role_name)
-    finally:
-        with psycopg.connect(database_dsn, autocommit=True) as connection:
-            with connection.transaction(), connection.cursor() as cursor:
+            for tenant_id, (role_name, password) in credentials.items():
                 cursor.execute(
-                    sql.SQL("REVOKE CONNECT ON DATABASE {} FROM {}").format(
+                    sql.SQL(
+                        "CREATE ROLE {} LOGIN PASSWORD {} NOSUPERUSER NOCREATEDB "
+                        "NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS"
+                    ).format(sql.Identifier(role_name), sql.Literal(password))
+                )
+                cursor.execute(
+                    sql.SQL(
+                        "GRANT neural_brain_gate, neural_brain_reader TO {} "
+                        "WITH ADMIN FALSE, INHERIT FALSE, SET TRUE"
+                    ).format(sql.Identifier(role_name))
+                )
+                cursor.execute(
+                    sql.SQL("GRANT CONNECT ON DATABASE {} TO {}").format(
                         sql.Identifier(database_name), sql.Identifier(role_name)
                     )
                 )
                 cursor.execute(
-                    sql.SQL("REVOKE neural_brain_gate, neural_brain_reader FROM {}").format(
+                    sql.SQL("GRANT USAGE ON SCHEMA brain_security TO {}").format(
                         sql.Identifier(role_name)
                     )
                 )
-                cursor.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role_name)))
+                cursor.execute(
+                    "INSERT INTO brain_security.tenant_runtime_identities "
+                    "(database_role, tenant_id) VALUES (%s, %s)",
+                    (role_name, tenant_id),
+                )
+    accesses = {
+        tenant_id: RuntimeDatabaseAccess(
+            dsn=RedactedDsn(make_conninfo(database_dsn, user=role_name, password=password)),
+            role_name=role_name,
+            tenant_id=tenant_id,
+        )
+        for tenant_id, (role_name, password) in credentials.items()
+    }
+    try:
+        yield accesses
+    finally:
+        with psycopg.connect(database_dsn, autocommit=True) as connection:
+            with connection.transaction(), connection.cursor() as cursor:
+                cursor.execute(
+                    "DELETE FROM brain_security.tenant_runtime_identities "
+                    "WHERE tenant_id = ANY(%s)",
+                    (list(credentials),),
+                )
+                for role_name, _ in credentials.values():
+                    cursor.execute(
+                        sql.SQL("REVOKE CONNECT ON DATABASE {} FROM {}").format(
+                            sql.Identifier(database_name), sql.Identifier(role_name)
+                        )
+                    )
+                    cursor.execute(
+                        sql.SQL("REVOKE USAGE ON SCHEMA brain_security FROM {}").format(
+                            sql.Identifier(role_name)
+                        )
+                    )
+                    cursor.execute(
+                        sql.SQL("REVOKE neural_brain_gate, neural_brain_reader FROM {}").format(
+                            sql.Identifier(role_name)
+                        )
+                    )
+                    cursor.execute(sql.SQL("DROP ROLE {}").format(sql.Identifier(role_name)))
+
+
+@pytest.fixture
+def runtime_database_access(
+    runtime_database_accesses: dict[str, RuntimeDatabaseAccess],
+) -> RuntimeDatabaseAccess:
+    """Compatibility alias for tests that require only the Tenant A login."""
+
+    return runtime_database_accesses["tenant-a"]
+
+
+@pytest.fixture
+def tenant_pool_resolver(
+    runtime_database_accesses: dict[str, RuntimeDatabaseAccess],
+) -> Iterator[TenantPoolResolver]:
+    """Return a bounded resolver backed by two real tenant-specific pools."""
+
+    resolver = TenantPoolResolver(
+        secret_provider=_TestSecretProvider(runtime_database_accesses),
+        max_cached_pools=2,
+        pool_max_size=2,
+    )
+    try:
+        yield resolver
+    finally:
+        resolver.close()
 
 
 def _seed(database_dsn: str) -> None:

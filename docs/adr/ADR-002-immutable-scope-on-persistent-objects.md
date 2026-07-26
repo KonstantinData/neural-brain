@@ -10,7 +10,16 @@
 - Supersedes: none
 - Superseded by: none
 - Amends: none
-- Amended by: ADR-015, ADR-016
+- Amended by: ADR-015, ADR-016, ADR-019
+
+## Amendment by ADR-019
+
+Authenticated Runtime scope is database-anchored at the Tenant dimension. Each
+productive Runtime database login and connection pool is bound to exactly one
+Tenant through protected PostgreSQL state keyed by immutable session identity.
+Application context and writable GUC values may only match that Tenant and
+narrow Area, Project, and Session below it; they cannot select another Tenant.
+RLS and FORCE remain mandatory defense in depth.
 
 ## Amendment by ADR-015 and ADR-016
 

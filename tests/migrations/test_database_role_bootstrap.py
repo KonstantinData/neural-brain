@@ -4,7 +4,7 @@ from pathlib import Path
 
 from psycopg.conninfo import conninfo_to_dict
 
-from tools.bootstrap_database_roles import ROLE_NAMES, coordination_dsn
+from tools.bootstrap_database_roles import PROVISIONER_ROLE, ROLE_NAMES, coordination_dsn
 
 
 def test_role_set_is_fixed_and_separates_runtime_responsibilities() -> None:
@@ -16,6 +16,7 @@ def test_role_set_is_fixed_and_separates_runtime_responsibilities() -> None:
         "neural_brain_reader",
         "neural_brain_dreamer",
     )
+    assert PROVISIONER_ROLE == "neural_brain_provisioner"
 
 
 def test_role_bootstrap_is_invoked_before_repository_migrations() -> None:

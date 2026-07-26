@@ -11,7 +11,16 @@
 - Supersedes: ADR-004, ADR-006, ADR-007, ADR-008, ADR-009, ADR-011
 - Superseded by: ADR-018
 - Amends: ADR-001, ADR-002, ADR-003, ADR-005, ADR-010, ADR-012, ADR-013, ADR-014
-- Amended by: ADR-016, ADR-017, ADR-018
+- Amended by: ADR-016, ADR-017, ADR-018, ADR-019
+
+## Amendment by ADR-019
+
+The retained Memory Core isolation boundary now requires a Tenant-bound Runtime
+database login and connection pool for productive customer data. PostgreSQL
+anchors Tenant identity in protected state keyed by immutable session identity;
+application context may only narrow scope within that Tenant. OIDC Principal,
+authority, Memory Transition Gate, RLS, FORCE, provenance, privacy, retention,
+deletion, promotion, and audit constraints remain binding.
 
 ## Supersession by ADR-018
 

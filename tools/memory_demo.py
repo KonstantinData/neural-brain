@@ -30,7 +30,12 @@ from neural_brain.memory import (
     WorkingMemoryEntryRequest,
     WorkingMemoryRequest,
 )
-from neural_brain.postgres import PostgresMemoryRepository, PostgresOidcPrincipalResolver
+from neural_brain.postgres import (
+    PostgresMemoryRepository,
+    PostgresOidcPrincipalResolver,
+    TenantDatabaseEndpoint,
+    TenantPoolResolver,
+)
 from tools.install_memory_core import (
     DEMO_AREA_ID,
     DEMO_OIDC_ISSUER,
@@ -68,6 +73,23 @@ class FixedLocalContextProvider:
             area_id=DEMO_AREA_ID,
             project_id=DEMO_PROJECT_ID,
             session_id=DEMO_SESSION_ID,
+        )
+
+
+@dataclass(frozen=True, slots=True)
+class _LocalDemoSecretProvider:
+    """Expose exactly one operator-provided local Tenant endpoint to the resolver."""
+
+    runtime_dsn: str
+
+    def get_database_endpoint(self, tenant_id: str) -> TenantDatabaseEndpoint:
+        if tenant_id != DEMO_TENANT_ID:
+            raise RuntimeError("Local demo Tenant database endpoint is unavailable")
+        return TenantDatabaseEndpoint(
+            tenant_id=tenant_id,
+            endpoint_id="local-demo-postgresql",
+            credential_revision="1",
+            conninfo=self.runtime_dsn,
         )
 
 
@@ -175,52 +197,60 @@ def run_memory_demo(admin_dsn: str, runtime_dsn: str, runtime_role: str) -> dict
     checkpoint_request = CheckpointRequest(checkpoint_id=f"checkpoint-{run_id}")
     private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
     token, jwks = _local_oidc_token(private_key, occurred_at)
-    consumer = OidcMemoryCoreConsumer(
-        authenticator=OidcJwtAuthenticator(
-            configuration=OidcJwtConfiguration(
-                issuer=DEMO_OIDC_ISSUER, audience=LOCAL_OIDC_AUDIENCE
+    tenant_pools = TenantPoolResolver(
+        secret_provider=_LocalDemoSecretProvider(runtime_dsn),
+        max_cached_pools=1,
+        pool_max_size=2,
+    )
+    try:
+        consumer = OidcMemoryCoreConsumer(
+            authenticator=OidcJwtAuthenticator(
+                configuration=OidcJwtConfiguration(
+                    issuer=DEMO_OIDC_ISSUER, audience=LOCAL_OIDC_AUDIENCE
+                ),
+                jwks=jwks,
+                principal_resolver=PostgresOidcPrincipalResolver(tenant_pools),
             ),
-            jwks=jwks,
-            principal_resolver=PostgresOidcPrincipalResolver(runtime_dsn),
-        ),
-        repository=PostgresMemoryRepository(runtime_dsn),
-    )
-    result = consumer.record_observation_and_checkpoint(
-        **{"bearer_token": token},
-        transition_request_id=f"transition-{run_id}",
-        observation=observation,
-        working_memory=working_memory,
-        checkpoint=checkpoint_request,
-    )
-    checkpoint = consumer.read_checkpoint(
-        **{"bearer_token": token}, checkpoint_id=checkpoint_request.checkpoint_id
-    )
-    observation_readback = consumer.read_observation(
-        **{"bearer_token": token}, observation_id=observation.observation_id
-    )
-    working_memory_readback = consumer.read_working_memory(
-        **{"bearer_token": token}, working_memory_id=working_memory.working_memory_id
-    )
-    if checkpoint != result.checkpoint:
-        raise RuntimeError("Checkpoint readback did not match the committed memory cycle")
-    if (
-        observation_readback != result.observation
-        or working_memory_readback != result.working_memory
-    ):
-        raise RuntimeError("OIDC scoped readback did not match the committed memory cycle")
-    return {
-        "status": "passed",
-        "migrations": migration_count,
-        "observation_id": result.observation.observation_id,
-        "working_memory_id": result.working_memory.working_memory_id,
-        "working_memory_version": result.working_memory.version,
-        "checkpoint_id": result.checkpoint.checkpoint_id,
-        "audit_committed": result.audit_committed,
-        "authentication": "oidc_rs256_local_demo",
-        "observation_readback": True,
-        "working_memory_readback": True,
-        "checkpoint_readback": True,
-    }
+            repository=PostgresMemoryRepository(tenant_pools),
+        )
+        result = consumer.record_observation_and_checkpoint(
+            **{"bearer_token": token},
+            transition_request_id=f"transition-{run_id}",
+            observation=observation,
+            working_memory=working_memory,
+            checkpoint=checkpoint_request,
+        )
+        checkpoint = consumer.read_checkpoint(
+            **{"bearer_token": token}, checkpoint_id=checkpoint_request.checkpoint_id
+        )
+        observation_readback = consumer.read_observation(
+            **{"bearer_token": token}, observation_id=observation.observation_id
+        )
+        working_memory_readback = consumer.read_working_memory(
+            **{"bearer_token": token}, working_memory_id=working_memory.working_memory_id
+        )
+        if checkpoint != result.checkpoint:
+            raise RuntimeError("Checkpoint readback did not match the committed memory cycle")
+        if (
+            observation_readback != result.observation
+            or working_memory_readback != result.working_memory
+        ):
+            raise RuntimeError("OIDC scoped readback did not match the committed memory cycle")
+        return {
+            "status": "passed",
+            "migrations": migration_count,
+            "observation_id": result.observation.observation_id,
+            "working_memory_id": result.working_memory.working_memory_id,
+            "working_memory_version": result.working_memory.version,
+            "checkpoint_id": result.checkpoint.checkpoint_id,
+            "audit_committed": result.audit_committed,
+            "authentication": "oidc_rs256_local_demo",
+            "observation_readback": True,
+            "working_memory_readback": True,
+            "checkpoint_readback": True,
+        }
+    finally:
+        tenant_pools.close()
 
 
 def _parser() -> argparse.ArgumentParser:

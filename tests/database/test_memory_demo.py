@@ -14,7 +14,7 @@ import pytest
 from psycopg import sql
 from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
-from tools.bootstrap_database_roles import bootstrap_roles
+from tools.bootstrap_database_roles import PROVISIONER_ROLE, bootstrap_roles
 from tools.install_memory_core import (
     INSTALL_SCHEMA,
     OWNER_ROLE,
@@ -159,7 +159,7 @@ def test_clean_concurrent_install_round_trip_and_fail_closed_guards(
                 sql.Identifier(INSTALL_SCHEMA)
             )
         )
-        assert cursor.fetchone() == (6,)
+        assert cursor.fetchone() == (7,)
         cursor.execute(
             "SELECT pg_catalog.pg_get_userbyid(datdba) FROM pg_catalog.pg_database "
             "WHERE datname = current_database()"
@@ -175,7 +175,12 @@ def test_clean_concurrent_install_round_trip_and_fail_closed_guards(
             "WHERE database_record.datname = current_database() "
             "AND acl.grantee <> database_record.datdba ORDER BY 1, 2"
         )
-        assert cursor.fetchall() == [(demo_database.runtime_role, "CONNECT", False)]
+        assert cursor.fetchall() == sorted(
+            [
+                (demo_database.runtime_role, "CONNECT", False),
+                (PROVISIONER_ROLE, "CONNECT", True),
+            ]
+        )
         cursor.execute(
             "SELECT count(*) FROM pg_catalog.pg_namespace AS namespace "
             "CROSS JOIN LATERAL pg_catalog.aclexplode(COALESCE(namespace.nspacl, "
@@ -468,3 +473,26 @@ def test_compromised_owner_membership_is_rejected_before_schema_mutation(
                 (demo_database.runtime_role,),
             )
             assert cursor.fetchone() == (0,)
+
+
+def test_transitive_fixed_role_membership_is_rejected(
+    demo_database: DemoDatabase,
+) -> None:
+    """A runtime gate cannot acquire owner authority through a transitive SET ROLE edge."""
+
+    with psycopg.connect(demo_database.admin_dsn, autocommit=True) as connection:
+        with connection.transaction(), connection.cursor() as cursor:
+            cursor.execute(
+                "GRANT neural_brain_owner TO neural_brain_reader "
+                "WITH ADMIN FALSE, INHERIT FALSE, SET TRUE"
+            )
+        try:
+            with pytest.raises(RuntimeError, match="must not inherit or SET"):
+                install_local_memory_core(
+                    demo_database.admin_dsn,
+                    demo_database.runtime_role,
+                    ROOT / "migrations",
+                )
+        finally:
+            with connection.transaction(), connection.cursor() as cursor:
+                cursor.execute("REVOKE neural_brain_owner FROM neural_brain_reader")

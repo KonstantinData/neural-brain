@@ -14,22 +14,24 @@ current authority, retained subsystem authority, or historical evidence.
 | Protected ledger and evidence | ADR-003, ADR-012 | Current for PostgreSQL, audit, retention, and evidence immutability. |
 | Security floor and policy | ADR-005 | Current and widened by ADR-018. |
 | Runtime and inference | ADR-013, ADR-014 | Current foundation baseline; capability enablement remains stage-gated. |
+| Runtime Tenant identity | ADR-019 | Current for Tenant-bound Runtime database login identity, Tenant-specific pools, and database-anchored scope. |
 
 ## Clean Authority Model
 
 | Authority | ADRs | Rule |
 | --- | --- | --- |
-| Current | ADR-001, ADR-002, ADR-003, ADR-005, ADR-012, ADR-013, ADR-014, ADR-016, ADR-017, ADR-018 | These records may authorize implementation when aligned with the current architecture directive, contracts, tests, and release gates. |
+| Current | ADR-001, ADR-002, ADR-003, ADR-005, ADR-012, ADR-013, ADR-014, ADR-016, ADR-017, ADR-018, ADR-019 | These records may authorize implementation when aligned with the current architecture directive, contracts, tests, and release gates. |
 | Retained subsystem | ADR-010, ADR-015 | These records authorize only the Memory Core subset named in their headers. They do not define the full Neural Brain product boundary. |
 | Historical | ADR-004, ADR-006, ADR-007, ADR-008, ADR-009, ADR-011 | These records are preserved as design history. They cannot authorize runtime implementation until revalidated by a new accepted ADR. |
 
 ## Required Reading Order
 
 1. ADR-018 for the complete product boundary.
-2. Architecture Directive v4.0 for operational architecture.
-3. ADR-015, ADR-016, and ADR-017 for retained Memory Core constraints.
-4. ADR-013 and ADR-014 for runtime and inference constraints.
-5. Historical ADRs only when revalidating earlier Goal, Action, dispatch,
+2. ADR-019 for the Runtime database Tenant-identity boundary.
+3. Architecture Directive v4.0 for operational architecture.
+4. ADR-015, ADR-016, and ADR-017 for retained Memory Core constraints.
+5. ADR-013 and ADR-014 for runtime and inference constraints.
+6. Historical ADRs only when revalidating earlier Goal, Action, dispatch,
    kill-switch, or verification designs.
 
 ## Active Revalidation Queue

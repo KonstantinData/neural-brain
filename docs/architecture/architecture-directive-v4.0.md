@@ -2,6 +2,7 @@
 
 - Status: Normative complete cognitive-system target baseline
 - Governing decision: ADR-018
+- Runtime Tenant identity amendment: ADR-019
 - Date: 2026-07-16
 - Supersedes: Architecture Directive v3.0 and the product boundary of ADR-015
 
@@ -36,6 +37,7 @@ Neural Brain
 |   `-- Metacognition
 `-- Protected Control Plane
     |-- Authenticated Identity and Scope
+    |-- Tenant-Bound Runtime Database Identity and Pools
     |-- Security Floor and Policy
     |-- Goal, Action, Memory, and Model Promotion Gates
     |-- Approvals, Budgets, Resource Claims, and Fences
@@ -66,6 +68,22 @@ request payloads cannot define or expand them.
 
 Unknown identity, scope, authority, state, policy, operation, model version,
 data class, or evaluation state is denied by default.
+
+For productive customer data, each Tenant has exactly one Tenant-bound Runtime
+database login identity and one dedicated Tenant-specific connection pool. An
+established Runtime connection may never switch Tenant. PostgreSQL derives the
+authoritative Tenant from protected state keyed by immutable `session_user`;
+`current_user` and application-writable GUC values are not identity anchors.
+Runtime context may only match the database-bound Tenant and narrow Area,
+Project, Session, role, and capability below it.
+
+RLS and `FORCE ROW LEVEL SECURITY` remain mandatory on protected tables, but
+they are defense in depth rather than the sole Tenant boundary. Shared
+cross-Tenant Runtime database logins and connection pools are prohibited.
+Tenant-bound Runtime identity does not replace OIDC Principal resolution,
+authority bindings, gate ownership, restricted privileges, catalog lineage, or
+audit. Owner, migration, provisioner, backup, restore, and break-glass
+identities remain separate from Runtime identities.
 
 ## 4. Neural cognitive substrate
 
@@ -253,6 +271,9 @@ Implementation or release of the affected capability stops when:
 - protected state can be changed outside its owning transition gate;
 - identity, scope, authority, policy, approval, or evaluation criteria can be
   supplied or changed by untrusted content;
+- a productive Runtime database login or connection pool can serve more than
+  one Tenant, a connection can switch Tenant, or application context can expand
+  the Tenant bound to immutable session identity;
 - a model, planner, memory subsystem, or skill can directly execute an action;
 - an external effect lacks committed intent, authority, approval where needed,
   bounded resources, fence, kill-switch state, or atomic audit;
@@ -281,3 +302,4 @@ directives and decisions remain intact as evidence.
 | ADR-004, ADR-006 through ADR-009, ADR-011 | Historical designs requiring explicit revalidation before runtime implementation |
 | ADR-015 | Superseded as product boundary; retained as the historical Memory Core boundary |
 | ADR-018 | Governing complete cognitive-system decision |
+| ADR-019 | Current Tenant-bound Runtime database identity and connection-pool amendment; ADR-018 remains the governing product decision |

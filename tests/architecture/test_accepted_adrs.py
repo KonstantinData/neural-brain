@@ -15,7 +15,7 @@ def _adr_paths() -> list[Path]:
 def test_repository_contains_current_accepted_adr_sequence() -> None:
     paths = _adr_paths()
     identifiers = [path.name[:7] for path in paths]
-    assert identifiers == [f"ADR-{number:03d}" for number in range(1, 19)]
+    assert identifiers == [f"ADR-{number:03d}" for number in range(1, 20)]
 
 
 def test_fnd_02_7_foundation_baseline_is_adr_001_through_adr_013() -> None:
@@ -35,7 +35,8 @@ def test_adr_has_traceable_decision_record(adr_path: Path) -> None:
         or "- Status: Superseded as product boundary by ADR-018" in text
         or "- Status: Superseded as product delivery model by ADR-018" in text
     )
-    expected_date = "2026-07-16" if adr_path.name.startswith("ADR-018") else "2026-07-15"
+    expected_dates = {"ADR-018": "2026-07-16", "ADR-019": "2026-07-26"}
+    expected_date = expected_dates.get(adr_path.name[:7], "2026-07-15")
     assert f"- Date: {expected_date}" in text
     assert "https://app.notion.com/p/" in text
     assert "## Context" in text
@@ -45,9 +46,9 @@ def test_adr_has_traceable_decision_record(adr_path: Path) -> None:
 
 def test_adr_index_records_complete_continuous_sequence() -> None:
     index = (ADR_DIRECTORY / "README.md").read_text(encoding="utf-8")
-    for number in range(1, 19):
+    for number in range(1, 20):
         assert f"[ADR-{number:03d}]" in index
-    assert "continuous decision sequence from ADR-001 through\nADR-018" in index
+    assert "continuous decision sequence from ADR-001 through\nADR-019" in index
     assert "ADR-018 governs the complete cognitive-system boundary" in index
     assert "## Current Authority" in index
     assert "## Thematic Map" in index
@@ -61,6 +62,7 @@ def test_adr_status_records_current_clean_authority_model() -> None:
     assert "## Clean Authority Model" in status
     assert "## Active Revalidation Queue" in status
     assert "ADR-018" in status
+    assert "ADR-019" in status
     assert "ADR-010, ADR-015" in status
     assert "ADR-004, ADR-006, ADR-007, ADR-008, ADR-009, ADR-011" in status
 
@@ -124,11 +126,11 @@ def test_adr_010_is_retained_as_memory_core_stage_order_only() -> None:
     ("number", "amendments"),
     [
         (1, ("ADR-018", "ADR-015")),
-        (2, ("ADR-015",)),
-        (3, ("ADR-018", "ADR-015")),
-        (5, ("ADR-018", "ADR-015")),
+        (2, ("ADR-015", "ADR-019")),
+        (3, ("ADR-018", "ADR-015", "ADR-019")),
+        (5, ("ADR-018", "ADR-015", "ADR-019")),
         (12, ("ADR-015",)),
-        (13, ("ADR-018", "ADR-015")),
+        (13, ("ADR-018", "ADR-015", "ADR-019")),
         (14, ("ADR-018", "ADR-015 and ADR-017")),
     ],
 )
@@ -140,3 +142,24 @@ def test_retained_adrs_preserve_historical_and_current_amendments(
     assert "- Status: Accepted" in text
     for amendment in amendments:
         assert f"## Amendment by {amendment}" in text
+
+
+def test_adr_019_anchors_runtime_tenant_identity_below_application_context() -> None:
+    text = (
+        ADR_DIRECTORY / "ADR-019-tenant-bound-runtime-database-identities-and-pools.md"
+    ).read_text(encoding="utf-8")
+    normalized = " ".join(text.split())
+    assert "- Status: Accepted" in text
+    assert "- Authority: current" in text
+    assert "- Theme: scope_and_isolation" in text
+    assert "every Company/Tenant has exactly one Tenant-bound Runtime database login" in normalized
+    assert "one dedicated Tenant-specific connection pool" in normalized
+    assert "protected state keyed by `session_user`" in normalized
+    assert "`current_user` is not an identity anchor" in normalized
+    assert "RLS and `FORCE ROW LEVEL SECURITY` remain mandatory" in normalized
+    assert "Shared cross-Tenant Runtime database logins" in normalized
+    assert (
+        "General cryptographic context attestation is explicitly outside this decision"
+        in normalized
+    )
+    assert "does not mandate a separate PostgreSQL cluster" in normalized
