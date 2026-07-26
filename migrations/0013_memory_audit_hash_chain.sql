@@ -225,6 +225,7 @@ ALTER FUNCTION memory_audit.canonical_event_hash(
 ) OWNER TO neural_brain_owner;
 ALTER FUNCTION memory_audit.append_event_hash() OWNER TO neural_brain_owner;
 ALTER FUNCTION memory_gate.verify_memory_audit_chain() OWNER TO neural_brain_owner;
+REVOKE ALL ON ALL FUNCTIONS IN SCHEMA memory_audit FROM PUBLIC;
 REVOKE ALL ON FUNCTION memory_audit.canonical_event_hash(
     text, text, bigint, text, text, text, text, text, jsonb, timestamptz, text
 ) FROM PUBLIC;

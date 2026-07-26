@@ -21,6 +21,7 @@ def test_s1_03_5_installs_canonical_scoped_hash_chain_and_verifier() -> None:
     assert "CREATE FUNCTION memory_gate.verify_memory_audit_chain()" in MIGRATION
     assert "PERFORM brain_security.assert_scope_authority('read')" in MIGRATION
     assert "audit hash chain head mismatch" in MIGRATION
+    assert "REVOKE ALL ON ALL FUNCTIONS IN SCHEMA memory_audit FROM PUBLIC" in MIGRATION
     assert "chr(0)" not in MIGRATION
     assert "length(NEW.tenant_id)::text" in MIGRATION
 

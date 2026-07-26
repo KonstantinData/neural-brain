@@ -298,6 +298,9 @@ def test_audit_hash_chain_detects_changed_removed_and_reordered_events(
         cursor.execute(
             "ALTER TABLE memory_audit.events DISABLE TRIGGER audit_events_are_append_only"
         )
+        cursor.execute(
+            "ALTER TABLE memory_audit.events DISABLE TRIGGER audit_events_are_hash_chained"
+        )
         try:
             if tamper == "changed":
                 cursor.execute(
@@ -314,14 +317,26 @@ def test_audit_hash_chain_detects_changed_removed_and_reordered_events(
                 )
             else:
                 cursor.execute(
-                    "UPDATE memory_audit.events SET audit_sequence = audit_sequence + 1000 "
-                    "WHERE tenant_id = 'tenant-a' AND area_id = 'area-a' "
-                    "AND audit_sequence = (SELECT min(audit_sequence) FROM memory_audit.events "
-                    "WHERE tenant_id = 'tenant-a' AND area_id = 'area-a')"
+                    "WITH first_event AS ("
+                    "DELETE FROM memory_audit.events WHERE tenant_id = 'tenant-a' "
+                    "AND area_id = 'area-a' AND audit_sequence = (SELECT min(audit_sequence) "
+                    "FROM memory_audit.events WHERE tenant_id = 'tenant-a' AND area_id = 'area-a') "
+                    "RETURNING tenant_id, area_id, audit_sequence, event_type, principal_id, "
+                    "transition_request_id, subject_kind, subject_id, evidence, occurred_at, "
+                    "previous_event_hash, event_hash"
+                    ") INSERT INTO memory_audit.events (tenant_id, area_id, audit_sequence, "
+                    "event_type, principal_id, transition_request_id, subject_kind, subject_id, "
+                    "evidence, occurred_at, previous_event_hash, event_hash) "
+                    "OVERRIDING SYSTEM VALUE SELECT tenant_id, area_id, audit_sequence + 1000, "
+                    "event_type, principal_id, transition_request_id, subject_kind, subject_id, "
+                    "evidence, occurred_at, previous_event_hash, event_hash FROM first_event"
                 )
         finally:
             cursor.execute(
                 "ALTER TABLE memory_audit.events ENABLE TRIGGER audit_events_are_append_only"
+            )
+            cursor.execute(
+                "ALTER TABLE memory_audit.events ENABLE TRIGGER audit_events_are_hash_chained"
             )
 
     with pytest.raises(psycopg.errors.ObjectNotInPrerequisiteState):
