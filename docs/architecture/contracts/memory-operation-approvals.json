@@ -1,0 +1,18 @@
+{
+  "document_type": "memory_operation_approval_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.memory-operation-approvals",
+  "contract_version": "1.0.0",
+  "status": "normative_subsystem_evidence",
+  "decisions": ["ADR-018", "ADR-019", "ADR-015"],
+  "scope": "Memory Core protected subsystem",
+  "approval_fields": ["approval_id", "actor_id", "approver_id", "approver_role", "tenant_id", "area_id", "project_id", "session_id", "checkpoint_id", "operation", "resource", "data_class", "purpose", "environment", "authority_snapshot_digest", "request_digest", "policy_decision_id", "policy_digest", "approved_at", "valid_until"],
+  "invariants": [
+    "An approval is immutable evidence for exactly one authenticated Memory Core request and cannot widen its actor, scope, operation, resource, purpose, data class, environment, authority snapshot, or policy decision.",
+    "The requester and approver are distinct; an approval role is accepted only when the exact current policy decision requires that role.",
+    "Unknown, future, expired, pre-authority, scope-mismatched, actor-mismatched, operation-mismatched, resource-mismatched, data-class-mismatched, purpose-mismatched, authority-mismatched, or policy-mismatched approval evidence is denied.",
+    "An approval never creates authority, policy, scope, a Memory Transition Gate permission, or atomic audit evidence. S1-06.3 current-authority and policy evidence validation remains independently required.",
+    "The Memory Transition Gate remains the sole writer of protected Memory Core state; no disclosure, promotion, deletion, Goal, Action, external effect, or later Memory Core capability is enabled by this contract."
+  ],
+  "persistence": "No persistence or approval-channel runtime is claimed. A future authenticated channel and Gate integration require separately accepted contracts and atomic audit evidence."
+}

@@ -34,6 +34,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "ledger-invariants.json",
         "memory-lifecycle.json",
         "memory-authority-grants.json",
+        "memory-operation-approvals.json",
         "memory-release-stops.json",
         "memory-stage-capabilities.json",
         "nb1-hidden-evaluation.json",
@@ -69,6 +70,29 @@ def test_memory_authority_grants_are_evidence_only_and_fail_closed() -> None:
     assert isinstance(boundary, dict)
     assert boundary["implemented_security_floor_operations"] == ["intake"]
     assert "retrieval" in boundary["not_released"]
+
+
+def test_memory_operation_approvals_are_bounded_evidence_only() -> None:
+    contract = _load("memory-operation-approvals.json")
+    assert contract["scope"] == "Memory Core protected subsystem"
+    fields = set(_strings(contract["approval_fields"]))
+    assert {
+        "actor_id",
+        "approver_id",
+        "approver_role",
+        "operation",
+        "resource",
+        "data_class",
+        "purpose",
+        "authority_snapshot_digest",
+        "policy_decision_id",
+        "policy_digest",
+        "valid_until",
+    } <= fields
+    invariants = set(_strings(contract["invariants"]))
+    assert any("never creates authority" in invariant for invariant in invariants)
+    assert any("sole writer" in invariant for invariant in invariants)
+    assert "No persistence" in str(contract["persistence"])
 
 
 def test_system_boundary_declares_target_and_honest_current_maturity() -> None:
