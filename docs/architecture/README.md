@@ -15,6 +15,9 @@ distinct.
   gates, baselines, ablations, transfer, robustness, and safety evaluation.
 - [`delivery-roadmap.md`](delivery-roadmap.md) defines NB-0 through NB-8 and
   their hard dependencies.
+- [`goal-gate-adr-018-revalidation-proposal-v1.md`](goal-gate-adr-018-revalidation-proposal-v1.md)
+  records the proposed, non-authorizing replacement boundary for historical
+  Goal Gate ADRs. It remains blocked pending authorized acceptance.
 - [`ledger-conventions-v1.md`](ledger-conventions-v1.md) fixes PostgreSQL
   representation conventions for protected keys, scope, time, exact amounts,
   naming, and structured payloads.

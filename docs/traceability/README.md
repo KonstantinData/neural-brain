@@ -153,6 +153,9 @@ when they are required by the acceptance criteria.
   MS-1 Memory Core source/observation, checkpoint, transition, provenance,
   lifecycle-boundary, and recovery mapping; it introduces no schema or early
   Goal, Action, or external-effect capability.
+- [`FND-ENT-02-goal-gate-adr-revalidation.md`](FND-ENT-02-goal-gate-adr-revalidation.md):
+  historical Goal Gate ADR disposition and the proposed, fail-closed NB-1
+  replacement boundary; it is not an accepted ADR or runtime authorization.
 
 ## Reconciliation Rules
 
