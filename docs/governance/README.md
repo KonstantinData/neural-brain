@@ -4,6 +4,12 @@ This directory contains the versioned desired repository-governance state for
 Neural Brain. The normative contract is
 [`repository-policy.json`](repository-policy.json).
 
+The authoritative repository-facing inventory of implemented and target AI
+components, models, datasets, adapters, integrations, data flows, tools, and
+deployment boundaries is [`ai-component-inventory.md`](ai-component-inventory.md).
+It is deliberately fail-closed: an inventory entry does not enable a capability,
+approve a deployment, or establish Neural Brain recognition.
+
 The contract requires task branches under `codex/`, Conventional Commit
 headers, pull-request review, blocking quality checks, CODEOWNERS review, and
 additional independence evidence for memory separation-of-duties-sensitive
