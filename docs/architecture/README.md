@@ -18,6 +18,10 @@ distinct.
 - [`goal-gate-adr-018-revalidation-proposal-v1.md`](goal-gate-adr-018-revalidation-proposal-v1.md)
   records the proposed, non-authorizing replacement boundary for historical
   Goal Gate ADRs. It remains blocked pending authorized acceptance.
+- [`action-gate-adr-018-revalidation-proposal-v1.md`](action-gate-adr-018-revalidation-proposal-v1.md)
+  records the proposed, non-authorizing NB-4/NB-5 boundary for historical
+  Action Gate, preparation, dispatch, and reconciliation ADRs. It remains
+  blocked pending authorized acceptance together with the Goal Gate boundary.
 - [`ledger-conventions-v1.md`](ledger-conventions-v1.md) fixes PostgreSQL
   representation conventions for protected keys, scope, time, exact amounts,
   naming, and structured payloads.
@@ -29,6 +33,9 @@ distinct.
 
 - `system-boundary.json`: complete-system and two-plane boundary.
 - `cognitive-cycle.json`: protected serial perception-to-learning cycle.
+- `action-transition-gate-v1.json`: bounded prerequisite contract for a future
+  NB-5 Action Transition Gate; it neither authorizes nor implements action,
+  dispatch, budget, resource, fence, sandbox, or external-effect behavior.
 - `stage-capabilities.json`: NB-0 through NB-8 availability and prohibitions.
 - `recognition-gates.json`: mandatory product-recognition gates.
 - `evaluation-gates.json`: ordered G0 through G8 evidence chain.

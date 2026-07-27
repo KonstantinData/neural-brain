@@ -17,6 +17,10 @@ ADR-017.
   Goal Transition Gate. It binds a session-scoped aggregate, immutable
   authenticated scope and lineage, evidence references, and stage boundaries;
   it does not authorize a Goal runtime, migration, action, or external effect.
+- `action-transition-gate-v1.json`: bounded prerequisite contract for a future
+  NB-5 Action Transition Gate. It separates NB-4 learning/consolidation from
+  NB-5 action and does not authorize a runtime, migration, executor, dispatch,
+  budget, resource, fence, sandbox, or external effect.
 - `nb1-hidden-evaluation.json`: label-free candidate boundary, candidate freeze
   receipt, external evaluator custody, and signed evidence intake for EVAL-01 v4.
 - `stage-capabilities.json`: cumulative NB-0 through NB-8 delivery contract.
