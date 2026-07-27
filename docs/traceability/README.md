@@ -203,6 +203,9 @@ when they are required by the acceptance criteria.
   proposed, fail-closed prerequisite boundary for S1-10.1, S1-10.3, and
   S1-10.6; it is not an accepted ADR, runtime authorization, or NB-1 release
   claim.
+- [`REL-MEM-01-08-relationship-memory-preparation.md`](REL-MEM-01-08-relationship-memory-preparation.md):
+  preparation-only Position 1–3 evidence, including the separately accepted
+  future enforcement package boundary.
 - [`S1-15.6-model-inference-inventory.md`](S1-15.6-model-inference-inventory.md):
   immutable, fail-closed model and inference-boundary inventory evidence; it
   records current absence and cannot activate, deploy, promote, or authorize a

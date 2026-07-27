@@ -52,6 +52,17 @@ This proposal does not define a protected Goal state model, verification runtime
 human approval channel, legal classification, or any determination about a real
 deployment. Missing accepted semantics deny a protected transition.
 
+### Relationship Memory boundary
+
+Any future Planner use may receive only approved, minimized, provenance-bound
+Relationship Memory signals as untrusted context. It may establish neither
+truth nor a profile decision and cannot create authority, mutate Memory, call a
+tool, or cause an external effect. This does not authorize a Planner runtime,
+retrieval surface, personal-data processing, or a Relationship Memory Gate
+transition. Goal Transition Gate revalidation, historical Goal Gate
+revalidation, this Planner/Verification revalidation, Privacy, and deployment
+evidence remain separate blockers.
+
 ## Serial-loop boundary
 
 The existing NB-1 development slice may remain an effect-free serial cognitive
