@@ -40,6 +40,13 @@
     ],
     "default_on_unknown_or_stale_fact": "deny"
   },
+  "relationship_memory_boundary": {
+    "permitted_future_input": "approved_minimized_provenance_bound_untrusted_context",
+    "prohibited_derivations": ["truth", "profile_decision", "authority", "memory_mutation", "tool_call", "external_effect"],
+    "runtime_authorized": false,
+    "retrieval_surface_authorized": false,
+    "personal_data_processing_authorized": false
+  },
   "verification_boundary": {
     "planner_or_tool_success_is_goal_success": false,
     "independent_verifier_required_for_future_goal_success": true,

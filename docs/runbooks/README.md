@@ -23,3 +23,6 @@ their accepted gates and may not be documented as model-controlled shortcuts.
 - [`protected-ledger-backup-recovery.md`](protected-ledger-backup-recovery.md)
   defines target-only backup, WAL/PITR, retention, custody, and isolated
   restore-test procedure; it does not prove a deployed recovery capability.
+- [`relationship-memory-governance-preparation.md`](relationship-memory-governance-preparation.md)
+  records only future service-managed request and non-use boundaries; it is not
+  a runtime operating procedure.

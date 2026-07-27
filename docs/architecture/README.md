@@ -26,6 +26,9 @@ distinct.
   records the proposed, non-authorizing prerequisite boundary for the NB-1
   S1-10 planner, verification, and serial-loop packages. It remains blocked
   pending an authorized current contract.
+- [`relationship-memory-adr-018-revalidation-proposal-v1.md`](relationship-memory-adr-018-revalidation-proposal-v1.md)
+  records preparation-only Positions 1–3; it authorizes neither runtime nor
+  retrieval, Planner, or Dreaming use.
 - [`ledger-conventions-v1.md`](ledger-conventions-v1.md) fixes PostgreSQL
   representation conventions for protected keys, scope, time, exact amounts,
   naming, and structured payloads.

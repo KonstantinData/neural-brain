@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "contract_id": "neural-brain.relationship-memory-signal",
+  "version": "1.0.0",
+  "status": "proposed_prerequisite_not_accepted_not_runtime_authorization",
+  "governing_decisions": ["ADR-016", "ADR-017", "ADR-018", "ADR-019", "architecture-directive-v4.0"],
+  "runtime_enabled": false,
+  "migrations_authorized": false,
+  "additionalProperties": false,
+  "type": "object",
+  "required": ["tenant_id", "area_id", "pseudonymized_subject_ref", "signal_type", "provenance", "purpose", "confidence", "freshness", "retention", "review", "access_policy", "correction_supersession", "forbidden_fields", "fail_closed"],
+  "properties": {
+    "tenant_id": {"type": "string", "minLength": 1}, "area_id": {"type": "string", "minLength": 1},
+    "project_id": {"type": "string", "minLength": 1}, "session_id": {"type": "string", "minLength": 1},
+    "pseudonymized_subject_ref": {"type": "string", "minLength": 1, "description": "Not scope, identity, authority, or authorization."},
+    "signal_type": {"enum": ["stated_interaction_preference", "explicit_correction", "stated_interaction_constraint", "relationship_context_observation"]},
+    "provenance": {"type": "object", "additionalProperties": false, "required": ["source_ref", "acquired_at", "source_class"], "properties": {"source_ref": {"type": "string", "minLength": 1}, "acquired_at": {"type": "string", "format": "date-time"}, "source_class": {"enum": ["approved_future_source", "reviewer_correction", "synthetic_test_fixture"]}}},
+    "purpose": {"type": "string", "minLength": 1}, "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "freshness": {"type": "object", "additionalProperties": false, "required": ["observed_at", "valid_until"], "properties": {"observed_at": {"type": "string", "format": "date-time"}, "valid_until": {"type": "string", "format": "date-time"}}},
+    "retention": {"type": "object", "additionalProperties": false, "required": ["expires_at", "deletion_propagation_required"], "properties": {"expires_at": {"type": "string", "format": "date-time"}, "deletion_propagation_required": {"const": true}}},
+    "review": {"type": "object", "additionalProperties": false, "required": ["state", "reviewer_required"], "properties": {"state": {"enum": ["unreviewed", "reviewed_approved", "reviewed_rejected", "correction_pending", "deletion_pending", "expired", "quarantined"]}, "reviewer_required": {"const": true}}},
+    "access_policy": {"type": "object", "additionalProperties": false, "required": ["purpose_bound", "area_local", "default"], "properties": {"purpose_bound": {"const": true}, "area_local": {"const": true}, "default": {"const": "deny"}}},
+    "correction_supersession": {"type": "object", "additionalProperties": false, "required": ["supersedes_ref", "correction_state"], "properties": {"supersedes_ref": {"type": ["string", "null"]}, "correction_state": {"enum": ["none", "pending_review", "superseded", "rejected"]}}},
+    "forbidden_fields": {"const": ["direct_identifier", "sensitive_data", "special_category_data", "criminal_data", "health_data", "biometric_data", "financial_data", "children_data", "location_data", "authentication_secret", "inferred_profile", "eligibility_score", "automated_decision"]},
+    "fail_closed": {"type": "object", "additionalProperties": false, "required": ["on_unknown", "on_scope_or_purpose_mismatch", "on_stale_or_unreviewed", "on_prohibited_content"], "properties": {"on_unknown": {"const": "deny_and_do_not_use"}, "on_scope_or_purpose_mismatch": {"const": "deny_and_do_not_use"}, "on_stale_or_unreviewed": {"const": "deny_and_do_not_use"}, "on_prohibited_content": {"const": "deny_quarantine_and_escalate"}}}
+  }
+}

@@ -17,6 +17,9 @@ ADR-017.
   Goal Transition Gate. It binds a session-scoped aggregate, immutable
   authenticated scope and lineage, evidence references, and stage boundaries;
   it does not authorize a Goal runtime, migration, action, or external effect.
+- `relationship-memory-signal-contract-v1.json`: proposed, fail-closed signal
+  vocabulary for future Relationship Memory preparation; it creates no signal
+  store, migration, runtime, retrieval, or processing authority.
 - `action-transition-gate-v1.json`: bounded prerequisite contract for a future
   NB-5 Action Transition Gate. It separates NB-4 learning/consolidation from
   NB-5 action and does not authorize a runtime, migration, executor, dispatch,
