@@ -62,6 +62,22 @@ ADR-017.
   under Articles 7, 8, and 9(2)(a). It provides no instance validator, consent
   determination, withdrawal workflow, processing stop, runtime authority, or
   release.
+- `privacy-notice-evidence-intake-v1.json`: immutable, scope-bound direct and
+  indirect collection notice evidence intake for qualified review only. It
+  records required notice-topic evidence without creating a real notice or
+  determining legal, processing, runtime, authority, or release outcomes.
+- `data-subject-request-evidence-intake-v1.json`: immutable, scope-bound DSAR
+  intake/case evidence template for qualified review only. It records identity,
+  deadline, audit, redaction, and escalation evidence without executing a
+  request or enabling processing, runtime, authority, or release.
+- `dpia-evidence-intake-v1.json`: immutable, scope-bound DPIA and risk-workflow
+  evidence intake for qualified review only. It records risk, mitigation,
+  residual-risk, approval, review, and Article 36 trigger evidence without
+  determining a risk, approval, consultation, or release outcome.
+- `processor-governance-evidence-intake-v1.json`: immutable, scope-bound
+  processor/subprocessor due-diligence evidence intake for qualified review
+  only. It records Article 28 control evidence without creating terms,
+  appointing a party, or enabling processing, runtime, authority, or release.
 - `prohibited-unsupported-use-v1.json`: deterministic, fail-closed
   classification of immutable prohibited and currently unsupported uses. It has
   no allow, activation, or release outcome and never replaces the Security

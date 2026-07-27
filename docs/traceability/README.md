@@ -182,6 +182,22 @@ when they are required by the acceptance criteria.
   and no instance validation, consent determination, qualified review,
   withdrawal, downstream stop, legal, authority, release, or runtime outcome
   exists.
+- [`S1-14.7-privacy-notice-evidence-intake.md`](S1-14.7-privacy-notice-evidence-intake.md):
+  immutable direct/indirect collection-notice evidence intake; required topics,
+  evidence, and qualified review fail closed and cannot create a real notice or
+  legal, authority, processing, release, or runtime outcome.
+- [`S1-14.8-data-subject-request-evidence-intake.md`](S1-14.8-data-subject-request-evidence-intake.md):
+  immutable DSAR evidence intake/case template; identity, deadline, audit,
+  redaction, and escalation evidence fail closed and cannot execute a request
+  or create legal, authority, processing, release, or runtime outcomes.
+- [`S1-14.12-dpia-evidence-intake.md`](S1-14.12-dpia-evidence-intake.md):
+  immutable DPIA and risk-workflow evidence intake; unresolved risk and review
+  evidence fail closed and cannot determine risk, approval, consultation,
+  processing, release, or runtime outcomes.
+- [`S1-14.13-processor-governance-evidence-intake.md`](S1-14.13-processor-governance-evidence-intake.md):
+  immutable processor/subprocessor due-diligence evidence intake; relationship,
+  control, subprocessor, transfer, deletion, and termination evidence fail
+  closed and cannot create terms, appointment, processing, release, or runtime outcomes.
 - [`S1-11.1-data-object-catalogue-intake.md`](S1-11.1-data-object-catalogue-intake.md):
   category-only, fail-closed data-object catalogue intake requiring ownership,
   purpose, storage, lifecycle, retention, rights, deletion, and RoPA evidence;

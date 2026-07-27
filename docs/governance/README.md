@@ -60,6 +60,26 @@ not validate an intake, perform qualified review, determine consent validity,
 lawfulness, authority, processing, deployment,
 release, or runtime behavior.
 
+[`privacy-notice-evidence-intake-v1.md`](privacy-notice-evidence-intake-v1.md)
+defines a fail-closed notice-evidence intake for direct and indirect collection.
+It neither creates a notice nor determines legal, processing, deployment,
+release, authority, or runtime behavior.
+
+[`data-subject-request-evidence-intake-v1.md`](data-subject-request-evidence-intake-v1.md)
+defines a fail-closed DSAR evidence intake and case-tracking template. It does
+not receive a real request, verify an identity, process data, or enable runtime,
+authority, or release.
+
+[`dpia-evidence-intake-v1.md`](dpia-evidence-intake-v1.md) defines a
+fail-closed DPIA/risk evidence intake. It does not determine risk, approve a
+DPIA, require consultation, or authorize processing, runtime, authority, or
+release.
+
+[`processor-governance-evidence-intake-v1.md`](processor-governance-evidence-intake-v1.md)
+defines a fail-closed processor/subprocessor due-diligence evidence intake. It
+does not create terms, appoint a party, determine Article 28 sufficiency, or
+authorize processing, runtime, authority, or release.
+
 [`compliance-raci-assessment-v1.md`](compliance-raci-assessment-v1.md) defines
 a fail-closed input template for qualified deployment-specific responsibility,
 approval-authority, independence, and escalation review. It does not assign a

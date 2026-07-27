@@ -1,0 +1,107 @@
+{
+  "document_type": "neural_brain_dpia_evidence_intake_contract",
+  "contract_id": "neural-brain.dpia-evidence-intake",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+  "purpose": "Define a versioned, product- and domain-neutral, fail-closed evidence intake for separately governed qualified review of a proposed data-protection impact assessment (DPIA). It records scope-bound assessment, risk, mitigation, residual-risk, approval, review, and prior-consultation-trigger evidence references only. It cannot determine whether a DPIA is required, determine high risk or residual risk, approve a DPIA, conclude whether prior consultation is required, establish trusted scope, grant authority, authorize processing, decide release, or enable runtime behavior.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2016/679",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "review_reference": "Article 35 and Article 36; any DPIA requirement, risk, residual-risk, approval, prior-consultation, or legal conclusion requires qualified deployment-specific review."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete controller, processing activity, intended purpose, data-subject population, jurisdiction, risk, mitigation, approval, review, or prior-consultation fact.",
+      "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether GDPR, Article 35, or Article 36 applies to a concrete deployment or processing activity",
+      "whether a concrete processing activity is likely to result in high risk or has unresolved high residual risk",
+      "whether a DPIA is required, complete, approved, current, sufficient, or legally compliant",
+      "whether a mitigation is appropriate, implemented, effective, or adequate",
+      "whether prior consultation is required or whether a concrete system may process personal data, be deployed, released, or operated"
+    ]
+  },
+  "dpia_evidence_intake_template": {
+    "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment and processing activity, immutable authenticated Tenant, Area, and Project scope references, intended-purpose contract version, activity/purpose reference, and jurisdiction evidence combination.",
+    "required_fields": [
+      "intake_identifier_and_contract_version",
+      "intake_timestamp_and_accountable_owner_reference",
+      "qualified_independent_reviewer_qualification_review_date_and_independence_reference",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdiction_evidence_references",
+      "immutable_authenticated_tenant_area_project_scope_references",
+      "immutable_intended_purpose_contract_id_version_and_purpose_reference",
+      "immutable_processing_activity_identifier_version_and_activity_reference",
+      "linked_gdpr_applicability_ropa_data_flow_and_reassessment_evidence_references",
+      "data_subject_personal_data_category_source_recipient_transfer_retention_and_safeguard_evidence_references",
+      "dpia_assessment_method_scope_and_necessity_proportionality_evidence_references_for_qualified_review_only",
+      "risk_scenario_likelihood_impact_and_risk_register_evidence_references_for_qualified_review_only",
+      "mitigation_control_owner_due_date_and_effectiveness_evidence_references_for_qualified_review_only",
+      "residual_risk_assessment_and_unresolved_high_residual_risk_evidence_references_for_qualified_review_only",
+      "approval_review_status_and_reviewer_or_approver_evidence_references_for_qualified_review_only",
+      "article_36_prior_consultation_trigger_disposition_and_evidence_references_for_qualified_review_only",
+      "explicit_non_applicability_unknown_conflict_gap_expiry_and_blocker_handling",
+      "mandatory_reassessment_triggers_next_review_date_and_independent_release_decision_reference"
+    ],
+    "scope_binding_requirements": [
+      "Tenant, Area, and Project references must identify immutable authenticated runtime-scope evidence. An intake identifier, purpose label, activity label, jurisdiction label, request payload, prompt, observation, model response, memory content, or tool output cannot establish, broaden, or substitute trusted scope.",
+      "Artifact, purpose, activity, deployment, and jurisdiction references must name immutable versioned evidence. A DPIA intake is valid only for its exact artifact, authenticated scope, purpose, activity, deployment, and jurisdiction combination; evidence may not be reused across Tenant, Area, Project, artifact, purpose, activity, deployment, or jurisdiction changes without a separate intake and qualified review.",
+      "The intake contains durable evidence references and categories only. It must not contain raw personal data, special-category values, criminal-offence data, personal identifiers, credentials, secrets, prompts, memory payloads, consent text, contracts, legal advice, risk narratives containing personal data, or unverified external assertions.",
+      "Assessment, risk, mitigation, residual-risk, approval, review, and prior-consultation-trigger entries must state provenance, date, currency, scope, qualified-review treatment, and contradiction status. Unknown, stale, contradictory, unauthenticated, unqualified, or unresolved facts remain explicit deployment-specific release blockers rather than inferred favorable facts."
+    ],
+    "deterministic_review_order": [
+      "Verify every required field, exact immutable artifact, authenticated scope, purpose, activity, deployment, jurisdiction, accountable owner, qualified independent reviewer, review date, evidence reference, blocker, and reassessment trigger; any absent, unknown, stale, contradictory, non-immutable, or scope-mismatched fact is incomplete.",
+      "Verify linked GDPR applicability, RoPA, personal-data-flow, and reassessment evidence for the same artifact, authenticated scope, purpose, activity, deployment, and jurisdiction; a missing or conflicting prerequisite remains a release blocker.",
+      "Record DPIA assessment-method, scope, necessity, proportionality, risk-scenario, likelihood, impact, and risk-register evidence without determining whether a DPIA is required or whether any risk is high; unknown or disputed evidence remains a release blocker.",
+      "Record mitigation, control, owner, due-date, effectiveness, residual-risk, approval, and review evidence for qualified review only, without determining adequacy, effectiveness, residual risk, approval validity, or a processing outcome; no favorable later fact compensates for an unresolved earlier fact.",
+      "Record the Article 36 prior-consultation-trigger disposition and its qualified evidence without determining whether prior consultation is legally required. An unresolved high-residual-risk evidence item, missing disposition, or missing qualified review remains a release blocker.",
+      "Record explicit non-applicability, unknown, conflict, gap, expiry, blocker, reassessment trigger, next review date, and independent release-decision reference. A completed intake remains evidence input only and cannot create a legal, authority, processing, deployment, release, or runtime outcome."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_model_supplier_or_deployment_change",
+      "authenticated_tenant_area_project_scope_purpose_activity_or_jurisdiction_change",
+      "data_subject_personal_data_category_source_recipient_transfer_retention_or_safeguard_change",
+      "dpia_assessment_method_risk_scenario_likelihood_impact_mitigation_control_or_residual_risk_evidence_change",
+      "approval_review_independence_external_fact_or_qualified_review_change",
+      "article_36_prior_consultation_trigger_disposition_change",
+      "evidence_expiry_unknown_conflict_incident_complaint_or_material_misuse_signal"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "dpia_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_or_nonimmutable_authenticated_scope_artifact_purpose_activity_or_jurisdiction_reference": "reject_intake_and_block_deployment_specific_release_decision",
+    "stale_scope_mismatched_or_contradictory_evidence": "dpia_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_accountable_owner_qualified_independent_reviewer_review_date_evidence_or_reassessment_trigger": "dpia_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unknown_unqualified_stale_or_conflicting_assessment_risk_mitigation_residual_risk_approval_review_or_prior_consultation_trigger_evidence": "dpia_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unresolved_high_residual_risk_or_prior_consultation_trigger_disposition": "dpia_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "cross_boundary_or_changed_artifact_purpose_activity_deployment_or_jurisdiction_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+    "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_dpia_requirement_risk_residual_risk_approval_or_prior_consultation_determination": true,
+    "no_runtime_authorization_processing_activation_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability evidence intake for separately governed qualified privacy review",
+    "template_is_not": [
+      "a legal opinion, data-protection impact assessment determination, prior-consultation determination, or compliance certification",
+      "a determination that a DPIA is required, a risk is high, residual risk is acceptable, a mitigation is effective, an approval is valid, or prior consultation is legally required",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, policy, or approval context",
+      "a policy decision, Security Floor override, protected-state transition request, or gate decision",
+      "a processing, deployment, productive-use, or release approval",
+      "a runtime capability enablement or external-effect authorization",
+      "an implementation, maturity, recognition, safety, product capability, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately applicable qualified review, accepted governance, and all Protected Control Plane, transition-gate, evaluation, recognition, and release evidence requirements may decide a concrete processing activity or deployment. This intake never activates a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_processing_scope_activity_jurisdiction_evidence_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, exact immutable artifact and authenticated scope/purpose/activity/jurisdiction evidence, linked prerequisite evidence, accountable owner, qualified independent reviewer, assessment/risk/mitigation/residual-risk/approval/review/prior-consultation-trigger evidence, explicit unknown dispositions, reassessment triggers, and separately governed release evidence.",
+    "next_step": "Create one immutable DPIA evidence intake per proposed artifact, authenticated Tenant/Area/Project scope, purpose, processing activity, deployment, and jurisdiction combination before any processing-specific or deployment-specific release decision."
+  }
+}

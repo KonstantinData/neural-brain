@@ -1,0 +1,108 @@
+{
+  "document_type": "neural_brain_processor_governance_evidence_intake_contract",
+  "contract_id": "neural-brain.processor-governance-evidence-intake",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+  "purpose": "Define a versioned, product- and domain-neutral, fail-closed evidence intake and qualified-review workflow template for possible processor or subprocessor due diligence and Article 28 evidence for one proposed processing relationship. It records immutable evidence references and explicit dispositions only; it cannot state contract terms, appoint a processor or subprocessor, determine Article 28 applicability or sufficiency, authorize processing, establish trusted scope, grant authority, decide release, or enable runtime behavior.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2016/679",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "review_reference": "Article 28; any controller-processor relationship, due-diligence conclusion, contractual sufficiency, subprocessor authorization, transfer, audit, deletion/return, change, termination, applicability, or lawfulness conclusion requires qualified deployment-specific review outside this template."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete controller, processor, subprocessor, processing relationship, processing activity, instruction, contract, appointment, transfer, audit arrangement, deletion or return obligation, termination fact, jurisdictional fact, or qualified review outcome.",
+      "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether GDPR or Article 28 applies to a concrete deployment or processing relationship",
+      "whether a party is or may be appointed as a controller, processor, or subprocessor",
+      "whether due diligence, instruction, security, confidentiality, subprocessor, audit, transfer, deletion/return, change, termination, or other Article 28 evidence is sufficient, current, valid, or applicable",
+      "whether a concrete system may process personal data, be deployed, released, or operated"
+    ]
+  },
+  "processor_governance_evidence_intake_template": {
+    "assessment_unit": "One immutable artifact version or digest, one concrete proposed processing relationship, immutable authenticated Tenant, Area, and Project scope references, intended-purpose contract version, processing activity and purpose reference combination, and jurisdiction evidence.",
+    "required_fields": [
+      "intake_identifier_and_contract_version",
+      "intake_timestamp_accountable_owner_and_qualified_reviewer_qualification_review_date_and_independence_reference",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdiction_evidence",
+      "immutable_authenticated_tenant_area_project_scope_references",
+      "immutable_intended_purpose_contract_id_version_and_purpose_reference",
+      "immutable_processing_activity_identifier_version_and_activity_reference",
+      "linked_ropa_gdpr_role_applicability_use_case_article_6_and_reassessment_evidence_references",
+      "proposed_party_and_processor_or_subprocessor_role_scope_and_controller_relationship_evidence_references",
+      "documented_instruction_evidence_references_for_qualified_review_only",
+      "security_and_confidentiality_evidence_references_for_qualified_review_only",
+      "subprocessor_due_diligence_change_and_authorization_evidence_references_for_qualified_review_only",
+      "audit_assistance_and_evidence_access_references_for_qualified_review_only",
+      "international_transfer_location_and_safeguard_evidence_references_for_qualified_review_only",
+      "deletion_or_return_and_termination_evidence_references_for_qualified_review_only",
+      "external_facts_source_provenance_date_currency_and_scope_evidence_references",
+      "explicit_non_applicability_unknown_conflict_gap_and_blocker_handling",
+      "review_rationale_verified_evidence_references_release_blockers_and_next_review_date",
+      "mandatory_reassessment_triggers_and_independent_release_decision_reference"
+    ],
+    "scope_binding_requirements": [
+      "Tenant, Area, and Project references must identify immutable authenticated runtime-scope evidence. An intake identifier, party label, role label, purpose label, activity label, request payload, prompt, observation, model response, memory content, or tool output cannot establish, broaden, or substitute trusted scope.",
+      "Purpose and activity references must name immutable versioned evidence. A processor-governance evidence intake is valid only for its exact artifact, authenticated scope, purpose, activity, proposed relationship, and jurisdiction combination; evidence may not be reused across Tenant, Area, Project, purpose, activity, artifact, relationship, party, role, jurisdiction, subprocessor, or transfer changes without a separate record and qualified review.",
+      "The intake must contain durable evidence references and categories only. It must not contain raw personal data, personal identifiers, credentials, secrets, prompts, memory payloads, contract text, contract terms, instructions, audit material, legal advice, or unverified external assertions.",
+      "Processor role/scope, controller relationship, instructions, security, confidentiality, subprocessors, audits, transfers, deletion/return, change, termination, external facts, and non-applicability assertions must identify their source, provenance, date, currency, scope, reviewer treatment, and contradiction status. Unknown, stale, contradictory, unauthenticated, or unqualified facts remain explicit release blockers rather than inferred favorable facts."
+    ],
+    "deterministic_review_order": [
+      "Verify every required field, exact immutable artifact, authenticated scope, purpose, activity, proposed relationship, jurisdiction, accountable owner, qualified reviewer, review date, evidence reference, and reassessment trigger; any absent, unknown, stale, contradictory, non-immutable, or scope-mismatched fact is incomplete.",
+      "Verify linked RoPA, GDPR role, GDPR applicability, use-case, Article 6, and reassessment evidence for the same artifact, authenticated scope, purpose, activity, relationship, and jurisdiction; a missing or conflicting prerequisite remains a release blocker.",
+      "Record the proposed party, processor or subprocessor role/scope, controller relationship, and instruction evidence without selecting a role, appointing a party, validating instructions, or concluding Article 28 applicability or sufficiency; unknown or disputed evidence remains a release blocker.",
+      "Record security, confidentiality, subprocessor due diligence, subprocessor change and authorization, audit, assistance, evidence access, location, transfer, deletion/return, and termination evidence as qualified-review inputs only; no favorable later fact compensates for an unresolved earlier fact.",
+      "Record explicit non-applicability, unknown, conflict, evidence-expiry, gap, and blocker dispositions with provenance and reviewer treatment. An unsubstantiated non-applicability statement, unknown downstream processor or subprocessor, or missing change evidence is incomplete and never an exemption or approval.",
+      "Record reassessment triggers, next review date, release blockers, and the independent release-decision reference. A completed intake remains evidence input only and cannot create a contract, appointment, legal, authority, processing, deployment, release, or runtime outcome."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_model_supplier_or_deployment_change",
+      "authenticated_tenant_area_project_scope_purpose_activity_relationship_or_jurisdiction_change",
+      "party_processor_or_subprocessor_role_scope_controller_relationship_or_instruction_change",
+      "security_confidentiality_subprocessor_audit_assistance_or_evidence_access_change",
+      "location_transfer_safeguard_deletion_return_change_or_termination_change",
+      "evidence_expiry_unknown_conflict_incident_complaint_material_misuse_or_qualified_review_change"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "processor_governance_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_or_nonimmutable_authenticated_scope_purpose_activity_relationship_or_artifact_reference": "reject_intake_and_block_deployment_specific_release_decision",
+    "stale_scope_mismatched_or_contradictory_evidence": "processor_governance_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_qualified_reviewer_review_date_rationale_evidence_or_reassessment_trigger": "processor_governance_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unknown_unqualified_stale_or_conflicting_processor_subprocessor_article_28_or_external_fact": "processor_governance_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_instruction_security_confidentiality_subprocessor_audit_transfer_deletion_return_change_or_termination_evidence": "processor_governance_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unknown_downstream_processor_or_subprocessor": "processor_governance_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "cross_boundary_or_changed_artifact_purpose_activity_relationship_jurisdiction_party_role_or_transfer_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+    "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_article_28_applicability_sufficiency_or_processor_appointment": true,
+    "no_runtime_authorization_processing_activation_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability evidence intake and qualified-review workflow template",
+    "template_is_not": [
+      "a legal opinion, Article 28 applicability or sufficiency determination, or compliance certification",
+      "a data-processing agreement, contract terms, controller-processor instruction, processor or subprocessor appointment, authorization, or approval",
+      "a determination of lawfulness, role validity, instruction validity, security or confidentiality sufficiency, subprocessor authorization, audit sufficiency, transfer validity, deletion/return sufficiency, change outcome, termination outcome, or a GDPR exemption",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, policy, or approval context",
+      "a policy decision, Security Floor override, protected-state transition request, or gate decision",
+      "a processing, deployment, productive-use, or release approval",
+      "a runtime capability enablement or external-effect authorization",
+      "an implementation, maturity, recognition, safety, product capability, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately applicable qualified review, accepted governance, and all Protected Control Plane, transition-gate, evaluation, recognition, and release evidence requirements may decide a concrete processing relationship or deployment. This intake never activates a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_processing_relationship_scope_activity_article_28_evidence_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, exact immutable artifact and authenticated scope/purpose/activity/relationship/jurisdiction evidence, linked prerequisite evidence, qualified reviewer and external-fact provenance, processor-governance evidence references, explicit unknown/non-applicability/conflict/blocker dispositions, reassessment triggers, and separately governed release evidence.",
+    "next_step": "Create one immutable processor-governance evidence intake per proposed artifact, authenticated Tenant/Area/Project scope, purpose, processing activity, relationship, and jurisdiction before any processing-specific or deployment-specific release decision."
+  }
+}
