@@ -530,7 +530,9 @@ def test_audit_failure_rolls_back_the_complete_transition(
     database_dsn: str,
     runtime_database_access: RuntimeDatabaseAccess,
 ) -> None:
-    """An injected audit failure leaves no observation, context version, or checkpoint."""
+    """An injected audit failure rolls back every Gate-owned transition artifact."""
+
+    _call_cycle(runtime_database_access.dsn, AREA_A, _cycle_arguments())
 
     with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
         with connection.cursor() as cursor:
@@ -560,6 +562,71 @@ def test_audit_failure_rolls_back_the_complete_transition(
                 "observation_id = 'observation-audit-fail'",
             )
             == 0
+        )
+        assert (
+            _count(
+                database_dsn,
+                "memory_core.working_contexts",
+                "tenant_id = 'tenant-a' AND area_id = 'area-b' AND project_id = 'project-b' "
+                "AND session_id = 'session-b' AND slot_name = 'primary'",
+            )
+            == 0
+        )
+        assert (
+            _count(
+                database_dsn,
+                "memory_core.working_context_versions",
+                "source_observation_id = 'observation-audit-fail'",
+            )
+            == 0
+        )
+        assert (
+            _count(
+                database_dsn,
+                "memory_core.checkpoints",
+                "checkpoint_id = 'checkpoint-audit-fail'",
+            )
+            == 0
+        )
+        assert (
+            _count(
+                database_dsn,
+                "memory_core.transition_receipts",
+                "transition_request_id = 'request-audit-fail'",
+            )
+            == 0
+        )
+        assert (
+            _count(
+                database_dsn,
+                "memory_audit.events",
+                "transition_request_id = 'request-audit-fail'",
+            )
+            == 0
+        )
+        assert (
+            _count(
+                database_dsn,
+                "memory_audit.chain_heads",
+                "tenant_id = 'tenant-a' AND area_id = 'area-b'",
+            )
+            == 0
+        )
+        assert (
+            _count(
+                database_dsn,
+                "memory_core.transition_receipts",
+                "tenant_id = 'tenant-a' AND area_id = 'area-a' AND transition_request_id = 'request-1'",
+            )
+            == 1
+        )
+        assert (
+            _count(
+                database_dsn,
+                "memory_audit.events",
+                "tenant_id = 'tenant-a' AND area_id = 'area-a' AND transition_request_id = 'request-1'",
+            )
+            == 1
         )
     finally:
         with psycopg.connect(database_dsn, autocommit=True) as connection, connection.transaction():
