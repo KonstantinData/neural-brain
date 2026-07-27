@@ -6,7 +6,9 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).parents[2]
-CONTRACT_PATH = ROOT / "docs" / "architecture" / "contracts" / "protected-ledger-backup-recovery-v1.json"
+CONTRACT_PATH = (
+    ROOT / "docs" / "architecture" / "contracts" / "protected-ledger-backup-recovery-v1.json"
+)
 
 
 def _contract() -> dict[str, object]:
@@ -55,7 +57,12 @@ def test_access_separation_and_restore_success_are_non_bypassable() -> None:
     separation = contract["access_separation"]
     assert isinstance(separation, dict)
     roles = _strings(separation["required_roles"])
-    assert {"restricted backup operator", "separate encryption-key custodian", "separate restore or recovery operator", "independent restore-test witness"} <= roles
+    assert {
+        "restricted backup operator",
+        "separate encryption-key custodian",
+        "separate restore or recovery operator",
+        "independent restore-test witness",
+    } <= roles
     prohibitions = _strings(separation["prohibitions"])
     assert any("Cognitive Plane" in rule for rule in prohibitions)
     assert any("cannot cut over" in rule for rule in prohibitions)
@@ -68,11 +75,22 @@ def test_fail_closed_recovery_retention_and_protected_ledger_invariants() -> Non
     contract = _contract()
     semantics = contract["fail_closed_semantics"]
     assert isinstance(semantics, dict)
-    assert semantics["unknown_backup_or_wal_coverage"] == "productive_admission_and_recovery_cutover_blocked"
+    assert (
+        semantics["unknown_backup_or_wal_coverage"]
+        == "productive_admission_and_recovery_cutover_blocked"
+    )
     assert semantics["missing_or_failed_restore_test"] == "productive_admission_blocked"
-    assert semantics["ambiguous_restore_outcome"] == "indeterminate_pending_authoritative_reconciliation_no_blind_retry"
-    assert semantics["incomplete_reconciliation_or_audit_continuity"] == "not_ready_no_service_cutover"
-    assert semantics["missing_or_expired_retention_hold_or_deletion_evidence"] == "destructive_expiry_blocked"
+    assert (
+        semantics["ambiguous_restore_outcome"]
+        == "indeterminate_pending_authoritative_reconciliation_no_blind_retry"
+    )
+    assert (
+        semantics["incomplete_reconciliation_or_audit_continuity"] == "not_ready_no_service_cutover"
+    )
+    assert (
+        semantics["missing_or_expired_retention_hold_or_deletion_evidence"]
+        == "destructive_expiry_blocked"
+    )
     invariants = _strings(contract["invariants"])
     assert any("authoritative protected ledger" in rule for rule in invariants)
     assert any("owning Gate" in rule for rule in invariants)
@@ -80,8 +98,12 @@ def test_fail_closed_recovery_retention_and_protected_ledger_invariants() -> Non
 
 
 def test_runbook_and_traceability_retain_non_claim_and_release_stop_boundary() -> None:
-    runbook = (ROOT / "docs" / "runbooks" / "protected-ledger-backup-recovery.md").read_text(encoding="utf-8")
-    traceability = (ROOT / "docs" / "traceability" / "S1-13.5-protected-ledger-backup-pitr.md").read_text(encoding="utf-8")
+    runbook = (ROOT / "docs" / "runbooks" / "protected-ledger-backup-recovery.md").read_text(
+        encoding="utf-8"
+    )
+    traceability = (
+        ROOT / "docs" / "traceability" / "S1-13.5-protected-ledger-backup-pitr.md"
+    ).read_text(encoding="utf-8")
     assert "is not evidence that a backup\ntarget" in runbook
     assert "isolated non-serving" in runbook
     assert "Tool exit or self-report as proof" in runbook
