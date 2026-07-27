@@ -172,6 +172,10 @@ when they are required by the acceptance criteria.
   historical Action, preparation, dispatch, and reconciliation disposition plus
   the blocked, fail-closed NB-4/NB-5 Action Gate prerequisite boundary; it is
   not an accepted ADR or runtime authorization.
+- [`S1-15.6-model-inference-inventory.md`](S1-15.6-model-inference-inventory.md):
+  immutable, fail-closed model and inference-boundary inventory evidence; it
+  records current absence and cannot activate, deploy, promote, or authorize a
+  model or inference provider.
 
 ## Reconciliation Rules
 
