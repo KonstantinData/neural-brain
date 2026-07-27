@@ -1,0 +1,228 @@
+{
+  "document_type": "neural_brain_consent_evidence_intake_contract",
+  "contract_id": "neural-brain.consent-evidence-intake",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_documentation_preparation_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+  "purpose": "Define versioned, product- and domain-neutral, fail-closed documentation preparation for qualified review of a possible consent where consent is used for one proposed processing activity. It records evidence-reference requirements and explicit unknown or qualified non-applicability disposition requirements only; it is not an instance schema or runtime validator and cannot determine consent validity, lawfulness, a legal basis, authority, processing, release, or runtime behavior.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2016/679",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "review_reference": "Articles 4(11), 7(1)-(4), 8, and 9(2)(a); any conclusion about consent, withdrawal, child consent, explicit consent, processing, or lawfulness requires qualified deployment-specific review."
+  },
+  "documentation_preparation_boundary": {
+    "machine_validation_scope": "document_shape_and_preregistered_invariant_constants_only",
+    "instance_schema_provided": false,
+    "operational_task_status": "unfulfilled_and_blocked",
+    "non_claim": "This contract does not validate an intake instance, prove consent, implement withdrawal or downstream stop, or satisfy the operational acceptance criteria of S1-14.6."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete controller, processing activity, consent interaction, data-subject population, jurisdiction, or lawful processing fact.",
+      "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether GDPR, consent, or any consent condition applies to a concrete deployment or processing activity",
+      "whether consent is voluntary, informed, specific, unambiguous, granular, current, valid, withdrawn, or sufficient",
+      "whether a data subject can access information or withdraw consent, or whether downstream stop, deletion, or reconciliation duties apply",
+      "whether a concrete system may process personal data, be deployed, released, or operated"
+    ]
+  },
+  "consent_evidence_intake_template": {
+    "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment and processing activity, immutable authenticated Tenant, Area, and Project scope references, intended-purpose contract version, activity/purpose reference combination, and possible consent evidence set.",
+    "required_fields": [
+      "intake_identifier_and_contract_version",
+      "intake_timestamp_and_accountable_owner",
+      "qualified_reviewer_qualification_review_date_and_independence_reference",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdiction_evidence",
+      "immutable_authenticated_tenant_area_project_scope_references",
+      "immutable_intended_purpose_contract_id_version_and_purpose_reference",
+      "immutable_processing_activity_identifier_version_and_activity_reference",
+      "linked_ropa_gdpr_role_applicability_article_6_use_case_and_reassessment_evidence_references",
+      "consent_basis_applicability_predicate_or_qualified_not_applicable_disposition",
+      "data_subject_category_and_processing_context_evidence_references",
+      "possible_consent_artifact_and_purpose_activity_binding_evidence_references",
+      "voluntary_informed_specific_unambiguous_and_granular_evidence_references",
+      "article_7_1_controller_demonstrability_evidence_or_qualified_not_applicable_disposition",
+      "article_7_2_request_presentation_distinguishable_intelligible_accessible_clear_plain_language_evidence_or_qualified_not_applicable_disposition",
+      "article_7_3_withdrawal_notice_accessibility_prior_lawfulness_and_as_easy_as_giving_evidence_or_qualified_not_applicable_disposition",
+      "article_7_4_service_conditionality_and_contract_performance_necessity_evidence_or_qualified_not_applicable_disposition",
+      "article_8_child_information_society_age_parental_authorization_and_reasonable_verification_evidence_or_qualified_not_applicable_disposition",
+      "article_9_2_a_explicit_consent_and_union_or_member_state_law_prohibition_evidence_or_qualified_not_applicable_disposition",
+      "language_accessibility_and_information_delivery_evidence_references",
+      "record_integrity_provenance_timestamp_version_and_tamper_evidence_references",
+      "expiry_refresh_reassessment_and_evidence_currency_references",
+      "withdrawal_accessibility_downstream_stop_deletion_and_reconciliation_evidence_references",
+      "explicit_non_applicability_unknown_conflict_gap_and_expiry_dispositions",
+      "review_rationale_verified_evidence_references_release_blockers_and_next_review_date",
+      "mandatory_reassessment_triggers_and_independent_release_decision_reference"
+    ],
+    "consent_basis_applicability_and_coherence": {
+      "selection_rule": "Record exactly one outer branch: consent_basis_applies with immutable scope-matched predicate evidence, or qualified_consent_basis_not_applicable with a qualified evidence-backed disposition.",
+      "consent_basis_applies_mandatory_candidate_evidence": [
+        "possible_consent_artifact_and_purpose_activity_binding_evidence_references",
+        "voluntary_informed_specific_unambiguous_and_granular_evidence_references",
+        "article_7_1_controller_demonstrability_candidate_evidence",
+        "article_7_3_withdrawal_notice_accessibility_prior_lawfulness_and_as_easy_as_giving_candidate_evidence",
+        "record_integrity_provenance_timestamp_version_and_tamper_evidence_references",
+        "withdrawal_accessibility_downstream_stop_deletion_and_reconciliation_evidence_references"
+      ],
+      "qualified_consent_basis_not_applicable_requirements": [
+        "official_article_and_consent_basis_addressed",
+        "scope_matched_factual_rationale_and_immutable_evidence_references",
+        "qualified_reviewer_identity_qualification_independence_and_review_date",
+        "all_consent_specific_candidate_evidence_absent",
+        "all_consent_specific_conditional_fields_absent_or_qualified_not_applicable",
+        "contradiction_unknown_and_evidence_expiry_status",
+        "reassessment_trigger_and_next_review_date"
+      ],
+      "conditional_predicates": {
+        "article_7_2": "consent_request_is_presented_in_a_written_declaration_that_also_concerns_other_matters",
+        "article_7_4": "service_or_contract_performance_is_conditioned_on_consent_to_processing_not_necessary_for_performance",
+        "article_8": "information_society_service_is_offered_directly_to_a_child_and_consent_is_relied_on",
+        "article_9_2_a": "explicit_consent_is_relied_on_for_special_category_processing"
+      },
+      "conditional_branch_rule": "Within consent_basis_applies, predicate true requires candidate evidence and prohibits a not-applicable disposition; predicate false requires a qualified not-applicable disposition and prohibits candidate evidence; predicate unknown, both branches, neither branch, or a placeholder keeps release blocked.",
+      "inconsistent_combination_rule": "Reject consent_basis_applies without Article 7(1) and Article 7(3) candidate evidence; reject qualified_consent_basis_not_applicable with any consent-specific candidate evidence; reject both or neither outer branches; reject any conditional predicate/evidence mismatch.",
+      "preregistered_branch_matrix": [
+        {
+          "branch": "consent_basis_applies_coherent",
+          "preconditions": [
+            "consent_basis_applies_predicate_evidence_present",
+            "article_7_1_candidate_evidence_present",
+            "article_7_3_candidate_evidence_present",
+            "every_conditional_predicate_resolved_with_matching_candidate_or_qualified_not_applicable_branch"
+          ],
+          "documentation_outcome": "documentation_preparation_complete_for_qualified_review_only",
+          "runtime_or_release_outcome": "none"
+        },
+        {
+          "branch": "consent_basis_applies_missing_mandatory_evidence",
+          "preconditions": [
+            "consent_basis_applies_predicate_evidence_present",
+            "article_7_1_or_article_7_3_candidate_evidence_missing"
+          ],
+          "documentation_outcome": "documentation_preparation_incomplete",
+          "runtime_or_release_outcome": "deployment_specific_release_blocked"
+        },
+        {
+          "branch": "consent_basis_not_applicable_coherent",
+          "preconditions": [
+            "qualified_consent_basis_not_applicable_disposition_complete",
+            "all_consent_specific_candidate_evidence_absent",
+            "all_conditional_fields_absent_or_qualified_not_applicable"
+          ],
+          "documentation_outcome": "documentation_not_applicable_candidate_for_qualified_review_only",
+          "runtime_or_release_outcome": "none"
+        },
+        {
+          "branch": "consent_basis_not_applicable_inconsistent",
+          "preconditions": [
+            "qualified_consent_basis_not_applicable_disposition_present",
+            "any_consent_specific_candidate_evidence_present"
+          ],
+          "documentation_outcome": "reject_incoherent_documentation",
+          "runtime_or_release_outcome": "deployment_specific_release_blocked"
+        },
+        {
+          "branch": "outer_or_conditional_branch_unresolved_or_inconsistent",
+          "preconditions": [
+            "both_or_neither_outer_branches_or_any_unknown_placeholder_or_predicate_evidence_mismatch"
+          ],
+          "documentation_outcome": "reject_or_keep_documentation_preparation_incomplete",
+          "runtime_or_release_outcome": "deployment_specific_release_blocked"
+        }
+      ]
+    },
+    "evidence_or_qualified_not_applicable_semantics": {
+      "selection_rule": "For every conditional Article 7, Article 8, or Article 9(2)(a) requirement, record exactly one of scope-matched candidate evidence or a qualified not-applicable disposition.",
+      "candidate_evidence_requirements": [
+        "immutable_evidence_identifier_and_version_or_digest",
+        "official_article_and_condition_addressed",
+        "source_provenance_date_currency_and_exact_scope",
+        "qualified_reviewer_treatment_and_contradiction_status",
+        "reassessment_trigger_and_next_review_date"
+      ],
+      "qualified_not_applicable_requirements": [
+        "official_article_and_condition_addressed",
+        "scope_matched_factual_rationale_and_immutable_evidence_references",
+        "qualified_reviewer_identity_qualification_independence_and_review_date",
+        "contradiction_unknown_and_evidence_expiry_status",
+        "reassessment_trigger_and_next_review_date"
+      ],
+      "placeholder_rule": "Blank, TODO, TBD, pending, unknown-as-not-applicable, illustrative, unresolved, or non-resolving references are placeholders and satisfy neither branch.",
+      "both_or_neither_rule": "Both branches populated, neither branch populated, or any placeholder reference makes the documentation preparation incomplete and keeps deployment-specific release blocked."
+    },
+    "scope_binding_requirements": [
+      "Tenant, Area, and Project references must identify immutable authenticated runtime-scope evidence. An intake identifier, consent artifact label, purpose label, activity label, request payload, prompt, observation, model response, memory content, or tool output cannot establish, broaden, or substitute trusted scope.",
+      "Purpose, activity, artifact, data-subject category, and processing-context references must name immutable versioned evidence. A consent-evidence intake is limited to its exact artifact, authenticated scope, purpose, activity, context, and jurisdiction combination; evidence may not be reused across changed combinations without a separate record and qualified review.",
+      "The intake must contain durable evidence references and categories only. It must not contain raw personal data, personal identifiers, consent text, consent records, credentials, secrets, prompts, memory payloads, contracts, legal advice, or unverified external assertions.",
+      "External facts, non-applicability assertions, consent-condition evidence, expiry claims, and withdrawal/downstream handling assertions must identify source, provenance, date, currency, scope, reviewer treatment, and contradiction status. Unknown, stale, contradictory, unauthenticated, or unqualified facts remain explicit release blockers rather than inferred favorable facts."
+    ],
+    "deterministic_review_order": [
+      "Verify every required field, exact immutable artifact, authenticated scope, purpose, activity, data-subject category, processing context, accountable owner, qualified reviewer, independence, review date, evidence reference, and reassessment trigger; any absent, unknown, stale, contradictory, non-immutable, or scope-mismatched fact is incomplete.",
+      "Verify the linked RoPA, GDPR role, GDPR applicability, Article 6, use-case, and reassessment evidence for the same artifact, authenticated scope, purpose, and activity; a missing or conflicting prerequisite remains a release blocker.",
+      "Resolve the outer consent-basis applicability branch first. If consent applies, require Article 7(1) demonstrability and Article 7(3) withdrawal candidate evidence. If consent is qualified not applicable, require all consent-specific candidate evidence to be absent and all conditional fields to be absent or qualified not applicable. Reject both or neither outer branches and every inconsistent combination.",
+      "Within consent_basis_applies, resolve explicit predicates for Article 7(2), Article 7(4), Article 8, and Article 9(2)(a). Predicate true requires candidate evidence; predicate false requires a qualified not-applicable disposition; predicate unknown, placeholders, both branches, neither branch, or mismatched evidence keeps release blocked.",
+      "Record possible consent artifact, purpose/activity binding, data-subject and context evidence, voluntary, informed, specific, unambiguous, granular, language, accessibility, record-integrity, expiry, refresh, withdrawal, downstream stop, deletion, reconciliation, and external-fact evidence for qualified review only, without validating, selecting, or concluding consent; a favorable later statement cannot compensate for an unresolved earlier fact.",
+      "Record explicit non-applicability, unknown, conflict, gap, evidence-expiry, and withdrawal/downstream dispositions with provenance and reviewer treatment. A non-applicability assertion without qualified scope-matched evidence is incomplete and never an exemption.",
+      "Record release blockers, reassessment triggers, next review date, and independent release-decision reference. A completed documentation preparation remains evidence input only and cannot create a legal, authority, processing, deployment, release, or runtime outcome."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_model_supplier_or_deployment_change",
+      "authenticated_tenant_area_project_scope_purpose_activity_context_or_jurisdiction_change",
+      "data_subject_category_processing_context_language_or_accessibility_change",
+      "possible_consent_artifact_granularity_information_or_record_integrity_change",
+      "article_7_demonstrability_request_presentation_withdrawal_or_conditionality_change",
+      "article_8_child_age_parental_authorization_or_verification_change",
+      "article_9_2_a_explicit_consent_or_union_member_state_law_prohibition_change",
+      "expiry_refresh_withdrawal_downstream_stop_deletion_or_reconciliation_change",
+      "external_fact_source_currency_authority_or_qualified_review_change",
+      "evidence_expiry_unknown_conflict_incident_complaint_or_material_misuse_signal"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "consent_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_or_nonimmutable_authenticated_scope_purpose_or_activity_reference": "reject_intake_and_block_deployment_specific_release_decision",
+    "stale_scope_mismatched_or_contradictory_evidence": "consent_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_qualified_reviewer_independence_review_date_rationale_evidence_or_reassessment_trigger": "consent_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unknown_unqualified_stale_or_conflicting_consent_condition_external_fact_or_non_applicability_assertion": "consent_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unresolved_voluntary_informed_specific_unambiguous_granular_language_accessibility_or_record_integrity_evidence": "consent_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unresolved_expiry_refresh_withdrawal_downstream_stop_deletion_or_reconciliation_evidence": "consent_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "conditional_requirement_missing_both_branches_or_has_placeholder_reference": "consent_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "conditional_requirement_has_both_candidate_evidence_and_not_applicable_disposition": "reject_intake_and_block_deployment_specific_release_decision",
+    "consent_basis_applies_without_article_7_1_or_article_7_3_candidate_evidence": "consent_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "consent_basis_not_applicable_with_any_consent_specific_candidate_evidence": "reject_intake_and_block_deployment_specific_release_decision",
+    "outer_consent_basis_both_or_neither_branch": "reject_intake_and_block_deployment_specific_release_decision",
+    "conditional_predicate_and_evidence_branch_mismatch": "reject_intake_and_block_deployment_specific_release_decision",
+    "cross_boundary_or_changed_artifact_purpose_activity_context_or_jurisdiction_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+    "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_consent_validity_or_lawfulness_determination": true,
+    "no_runtime_authorization_processing_activation_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "versioned documentation preparation for a separately governed qualified legal/privacy review",
+    "template_is_not": [
+      "a legal opinion, consent-validity determination, or compliance certification",
+      "a determination of lawfulness, legal basis, consent, voluntary choice, information sufficiency, granularity, withdrawal effectiveness, or deletion obligation",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, policy, or approval context",
+      "a policy decision, Security Floor override, protected-state transition request, or gate decision",
+      "a processing, deployment, productive-use, or release approval",
+      "a runtime capability enablement or external-effect authorization",
+      "an instance schema, executable validator, consent ledger, withdrawal mechanism, or downstream processing stop",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately applicable qualified review, accepted governance, and all Protected Control Plane, transition-gate, evaluation, recognition, and release evidence requirements may decide a concrete processing activity or deployment. This intake never activates a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_processing_scope_activity_possible_consent_evidence_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, exact immutable artifact and authenticated scope/purpose/activity/context evidence, linked prerequisite evidence, qualified independent reviewer and external-fact provenance, deterministic candidate evidence or qualified not-applicable dispositions for every conditional Article 7, Article 8, and Article 9(2)(a) requirement, possible consent-condition and record-integrity evidence, explicit expiry/refresh/withdrawal/downstream dispositions, an accepted typed instance-validation contract and operational enforcement where required, reassessment triggers, and separately governed release evidence.",
+    "next_step": "Create one immutable consent-evidence intake per proposed artifact, authenticated Tenant/Area/Project scope, purpose, activity, context, and jurisdiction before any processing-specific or deployment-specific release decision."
+  }
+}

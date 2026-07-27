@@ -1,0 +1,136 @@
+{
+  "document_type": "neural_brain_legitimate_interest_assessment_evidence_intake_contract",
+  "contract_id": "neural-brain.legitimate-interest-assessment-evidence-intake",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_documentation_preparation_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+  "purpose": "Define versioned, product- and domain-neutral, fail-closed documentation preparation for qualified review of a possible Article 6(1)(f) legitimate-interest assessment. It records immutable evidence-reference requirements and explicit qualified non-applicability disposition requirements only; it is not an instance schema or runtime validator and cannot provide legal advice, determine lawful processing, establish legitimate interest, authorize processing, establish trusted scope, grant authority, decide release, or enable runtime behavior.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2016/679",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "review_reference": "Article 6(1)(f), including the public-authority exclusion, Article 21(1)-(3), and Recital 47; any applicability, legitimate-interest, necessity, balancing, child or vulnerability weighting, objection, direct-marketing stop, or lawfulness conclusion requires qualified deployment-specific review."
+  },
+  "documentation_preparation_boundary": {
+    "machine_validation_scope": "document_shape_and_preregistered_invariant_constants_only",
+    "instance_schema_provided": false,
+    "operational_task_status": "unfulfilled_and_blocked",
+    "non_claim": "This contract does not validate an intake instance, conclude a legitimate-interest assessment, stop direct marketing, or satisfy the operational acceptance criteria of S1-14.5."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete controller, processing activity, personal-data processing, purpose, data-subject population, jurisdiction, legitimate interest, necessity, balancing result, safeguard, objection handling, or lawfulness.",
+      "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether GDPR, Article 6(1)(f), or Article 21 applies to a concrete deployment or processing activity",
+      "whether a legitimate interest, necessity, less-intrusive alternative, balancing outcome, impact, safeguard, objection mechanism, or review date is sufficient, current, or valid",
+      "whether a concrete system may process personal data, be deployed, released, or operated"
+    ]
+  },
+  "legitimate_interest_assessment_evidence_intake_template": {
+    "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment and processing activity, immutable authenticated Tenant, Area, and Project scope references, intended-purpose contract version, activity/purpose reference, and jurisdiction evidence combination.",
+    "required_fields": [
+      "intake_identifier_and_contract_version",
+      "intake_timestamp_and_accountable_owner",
+      "qualified_reviewer_qualification_review_date_and_independence_reference",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdiction_evidence",
+      "immutable_authenticated_tenant_area_project_scope_references",
+      "immutable_intended_purpose_contract_id_version_and_purpose_reference",
+      "immutable_processing_activity_identifier_version_and_activity_reference",
+      "linked_ropa_gdpr_role_applicability_article_6_use_case_and_reassessment_evidence_references",
+      "possible_legitimate_interest_artifact_and_purpose_evidence_references_for_qualified_review_only",
+      "article_6_1_f_public_authority_performance_of_tasks_exclusion_evidence_or_qualified_not_applicable_disposition",
+      "necessity_rationale_processing_activity_and_less_intrusive_alternative_evidence_references",
+      "balancing_data_subject_impact_reasonable_expectation_child_and_vulnerable_person_weighting_and_rights_freedoms_evidence_references",
+      "safeguard_data_minimisation_retention_security_transparency_and_accountability_evidence_references",
+      "article_21_objection_and_downstream_review_evidence_references",
+      "article_21_2_3_direct_marketing_objection_and_processing_stop_evidence_or_qualified_not_applicable_disposition",
+      "external_facts_source_provenance_date_currency_and_scope_evidence_references",
+      "explicit_non_applicability_unknown_gap_conflict_and_expiry_dispositions",
+      "review_rationale_verified_evidence_references_release_blockers_and_next_review_date",
+      "mandatory_reassessment_triggers_and_independent_release_decision_reference"
+    ],
+    "evidence_or_qualified_not_applicable_semantics": {
+      "selection_rule": "For the Article 6(1)(f) public-authority exclusion and Article 21(2)-(3) direct-marketing stop, record exactly one of scope-matched candidate evidence or a qualified not-applicable disposition.",
+      "candidate_evidence_requirements": [
+        "immutable_evidence_identifier_and_version_or_digest",
+        "official_article_condition_or_control_addressed",
+        "source_provenance_date_currency_and_exact_scope",
+        "qualified_reviewer_treatment_and_contradiction_status",
+        "reassessment_trigger_and_next_review_date"
+      ],
+      "qualified_not_applicable_requirements": [
+        "official_article_condition_or_control_addressed",
+        "scope_matched_factual_rationale_and_immutable_evidence_references",
+        "qualified_reviewer_identity_qualification_independence_and_review_date",
+        "contradiction_unknown_and_evidence_expiry_status",
+        "reassessment_trigger_and_next_review_date"
+      ],
+      "placeholder_rule": "Blank, TODO, TBD, pending, unknown-as-not-applicable, illustrative, unresolved, or non-resolving references are placeholders and satisfy neither branch.",
+      "both_or_neither_rule": "Both branches populated, neither branch populated, or any placeholder reference makes the documentation preparation incomplete and keeps deployment-specific release blocked."
+    },
+    "scope_binding_requirements": [
+      "Tenant, Area, and Project references must identify immutable authenticated runtime-scope evidence. An intake identifier, purpose label, activity label, request payload, prompt, observation, model response, memory content, or tool output cannot establish, broaden, or substitute trusted scope.",
+      "Purpose and activity references must name immutable versioned evidence. An intake is valid only for its exact artifact, authenticated scope, purpose, activity, and jurisdiction combination; evidence may not be reused across Tenant, Area, Project, purpose, activity, artifact, or jurisdiction changes without a separate intake and qualified review.",
+      "The intake contains durable evidence references and categories only. It must not contain raw personal data, personal identifiers, credentials, secrets, prompts, memory payloads, legal advice, legal conclusions, or balancing conclusions.",
+      "External facts and every non-applicability, gap, conflict, or expiry disposition must identify source, provenance, date, currency, scope, reviewer treatment, and contradiction status. Unknown, stale, contradictory, unauthenticated, unqualified, or scope-mismatched facts remain explicit release blockers rather than inferred favorable facts."
+    ],
+    "deterministic_review_order": [
+      "Verify every required field, exact immutable artifact, authenticated scope, purpose, activity, accountable owner, qualified reviewer, independence, review date, evidence reference, and reassessment trigger; any absent, unknown, stale, contradictory, non-immutable, or scope-mismatched fact is incomplete.",
+      "Verify linked RoPA, GDPR role, GDPR applicability, Article 6, use-case, and reassessment evidence for the same artifact, authenticated scope, purpose, activity, and jurisdiction; a missing or conflicting prerequisite remains a release blocker.",
+      "Apply the exactly-one candidate-evidence-or-qualified-not-applicable rule to the Article 6(1)(f) public-authority performance-of-tasks exclusion, then record possible legitimate-interest artifact and purpose evidence for qualified review only, without determining, selecting, validating, or concluding a legitimate interest or legal basis.",
+      "Record necessity, processing activity, less-intrusive alternatives, balancing, data-subject impact, reasonable expectations, specific weighting for children and other vulnerable persons, rights and freedoms, safeguards, data minimisation, retention, security, transparency, and accountability evidence. Apply the same exactly-one rule to Article 21(2)-(3) direct marketing and evidence that processing for those purposes stops after objection; no favorable later fact compensates for an unresolved earlier fact.",
+      "Record explicit non-applicability, unknown, gap, conflict, expiry, and external-fact dispositions with provenance and reviewer treatment. A non-applicability statement without qualified scope-matched evidence is incomplete and never an exemption.",
+      "Record release blockers, reassessment triggers, next review date, and the independent release-decision reference. A completed intake remains evidence input only and cannot create a legal, authority, processing, deployment, release, runtime, capability, maturity, or recognition outcome."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_model_supplier_or_deployment_change",
+      "authenticated_tenant_area_project_scope_purpose_activity_or_jurisdiction_change",
+      "possible_legitimate_interest_necessity_alternative_balancing_impact_or_safeguard_change",
+      "data_subject_category_data_class_source_recipient_transfer_retention_or_objection_change",
+      "public_authority_task_child_vulnerability_direct_marketing_or_processing_stop_change",
+      "external_fact_source_currency_authority_or_qualified_review_change",
+      "evidence_expiry_unknown_gap_conflict_incident_complaint_or_material_misuse_signal"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "legitimate_interest_assessment_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_or_nonimmutable_authenticated_scope_purpose_or_activity_reference": "reject_intake_and_block_deployment_specific_release_decision",
+    "stale_scope_mismatched_or_contradictory_evidence": "legitimate_interest_assessment_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_qualified_reviewer_independence_review_date_rationale_evidence_or_reassessment_trigger": "legitimate_interest_assessment_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unknown_unqualified_stale_or_conflicting_external_fact_or_disposition": "legitimate_interest_assessment_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unresolved_possible_legitimate_interest_necessity_alternative_balancing_impact_safeguard_or_objection_evidence": "legitimate_interest_assessment_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "conditional_requirement_missing_both_branches_or_has_placeholder_reference": "legitimate_interest_assessment_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "conditional_requirement_has_both_candidate_evidence_and_not_applicable_disposition": "reject_intake_and_block_deployment_specific_release_decision",
+    "cross_boundary_or_changed_artifact_purpose_activity_or_jurisdiction_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+    "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_legitimate_interest_or_lawfulness_determination": true,
+    "no_runtime_authorization_processing_activation_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_capability_maturity_or_recognition_claim": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "versioned documentation preparation for a separately governed qualified legal/privacy review",
+    "template_is_not": [
+      "a legal opinion, legitimate-interest assessment conclusion, or compliance certification",
+      "a determination of lawfulness, Article 6 legal basis, legitimate interest, necessity, alternative sufficiency, balancing result, data-subject impact, safeguard sufficiency, or Article 21 objection outcome",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, policy, or approval context",
+      "a policy decision, Security Floor override, protected-state transition request, or gate decision",
+      "a processing, deployment, productive-use, or release approval",
+      "a runtime capability enablement or external-effect authorization",
+      "an instance schema, executable validator, balancing engine, objection workflow, or direct-marketing processing stop",
+      "an implementation, capability, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately applicable qualified review, accepted governance, and all Protected Control Plane, transition-gate, evaluation, recognition, and release evidence requirements may decide a concrete processing activity or deployment. This intake never activates a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_processing_scope_activity_purpose_evidence_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, exact immutable artifact and authenticated scope/purpose/activity evidence, linked prerequisite evidence, qualified independent reviewer and external-fact provenance, deterministic candidate evidence or qualified not-applicable dispositions for the public-authority exclusion and direct-marketing stop, possible legitimate-interest, necessity, alternatives, child and vulnerability weighting, balancing, impact, safeguards, objection and processing-stop evidence, an accepted typed instance-validation contract and operational enforcement where required, reassessment triggers, and separately governed release evidence.",
+    "next_step": "Create one immutable legitimate-interest assessment evidence intake per proposed artifact, authenticated Tenant/Area/Project scope, purpose, activity, and jurisdiction before any processing-specific or deployment-specific release decision."
+  }
+}

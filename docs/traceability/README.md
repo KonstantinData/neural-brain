@@ -169,6 +169,19 @@ when they are required by the acceptance criteria.
   proportionality evidence intake for qualified review only; unknown,
   non-applicability, conflict, and external facts fail closed and cannot create
   legal, authority, processing, release, or runtime outcomes.
+- [`S1-14.4-article-9-special-category-evidence-intake.md`](S1-14.4-article-9-special-category-evidence-intake.md):
+  documentation-only Article 9/10 preparation; the operational task remains
+  blocked and no instance validation, qualified review, authorization,
+  processing, release, or runtime outcome exists.
+- [`S1-14.5-legitimate-interest-assessment-evidence-intake.md`](S1-14.5-legitimate-interest-assessment-evidence-intake.md):
+  documentation-only Article 6(1)(f) preparation; the operational task remains
+  blocked and no instance validation, balancing result, qualified review,
+  processing stop, legal, authority, release, or runtime outcome exists.
+- [`S1-14.6-consent-evidence-intake.md`](S1-14.6-consent-evidence-intake.md):
+  documentation-only consent preparation; the operational task remains blocked
+  and no instance validation, consent determination, qualified review,
+  withdrawal, downstream stop, legal, authority, release, or runtime outcome
+  exists.
 - [`S1-11.1-data-object-catalogue-intake.md`](S1-11.1-data-object-catalogue-intake.md):
   category-only, fail-closed data-object catalogue intake requiring ownership,
   purpose, storage, lifecycle, retention, rights, deletion, and RoPA evidence;

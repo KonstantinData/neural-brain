@@ -42,6 +42,24 @@ legal-basis candidates and necessity/proportionality facts. It does not select
 or validate a legal basis, determine lawfulness, grant authority, authorize
 processing, deployment, or release, or enable runtime behavior.
 
+[`article-9-special-category-evidence-intake-v1.md`](article-9-special-category-evidence-intake-v1.md)
+defines fail-closed documentation preparation for potential Article 9
+conditions, safeguards, and Article 10 controls. It does not validate an intake,
+perform qualified review, or
+determine applicability, lawfulness, a condition, authority, processing,
+deployment, release, or runtime behavior.
+
+[`legitimate-interest-assessment-evidence-intake-v1.md`](legitimate-interest-assessment-evidence-intake-v1.md)
+defines fail-closed documentation preparation for a possible Article 6(1)(f)
+assessment. It does not validate an intake, perform qualified review, conclude a legitimate interest, balancing,
+lawfulness, authority, processing, deployment, release, or runtime behavior.
+
+[`consent-evidence-intake-v1.md`](consent-evidence-intake-v1.md) defines a
+fail-closed documentation preparation for possible consent evidence. It does
+not validate an intake, perform qualified review, determine consent validity,
+lawfulness, authority, processing, deployment,
+release, or runtime behavior.
+
 [`compliance-raci-assessment-v1.md`](compliance-raci-assessment-v1.md) defines
 a fail-closed input template for qualified deployment-specific responsibility,
 approval-authority, independence, and escalation review. It does not assign a

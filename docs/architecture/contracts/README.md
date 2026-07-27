@@ -48,6 +48,20 @@ ADR-017.
   external-fact and non-applicability handling, fails closed, and never selects
   a legal basis, determines lawfulness, grants authority, or authorizes
   processing, release, or runtime enablement.
+- `article-9-special-category-evidence-intake-v1.json`: documentation-only
+  preparation for future scope-bound Article 9 and Article 10 evidence review.
+  It defines candidate-evidence XOR qualified-N/A requirements but provides no
+  instance validator, qualified review, authorization, enforcement, or release.
+- `legitimate-interest-assessment-evidence-intake-v1.json`: immutable,
+  documentation-only preparation for future scope-bound Article 6(1)(f)
+  evidence review, including public-authority, vulnerability, objection, and
+  direct-marketing controls. It provides no instance validator, balancing
+  result, processing stop, legal conclusion, runtime authority, or release.
+- `consent-evidence-intake-v1.json`: immutable,
+  documentation-only preparation for future scope-bound consent evidence review
+  under Articles 7, 8, and 9(2)(a). It provides no instance validator, consent
+  determination, withdrawal workflow, processing stop, runtime authority, or
+  release.
 - `prohibited-unsupported-use-v1.json`: deterministic, fail-closed
   classification of immutable prohibited and currently unsupported uses. It has
   no allow, activation, or release outcome and never replaces the Security
