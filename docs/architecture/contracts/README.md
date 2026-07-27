@@ -59,6 +59,11 @@ ADR-017.
   PostgreSQL protected-ledger backup, WAL/PITR, retention, key/access
   separation, restore-test, and release-stop contract. It configures no backup
   system and makes no recovery-readiness claim.
+- `personal-data-flow-register-v1.json`: category-only, fail-closed evidence
+  template for a proposed end-to-end personal-data flow and recipient
+  relationship. It requires immutable scope-bound source, recipient, transfer,
+  retention, safeguard, and provenance evidence but never routes, discloses,
+  transfers, processes, or authorizes data at runtime.
 
 ## Memory Core contracts
 

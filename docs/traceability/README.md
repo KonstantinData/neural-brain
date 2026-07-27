@@ -151,6 +151,11 @@ when they are required by the acceptance criteria.
   immutable authenticated Tenant and Area scope references; it stores only
   categories and references, fails closed, and cannot create processing,
   authority, release, or runtime outcomes.
+- [`S1-14.2-personal-data-flow-register.md`](S1-14.2-personal-data-flow-register.md):
+  product-neutral, category-only source-to-recipient data-flow evidence with
+  immutable scope, transfer-boundary, retention, safeguard, and provenance
+  references; it fails closed and cannot disclose, transfer, process, or
+  authorize data at runtime.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
