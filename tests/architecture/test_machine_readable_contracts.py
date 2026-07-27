@@ -52,6 +52,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "reassessment-trigger-intake-v1.json",
         "release-stops.json",
         "scope-catalog.json",
+        "security-floor-governance-v1.json",
         "stage-capabilities.json",
         "system-boundary.json",
         "use-case-scope-intake-v1.json",

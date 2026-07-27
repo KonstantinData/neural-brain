@@ -103,6 +103,10 @@ when they are required by the acceptance criteria.
 - [`FND-04.3-prohibited-unsupported-uses.md`](FND-04.3-prohibited-unsupported-uses.md):
   deterministic, fail-closed prohibited and unsupported-use classification;
   it has no authorization or activation outcome.
+- [`S1-15.3-security-floor-governance.md`](S1-15.3-security-floor-governance.md):
+  maps immutable prohibited-use constraints to non-overridable Security Floor
+  governance rules and bounds required human review for sensitive or high-risk
+  candidate cases; it adds no legal classification, authority, or runtime path.
 - [`FND-04.5-ai-act-role-assessment.md`](FND-04.5-ai-act-role-assessment.md):
   deployment-specific EU AI Act operator-role assessment template; it is
   evidence input only and fails closed without verified deployment facts and
