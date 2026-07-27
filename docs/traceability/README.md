@@ -123,6 +123,10 @@ when they are required by the acceptance criteria.
   qualified-review input for a future deployment-specific EU AI Act risk
   classification; it fails closed and neither classifies a real deployment nor
   authorizes authority, release, or enablement.
+- [`S1-15.1-ai-act-obligation-matrix.md`](S1-15.1-ai-act-obligation-matrix.md):
+  versioned, fail-closed provider, deployer, model-supplier, downstream-actor,
+  and non-applicability obligation evidence matrix; it has no legal, authority,
+  model/deployment, release, or runtime-enablement outcome.
 - [`FND-04.8-gdpr-applicability-screening.md`](FND-04.8-gdpr-applicability-screening.md):
   qualified-review input for future deployment-specific GDPR applicability,
   special-category, automated-decision, and DPIA screening; it records article
