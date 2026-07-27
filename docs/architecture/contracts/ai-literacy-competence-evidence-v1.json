@@ -1,0 +1,114 @@
+{
+  "document_type": "neural_brain_ai_literacy_competence_evidence_template",
+  "contract_id": "neural-brain.ai-literacy-competence-evidence",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Define a versioned, product- and domain-neutral, fail-closed curriculum and competence-evidence template for people affected by a future Neural Brain deployment. The template does not claim that any real person was trained or competent, process HR personal data, determine law, grant authority, approve a deployment, or authorize runtime operation.",
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The repository does not establish a concrete deployment, employer, worker population, affected-person group, training provider, learner record, qualification, or applicable legal duty.",
+      "The protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether any real person has completed, understood, retained, or applied a curriculum",
+      "the identity, employment, protected characteristics, performance, competence, authority, delegation, or availability of a real person",
+      "whether a concrete training, competence, personnel, regulatory, release, deployment, or runtime outcome is permitted"
+    ]
+  },
+  "competence_template": {
+    "assessment_unit": "One immutable curriculum version or digest, role category, proposed deployment and intended-purpose version, authenticated Tenant, Area, and Project scope combination, and de-identified evidence-record reference where applicable.",
+    "role_categories": [
+      "developers",
+      "operators",
+      "approvers",
+      "independent_verifiers",
+      "support",
+      "affected_staff"
+    ],
+    "shared_required_curriculum_topics": [
+      "product_and_domain_neutral_scope_and_current_maturity_boundary",
+      "two_plane_architecture_and_cognitive_capability_does_not_create_authority",
+      "authenticated_identity_immutable_scope_and_data_boundary",
+      "protected_transition_gates_security_floor_and_fail_closed_behavior",
+      "audit_evidence_incident_escalation_and_indeterminate_effect_reconciliation",
+      "human_oversight_competence_boundaries_stop_ask_defer_and_escalate",
+      "privacy_data_minimization_and_no_untrusted_context_expansion",
+      "recognition_delivery_stage_and_no_unsupported_capability_claims"
+    ],
+    "role_specific_required_topics": {
+      "developers": ["secure_change_control", "no_direct_protected_state_mutation", "testing_traceability_and_release_stops"],
+      "operators": ["authenticated_scope_handling", "kill_switch_and_incident_runbook", "no_manual_gate_bypass"],
+      "approvers": ["pre_existing_authority_and_scope", "requester_approver_separation", "approval_does_not_create_authority"],
+      "independent_verifiers": ["independence_from_executor", "outcome_evidence_not_tool_success", "indeterminate_effect_escalation"],
+      "support": ["safe_information_handling", "incident_intake_and_escalation", "no_unsupported_runtime_claims"],
+      "affected_staff": ["intended_use_and_known_limits", "human_oversight_and_escalation_path", "no_authority_or_performance_inference"]
+    },
+    "required_evidence_fields": [
+      "curriculum_identifier_version_or_immutable_digest",
+      "role_category_and_role_specific_topic_version",
+      "proposed_deployment_and_intended_purpose_reference",
+      "authenticated_tenant_area_project_scope_model",
+      "de_identified_evidence_record_reference_or_explicit_absence",
+      "qualified_assessment_method_and_independent_reviewer_reference_where_required",
+      "completion_or_competence_claim_status_as_unknown_pending_or_evidenced",
+      "evidence_timestamp_expiry_and_reassessment_due_or_trigger",
+      "identified_gaps_escalation_owner_and_next_step",
+      "linked_release_or_operation_blocker_reference"
+    ],
+    "competence_evidence_rules": [
+      "A curriculum artifact and an evidence-record reference are separate: neither proves that a real person is trained, competent, authorized, or available.",
+      "Competence evidence must be de-identified or held in an independently governed personnel system; this repository stores neither HR personal data nor learner performance data.",
+      "A competence record never creates authority, delegation, approval, policy activation, authenticated identity, immutable scope, Gate ownership, or runtime access.",
+      "Required role separation remains binding: requester and elevated-risk approver, executor and independent verifier, policy author and sole policy activator, and Brain runtime and kill-switch authority cannot be collapsed by competence evidence.",
+      "Expiry, unknown status, incomplete evidence, failed reassessment, scope mismatch, conflict, or missing independent review where required blocks the affected role-dependent release or operation decision until separately governed evidence resolves it.",
+      "Refresh is required after material changes to intended purpose, enabled operation, model or artifact, supplier, data boundary, policy, Security Floor, incident pattern, role responsibilities, deployment scope, or applicable qualified-review requirement."
+    ],
+    "refresh_cycle": {
+      "required_fields": [
+        "last_evidence_timestamp",
+        "evidence_expiry",
+        "next_review_date_or_explicit_trigger",
+        "material_change_trigger_reference",
+        "reassessment_owner_and_next_step",
+        "linked_curriculum_and_scope_version"
+      ],
+      "deterministic_order": [
+        "Verify immutable curriculum version, role category, scope binding, de-identified evidence reference or explicit absence, assessment method, evidence time, expiry, and review trigger; any unknown, missing, stale, contradictory, or scope-mismatched item is incomplete.",
+        "Check whether an expiry or material-change trigger applies; if it does, preserve the prior evidence and create or link one separately governed reassessment work item with owner, next step, due date or trigger, and non-bypass release boundary.",
+        "Treat a refresh outcome as evidence only. It cannot alter authority, approvals, policy, transition gates, security controls, identity, scope, runtime permissions, protected state, or release state.",
+        "Close the reassessment work only through separately governed qualified evidence; completion of a learning activity alone is not an allow outcome."
+      ]
+    }
+  },
+  "fail_closed_semantics": {
+    "unknown_missing_stale_expired_conflicted_or_scope_mismatched_evidence": "competence_evidence_incomplete_and_affected_role_dependent_release_or_operation_blocked",
+    "missing_role_specific_curriculum_or_refresh_cycle": "competence_evidence_incomplete_and_affected_role_dependent_release_or_operation_blocked",
+    "attempt_to_use_competence_evidence_as_authority_or_gate_bypass": "competence_evidence_invalid_and_affected_role_dependent_release_or_operation_blocked",
+    "no_real_person_training_or_competence_claim": true,
+    "no_hr_personal_data_processing_or_storage": true,
+    "no_automatic_legal_or_regulatory_determination": true,
+    "no_authority_delegation_or_runtime_authorization": true,
+    "no_protected_runtime_state_mutation": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned curriculum, de-identified competence-evidence, and refresh-cycle input for separately governed human oversight and release review",
+    "template_is_not": [
+      "a claim that any real person was trained, competent, suitable, available, authorized, or supervised",
+      "an HR system, personnel record, performance assessment, employment decision, or processing of HR personal data",
+      "legal advice, a legal determination, a compliance certification, or a conclusion about an applicable obligation",
+      "an authority grant, delegation, policy decision, approval, authenticated runtime context, or Security Floor override",
+      "a protected-state transition request, Gate decision, runtime command, deployment approval, release approval, or runtime capability enablement",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "non_bypass_boundary": "Curriculum, evidence, expiry, refresh, and escalation records cannot waive, compensate for, reorder, or satisfy a Security Floor prohibition, Protected Control Plane gate, transition gate, independent verification, delivery-stage gate, recognition gate, release stop, or separately required approval."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_deployment_scope_and_independently_governed_personnel_evidence",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies immutable curriculum and role versions, authenticated scope, applicable qualified-review basis, independently governed de-identified competence evidence or explicit absence, current refresh evidence, required independence evidence, and a separate release or operation decision where required.",
+    "next_step": "For each concrete deployment, create a scope-bound curriculum and de-identified evidence reference, then open reassessment work before relying on expired, changed, unknown, or incomplete role-dependent evidence."
+  }
+}
