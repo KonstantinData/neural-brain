@@ -49,6 +49,12 @@ distinct.
 
 ## Active machine-readable contracts
 
+Relationship Memory preparation is documented in
+[`relationship-memory-adr-018-revalidation-proposal-v1.md`](relationship-memory-adr-018-revalidation-proposal-v1.md),
+its signal contract, governance matrices, Dreaming boundary, threat plan,
+traceability, and runbook. These artifacts create no storage, retrieval,
+personal-data processing, Dreaming, Planner, or protected-state runtime.
+
 - `system-boundary.json`: complete-system and two-plane boundary.
 - `cognitive-cycle.json`: protected serial perception-to-learning cycle.
 - `action-transition-gate-v1.json`: bounded prerequisite contract for a future
