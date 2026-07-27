@@ -150,6 +150,10 @@ when they are required by the acceptance criteria.
   versioned, product-neutral AI-literacy curriculum, de-identified competence
   evidence, and refresh-cycle template; it makes no real-person, HR, legal,
   authority, release, or runtime claim.
+- [`S1-15.8-gpai-provider-obligation-applicability.md`](S1-15.8-gpai-provider-obligation-applicability.md):
+  fail-closed, qualified-review input for concrete GPAI distribution,
+  modification, branding, or fine-tuning facts; it never assigns provider
+  status, determines an obligation, or authorizes a deployment or runtime.
 - [`S1-14.1-ropa-evidence-intake.md`](S1-14.1-ropa-evidence-intake.md):
   deployment-specific record-of-processing-activities evidence intake with
   immutable authenticated Tenant and Area scope references; it stores only

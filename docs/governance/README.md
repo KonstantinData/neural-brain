@@ -42,6 +42,12 @@ a fail-closed input template for qualified deployment-specific responsibility,
 approval-authority, independence, and escalation review. It does not assign a
 real role, grant authority, approve a release, or enable runtime operation.
 
+[`gpai-provider-obligation-applicability-v1.md`](gpai-provider-obligation-applicability-v1.md)
+defines a fail-closed evidence input for qualified review of concrete GPAI
+distribution, modification, branding, or fine-tuning facts. It does not assign
+provider status, determine an obligation, make a legal conclusion, or authorize
+deployment, release, authority, model activation, or runtime operation.
+
 The contract requires task branches under `codex/`, Conventional Commit
 headers, pull-request review, blocking quality checks, CODEOWNERS review, and
 additional independence evidence for memory separation-of-duties-sensitive

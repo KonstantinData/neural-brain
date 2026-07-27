@@ -60,6 +60,10 @@ ADR-017.
   for qualified provider, deployer, model-supplier, downstream-actor, and
   non-applicability obligation review. It never assigns a real role or
   obligation, approves a model or deployment, or authorizes a release.
+- `gpai-provider-obligation-applicability-v1.json`: fail-closed evidence input
+  for qualified review of a concrete distribution, modification, branding, or
+  fine-tuning fact pattern. It never assigns GPAI-provider status, determines
+  an Article 53 obligation, or authorizes a deployment, model, or runtime.
 - `compliance-release-decision-v1.json`: fail-closed, signed-evidence record
   template for a separately governed compliance-release decision. It requires
   scope-matched qualified GDPR and EU AI Act findings or explicit qualified
