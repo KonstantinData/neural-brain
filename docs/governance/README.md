@@ -4,6 +4,11 @@ This directory contains the versioned desired repository-governance state for
 Neural Brain. The normative contract is
 [`repository-policy.json`](repository-policy.json).
 
+[`relationship-memory-access-purpose-agent-scope-matrix-v1.md`](relationship-memory-access-purpose-agent-scope-matrix-v1.md)
+and [`relationship-memory-privacy-retention-correction-matrix-v1.md`](relationship-memory-privacy-retention-correction-matrix-v1.md)
+define preparation-only, fail-closed Relationship Memory future boundaries.
+They do not assign roles, authorize processing, or enable runtime access.
+
 The authoritative repository-facing inventory of implemented and target AI
 components, models, datasets, adapters, integrations, data flows, tools, and
 deployment boundaries is [`ai-component-inventory.md`](ai-component-inventory.md).
