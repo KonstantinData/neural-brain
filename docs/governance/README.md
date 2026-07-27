@@ -76,6 +76,21 @@ review of possible subject-data discovery coverage and access-export readiness.
 It does not discover data, access a store, create or deliver an export, disclose
 data, process data, or enable legal, authority, runtime, or release outcomes.
 
+[`future-deployment-data-inventory-v1.md`](future-deployment-data-inventory-v1.md)
+defines a category-only future-deployment inventory and subject-export-readiness
+template. It records no real deployment facts and cannot discover, access,
+process, export, deliver, disclose, authorize, or release data.
+
+[`nb1-independent-evaluation-preparation-v1.md`](nb1-independent-evaluation-preparation-v1.md)
+defines EVAL-01 v4 preparation requirements for candidate freeze, external
+custody, registries, ledger, signatures, and review. It creates no candidate,
+hidden artifact, evaluation, release, recognition, runtime, or external effect.
+
+[`protected-control-kill-switch-v1.md`](protected-control-kill-switch-v1.md)
+defines an unaccepted, non-authorizing target contract for a future Protected
+Control Plane kill switch, credential revocation, and recovery capability. It
+does not implement or authorize any control-plane runtime behavior.
+
 [`dpia-evidence-intake-v1.md`](dpia-evidence-intake-v1.md) defines a
 fail-closed DPIA/risk evidence intake. It does not determine risk, approve a
 DPIA, require consultation, or authorize processing, runtime, authority, or

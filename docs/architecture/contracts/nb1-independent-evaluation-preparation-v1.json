@@ -1,0 +1,238 @@
+{
+  "document_type": "nb1_independent_hidden_evaluation_preparation_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.nb1.independent-evaluation-preparation",
+  "contract_version": "1.0.0",
+  "status": "preparation_only_external_execution_blocked",
+  "decision": "ADR-018",
+  "evaluation_spec": {
+    "id": "EVAL-01.NB-1.safe-serial-cognition.v4",
+    "required_status": "frozen_before_candidate_training_and_hidden_attachment",
+    "generator_contract": "nb1-serial-context-generator-v4",
+    "rejected_historical_spec": "EVAL-01.NB-1.safe-serial-cognition.v3",
+    "evidence_scope": "contributes_to_g0_g1_only_and_never_passes_a_gate_or_release"
+  },
+  "claim_boundary": {
+    "evaluation_performed": false,
+    "candidate_created": false,
+    "hidden_artifact_created_or_attached": false,
+    "signing_key_created_or_registered": false,
+    "signature_or_attestation_issued": false,
+    "evaluation_gates_passed": [],
+    "recognition_gates_passed": [],
+    "stage_release_authorized": false,
+    "neural_brain_candidate_claimed": false,
+    "runtime_or_external_effect_enabled": false
+  },
+  "candidate_freeze": {
+    "required_before_hidden_attachment": true,
+    "candidate_must_be_v4_bound": true,
+    "clean_committed_source_tree_required": true,
+    "canonicalization": "UTF-8 normalized LF text; canonical JSON uses sorted keys, compact separators, and decimal strings where specified by the v4 generator",
+    "hash_algorithm": "SHA-256",
+    "required_freeze_receipt_bindings": [
+      "source_commit",
+      "source_tree_digest",
+      "candidate_artifact_digest",
+      "model_manifest_digest",
+      "parameter_digest",
+      "training_artifact_digest",
+      "public_train_artifact_digest",
+      "public_development_artifact_digest",
+      "dataset_and_split_digests",
+      "training_code_digest",
+      "candidate_code_digest",
+      "evaluation_contract_digest",
+      "evaluation_spec_digest",
+      "generator_contract_digest",
+      "dependency_lock_digest",
+      "fixed_train_derived_majority_label",
+      "frozen_at"
+    ],
+    "reproducibility_requirements": [
+      "A reviewer can recompute every listed digest from the accepted public candidate bundle and declared canonicalization.",
+      "The training artifact records public train/development provenance and excludes hidden seed, labels, latent metadata, provider implementation details, and per-sequence correctness.",
+      "Any source, dependency, model, parameter, protocol, threshold, or generator change after freeze invalidates the receipt and requires a new review cycle."
+    ],
+    "model_manifest_required_fields": [
+      "model_version_and_architecture_identifier",
+      "candidate_code_digest",
+      "parameter_digest",
+      "training_code_digest",
+      "training_artifact_digest",
+      "public_train_artifact_digest",
+      "public_development_artifact_digest",
+      "dataset_and_split_digests",
+      "evaluation_spec_digest",
+      "generator_contract_digest",
+      "resource_bound_declaration"
+    ],
+    "evaluation_manifest_required_fields": [
+      "evaluation_protocol_identifier_and_digest",
+      "evaluation_spec_digest",
+      "generator_contract_digest",
+      "candidate_bundle_digest",
+      "baseline_and_ablation_declarations",
+      "threshold_and_failure_criterion_declarations",
+      "confidence_interval_method_declaration",
+      "resource_budget_declaration",
+      "environment_digest",
+      "evaluation_executable_digest"
+    ]
+  },
+  "custody_and_separation": {
+    "hidden_dataset_and_seed": {
+      "custodian": "independent_hidden_artifact_provider",
+      "required_pre_run_commitment_fields": [
+        "commitment_id",
+        "provider_id",
+        "provider_attestation_digest",
+        "generator_contract_digest",
+        "split_id",
+        "artifact_digest",
+        "label_digest",
+        "seed_commitment",
+        "sequence_count",
+        "search_space_floor_attestation_digest",
+        "committed_at"
+      ],
+      "never_disclosed_to_implementer": [
+        "hidden_seed",
+        "hidden_examples",
+        "expected_labels",
+        "latent_variables",
+        "provider_private_implementation_details",
+        "per_sequence_correctness"
+      ]
+    },
+    "required_roles": {
+      "implementation_owner": "owns public source and candidate preparation; cannot self-attest independence, custody, or gate passage",
+      "hidden_artifact_provider": "owns hidden seed, hidden artifact, labels, and pre-run commitment",
+      "independent_evaluator": "owns fresh network-disabled scoring, baselines, ablations, complete attempt ledger, aggregate report, and signer custody",
+      "independent_reviewer": "owns admissibility review, accepted registries, identity attestations, key acceptance, and gate-review recommendation"
+    },
+    "separation_rules": [
+      "Provider, evaluator, reviewer, and implementation owner identities, organizations, reporting lines, and conflicting financial or operational interests require external attestation.",
+      "No actor may self-certify a required separation or substitute a subagent, branch, worktree, repository role, or identifier prefix for organizational independence.",
+      "The implementation owner cannot hold the hidden seed or labels, operate scoring, choose omitted attempts, approve its own evidence, or control the accepted public-key or attestation registries.",
+      "The evaluator may not modify the frozen candidate, evaluation thresholds, generator contract, or accepted registries after hidden commitment."
+    ]
+  },
+  "registry_and_evidence_requirements": {
+    "registry_custodian": "independent_reviewer",
+    "required_external_registries": [
+      "accepted_specification_id_to_digest",
+      "accepted_candidate_bundle_digest_to_complete_freeze_receipt",
+      "accepted_hidden_commitment_id_to_canonical_commitment_digest",
+      "provider_evaluator_reviewer_identity_to_attestation_digest",
+      "signer_id_to_trusted_ed25519_public_key_and_key_status",
+      "evaluation_protocol_digest_to_accepted_protocol_version"
+    ],
+    "public_key_registry_requirements": [
+      "Each entry contains signer_id, Ed25519 public key, key fingerprint, custody attestation digest, validity interval, revocation status, and reviewer acceptance reference.",
+      "Unknown, expired, revoked, mismatched, self-supplied, or unverifiable keys are rejected.",
+      "Private keys, signing tokens, seeds, hidden data, and raw per-sequence outcomes are prohibited from this repository and from the public registry."
+    ],
+    "evidence_ledger": {
+      "owner": "independent_evaluator",
+      "append_only": true,
+      "all_attempts_mandatory": true,
+      "required_attempt_fields": [
+        "attempt_index",
+        "run_id",
+        "started_at",
+        "completed_at",
+        "status",
+        "candidate_bundle_digest",
+        "hidden_artifact_digest",
+        "input_batch_digest",
+        "prediction_batch_digest",
+        "evaluation_executable_digest",
+        "environment_digest",
+        "failure_summary_digest_or_null",
+        "previous_entry_digest",
+        "entry_digest"
+      ],
+      "failure_semantics": "Completed, failed, aborted, crashed, duplicate, or missing-output attempts are immutable ledger entries; none may be silently retried, replaced, or omitted."
+    },
+    "attestation_and_signature": {
+      "canonical_evidence_format": "canonical JSON",
+      "digest_algorithm": "SHA-256",
+      "signature_algorithm": "Ed25519 detached signature",
+      "required_signed_sections": [
+        "candidate_and_hidden_commitments",
+        "provider_evaluator_and_reviewer_identity_attestations",
+        "environment_and_resource_results",
+        "complete_attempt_ledger_commitment",
+        "baseline_and_ablation_aggregates",
+        "confidence_intervals",
+        "contamination_report",
+        "hard_failure_results",
+        "claim_boundary"
+      ],
+      "structural_validity_limit": "A valid signature proves only that a registered key signed the bound bytes; it does not prove independence, hidden-data non-observation, scientific adequacy, gate passage, release, or recognition."
+    }
+  },
+  "review_workflow": [
+    "Independent reviewer accepts the frozen v4 specification, protocol digest, role identities, separation attestations, and registry custody before candidate freeze review.",
+    "Implementation owner submits a v4-bound freeze receipt and public-only candidate bundle; reviewer independently recomputes bindings and accepts or rejects it.",
+    "Hidden artifact provider records a pre-run hidden commitment outside the repository; reviewer verifies commitment completeness without disclosing hidden content.",
+    "Evaluator runs the frozen candidate and independently owned baselines and ablations in fresh network-disabled, read-only processes and finalizes every attempt in the append-only ledger.",
+    "Evaluator releases only permitted aggregate evidence and detached signature; reviewer verifies registries, attestation freshness, signature, ledger completeness, contamination controls, and claim boundary.",
+    "A separately authorized evaluation-gate review may assess admissibility. Neither preparation nor intake automatically passes G0, G1, another gate, a stage exit, release, or recognition."
+  ],
+  "test_plan": {
+    "repository_contract_tests": [
+      "v4 specification and rejected v3 identifiers are bound correctly",
+      "candidate freeze receipt requires every digest and post-freeze invalidation",
+      "hidden custody and candidate inputs prohibit seed, labels, hidden examples, latent metadata, and per-sequence correctness",
+      "identity, registry, key, ledger, attestation, signature, and review requirements are complete and fail closed",
+      "all claim-boundary flags remain false and no runtime path is authorized"
+    ],
+    "external_independent_tests": [
+      "reviewer recomputes freeze and evidence digests from accepted artifacts",
+      "provider demonstrates pre-run commitment and split-isolation/search-space-floor evidence without disclosure",
+      "evaluator demonstrates fresh network-disabled process isolation, full-ledger finalization, and aggregate-only output",
+      "reviewer exercises unknown, revoked, expired, mismatched, self-signed, incomplete, repeated, and post-freeze evidence rejection",
+      "independent security and scientific review validate organizational separation, custody, reproducibility, contamination controls, baseline/ablation execution, and gate admissibility"
+    ]
+  },
+  "fail_closed": {
+    "unknown_or_missing_candidate_freeze_binding": "candidate_not_admissible_and_hidden_attachment_blocked",
+    "unknown_or_unattested_role_identity_or_separation": "independent_evaluation_blocked",
+    "missing_or_unverifiable_registry_key_attestation_or_signature": "evidence_not_admissible",
+    "missing_or_non_append_only_attempt_ledger": "evidence_not_admissible",
+    "hidden_data_or_seed_leakage_or_post_freeze_change": "evaluation_invalid_and_gate_review_blocked",
+    "any_unknown_failure_or_contamination_result": "evidence_not_admissible",
+    "attempted_runtime_release_or_recognition_claim": "prohibited"
+  },
+  "external_blockers": [
+    {
+      "id": "EVAL-01-B1",
+      "cause": "No accepted v4-bound public candidate, complete freeze receipt, and reviewer-verified reproducibility bundle exist.",
+      "owner": "implementation owner with independent reviewer acceptance",
+      "required_evidence": "Committed clean v4-bound candidate, public train/development artifact, complete receipt bindings, canonical digest recomputation record, and explicit hidden-data exclusion.",
+      "required_approval": "Independent reviewer acceptance of the candidate freeze receipt.",
+      "impact": "Hidden attachment and any independent scoring remain blocked.",
+      "unblocker": "Produce a separately scoped public-only v4 candidate-freeze package and have the independent reviewer accept it."
+    },
+    {
+      "id": "EVAL-01-B2",
+      "cause": "No externally attested provider, evaluator, reviewer, custody model, or accepted public-key and attestation registries are established.",
+      "owner": "designated independent-review authority",
+      "required_evidence": "Identity, organizational-separation, conflict, role, custody, registry-custodian, key-custody, and revocation attestations from outside the implementation trust domain.",
+      "required_approval": "Independent-review authority approval of identities, separation, registry custody, and admissibility process.",
+      "impact": "Repository-only work cannot establish evaluator independence or trusted signature verification.",
+      "unblocker": "Appoint and externally attest qualified independent provider, evaluator, reviewer, and registry custodian before hidden commitment."
+    },
+    {
+      "id": "EVAL-01-B3",
+      "cause": "No hidden artifact, seed custody, pre-run commitment, independent run, or signed aggregate evidence exists.",
+      "owner": "independent hidden-artifact provider and independent evaluator",
+      "required_evidence": "Pre-run commitment, custody attestation, append-only ledger, aggregate baseline/ablation and confidence evidence, contamination and hard-failure reports, and detached signature verified against the accepted registry.",
+      "required_approval": "Independent reviewer admissibility review and separately authorized evaluation-gate review.",
+      "impact": "EVAL-01 is not performed; no gate, stage, release, or recognition result may be claimed.",
+      "unblocker": "After B1 and B2, conduct the external independent evaluation under the accepted protocol and submit its aggregate evidence for independent review."
+    }
+  ]
+}

@@ -196,6 +196,18 @@ when they are required by the acceptance criteria.
   and deletion-linkage evidence fail closed and cannot discover data, access a
   store, create or deliver an export, disclose data, or create legal, authority,
   processing, release, or runtime outcomes.
+- [`S1-14.9-future-deployment-export-readiness.md`](S1-14.9-future-deployment-export-readiness.md):
+  category-only inventory, seven readiness matrices, review, and audit template
+  for future deployment evidence; it has no real data facts, discovery, access,
+  processing, export, disclosure, authority, runtime, or release outcome.
+- [`EVAL-01-independent-evaluation-preparation.md`](EVAL-01-independent-evaluation-preparation.md):
+  v4-only candidate-freeze, external custody, registry, ledger, signature, and
+  reviewer preparation; it does not create a candidate, hidden artifact,
+  evaluation result, gate pass, release, or recognition claim.
+- [`S1-02.5-protected-control-kill-switch.md`](S1-02.5-protected-control-kill-switch.md):
+  unaccepted Protected Control Plane kill-switch, credential-revocation, and
+  recovery target contract; it does not authorize a runtime, migration, writer,
+  executor, dispatch, revocation, or release.
 - [`S1-14.12-dpia-evidence-intake.md`](S1-14.12-dpia-evidence-intake.md):
   immutable DPIA and risk-workflow evidence intake; unresolved risk and review
   evidence fail closed and cannot determine risk, approval, consultation,

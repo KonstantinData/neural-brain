@@ -26,6 +26,14 @@ ADR-017.
   budget, resource, fence, sandbox, or external effect.
 - `nb1-hidden-evaluation.json`: label-free candidate boundary, candidate freeze
   receipt, external evaluator custody, and signed evidence intake for EVAL-01 v4.
+- `nb1-independent-evaluation-preparation-v1.json`: preparation-only,
+  fail-closed EVAL-01 v4 candidate-freeze, custody, registry, key, ledger,
+  signature, and review handoff. It creates no candidate, hidden artifact,
+  evaluation, release, recognition, runtime, or external effect.
+- `protected-control-kill-switch-v1.json`: proposed, non-authorizing Protected
+  Control Plane target contract for a future kill switch, credential revocation,
+  and safe recovery. It has no runtime, schema, migration, writer, executor,
+  dispatch, credential, deployment, or release authority.
 - `stage-capabilities.json`: cumulative NB-0 through NB-8 delivery contract.
 - `recognition-gates.json`: all-required recognition criteria.
 - `evaluation-gates.json`: ordered, non-compensatory G0 through G8 evidence.
@@ -76,6 +84,10 @@ ADR-017.
   third-party-rights, export, cache, derivative, retention, and deletion-linkage
   evidence without discovering data, accessing a store, creating or delivering
   an export, or authorizing processing, runtime, authority, or release outcomes.
+- `future-deployment-data-inventory-v1.json`: category-only, fail-closed future
+  deployment inventory and subject-export-readiness evidence template. It
+  records no real data facts and cannot discover, access, process, export,
+  deliver, disclose, authorize, or release data.
 - `dpia-evidence-intake-v1.json`: immutable, scope-bound DPIA and risk-workflow
   evidence intake for qualified review only. It records risk, mitigation,
   residual-risk, approval, review, and Article 36 trigger evidence without

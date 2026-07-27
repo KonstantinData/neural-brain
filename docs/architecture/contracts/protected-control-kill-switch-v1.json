@@ -1,0 +1,186 @@
+{
+    "document_type": "neural_brain_protected_control_kill_switch_prerequisite_contract",
+    "format_version": 1,
+    "contract_id": "neural-brain.protected-control-kill-switch",
+    "contract_version": "1.0.0-draft",
+    "status": "proposed_not_accepted_not_runtime_authorization",
+    "task": "S1-02.5",
+    "governing_decisions": ["ADR-018", "ADR-019", "ADR-005"],
+    "historical_input_requiring_revalidation": ["ADR-006"],
+    "purpose": "Specify the fail-closed prerequisite for a future Protected Control Plane kill-switch, credential-revocation, and safe-recovery capability. It creates neither a runtime component nor authority, protected state, credential revocation, shutdown, recovery, deployment, or release authorization.",
+    "authority_boundary": {
+        "sole_future_writer": "accepted Protected Control Plane Kill-Switch Transition Gate",
+        "trusted_context_source": "authenticated_protected_control_plane_runtime_context",
+        "untrusted_context_sources": [
+            "Cognitive Plane",
+            "model output",
+            "prompt",
+            "memory content",
+            "observation",
+            "tool output",
+            "request payload"],
+        "default_on_unknown": "deny_or_stop_and_escalate",
+        "brain_prohibition": "The Brain, including self-monitoring and metacognition, may propose stop or escalation only. It cannot disable, enable, recover, revoke, alter scope, or satisfy a guard."},
+    "immutable_scope": [
+        "tenant_id",
+        "area_id",
+        "project_id",
+        "session_id",
+        "operation_class",
+        "control_scope_id"],
+    "state_machine": {
+        "states": ["enabled", "drain", "disabled", "recovery"],
+        "safe_default": "disabled",
+        "semantics": {
+            "enabled": "New protected admissions may proceed only when every independently required Action, Goal, policy, approval, fence, sandbox, budget, resource, audit, and kill-switch guard passes.",
+            "drain": "New effect admissions, intent commitments, dispatches, and credential grants are denied. No new external work starts. Existing ambiguous effects, audit completion, containment, settlement, and authoritative reconciliation remain available under separately authorized controls.",
+            "disabled": "All effect admissions, dispatches, credential use, and recovery activation are denied. In-flight work is contained or marked indeterminate; no blind retry or claim release occurs.",
+            "recovery": "A constrained, independently approved evidence-gathering state. It remains effect-disabled; it may verify state, reconcile, rotate credentials, and prepare a proposed transition to enabled only after every recovery guard passes."},
+        "permitted_transitions": [
+            {
+                "from": "enabled",
+                "to": "drain",
+                "trigger": "authenticated authorized kill request or independent Safety Supervisor stop",
+                "guard": "fresh scope binding, actor role, reason, monotonic revision, atomic audit"},
+            {
+                "from": "enabled",
+                "to": "disabled",
+                "trigger": "authenticated emergency disable or independent Safety Supervisor stop",
+                "guard": "fresh scope binding, actor role, reason, monotonic revision, atomic audit"},
+            {
+                "from": "drain",
+                "to": "disabled",
+                "trigger": "authenticated escalation, timeout, fault, revocation, or containment failure",
+                "guard": "fail closed and atomically audit"},
+            {
+                "from": "drain",
+                "to": "recovery",
+                "trigger": "drain quiescence and independently approved incident recovery",
+                "guard": "no unresolved effect, fence, audit, credential, or scope ambiguity"},
+            {
+                "from": "disabled",
+                "to": "recovery",
+                "trigger": "independently approved incident recovery",
+                "guard": "credential revocation/rotation evidence, authoritative state inventory, audit continuity, fresh authenticated scope"},
+            {
+                "from": "recovery",
+                "to": "enabled",
+                "trigger": "separate recovery approver decision",
+                "guard": "all release stops resolved, control integrity and reconciliation independently verified, fresh policy/authority/approval/fence evidence, atomic audit"},
+            {
+                "from": "recovery",
+                "to": "disabled",
+                "trigger": "failed, unknown, stale, conflicting, or expired recovery evidence",
+                "guard": "automatic fail-closed transition with audit"}],
+        "forbidden_transitions": [
+            "enabled directly from disabled",
+            "enabled directly from drain",
+            "any Brain-initiated enable or recovery",
+            "any transition with unknown, stale, revoked, expired, conflicting, or scope-mismatched evidence",
+            "implicit restart restoration to enabled"]},
+    "roles_and_separation_of_duties": [
+        {
+            "role": "kill_operator",
+            "may": ["request drain", "request disabled"],
+            "may_not": [
+                "approve own recovery",
+                "activate policy",
+                "verify own effect",
+                "re-enable Brain runtime"]},
+        {
+            "role": "independent_safety_supervisor",
+            "may": [
+                "request or force fail-closed drain/disabled",
+                "observe control evidence",
+                "escalate"],
+            "may_not": ["perform sole recovery approval", "be controlled by Brain runtime"]},
+        {
+            "role": "credential_revoker",
+            "may": ["revoke and rotate exact credential bindings", "attest revocation evidence"],
+            "may_not": ["enable operation", "approve own recovery"]},
+        {
+            "role": "incident_commander",
+            "may": ["coordinate containment and reconciliation"],
+            "may_not": ["unilaterally re-enable", "replace independent verification"]},
+        {
+            "role": "recovery_approver",
+            "may": ["approve recovery-to-enabled only after independent evidence"],
+            "may_not": [
+                "be the triggering operator, sole verifier, credential revoker, or Brain runtime"
+            ]},
+        {
+            "role": "independent_reviewer",
+            "may": ["review design, test evidence, and separation"],
+            "may_not": ["create runtime authority or waive a Security Floor rule"]}],
+    "future_persisted_evidence": {
+        "required_fields": [
+            "control_scope_id",
+            "immutable_scope",
+            "state",
+            "revision",
+            "issued_at",
+            "expires_at",
+            "transition_id",
+            "causation_id",
+            "actor_identity",
+            "actor_role",
+            "authority_snapshot_ref",
+            "policy_decision_ref",
+            "approval_refs",
+            "credential_revision_refs",
+            "fence_refs",
+            "reason_code",
+            "audit_hash",
+            "previous_audit_hash"],
+        "integrity": [
+            "append-only atomic audit",
+            "monotonic revision",
+            "compare-and-swap precondition",
+            "idempotency key bound to exact scope and transition",
+            "durable causal ordering",
+            "tamper-evident correlation"],
+        "access_boundary": "General application roles, Cognitive Plane components, models, planners, executors, and untrusted requests must not write, alter, or restore the future protected control state."},
+    "enforcement_and_failure_behavior": [
+        "Every future Action and Goal admission, commitment, dispatch, executor lease/fence check, credential use, and recovery step revalidates the exact current control scope and revision.",
+        "Credential revocation is scope-bound, auditable, monotonic, and checked before admission, commitment, dispatch, and use; a revoked or unverifiable credential denies.",
+        "CAS failure, duplicate request, stale fence, stale revision, expiry, clock uncertainty, audit failure, storage unavailability, restart ambiguity, or network partition denies/contains and records an incident where possible.",
+        "On restart there is no implicit enabled state. The durable authoritative state is re-read and revalidated; unavailable or contradictory state is disabled.",
+        "During a network partition no side may infer enabled from cached state. A fence/lease holder must stop at expiry; split-brain, duplicate effect, and uncertain in-flight work become indeterminate and require reconciliation.",
+        "A non-idempotent or ambiguous effect is never blindly retried. Budget/resource claims and evidence remain retained until authoritative reconciliation establishes the terminal disposition.",
+        "Rollback means transition to disabled plus containment, credential revocation where applicable, evidence preservation, and separately governed recovery; it never erases audit evidence or creates authority."],
+    "gate_interfaces": {
+        "action_transition_gate": "Requires an enabled, exact-scope, current-revision control decision at precommit, commit, dispatch, and executor fence use; it cannot consume a cached or unscoped allow.",
+        "goal_transition_gate": "Cannot write Achieved from tool success; kill-switch containment and indeterminate effects require independent verification and reconciliation before goal completion.",
+        "executor_and_sandbox": "Must enforce current control revision, credential revision, sandbox binding, and fence at start and before every effect boundary; success does not override disable/drain.",
+        "audit_and_reconciliation": "Audit failure blocks admission. Reconciliation and containment may proceed in drain/disabled without enabling new effects, under their own authenticated controls.",
+        "security_floor": "No policy, approval, recovery record, or human review may override a Security Floor prohibition or create missing authority."},
+    "required_future_test_evidence": [
+        "positive transition and exact-scope admission tests",
+        "unknown/missing/stale/revoked/expired/conflicting identity, scope, authority, policy, approval, credential, fence, and audit denial tests",
+        "actor and separation-of-duties tests including Brain self-enable prohibition",
+        "atomic audit, CAS, idempotency, duplicate request, and concurrency race tests",
+        "drain admission/dispatch denial with reconciliation continuity tests",
+        "credential revocation before and during in-flight work tests",
+        "crash-boundary, restart, clock-skew, stale checkpoint, stale fence, and partition/split-brain tests",
+        "indeterminate effect, no-blind-retry, retained-claim, rollback, and independently approved recovery tests",
+        "independent security/safety review and NB-5 controlled-sandbox evaluation evidence"],
+    "implementation_blocker": {
+        "status": "blocked_pending_accepted_adr_018_conformant_control_plane_decision",
+        "decision_owner": "Neural Brain architecture decision owner",
+        "contract_owner": "Protected Control Plane architecture owner",
+        "required_approvals": [
+            "accepted ADR decision",
+            "independent security and safety review",
+            "qualified operational recovery ownership"],
+        "unblock_condition": "An authorized ADR accepts or replaces this proposal and fixes state ownership, PostgreSQL authorization and audit design, exact scopes, actor identities, recovery authority, credential-revocation integration, and NB-5 test/evaluation acceptance criteria.",
+        "next_step": "After acceptance, split non-overlapping implementation packages for protected schema/roles, transition gate, revocation integration, executor enforcement, reconciliation, and independent verification. Do not implement any of them before acceptance."},
+    "explicit_exclusions": [
+        "runtime component",
+        "database schema or migration",
+        "protected-state writer",
+        "credential revocation implementation",
+        "executor or dispatch integration",
+        "network control",
+        "automatic recovery",
+        "deployment or release authorization",
+        "claim that a kill switch is implemented, safe, or effective"]}

@@ -29,6 +29,10 @@ distinct.
 - [`relationship-memory-adr-018-revalidation-proposal-v1.md`](relationship-memory-adr-018-revalidation-proposal-v1.md)
   records preparation-only Positions 1–3; it authorizes neither runtime nor
   retrieval, Planner, or Dreaming use.
+- [`protected-control-kill-switch-adr-018-revalidation-proposal-v1.md`](protected-control-kill-switch-adr-018-revalidation-proposal-v1.md)
+  records the proposed, non-authorizing replacement boundary for historical
+  Kill-Switch ADR-006. It remains blocked pending an authorized Protected
+  Control Plane decision and does not authorize runtime implementation.
 - [`ledger-conventions-v1.md`](ledger-conventions-v1.md) fixes PostgreSQL
   representation conventions for protected keys, scope, time, exact amounts,
   naming, and structured payloads.
