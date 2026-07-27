@@ -8,6 +8,9 @@ durable technical source of truth.
 - [`governance-blocker-integration-evidence.md`](governance-blocker-integration-evidence.md):
   controller-owned cross-package mapping for EVAL-01, S1-02.5, S1-14.9, reviews,
   integrated commands, and external-only blockers.
+- [`REL-MEM-01-08-relationship-memory-preparation.md`](REL-MEM-01-08-relationship-memory-preparation.md):
+  ADR-018-aligned Relationship Memory preparation mapping for contracts,
+  matrices, planned negative tests, and a non-executing governance runbook.
 
 ## Evidence Chain
 
