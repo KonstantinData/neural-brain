@@ -1,0 +1,74 @@
+{
+  "contract_id": "neural-brain.nb1.planner-verification-revalidation",
+  "version": "1.0.0",
+  "status": "proposed_prerequisite_not_accepted_not_runtime_authorization",
+  "task_id": "FND-ENT-04",
+  "governing_decisions": ["ADR-018", "ADR-019", "architecture-directive-v4.0"],
+  "stage": "NB-1",
+  "successor_tasks": ["S1-10.1", "S1-10.3", "S1-10.6"],
+  "scope": {
+    "permitted": [
+      "recorded_or_synthetic_observations",
+      "typed_internal_plan_proposals",
+      "bounded_cognitive_checkpoints",
+      "effect_free_serial_cognitive_cycle"
+    ],
+    "prohibited": [
+      "protected_goal_or_action_state",
+      "goal_or_action_transition_gate_runtime",
+      "tool_or_executor_invocation",
+      "external_effect_or_reconciliation",
+      "authority_approval_policy_or_budget_creation",
+      "active_model_mutation",
+      "stage_release_recognition_or_production_autonomy_claim"
+    ]
+  },
+  "trust_boundary": {
+    "trusted_context": [
+      "authenticated_protected_control_plane_context",
+      "immutable_authenticated_scope",
+      "trusted_model_identity",
+      "evaluation_policy_reference"
+    ],
+    "untrusted_context": [
+      "prompts",
+      "observations",
+      "memory_content",
+      "model_output",
+      "tool_output",
+      "request_payloads"
+    ],
+    "default_on_unknown_or_stale_fact": "deny"
+  },
+  "verification_boundary": {
+    "planner_or_tool_success_is_goal_success": false,
+    "independent_verifier_required_for_future_goal_success": true,
+    "goal_transition_gate_is_sole_future_achieved_writer": true,
+    "required_goal_success_fields": [
+      "verification_method",
+      "threshold",
+      "evidence_requirements",
+      "failure_behavior",
+      "legal_effect_classification",
+      "human_confirmation_requirement"
+    ]
+  },
+  "acceptance": {
+    "owner": "Protected Control Plane architecture owner",
+    "required_disposition": ["accept", "replace", "reject"],
+    "required_before_successor_implementation": true,
+    "required_future_evidence": [
+      "state_and_proposal_model",
+      "authenticated_scope_identity_authority_policy_and_approval",
+      "independent_verification_and_quiescence",
+      "atomic_audit_recovery_and_concurrency",
+      "positive_negative_scope_authority_and_failure_tests",
+      "stage_exclusion_and_no_effect_tests"
+    ]
+  },
+  "migrations_authorized": false,
+  "runtime_enabled": false,
+  "external_effects_enabled": false,
+  "stage_release_authorized": false,
+  "recognition_claim_authorized": false
+}

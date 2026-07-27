@@ -187,6 +187,10 @@ when they are required by the acceptance criteria.
   historical Action, preparation, dispatch, and reconciliation disposition plus
   the blocked, fail-closed NB-4/NB-5 Action Gate prerequisite boundary; it is
   not an accepted ADR or runtime authorization.
+- [`FND-ENT-04-nb1-planner-verification-revalidation.md`](FND-ENT-04-nb1-planner-verification-revalidation.md):
+  proposed, fail-closed prerequisite boundary for S1-10.1, S1-10.3, and
+  S1-10.6; it is not an accepted ADR, runtime authorization, or NB-1 release
+  claim.
 - [`S1-15.6-model-inference-inventory.md`](S1-15.6-model-inference-inventory.md):
   immutable, fail-closed model and inference-boundary inventory evidence; it
   records current absence and cannot activate, deploy, promote, or authorize a
