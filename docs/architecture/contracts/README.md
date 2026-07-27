@@ -70,6 +70,12 @@ ADR-017.
   intake/case evidence template for qualified review only. It records identity,
   deadline, audit, redaction, and escalation evidence without executing a
   request or enabling processing, runtime, authority, or release.
+- `data-subject-access-export-evidence-intake-v1.json`: immutable,
+  scope-bound, category-only discovery-coverage and access-export evidence
+  intake for qualified review only. It records inventory, redaction,
+  third-party-rights, export, cache, derivative, retention, and deletion-linkage
+  evidence without discovering data, accessing a store, creating or delivering
+  an export, or authorizing processing, runtime, authority, or release outcomes.
 - `dpia-evidence-intake-v1.json`: immutable, scope-bound DPIA and risk-workflow
   evidence intake for qualified review only. It records risk, mitigation,
   residual-risk, approval, review, and Article 36 trigger evidence without

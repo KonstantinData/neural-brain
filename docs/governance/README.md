@@ -70,6 +70,12 @@ defines a fail-closed DSAR evidence intake and case-tracking template. It does
 not receive a real request, verify an identity, process data, or enable runtime,
 authority, or release.
 
+[`data-subject-access-export-evidence-intake-v1.md`](data-subject-access-export-evidence-intake-v1.md)
+defines a fail-closed, category-only evidence intake for separately governed
+review of possible subject-data discovery coverage and access-export readiness.
+It does not discover data, access a store, create or deliver an export, disclose
+data, process data, or enable legal, authority, runtime, or release outcomes.
+
 [`dpia-evidence-intake-v1.md`](dpia-evidence-intake-v1.md) defines a
 fail-closed DPIA/risk evidence intake. It does not determine risk, approve a
 DPIA, require consultation, or authorize processing, runtime, authority, or

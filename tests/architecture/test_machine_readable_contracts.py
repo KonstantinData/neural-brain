@@ -37,6 +37,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "compliance-raci-assessment-v1.json",
         "consent-evidence-intake-v1.json",
         "data-object-catalogue-intake-v1.json",
+        "data-subject-access-export-evidence-intake-v1.json",
         "data-subject-request-evidence-intake-v1.json",
         "dpia-evidence-intake-v1.json",
         "dreaming.json",

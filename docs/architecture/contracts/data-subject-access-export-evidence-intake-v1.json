@@ -1,0 +1,107 @@
+{
+    "document_type": "neural_brain_data_subject_access_export_evidence_intake_contract",
+    "contract_id": "neural-brain.data-subject-access-export-evidence-intake",
+    "contract_version": "1.0.0",
+    "status": "normative_foundation_governance_template",
+    "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+    "purpose": "Define a versioned, product- and domain-neutral, fail-closed evidence intake for separately governed qualified review of possible subject-data discovery coverage and access-export readiness. It records category-only inventory, coverage, redaction, rights, export-evidence, cache, derivative, retention, and deletion-linkage references only. It cannot discover data, access a store, create an export, determine a right or obligation, establish trusted scope, grant authority, authorize processing, decide release, or enable runtime behavior.",
+    "authoritative_external_reference": {
+        "instrument": "Regulation (EU) 2016/679",
+        "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+        "review_reference": "Articles 12 through 23; any conclusion about data-subject access, copy, portability, recipient information, redaction, third-party rights, deadline, export, disclosure, or obligation requires qualified deployment-specific review."
+    },
+    "repository_facts_at_template_creation": {
+        "verified_facts": [
+            "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+            "The current repository does not establish a concrete controller, processor, processing activity, data subject, request, jurisdiction, runtime data-object inventory, storage estate, data discovery operation, export operation, or deployment-specific privacy review.",
+            "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+        ],
+        "unknown_facts_not_inferred": [
+            "whether GDPR or a data-subject access, copy, portability, recipient-information, or other right applies to a concrete deployment, processing activity, request, or jurisdiction",
+            "whether a concrete primary-data store, memory store, evidence store, audit or application log, cache, derivative, backup, archive, recipient, or subprocessor exists, contains personal data, is in scope, or is technically discoverable",
+            "whether an identity, representative authorization, third-party right, redaction, retention, legal-hold, deletion, export format, delivery route, security control, deadline, or response is sufficient, required, lawful, or permitted",
+            "whether a concrete system may process personal data, discover data, create or deliver an export, disclose data, be deployed, released, or operated"
+        ]
+    },
+    "data_subject_access_export_evidence_intake_template": {
+        "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment and processing activity, immutable authenticated Tenant, Area, and Project scope references, intended-purpose contract version, activity/purpose reference, jurisdiction, one request-case reference, and one category-only discovery-coverage inventory combination.",
+        "required_fields": [
+            "intake_identifier_and_contract_version",
+            "intake_timestamp_and_accountable_owner_reference",
+            "qualified_independent_privacy_reviewer_qualification_review_date_and_independence_reference",
+            "immutable_artifact_version_or_digest",
+            "deployment_identifier_target_environment_and_jurisdiction_evidence_references",
+            "immutable_authenticated_tenant_area_project_scope_references",
+            "immutable_intended_purpose_contract_id_version_and_purpose_reference",
+            "immutable_processing_activity_identifier_version_and_activity_reference",
+            "linked_data_object_catalogue_ropa_data_flow_data_subject_request_and_reassessment_evidence_references",
+            "case_tracking_request_category_identity_and_representative_authorization_evidence_references_for_qualified_review_only",
+            "category_only_primary_data_memory_evidence_log_cache_derivative_backup_and_archive_inventory_references",
+            "category_only_discovery_coverage_method_boundary_gap_and_currency_evidence_references_for_qualified_review_only",
+            "data_source_owner_location_recipient_subprocessor_transfer_retention_legal_hold_and_deletion_linkage_evidence_references",
+            "access_copy_portability_recipient_information_format_delivery_security_and_export_evidence_references_for_qualified_review_only",
+            "third_party_rights_redaction_data_minimisation_access_control_and_audit_evidence_references_for_qualified_review_only",
+            "cache_derivative_backup_archive_recovery_and_deletion_propagation_evidence_references_for_qualified_review_only",
+            "explicit_non_applicability_unknown_gap_conflict_expiry_and_unavailable_source_dispositions",
+            "mandatory_reassessment_triggers_next_review_date_and_independent_release_decision_reference"
+        ],
+        "scope_binding_requirements": [
+            "Tenant, Area, and Project references must identify immutable authenticated runtime-scope evidence. An intake identifier, request label, case identifier, inventory label, source label, prompt, observation, model response, memory content, tool output, log entry, cache key, or export request cannot establish, broaden, or substitute trusted scope.",
+            "Artifact, purpose, activity, deployment, jurisdiction, case-tracking, and discovery-coverage references must name immutable versioned evidence. An intake is valid only for its exact artifact, authenticated scope, purpose, activity, deployment, jurisdiction, case reference, and category-only inventory combination; evidence may not be reused across changed combinations without a separate record and qualified review.",
+            "The intake contains durable evidence references and category-level coverage only. It must not contain raw personal data, personal identifiers, request content, identity or authorization documents, discovered records, export payloads, data values, credentials, secrets, prompts, memory payloads, log contents, cache contents, backup contents, legal advice, or response content.",
+            "Inventory, discovery coverage, source owner, retention, legal hold, deletion linkage, export, third-party-rights, redaction, delivery, security, audit, cache, derivative, backup, archive, recovery, and unavailable-source entries must state provenance, date, currency, scope, qualified-review treatment, and contradiction status. Unknown, stale, contradictory, unauthenticated, unqualified, scope-mismatched, or unavailable facts remain explicit deployment-specific release blockers rather than inferred favorable facts."
+        ],
+        "deterministic_review_order": [
+            "Verify every required field, exact immutable artifact, authenticated scope, purpose, activity, deployment, jurisdiction, accountable owner, qualified independent privacy reviewer, review date, case reference, inventory reference, evidence reference, blocker, and reassessment trigger; any absent, unknown, stale, contradictory, non-immutable, or scope-mismatched fact is incomplete.",
+            "Verify linked data-object catalogue, RoPA, personal-data-flow, data-subject-request, and reassessment evidence for the same artifact, authenticated scope, purpose, activity, deployment, jurisdiction, and case reference; a missing or conflicting prerequisite remains a release blocker.",
+            "Record category-only primary-data, memory, evidence, audit or application log, cache, derivative, backup, archive, recovery, source-owner, location, recipient, subprocessor, transfer, retention, legal-hold, and deletion-linkage evidence without discovering, reading, enumerating, or copying a data store; an absent category or source remains an explicit coverage gap unless qualified review establishes a scope-matched disposition.",
+            "Record discovery-coverage method, boundary, currency, unavailable-source, access, copy, portability, recipient-information, format, delivery, security, and export-evidence references for qualified review only, without determining a right, obligation, completeness, export format, delivery route, or disclosure outcome; no favorable later fact compensates for an unresolved earlier fact.",
+            "Record third-party-rights, redaction, data minimisation, access-control, audit, cache, derivative, backup, archive, recovery, and deletion-propagation evidence for qualified review only, without determining adequacy, a redaction, a third-party-right outcome, or a deletion outcome. Unresolved evidence remains a release blocker.",
+            "Record explicit non-applicability, unknown, gap, conflict, expiry, unavailable-source, blocker, reassessment trigger, next review date, and independent release-decision reference. A completed intake remains evidence input only and cannot create a legal, authority, processing, data-discovery, export, disclosure, deployment, release, or runtime outcome."
+        ],
+        "mandatory_reassessment_triggers": [
+            "immutable_artifact_model_supplier_or_deployment_change",
+            "authenticated_tenant_area_project_scope_purpose_activity_jurisdiction_or_case_reference_change",
+            "data_object_category_source_owner_location_recipient_subprocessor_transfer_retention_legal_hold_or_deletion_linkage_change",
+            "discovery_coverage_method_boundary_gap_currency_or_unavailable_source_disposition_change",
+            "access_export_format_delivery_security_third_party_right_redaction_audit_cache_derivative_backup_archive_or_recovery_evidence_change",
+            "qualified_privacy_review_independence_external_fact_or_evidence_provenance_change",
+            "evidence_expiry_unknown_gap_conflict_incident_complaint_or_material_misuse_signal"
+        ]
+    },
+    "fail_closed_semantics": {
+        "unknown_or_missing_required_field": "data_subject_access_export_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+        "missing_or_nonimmutable_authenticated_scope_artifact_purpose_activity_deployment_jurisdiction_or_case_reference": "reject_intake_and_block_deployment_specific_release_decision",
+        "stale_scope_mismatched_or_contradictory_evidence": "data_subject_access_export_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+        "missing_accountable_owner_qualified_independent_privacy_reviewer_review_date_inventory_coverage_or_reassessment_trigger": "data_subject_access_export_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+        "unknown_unqualified_stale_conflicting_or_unavailable_inventory_discovery_export_redaction_third_party_cache_derivative_or_deletion_linkage_evidence": "data_subject_access_export_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+        "unresolved_coverage_gap_unavailable_source_third_party_right_redaction_or_export_evidence": "data_subject_access_export_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+        "cross_boundary_or_changed_artifact_purpose_activity_deployment_jurisdiction_case_or_inventory_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+        "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
+        "no_automatic_legal_or_regulatory_conclusion": true,
+        "no_automatic_data_subject_right_identity_deadline_completeness_or_obligation_determination": true,
+        "no_data_discovery_store_access_export_delivery_or_disclosure": true,
+        "no_runtime_authorization_processing_activation_or_enablement": true,
+        "no_automatic_release_or_authority_outcome": true,
+        "no_allow_outcome": true
+    },
+    "authority_boundary": {
+        "template_is": "a versioned governance and traceability evidence intake for separately governed qualified privacy review",
+        "template_is_not": [
+            "a legal opinion, data-subject access, copy, portability, recipient-information, third-party-right, redaction, deadline, export, disclosure, or compliance determination",
+            "a data discovery, inventory enumeration, data-store access, data collection, record lookup, export generation, export delivery, or disclosure workflow",
+            "an authenticated Tenant, Area, Project, Session, principal, role, authority, policy, or approval context",
+            "a policy decision, Security Floor override, protected-state transition request, or gate decision",
+            "a processing, deployment, productive-use, data-subject-request handling, or release approval",
+            "a runtime capability enablement, personal-data operation, protected-state write, or external-effect authorization",
+            "an implementation, capability, maturity, recognition, safety, or production-autonomy claim"
+        ],
+        "release_boundary": "Only separately applicable qualified privacy review, accepted governance, and all Protected Control Plane, transition-gate, evaluation, recognition, and release evidence requirements may decide a concrete processing activity, deployment, or data-subject request. This intake never accesses a store, discovers data, creates or delivers an export, or activates a runtime path."
+    },
+    "current_blocker": {
+        "status": "blocked_pending_concrete_runtime_data_object_inventory_deployment_scope_request_case_and_qualified_privacy_review_evidence",
+        "owner": "future deployment accountable owner",
+        "unblock_condition": "A concrete proposed deployment supplies every required field; exact immutable artifact, authenticated scope, purpose, activity, deployment, jurisdiction, and case evidence; category-only primary-data, memory, evidence, log, cache, derivative, backup, archive, recovery, source-owner, retention, legal-hold, deletion-linkage, discovery-coverage, export, redaction, third-party-right, audit, and security evidence; qualified independent privacy review; explicit gap dispositions; and separately governed release evidence.",
+        "next_step": "Create one immutable intake per proposed artifact, authenticated Tenant/Area/Project scope, purpose, processing activity, deployment, jurisdiction, case reference, and category-only discovery-coverage inventory before any processing-specific, request-specific, data-discovery, export, or deployment-specific release decision."
+    }
+}

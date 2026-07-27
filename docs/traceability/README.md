@@ -190,6 +190,12 @@ when they are required by the acceptance criteria.
   immutable DSAR evidence intake/case template; identity, deadline, audit,
   redaction, and escalation evidence fail closed and cannot execute a request
   or create legal, authority, processing, release, or runtime outcomes.
+- [`S1-14.9-data-subject-access-export-evidence-intake.md`](S1-14.9-data-subject-access-export-evidence-intake.md):
+  immutable, category-only discovery-coverage and access-export evidence intake;
+  inventory, third-party-rights, redaction, cache, derivative, export, retention,
+  and deletion-linkage evidence fail closed and cannot discover data, access a
+  store, create or deliver an export, disclose data, or create legal, authority,
+  processing, release, or runtime outcomes.
 - [`S1-14.12-dpia-evidence-intake.md`](S1-14.12-dpia-evidence-intake.md):
   immutable DPIA and risk-workflow evidence intake; unresolved risk and review
   evidence fail closed and cannot determine risk, approval, consultation,
