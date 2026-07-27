@@ -1,0 +1,41 @@
+{
+  "document_type": "protected_ledger_backup_recovery_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.protected-ledger-backup-recovery",
+  "contract_version": "1.0.0",
+  "status": "normative_target_contract",
+  "governing_decisions": ["ADR-003", "ADR-018", "ADR-019"],
+  "delivery_stage": "nb_0_foundation_operational_control",
+  "scope": "PostgreSQL authoritative protected ledger and its required audit evidence",
+  "current_state": "contract_only_no_deployment_or_restore_evidence",
+  "purpose": "Define fail-closed backup, WAL point-in-time recovery, retention, custody, and restore-evidence requirements without operating a backup system.",
+  "non_claims": [
+    "No backup target, encryption key, credential, scheduler, archive, retention duration, RPO, RTO, restore environment, or restore proof is configured by this contract.",
+    "This contract does not establish that backups are encrypted, immutable, complete, recoverable, tested, or deployed.",
+    "This contract does not authorize a protected-state transition, release, external effect, credential use, or break-glass access."
+  ],
+  "backup_requirements": {
+    "coverage": ["authoritative PostgreSQL protected ledger", "WAL required to recover from the selected base backup to the declared recovery target", "migration version and release artifact digests required to interpret restored state", "secret-free backup manifest and immutable operation evidence"],
+    "confidentiality_and_integrity": ["encrypt backup and WAL material in transit and at rest using deployment-approved cryptography", "separate backup-encryption key custody from backup storage administration and ordinary runtime credentials", "verify cryptographic integrity digest and manifest completeness before considering a backup eligible", "record immutable secret-free evidence for creation, archive, retention, restore test, and destruction events"],
+    "pitr": ["pair each eligible base backup with continuous validated WAL archive coverage", "select a recovery target time, transaction, or restore point only from authoritative evidence", "restore only into an isolated non-serving environment until independent verification and explicit controlled cutover authorization", "preserve original evidence; a restore never overwrites or reclassifies the authoritative source without an accepted recovery procedure"]
+  },
+  "deployment_parameters": {
+    "must_be_approved_and_recorded_before_productive_admission": ["backup cadence and maximum permitted backup age", "WAL archive latency and continuity threshold", "RPO target and measurement method", "RTO target and measurement method", "retention schedule, legal-hold handling, deletion propagation, and cryptographic-key retention alignment", "backup target, geographic or jurisdictional constraints, and immutable-storage configuration", "operator identities, access reviews, break-glass path, monitoring, alerting, and incident ownership", "restore-test cadence, isolated environment, acceptance criteria, independent witness, and evidence retention"],
+    "repository_defaults": "none"
+  },
+  "access_separation": {
+    "required_roles": ["restricted backup operator", "separate encryption-key custodian", "separate restore or recovery operator", "independent restore-test witness", "authorized incident or release decision owner"],
+    "prohibitions": ["Runtime Tenant logins, Cognitive Plane components, models, planners, and general application roles cannot read, create, delete, or restore backup material.", "A backup-storage administrator alone cannot decrypt and restore protected ledger material.", "A restore operator cannot cut over an isolated restore into service without the separately authorized recovery decision and independent verification.", "Backup or restore evidence never creates authority, bypasses a Gate, or satisfies a release stop by itself."]
+  },
+  "retention_and_deletion": {
+    "requirements": ["Backup retention is governed by approved retention, legal-hold, deletion-propagation, and jurisdictional policy.", "A deletion request is not complete merely because primary data changes; backup expiry, hold, exception, and eventual destruction evidence must be reconciled.", "Legal hold prevents destructive expiry only through the authorized policy path and is recorded in secret-free immutable evidence.", "Expired backup material and associated key material are destroyed only by a restricted, auditable process after hold and recovery obligations are evaluated."],
+    "forbidden_shortcuts": ["indefinite retention without an approved policy", "deleting a backup or key without hold and recovery evaluation", "treating backup retention as an exception to Area or Tenant isolation"]
+  },
+  "restore_acceptance": {
+    "required_checks": ["manifest authenticity, completeness, digest, base-backup identity, and WAL continuity", "isolated restore target and non-serving network posture", "migration and release-artifact compatibility", "protected ledger scope lineage, RLS, FORCE ROW LEVEL SECURITY, Gate-only writer privileges, audit continuity, and reconciliation readiness", "declared recovery target, measured elapsed time, data-loss window, failures, deviations, and independent witness result", "post-test cleanup, secret revocation, and immutable secret-free evidence"],
+    "success_semantics": "A successful storage operation, database start, or tool exit is not restore success. Only the complete recorded acceptance checks and independent witness evidence establish a restore-test result."
+  },
+  "fail_closed_semantics": {"unknown_backup_or_wal_coverage": "productive_admission_and_recovery_cutover_blocked", "missing_encryption_key_separation_or_access_review": "productive_admission_blocked", "missing_or_failed_restore_test": "productive_admission_blocked", "rpo_or_rto_unmeasured_or_exceeded": "release_stop_pending_authorized_remediation", "ambiguous_restore_outcome": "indeterminate_pending_authoritative_reconciliation_no_blind_retry", "incomplete_reconciliation_or_audit_continuity": "not_ready_no_service_cutover", "missing_or_expired_retention_hold_or_deletion_evidence": "destructive_expiry_blocked"},
+  "release_stop_conditions": ["No current deployment-specific encrypted backup and validated WAL/PITR coverage evidence.", "No approved, measured RPO/RTO target and isolated restore-test evidence.", "No least-privilege access separation, key separation, immutable evidence, or independent restore witness.", "Unresolved backup-retention, legal-hold, deletion-propagation, reconciliation, or audit-continuity gap."],
+  "invariants": ["PostgreSQL remains the authoritative protected ledger; a backup copy does not become an alternate mutable authority.", "Protected state remains writable only through its owning Gate before and after recovery.", "Tenant and Area isolation, provenance, audit continuity, retention, legal hold, deletion propagation, and reconciliation survive restore validation.", "Unknown or ambiguous recovery outcomes are indeterminate and are never blindly retried or cut over."]
+}

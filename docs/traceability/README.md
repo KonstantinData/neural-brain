@@ -181,6 +181,10 @@ when they are required by the acceptance criteria.
   immutable, fail-closed model and inference-boundary inventory evidence; it
   records current absence and cannot activate, deploy, promote, or authorize a
   model or inference provider.
+- [`S1-13.5-protected-ledger-backup-pitr.md`](S1-13.5-protected-ledger-backup-pitr.md):
+  target-only protected-ledger backup, WAL/PITR, retention, custody, isolated
+  restore-test, and release-stop evidence; it makes no deployed backup or
+  recovery-readiness claim.
 
 ## Reconciliation Rules
 
