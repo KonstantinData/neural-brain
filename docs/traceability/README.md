@@ -142,6 +142,10 @@ when they are required by the acceptance criteria.
   signed-evidence record template for a separately governed compliance-release
   decision; it requires current scope-matched GDPR and EU AI Act evidence or
   qualified non-applicability bases and cannot authorize runtime enablement.
+- [`S1-15.2-ai-literacy-competence-evidence.md`](S1-15.2-ai-literacy-competence-evidence.md):
+  versioned, product-neutral AI-literacy curriculum, de-identified competence
+  evidence, and refresh-cycle template; it makes no real-person, HR, legal,
+  authority, release, or runtime claim.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
