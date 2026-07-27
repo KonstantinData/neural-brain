@@ -34,6 +34,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "cognitive-cycle.json",
         "compliance-release-decision-v1.json",
         "compliance-raci-assessment-v1.json",
+        "data-object-catalogue-intake-v1.json",
         "dreaming.json",
         "envelopes.json",
         "evaluation-gates.json",
