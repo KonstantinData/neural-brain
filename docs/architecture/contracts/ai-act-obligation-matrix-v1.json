@@ -1,0 +1,50 @@
+{
+  "document_type": "neural_brain_ai_act_obligation_matrix_template",
+  "contract_id": "neural-brain.ai-act-obligation-matrix",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018"],
+  "purpose": "Versioned, product- and domain-neutral, fail-closed evidence template for qualified deployment-specific EU AI Act operator-obligation review. It records review inputs only; it does not determine legal applicability, assign a real role or obligation, authorize a model, deployment, release, policy, authority, or runtime operation.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2024/1689",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "review_references": ["Article 3 definitions and operator facts", "Article 16 provider obligations", "Article 25 responsibilities along the AI value chain", "Article 26 deployer obligations", "Articles 13, 14, 17 to 20, 23 and 27 where qualified review identifies them as potentially relevant"],
+    "interpretation_boundary": "Current consolidated law, applicability, role and obligation conclusions require scope-matched qualified review; citations are review orientation, not repository legal conclusions."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": ["Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.", "The repository establishes no concrete deployment, legal entity, market placement, model supply chain, downstream distribution, operator role, applicable obligation, or qualified legal review.", "The protected Memory Core is an internal subsystem and cannot narrow the complete protected cognitive-system product boundary established by ADR-018."],
+    "unknown_facts_not_inferred": ["whether a concrete artifact, model, supplier, downstream actor, provider or deployer exists", "whether Regulation (EU) 2024/1689 applies to a concrete deployment or actor", "which role, obligation, deadline, standard, conformity activity, registration, documentation, monitoring or incident duty applies", "whether an obligation is satisfied, due, waived, exempt, delegated or non-applicable", "whether a system, model, deployment, release or operation may be enabled"]
+  },
+  "matrix_template": {
+    "assessment_unit": "One immutable artifact version or digest, proposed deployment, authenticated Tenant/Area/Project scope combination, operating context, and review snapshot.",
+    "role_categories_for_review_only": ["provider", "deployer", "model_supplier", "downstream_actor", "non_applicability_candidate", "not_assessed"],
+    "required_matrix_record_fields": ["matrix_identifier_and_version", "assessment_timestamp_and_evidence_snapshot_timestamp", "accountable_owner_qualified_reviewer_and_review_date", "immutable_artifact_model_and_supplier_version_or_digest", "proposed_deployment_identifier_environment_jurisdictions_and_operating_entity", "authenticated_tenant_area_project_scope_reference", "intended_purpose_contract_id_version_and_enabled_operation_boundary", "external_facts_and_official_source_references", "role_basis_evidence_and_candidate_role", "obligation_candidate_article_basis_and_qualified_rationale", "obligation_owner_due_date_review_status_and_evidence_reference", "dependencies_gaps_release_stops_and_evidence_expiry", "reassessment_triggers_next_review_date_and_linked_reassessment_work", "independent_release_decision_reference_or_explicit_absence"],
+    "required_row_fields": ["candidate_role", "role_basis_evidence_reference_or_explicit_absence", "external_fact_reference_and_official_source", "candidate_obligation_and_article_reference", "qualified_rationale_and_review_status", "accountable_obligation_owner_or_explicit_absence", "due_date_or_qualified_non_applicability_basis", "evidence_reference_or_explicit_absence", "reassessment_trigger_and_next_review_date", "scope_binding_and_immutable_artifact_reference", "gap_or_release_stop_reference"],
+    "deterministic_review_order": ["Verify immutable artifact, authenticated scope, operating entity, deployment, purpose, external facts, owner, qualified reviewer, review date, rationale, evidence freshness, and reassessment data; any unknown, missing, stale, contradictory or scope-mismatched item is incomplete.", "Bind every review-only role candidate to independently reviewable role-basis evidence and official external facts; repository metadata, prompts, self-description, model output, or an unverified supplier statement is insufficient.", "For every candidate obligation, record qualified article basis, rationale, accountable owner, due date or qualified non-applicability basis, evidence, dependencies, gaps and release stops. Non-applicability requires the same qualified, current, scope-matched evidence and reassessment data as every other row.", "Preserve separately governed authority, policy, approval, transition-gate, Security Floor, independent-verification, evaluation, recognition, delivery-stage and release requirements. An obligation row never grants, transfers, delegates, or proves any of them.", "Create or update a separately governed reassessment work item before any material change, expiry, contradiction, incident, supplier/model change, purpose/deployment change, legal change, or missed due date is treated as resolved."],
+    "mandatory_reassessment_triggers": ["artifact_model_or_model_supplier_change", "provider_deployer_or_downstream_actor_change", "purpose_enabled_operation_or_external_effect_boundary_change", "deployment_scope_jurisdiction_operating_entity_or_affected_people_change", "external_law_guidance_or_standard_change", "evidence_expiry_missing_due_date_missed_due_date_or_contradiction", "incident_complaint_material_misuse_or_control_failure"]
+  },
+  "fail_closed_semantics": {
+    "unknown_role_or_role_basis_evidence": "obligation_matrix_incomplete_and_deployment_specific_release_blocked",
+    "unknown_missing_stale_contradictory_or_scope_mismatched_obligation_evidence": "obligation_matrix_incomplete_and_deployment_specific_release_blocked",
+    "missing_owner_due_date_review_rationale_or_reassessment_data": "obligation_matrix_incomplete_and_deployment_specific_release_blocked",
+    "unqualified_or_unverified_non_applicability_basis": "obligation_matrix_incomplete_and_deployment_specific_release_blocked",
+    "attempt_to_use_matrix_as_authority_or_runtime_enablement": "obligation_matrix_invalid_and_deployment_specific_release_blocked",
+    "no_automatic_role_or_obligation_assignment": true,
+    "no_automatic_ai_act_applicability_or_compliance_conclusion": true,
+    "no_automatic_non_applicability_conclusion": true,
+    "no_authority_policy_approval_or_release_outcome": true,
+    "no_model_deployment_or_runtime_enablement": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability input for separately governed qualified review",
+    "template_is_not": ["legal advice, a legal opinion, or a regulatory determination", "a real provider, deployer, model supplier or downstream-actor assignment", "a conclusion that an obligation applies, is satisfied, is due, is delegated, is waived or is non-applicable", "a model supplier approval, model promotion, deployment, productive-use or release approval", "an authority grant, policy decision, approval, authenticated identity or trusted scope", "a Protected Control Plane, transition-gate, Security Floor, independent-verification or recognition-gate decision", "a protected-state mutation, external effect, runtime capability enablement, maturity, safety or compliance claim"],
+    "release_boundary": "Only separately authorized release governance with qualified current scope-matched review and every applicable Protected Control Plane, legal, security, evaluation, recognition and delivery-stage requirement may decide a concrete deployment. This template has no allow path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_deployment_facts_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies immutable scope and artifact evidence, independently reviewable external facts and role basis, a qualified current obligation matrix with every owner, due date, evidence and reassessment field, and a separately governed release decision.",
+    "next_step": "Create one immutable matrix record per proposed deployment and reassess every affected row when a mandatory trigger occurs before a separately governed release decision."
+  }
+}

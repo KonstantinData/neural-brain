@@ -26,6 +26,7 @@ def _strings(value: object) -> list[str]:
 def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
     assert {path.name for path in CONTRACTS.glob("*.json")} == {
         "action-transition-gate-v1.json",
+        "ai-act-obligation-matrix-v1.json",
         "ai-act-role-assessment-v1.json",
         "ai-act-risk-classification-assessment-v1.json",
         "ai-literacy-competence-evidence-v1.json",
