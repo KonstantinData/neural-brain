@@ -16,25 +16,32 @@ boundary.
 ## Required evidence
 
 One immutable record is required for every proposed artifact, authenticated
-Tenant and Area scope, data-object type, processing activity, and purpose. It
-records technical and accountable owners, controller/processor role evidence,
-purpose, recipients, storage, lifecycle transitions, retention, legal hold,
-rights, deletion responsibility, and a corresponding RoPA evidence reference.
-It holds categories and durable evidence references only.
+Tenant and Area scope, authenticated Project scope and immutable parent
+Tenant/Area lineage when the proposed object is project-bound, data-object type,
+processing activity, and purpose. It records technical and accountable owners,
+controller/processor role evidence, purpose, recipients, storage, lifecycle
+transitions, retention, legal hold, rights, deletion responsibility, and a
+corresponding RoPA evidence reference. It holds categories and durable evidence
+references only. A project-bound record cannot infer Project scope from a label,
+payload, prompt, observation, model response, memory content, or tool output.
 
 ## Fail-closed boundary
 
 Missing, unknown, stale, contradictory, scope-mismatched, non-immutable, or
 unqualified evidence rejects or leaves the intake incomplete and blocks the
-deployment-specific release decision. A missing processing-register reference
-is a release stop. Raw personal data, identifiers, credentials, secrets,
-prompts, and memory payloads are rejected and recorded as data-minimization
-blockers. Catalogue content cannot establish trusted scope or authorize a
-Memory Gate transition, processing, release, authority, or external effect.
+deployment-specific release decision. An unknown or missing Project scope or
+parent lineage for a project-bound object is a release stop. Evidence may never
+be reused across Tenant, Area, or Project boundaries. A missing
+processing-register reference is a release stop. Raw personal data, identifiers,
+credentials, secrets, prompts, and memory payloads are rejected and recorded as
+data-minimization blockers. Catalogue content cannot establish trusted scope or
+authorize a Memory Gate transition, processing, release, authority, or external
+effect.
 
 ## Current blocker
 
-No concrete deployment, authenticated-scope evidence, data-object facts,
+No concrete deployment, authenticated-scope evidence, project-scope and
+parent-lineage evidence for any project-bound object, data-object facts,
 processing activity, RoPA record, or qualified review is present in this
 repository. The future deployment accountable owner must provide all required
 evidence before separate governance and release evaluation.

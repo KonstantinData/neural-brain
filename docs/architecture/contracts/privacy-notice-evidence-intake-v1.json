@@ -1,0 +1,109 @@
+{
+  "document_type": "neural_brain_privacy_notice_evidence_intake_contract",
+  "contract_id": "neural-brain.privacy-notice-evidence-intake",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+  "purpose": "Define a versioned, product- and domain-neutral, fail-closed evidence intake for qualified review of a possible direct- or indirect-collection privacy notice for one proposed processing activity. It records evidence references and explicit dispositions only; it cannot determine legal sufficiency, lawfulness, authority, processing, release, or runtime behavior.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2016/679",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "review_reference": "Articles 13 and 14; any conclusion about notice content, timing, delivery, processing, or lawfulness requires qualified deployment-specific review."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete controller, representative, DPO, processing activity, collection path, data-subject population, recipient, transfer, jurisdiction, or privacy-notice fact.",
+      "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether GDPR, direct or indirect collection, a privacy notice, or any notice element applies to a concrete deployment or processing activity",
+      "whether a controller, representative, DPO, purpose, basis, category, source, recipient, transfer, retention, right, automated decision, complaint route, contact route, delivery, accessibility, version, or timing is sufficient",
+      "whether a concrete system may collect, process, disclose, transfer, be deployed, released, or operated"
+    ]
+  },
+  "privacy_notice_evidence_intake_template": {
+    "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment and processing activity, immutable authenticated Tenant, Area, and Project scope references, intended-purpose contract version, activity/purpose reference combination, jurisdiction, collection path, and possible notice evidence set.",
+    "required_fields": [
+      "intake_identifier_and_contract_version",
+      "intake_timestamp_and_accountable_owner",
+      "qualified_reviewer_qualification_review_date_and_independence_reference",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdiction_evidence",
+      "immutable_authenticated_tenant_area_project_scope_references",
+      "immutable_intended_purpose_contract_id_version_and_purpose_reference",
+      "immutable_processing_activity_identifier_version_and_activity_reference",
+      "collection_path_direct_or_indirect_and_collection_event_evidence_references",
+      "linked_ropa_gdpr_role_applicability_article_6_use_case_and_reassessment_evidence_references",
+      "controller_representative_and_dpo_contact_evidence_references",
+      "purpose_basis_personal_data_category_and_data_subject_category_evidence_references",
+      "indirect_collection_source_category_and_source_information_evidence_references",
+      "recipient_processor_location_and_transfer_boundary_evidence_references",
+      "retention_deletion_and_reassessment_evidence_references",
+      "data_subject_rights_complaint_and_contact_route_evidence_references",
+      "article_22_automated_decision_and_profiling_disposition_evidence_references",
+      "notice_delivery_timing_language_accessibility_and_version_integrity_evidence_references",
+      "explicit_non_applicability_unknown_conflict_gap_and_expiry_dispositions",
+      "review_rationale_verified_evidence_references_release_blockers_and_next_review_date",
+      "mandatory_reassessment_triggers_and_independent_release_decision_reference"
+    ],
+    "scope_binding_requirements": [
+      "Tenant, Area, and Project references must identify immutable authenticated runtime-scope evidence. An intake identifier, collection-path label, notice label, purpose label, activity label, request payload, prompt, observation, model response, memory content, or tool output cannot establish, broaden, or substitute trusted scope.",
+      "Purpose, activity, artifact, jurisdiction, collection path, and notice-version references must name immutable versioned evidence. A privacy-notice evidence intake is limited to its exact artifact, authenticated scope, purpose, activity, jurisdiction, collection path, and notice-version combination; evidence may not be reused across changed combinations without a separate record and qualified review.",
+      "The intake must contain durable evidence references and categories only. It must not contain raw personal data, personal identifiers, notice text, contact values, credentials, secrets, prompts, memory payloads, contracts, legal advice, or unverified external assertions.",
+      "External facts, non-applicability assertions, notice-element evidence, collection-path assertions, expiry claims, delivery claims, and accessibility assertions must identify source, provenance, date, currency, scope, reviewer treatment, and contradiction status. Unknown, stale, contradictory, unauthenticated, or unqualified facts remain explicit release blockers rather than inferred favorable facts."
+    ],
+    "deterministic_review_order": [
+      "Verify every required field, exact immutable artifact, authenticated scope, purpose, activity, jurisdiction, collection path, accountable owner, qualified reviewer, independence, review date, evidence reference, and reassessment trigger; any absent, unknown, stale, contradictory, non-immutable, or scope-mismatched fact is incomplete.",
+      "Verify the linked RoPA, GDPR role, GDPR applicability, Article 6, use-case, and reassessment evidence for the same artifact, authenticated scope, purpose, and activity; a missing or conflicting prerequisite remains a release blocker.",
+      "Record direct or indirect collection-path evidence; controller, representative, and DPO contact evidence; purpose, possible basis, category, data-subject, indirect-source, recipient, transfer, retention, rights, complaint, and contact-route evidence for qualified review only, without selecting, validating, or concluding any notice requirement.",
+      "Record possible Article 22 automated-decision or profiling disposition and notice delivery, timing, language, accessibility, version, integrity, and currency evidence as qualified-review inputs only; a favorable later statement cannot compensate for an unresolved earlier fact.",
+      "Record explicit non-applicability, unknown, conflict, gap, and evidence-expiry dispositions with provenance and reviewer treatment. A non-applicability assertion without qualified scope-matched evidence is incomplete and never an exemption.",
+      "Record release blockers, reassessment triggers, next review date, and independent release-decision reference. A completed intake remains evidence input only and cannot create a legal, authority, collection, processing, deployment, release, or runtime outcome."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_model_supplier_or_deployment_change",
+      "authenticated_tenant_area_project_scope_purpose_activity_jurisdiction_or_collection_path_change",
+      "controller_representative_dpo_contact_or_accountable_owner_change",
+      "purpose_possible_basis_data_category_data_subject_category_source_recipient_processor_location_or_transfer_change",
+      "retention_deletion_rights_complaint_contact_or_article_22_disposition_change",
+      "notice_delivery_timing_language_accessibility_version_integrity_or_currency_change",
+      "external_fact_source_currency_authority_or_qualified_review_change",
+      "evidence_expiry_unknown_conflict_incident_complaint_or_material_misuse_signal"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "privacy_notice_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_or_nonimmutable_authenticated_scope_purpose_activity_jurisdiction_or_collection_path_reference": "reject_intake_and_block_deployment_specific_release_decision",
+    "stale_scope_mismatched_or_contradictory_evidence": "privacy_notice_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_qualified_reviewer_independence_review_date_rationale_evidence_or_reassessment_trigger": "privacy_notice_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unknown_unqualified_stale_or_conflicting_notice_element_external_fact_or_non_applicability_assertion": "privacy_notice_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unresolved_collection_path_contact_purpose_category_source_recipient_transfer_retention_rights_article_22_delivery_accessibility_or_version_evidence": "privacy_notice_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "cross_boundary_or_changed_artifact_purpose_activity_jurisdiction_collection_path_or_notice_version_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+    "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_privacy_notice_sufficiency_or_lawfulness_determination": true,
+    "no_runtime_authorization_collection_processing_activation_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability evidence intake for separately governed qualified legal/privacy review",
+    "template_is_not": [
+      "a legal opinion, privacy-notice sufficiency determination, or compliance certification",
+      "a determination of lawfulness, legal basis, controller identity, collection path, notice applicability, notice timing, delivery sufficiency, accessibility, or data-subject-rights obligation",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, policy, or approval context",
+      "a policy decision, Security Floor override, protected-state transition request, or gate decision",
+      "a collection, processing, disclosure, transfer, deployment, productive-use, or release approval",
+      "a runtime capability enablement or external-effect authorization",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately applicable qualified review, accepted governance, and all Protected Control Plane, transition-gate, evaluation, recognition, and release evidence requirements may decide a concrete processing activity or deployment. This intake never activates a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_processing_scope_collection_path_notice_evidence_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, exact immutable artifact and authenticated scope/purpose/activity/jurisdiction/collection-path evidence, linked prerequisite evidence, qualified independent reviewer and external-fact provenance, possible notice-element and delivery/accessibility/version evidence, explicit dispositions, reassessment triggers, and separately governed release evidence.",
+    "next_step": "Create one immutable privacy-notice evidence intake per proposed artifact, authenticated Tenant/Area/Project scope, purpose, activity, jurisdiction, collection path, and notice version before any collection-specific, processing-specific, or deployment-specific release decision."
+  }
+}

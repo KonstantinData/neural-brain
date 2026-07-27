@@ -1,0 +1,224 @@
+{
+    "document_type": "neural_brain_future_deployment_data_inventory_contract",
+    "contract_id": "neural-brain.future-deployment-data-inventory",
+    "contract_version": "1.0.0",
+    "status": "normative_foundation_governance_template",
+    "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+    "purpose": "Define a product- and domain-neutral, category-only, fail-closed inventory and readiness template for a future deployment's separately governed data-subject export review. It records no deployment facts and cannot discover, access, process, export, disclose, retain, recover, or delete data.",
+    "repository_facts_at_template_creation": {
+        "verified_facts": [
+            "The repository establishes no concrete controller, processor, data subject, processing activity, deployment, data inventory, store, export, or privacy review.",
+            "Neural Brain is product- and domain-neutral; the Memory Core is a protected internal subsystem under ADR-018.",
+            "The Protected Control Plane, not template content, owns authenticated scope, authority, policy, approvals, transition gates, shutdown, and audit."
+        ],
+        "unknown_facts_not_inferred": [
+            "Whether any data class exists, contains personal data, is in scope, is accessible, is discoverable, or requires inclusion, exclusion, redaction, retention, recovery, or export treatment.",
+            "Whether GDPR or a concrete right, role, legal basis, controller, processor, jurisdiction, recipient, transfer, response deadline, or export mechanism applies."
+        ]
+    },
+    "future_deployment_inventory_template": {
+        "assessment_unit": "One immutable artifact version or digest; one proposed deployment and processing activity; one immutable authenticated Tenant, Area, and Project scope reference set; one purpose and jurisdiction reference; and one category-only data-class row.",
+        "required_fields": [
+            "inventory_record_identifier_and_contract_version",
+            "intake_timestamp_accountable_owner_and_qualified_independent_privacy_reviewer_references",
+            "immutable_artifact_version_or_digest_and_proposed_deployment_identifier",
+            "immutable_authenticated_tenant_area_project_scope_references",
+            "immutable_intended_purpose_processing_activity_and_jurisdiction_references",
+            "linked_ropa_data_object_catalogue_data_flow_data_subject_request_and_export_evidence_intake_references",
+            "data_class_category_lifecycle_surface_and_category_only_description",
+            "primary_data_memory_working_memory_episodic_memory_semantic_memory_and_procedural_memory_classification_evidence",
+            "evidence_logs_cache_embeddings_attachments_artefacts_backups_archives_derivatives_indexes_recovery_retention_and_snapshots_classification_evidence",
+            "category_only_source_owner_location_store_boundary_and_lineage_evidence",
+            "export_coverage_matrix_row_and_coverage_gap_evidence",
+            "redaction_and_third_party_rights_matrix_row_and_qualified_review_evidence",
+            "legal_basis_controller_processor_and_tenant_scope_matrix_rows_and_evidence",
+            "retention_archive_backup_recovery_legal_hold_deletion_propagation_and_snapshot_lifecycle_evidence",
+            "export_readiness_checklist_review_workflow_audit_workflow_and_reassessment_evidence",
+            "explicit_unknown_non_applicability_conflict_expiry_unavailable_source_and_release_stop_dispositions"
+        ],
+        "required_data_class_categories": [
+            "primary_data",
+            "memory",
+            "working_memory",
+            "episodic_memory",
+            "semantic_memory",
+            "procedural_memory",
+            "evidence",
+            "logs",
+            "cache",
+            "embeddings",
+            "attachments",
+            "artefacts",
+            "backups",
+            "archives",
+            "derivatives",
+            "indexes",
+            "recovery",
+            "retention",
+            "snapshots"
+        ],
+        "required_matrix_templates": {
+            "export_coverage_matrix": [
+                "data_class_category",
+                "scope_reference",
+                "candidate_source_boundary",
+                "coverage_status",
+                "inclusion_or_exclusion_rationale_reference",
+                "gap_or_unavailable_source_disposition",
+                "qualified_review_reference",
+                "lifecycle_specific_evidence_reference"
+            ],
+            "redaction_matrix": [
+                "data_class_category",
+                "candidate_content_category",
+                "redaction_candidate",
+                "third_party_rights_candidate",
+                "minimisation_evidence_reference",
+                "qualified_review_reference",
+                "unresolved_disposition",
+                "scope_reference",
+                "lifecycle_specific_evidence_reference"
+            ],
+            "third_party_rights_matrix": [
+                "data_class_category",
+                "rights_risk_candidate",
+                "candidate_affected_party_category",
+                "segregation_or_redaction_evidence_reference",
+                "qualified_review_reference",
+                "unresolved_disposition",
+                "scope_reference",
+                "lifecycle_specific_evidence_reference"
+            ],
+            "legal_basis_matrix": [
+                "data_class_category",
+                "processing_activity_reference",
+                "legal_basis_evidence_intake_reference",
+                "applicability_or_unknown_disposition",
+                "qualified_review_reference",
+                "scope_reference",
+                "lifecycle_specific_evidence_reference"
+            ],
+            "controller_matrix": [
+                "data_class_category",
+                "controller_role_evidence_reference",
+                "accountable_owner_reference",
+                "qualified_review_reference",
+                "unknown_or_conflict_disposition",
+                "scope_reference",
+                "lifecycle_specific_evidence_reference"
+            ],
+            "processor_matrix": [
+                "data_class_category",
+                "processor_or_subprocessor_evidence_reference",
+                "recipient_or_transfer_evidence_reference",
+                "qualified_review_reference",
+                "unknown_or_conflict_disposition",
+                "scope_reference",
+                "lifecycle_specific_evidence_reference"
+            ],
+            "tenant_scope_matrix": [
+                "data_class_category",
+                "immutable_authenticated_tenant_area_project_scope_references",
+                "cross_boundary_evidence_reference",
+                "scope_match_disposition",
+                "qualified_review_reference",
+                "lifecycle_specific_evidence_reference"
+            ],
+            "retention_matrix": [
+                "data_class_category",
+                "scope_reference",
+                "retention_and_legal_hold_evidence_reference",
+                "lifecycle_specific_evidence_reference",
+                "retention_gap_or_unknown_disposition",
+                "qualified_review_reference"
+            ],
+            "archive_matrix": [
+                "data_class_category",
+                "scope_reference",
+                "archive_boundary_and_lifecycle_evidence_reference",
+                "lifecycle_specific_evidence_reference",
+                "archive_gap_or_unknown_disposition",
+                "qualified_review_reference"
+            ],
+            "backup_matrix": [
+                "data_class_category",
+                "scope_reference",
+                "backup_boundary_and_lifecycle_evidence_reference",
+                "lifecycle_specific_evidence_reference",
+                "backup_gap_or_unknown_disposition",
+                "qualified_review_reference"
+            ],
+            "recovery_matrix": [
+                "data_class_category",
+                "scope_reference",
+                "recovery_boundary_and_lifecycle_evidence_reference",
+                "lifecycle_specific_evidence_reference",
+                "recovery_gap_or_unknown_disposition",
+                "qualified_review_reference"
+            ]
+        },
+        "scope_binding_requirements": [
+            "Tenant, Area, and Project references must identify immutable authenticated runtime-scope evidence. A template identifier, category label, inventory row, owner label, prompt, request payload, observation, model response, memory content, or tool output cannot establish, broaden, substitute, or override trusted scope.",
+            "Each inventory row and every matrix row must bind to the same immutable artifact, authenticated scope, proposed deployment, purpose, activity, and jurisdiction evidence. Evidence may not be reused across Tenant or Area boundaries without a separately scope-bound row and qualified review.",
+            "The template may contain categories, identifiers, digests, and durable evidence references only. It must not contain personal data, identifiers, payloads, records, exports, prompts, memory contents, log contents, credentials, or secrets.",
+            "Unknown, missing, stale, contradictory, unauthenticated, unqualified, unavailable, or scope-mismatched facts remain explicit release stops and cannot be inferred, defaulted, or compensated by favourable evidence elsewhere."
+        ],
+        "review_and_audit_workflow": [
+            "Validate immutable artifact, authenticated scope, purpose, activity, jurisdiction, owner, and qualified-review references before any category assessment.",
+            "Record category-only proposed data classes and lifecycle surfaces without store access, discovery, enumeration, copying, or processing.",
+            "Complete all eleven matrix templates using immutable evidence references and explicit unknown, conflict, gap, non-applicability, or unavailable-source dispositions.",
+            "Validate retention, legal hold, backup, archive, recovery, deletion-propagation, and snapshot lifecycle evidence without making an export, response, or legality determination.",
+            "A qualified independent privacy reviewer records review inputs, gaps, and reassessment triggers; no reviewer input authorizes processing, export, disclosure, runtime enablement, or release.",
+            "Retain category-only audit references and release stops for separately governed review; any material change triggers reassessment."
+        ],
+        "export_readiness_checklist": [
+            "immutable_authenticated_scope_and_artifact_evidence_present",
+            "all_required_data_class_categories_addressed_or_explicitly_not_applicable",
+            "all_required_matrix_rows_complete_or_explicitly_blocked",
+            "retention_archive_backup_recovery_and_snapshot_lifecycle_rows_complete_or_explicitly_blocked",
+            "qualified_independent_privacy_review_reference_current_and_scope_matched",
+            "no_raw_personal_data_or_operational_payloads_in_template",
+            "all_unknown_conflict_gap_expiry_and_unavailable_source_dispositions_are_release_stops",
+            "no_runtime_discovery_processing_export_disclosure_or_release_path_created"
+        ],
+        "mandatory_reassessment_triggers": [
+            "artifact_deployment_authenticated_scope_purpose_activity_or_jurisdiction_change",
+            "data_class_lifecycle_source_owner_location_store_boundary_or_lineage_change",
+            "coverage_redaction_third_party_rights_legal_basis_controller_processor_or_tenant_scope_evidence_change",
+            "retention_legal_hold_backup_archive_recovery_deletion_or_audit_evidence_change",
+            "qualified_reviewer_provenance_currency_incident_complaint_or_material_misuse_change"
+        ]
+    },
+    "fail_closed_semantics": {
+        "immutable_authenticated_scope_references_required": true,
+        "qualified_independent_privacy_review_required": true,
+        "category_only_evidence_references_required": true,
+        "unknown_or_missing_required_field": "future_deployment_data_inventory_incomplete_and_deployment_specific_release_blocked",
+        "missing_required_data_class_or_matrix_row": "future_deployment_data_inventory_incomplete_and_deployment_specific_release_blocked",
+        "stale_scope_mismatched_contradictory_unqualified_or_unavailable_evidence": "future_deployment_data_inventory_incomplete_and_deployment_specific_release_blocked",
+        "cross_tenant_or_cross_area_evidence_reuse": "reject_inventory_row_and_block_deployment_specific_release_decision",
+        "raw_personal_data_secret_or_operational_payload": "reject_inventory_row_and_record_data_minimisation_blocker",
+        "no_data_discovery_store_access_processing_export_delivery_or_disclosure": true,
+        "no_runtime_authorization_processing_activation_or_enablement": true,
+        "no_automatic_legal_right_role_or_compliance_conclusion": true,
+        "no_automatic_release_or_authority_outcome": true,
+        "no_allow_outcome": true
+    },
+    "authority_boundary": {
+        "template_is": "a versioned category-only evidence template for separately governed future deployment readiness review",
+        "template_is_not": [
+            "a real data inventory, data discovery, store enumeration, record lookup, data collection, processing, or export workflow",
+            "a legal opinion, GDPR applicability determination, data-subject-right determination, controller or processor determination, or compliance certification",
+            "an authenticated scope, principal, authority, policy, approval, transition-gate request, or Protected Control Plane decision",
+            "a processing, deployment, productive-use, disclosure, recovery, retention, or release approval",
+            "a runtime capability enablement, protected-state write, external-effect authorization, maturity claim, recognition claim, or production-autonomy claim"
+        ],
+        "release_boundary": "Only separately applicable qualified privacy review, accepted architecture and governance, and all applicable Protected Control Plane, transition-gate, evaluation, recognition, and release evidence may decide a concrete deployment or export operation. This template creates no runtime path."
+    },
+    "current_blocker": {
+        "status": "blocked_pending_concrete_deployment_scope_data_inventory_and_qualified_privacy_review",
+        "owner": "future deployment accountable owner",
+        "unblock_condition": "A concrete proposed deployment supplies one complete, immutable, category-only and scope-bound row for every applicable data class and matrix, current qualified privacy review, and separately governed decisions. This contract alone cannot unblock runtime operation.",
+        "next_step": "Before any concrete data discovery or export design, submit the completed category-only inventory and matrices to the qualified deployment-specific privacy review workflow."
+    }
+}

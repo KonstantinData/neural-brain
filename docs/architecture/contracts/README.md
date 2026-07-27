@@ -26,6 +26,28 @@ ADR-017.
   budget, resource, fence, sandbox, or external effect.
 - `nb1-hidden-evaluation.json`: label-free candidate boundary, candidate freeze
   receipt, external evaluator custody, and signed evidence intake for EVAL-01 v4.
+- `nb1-independent-evaluation-preparation-v1.json`: preparation-only,
+  fail-closed EVAL-01 v4 candidate-freeze, custody, registry, key, ledger,
+  signature, and review handoff. It creates no candidate, hidden artifact,
+  evaluation, release, recognition, runtime, or external effect.
+- `nb1-independent-evaluation-artifact-manifests-v1.json`: v4-only,
+  non-instantiating schemas for a future freeze receipt and model, evaluation,
+  dataset, and generator manifests. It creates no candidate, data, key,
+  signature, evaluation, release, or recognition result.
+- `nb1-independent-evaluation-organization-v1.json`: preparation-only
+  role, RACI, approval, review, deputy, escalation, and decision matrices for
+  independent evaluation. It appoints no person and creates no authority.
+- `nb1-candidate-freeze-lifecycle-v1.json`: preparation-only lifecycle for a
+  future candidate freeze, immutable external storage, registry handoff,
+  verification, invalidation, and rollback. It creates no artifact or release.
+- `protected-control-kill-switch-v1.json`: proposed, non-authorizing Protected
+  Control Plane target contract for a future kill switch, credential revocation,
+  and safe recovery. It has no runtime, schema, migration, writer, executor,
+  dispatch, credential, deployment, or release authority.
+- `protected-control-kill-switch-test-plan-v1.json`: non-executing,
+  preregistered state, authority, race, failure, and recovery test definitions
+  for the unaccepted Kill-Switch target contract. It does not test or operate a
+  runtime.
 - `stage-capabilities.json`: cumulative NB-0 through NB-8 delivery contract.
 - `recognition-gates.json`: all-required recognition criteria.
 - `evaluation-gates.json`: ordered, non-compensatory G0 through G8 evidence.
@@ -62,6 +84,32 @@ ADR-017.
   under Articles 7, 8, and 9(2)(a). It provides no instance validator, consent
   determination, withdrawal workflow, processing stop, runtime authority, or
   release.
+- `privacy-notice-evidence-intake-v1.json`: immutable, scope-bound direct and
+  indirect collection notice evidence intake for qualified review only. It
+  records required notice-topic evidence without creating a real notice or
+  determining legal, processing, runtime, authority, or release outcomes.
+- `data-subject-request-evidence-intake-v1.json`: immutable, scope-bound DSAR
+  intake/case evidence template for qualified review only. It records identity,
+  deadline, audit, redaction, and escalation evidence without executing a
+  request or enabling processing, runtime, authority, or release.
+- `data-subject-access-export-evidence-intake-v1.json`: immutable,
+  scope-bound, category-only discovery-coverage and access-export evidence
+  intake for qualified review only. It records inventory, redaction,
+  third-party-rights, export, cache, derivative, retention, and deletion-linkage
+  evidence without discovering data, accessing a store, creating or delivering
+  an export, or authorizing processing, runtime, authority, or release outcomes.
+- `future-deployment-data-inventory-v1.json`: category-only, fail-closed future
+  deployment inventory and subject-export-readiness evidence template. It
+  records no real data facts and cannot discover, access, process, export,
+  deliver, disclose, authorize, or release data.
+- `dpia-evidence-intake-v1.json`: immutable, scope-bound DPIA and risk-workflow
+  evidence intake for qualified review only. It records risk, mitigation,
+  residual-risk, approval, review, and Article 36 trigger evidence without
+  determining a risk, approval, consultation, or release outcome.
+- `processor-governance-evidence-intake-v1.json`: immutable, scope-bound
+  processor/subprocessor due-diligence evidence intake for qualified review
+  only. It records Article 28 control evidence without creating terms,
+  appointing a party, or enabling processing, runtime, authority, or release.
 - `prohibited-unsupported-use-v1.json`: deterministic, fail-closed
   classification of immutable prohibited and currently unsupported uses. It has
   no allow, activation, or release outcome and never replaces the Security

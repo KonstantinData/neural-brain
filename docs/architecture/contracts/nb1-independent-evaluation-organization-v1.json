@@ -1,0 +1,493 @@
+{
+    "document_type": "nb1_independent_evaluation_organization_preparation_contract",
+    "format_version": 1,
+    "contract_id": "neural-brain.nb1.independent-evaluation-organization",
+    "contract_version": "1.0.0",
+    "status": "preparation_only_roles_unappointed",
+    "decision": "ADR-018",
+    "scope": {
+        "evaluation_spec": "EVAL-01.NB-1.safe-serial-cognition.v4",
+        "purpose": "Define externally appointed, independently attested roles and decision separation for a future hidden evaluation.",
+        "prohibited": [
+            "role_appointment",
+            "authority_grant",
+            "candidate_acceptance",
+            "hidden_data_attachment",
+            "evaluation_execution",
+            "gate_passage",
+            "stage_release",
+            "recognition_claim",
+            "runtime_or_external_effect"
+        ]
+    },
+    "common_role_requirements": {
+        "identity_and_scope": "Every acting identity, delegated identity, mandate, scope, validity interval, conflict disclosure, and handoff record must be externally attested and accepted before use. Unknown, expired, revoked, self-supplied, or scope-mismatched evidence is denied.",
+        "independence": "Organizational independence requires attested organizations, reporting lines, financial and operational interests. A repository role, branch, worktree, subagent, process label, or identifier prefix is never evidence of independence.",
+        "deputy": "A deputy is separately qualified, conflict-checked, identity-attested, scope-limited, and accepted before activation; a deputy never inherits authority implicitly.",
+        "handoff": "A handoff records outgoing and incoming identities, scope, immutable evidence digests, registry/key status, open exceptions, timestamp, and independent acceptance. Incomplete handoffs block the next decision.",
+        "escalation": "Conflicts, custody loss, suspected leakage, key compromise, ledger inconsistency, or unclear authority are escalated to the Independent Reviewer and Audit Owner; affected evidence becomes inadmissible pending resolution."
+    },
+    "v4_custody_binding": {
+        "logical_duty": "hidden_dataset_provider",
+        "performed_by": "independent_evaluator_only",
+        "separate_provider_organization": "prohibited_until_an_accepted_v4_revalidation_explicitly_changes_this_binding",
+        "independence_preserved": [
+            "independent_evaluator_from_implementation_owner",
+            "independent_evaluator_from_independent_reviewer"
+        ],
+        "reason": "The frozen v4 evaluation custody contract binds hidden dataset, seed, labels, commitment, and scoring to the independent evaluator; organizational separation of provider from evaluator would contradict that frozen contract."
+    },
+    "roles": {
+        "implementation_owner": {
+            "responsibilities": [
+                "prepare public-only source and v4 candidate-freeze submission",
+                "disclose candidate provenance and changes",
+                "remediate reviewer-rejected public artifacts"
+            ],
+            "rights": [
+                "submit public-only freeze receipt",
+                "receive aggregate admissibility outcome and permitted remediation requests"
+            ],
+            "prohibitions": [
+                "hold hidden seed, examples, labels, latent metadata, or per-sequence correctness",
+                "operate hidden scoring or omit attempts",
+                "approve own freeze, evidence, release, or recognition",
+                "control registry or signing-key acceptance"
+            ],
+            "independent_from": [
+                "independent_evaluator",
+                "independent_reviewer",
+                "registry_custodian",
+                "key_custodian"
+            ],
+            "required_evidence": [
+                "identity_and_conflict_attestation",
+                "public_candidate_provenance",
+                "complete_v4_freeze_receipt"
+            ]
+        },
+        "hidden_dataset_provider": {
+            "role_type": "logical_duty_not_a_separate_organizational_role_under_v4",
+            "performed_by": "independent_evaluator_only",
+            "responsibilities": [
+                "retain hidden dataset, seed, labels, and generator-private material",
+                "create pre-run commitment",
+                "attest split isolation and custody without disclosure"
+            ],
+            "rights": ["control hidden artifact access", "submit commitment metadata to reviewer"],
+            "prohibitions": [
+                "exist_as_a_separate_provider_organization_or_actor_under_frozen_v4",
+                "disclose hidden material to implementation owner",
+                "modify frozen candidate or evaluation thresholds",
+                "approve own custody or evaluation admissibility"
+            ],
+            "independent_from": ["implementation_owner", "independent_reviewer"],
+            "required_evidence": [
+                "identity_organization_and_conflict_attestation",
+                "custody_attestation",
+                "pre_run_commitment"
+            ]
+        },
+        "independent_evaluator": {
+            "responsibilities": [
+                "operate fresh network-disabled scoring",
+                "run owned baselines and ablations",
+                "finalize every attempt in append-only ledger",
+                "issue permitted aggregate evidence"
+            ],
+            "rights": [
+                "control evaluation executable and isolated environment",
+                "write evaluator-owned external ledger",
+                "request re-freeze on candidate drift"
+            ],
+            "prohibitions": [
+                "modify frozen candidate, protocol, thresholds, or accepted registries",
+                "return raw hidden data or per-sequence correctness",
+                "approve own independence, release, or recognition"
+            ],
+            "independent_from": [
+                "implementation_owner",
+                "independent_reviewer",
+                "release_authority",
+                "recognition_authority"
+            ],
+            "required_evidence": [
+                "identity_organization_and_conflict_attestation",
+                "isolation_attestation",
+                "ledger_completeness_attestation",
+                "signing_key_custody_attestation"
+            ]
+        },
+        "independent_reviewer": {
+            "responsibilities": [
+                "review role separation, candidate freeze, registry entries, signatures, ledger completeness, and evidence admissibility",
+                "recommend accept, reject, or escalate"
+            ],
+            "rights": [
+                "accept or reject evidence for admissibility recommendation",
+                "require corrective evidence",
+                "escalate conflicts to Audit Owner"
+            ],
+            "prohibitions": [
+                "implement candidate",
+                "operate scoring",
+                "hold hidden material beyond permitted commitment metadata",
+                "issue release or recognition"
+            ],
+            "independent_from": [
+                "implementation_owner",
+                "independent_evaluator",
+                "release_authority",
+                "recognition_authority"
+            ],
+            "required_evidence": [
+                "identity_qualification_and_conflict_attestation",
+                "review_record",
+                "registry_acceptance_record"
+            ]
+        },
+        "registry_custodian": {
+            "responsibilities": [
+                "maintain append-only accepted specification, receipt, commitment, identity, and key-status registry",
+                "record revocation and acceptance references"
+            ],
+            "rights": [
+                "write accepted registry entries after reviewer decision",
+                "publish permitted verification metadata"
+            ],
+            "prohibitions": [
+                "accept own registry entries",
+                "hold private signing keys or hidden artifacts",
+                "alter accepted evidence without immutable superseding record"
+            ],
+            "independent_from": ["implementation_owner", "independent_evaluator", "key_custodian"],
+            "required_evidence": [
+                "custody_and_integrity_attestation",
+                "append_only_operation_record",
+                "revocation_record"
+            ]
+        },
+        "key_custodian": {
+            "responsibilities": [
+                "protect evaluator signing-key lifecycle",
+                "attest public-key fingerprint, validity, compromise, and revocation status"
+            ],
+            "rights": [
+                "activate, suspend, or revoke externally held signing keys",
+                "submit public-key metadata for registry review"
+            ],
+            "prohibitions": [
+                "store keys in repository",
+                "sign evidence without evaluator-run authorization",
+                "accept own key into registry",
+                "issue gate, release, or recognition decisions"
+            ],
+            "independent_from": [
+                "implementation_owner",
+                "registry_custodian",
+                "independent_reviewer",
+                "release_authority"
+            ],
+            "required_evidence": [
+                "key_custody_attestation",
+                "public_key_fingerprint",
+                "revocation_and_compromise_process"
+            ]
+        },
+        "audit_owner": {
+            "responsibilities": [
+                "own audit completeness and escalation tracking",
+                "preserve decision and exception records",
+                "verify required review records exist"
+            ],
+            "rights": [
+                "open audit exceptions",
+                "require evidence completion before closure",
+                "escalate unresolved integrity concerns"
+            ],
+            "prohibitions": [
+                "alter technical evidence",
+                "approve own audit closure",
+                "replace reviewer admissibility or release authority"
+            ],
+            "independent_from": [
+                "implementation_owner",
+                "independent_evaluator",
+                "release_authority"
+            ],
+            "required_evidence": ["audit_mandate", "exception_ledger", "closure_review_record"]
+        },
+        "release_authority": {
+            "responsibilities": [
+                "make separately authorized stage-release decisions only after all required gates and control evidence",
+                "record denial and scope"
+            ],
+            "rights": [
+                "approve or deny a release request within accepted policy",
+                "require independent evidence and control review"
+            ],
+            "prohibitions": [
+                "treat preparation, signature, or admissibility as a gate pass",
+                "override security floor, missing authority, or unknown evidence",
+                "perform recognition decision"
+            ],
+            "independent_from": [
+                "implementation_owner",
+                "independent_evaluator",
+                "recognition_authority"
+            ],
+            "required_evidence": [
+                "authenticated_mandate",
+                "complete_gate_evidence",
+                "independent_review_recommendation",
+                "release_decision_record"
+            ]
+        },
+        "recognition_authority": {
+            "responsibilities": [
+                "assess recognition only under the Recognition Standard and complete non-compensatory evidence",
+                "record rationale and denial"
+            ],
+            "rights": [
+                "accept or reject a recognition claim after authorized independent G8 validation",
+                "request missing evidence"
+            ],
+            "prohibitions": [
+                "recognize on EVAL-01 alone",
+                "equate preparation or release with recognition",
+                "override unknown or failed recognition gates"
+            ],
+            "independent_from": [
+                "implementation_owner",
+                "independent_evaluator",
+                "release_authority"
+            ],
+            "required_evidence": [
+                "authenticated_mandate",
+                "complete_recognition_gate_evidence",
+                "independent_g8_validation",
+                "recognition_decision_record"
+            ]
+        }
+    },
+    "matrices": {
+        "raci": [
+            {
+                "activity": "public_candidate_freeze_submission",
+                "responsible": "implementation_owner",
+                "accountable": "implementation_owner",
+                "consulted": ["independent_reviewer"],
+                "informed": ["audit_owner"]
+            },
+            {
+                "activity": "hidden_commitment",
+                "responsible": "independent_evaluator",
+                "accountable": "independent_evaluator",
+                "consulted": ["independent_reviewer"],
+                "informed": ["audit_owner"]
+            },
+            {
+                "activity": "hidden_scoring_and_ledger",
+                "responsible": "independent_evaluator",
+                "accountable": "independent_evaluator",
+                "consulted": [],
+                "informed": ["independent_reviewer", "audit_owner"]
+            },
+            {
+                "activity": "evidence_admissibility_recommendation",
+                "responsible": "independent_reviewer",
+                "accountable": "independent_reviewer",
+                "consulted": ["registry_custodian", "key_custodian"],
+                "informed": ["audit_owner", "release_authority"]
+            },
+            {
+                "activity": "registry_integrity",
+                "responsible": "registry_custodian",
+                "accountable": "registry_custodian",
+                "consulted": ["independent_reviewer"],
+                "informed": ["audit_owner"]
+            },
+            {
+                "activity": "key_lifecycle",
+                "responsible": "key_custodian",
+                "accountable": "key_custodian",
+                "consulted": ["independent_reviewer", "registry_custodian"],
+                "informed": ["audit_owner"]
+            },
+            {
+                "activity": "audit_exception_closure",
+                "responsible": "audit_owner",
+                "accountable": "audit_owner",
+                "consulted": ["independent_reviewer"],
+                "informed": ["release_authority"]
+            },
+            {
+                "activity": "stage_release_decision",
+                "responsible": "release_authority",
+                "accountable": "release_authority",
+                "consulted": ["independent_reviewer", "audit_owner"],
+                "informed": ["recognition_authority"]
+            },
+            {
+                "activity": "recognition_decision",
+                "responsible": "recognition_authority",
+                "accountable": "recognition_authority",
+                "consulted": ["independent_reviewer", "audit_owner"],
+                "informed": ["release_authority"]
+            }
+        ],
+        "approval": [
+            {
+                "decision": "role_and_separation_acceptance",
+                "required_approver": "designated_independent_review_authority",
+                "evidence": [
+                    "identity",
+                    "qualification",
+                    "conflict",
+                    "organization",
+                    "reporting_line",
+                    "custody"
+                ]
+            },
+            {
+                "decision": "freeze_admissibility",
+                "required_approver": "independent_reviewer",
+                "evidence": [
+                    "complete_v4_freeze_receipt",
+                    "digest_recomputation",
+                    "hidden_data_exclusion"
+                ]
+            },
+            {
+                "decision": "evidence_admissibility",
+                "required_approver": "independent_reviewer",
+                "evidence": [
+                    "registry_verification",
+                    "signature_verification",
+                    "complete_ledger",
+                    "contamination_report"
+                ]
+            },
+            {
+                "decision": "stage_release",
+                "required_approver": "release_authority",
+                "evidence": [
+                    "complete_required_gates",
+                    "independent_review",
+                    "security_and_control_evidence"
+                ]
+            },
+            {
+                "decision": "recognition",
+                "required_approver": "recognition_authority",
+                "evidence": ["all_non_compensatory_recognition_gates", "independent_g8_validation"]
+            }
+        ],
+        "review": [
+            {
+                "subject": "identity_separation_and_conflict",
+                "reviewer": "independent_reviewer",
+                "must_be_external": true
+            },
+            {
+                "subject": "registry_and_key_status",
+                "reviewer": "independent_reviewer",
+                "must_be_external": true
+            },
+            {
+                "subject": "candidate_freeze_and_evidence_admissibility",
+                "reviewer": "independent_reviewer",
+                "must_be_external": true
+            },
+            {"subject": "audit_completeness", "reviewer": "audit_owner", "must_be_external": true},
+            {
+                "subject": "release_request",
+                "reviewer": "release_authority",
+                "must_be_external": true
+            },
+            {
+                "subject": "recognition_request",
+                "reviewer": "recognition_authority",
+                "must_be_external": true
+            }
+        ],
+        "deputy": [
+            {
+                "role": "all_roles",
+                "activation_requires": [
+                    "separate_identity",
+                    "qualification",
+                    "conflict_check",
+                    "independence_attestation",
+                    "scope_limited_mandate",
+                    "accepted_handoff"
+                ],
+                "implicit_delegation": false
+            },
+            {
+                "role": "independent_reviewer",
+                "additional_constraint": "Deputy must remain independent from implementation owner, provider, evaluator, release authority, and recognition authority."
+            }
+        ],
+        "escalation": [
+            {
+                "trigger": "conflict_or_unclear_authority",
+                "first_recipient": "independent_reviewer",
+                "oversight": "audit_owner",
+                "effect": "block_affected_decision"
+            },
+            {
+                "trigger": "hidden_data_leakage_or_custody_loss",
+                "first_recipient": "independent_reviewer",
+                "oversight": "audit_owner",
+                "effect": "invalidate_evidence_and_block_gate_review"
+            },
+            {
+                "trigger": "key_compromise_or_registry_inconsistency",
+                "first_recipient": "key_custodian",
+                "oversight": "independent_reviewer",
+                "effect": "revoke_or_reject_key_and_block_evidence"
+            },
+            {
+                "trigger": "ledger_gap_or_post_freeze_drift",
+                "first_recipient": "independent_evaluator",
+                "oversight": "independent_reviewer",
+                "effect": "evidence_not_admissible"
+            }
+        ],
+        "decision": [
+            {
+                "decision": "appoint_roles",
+                "owner": "designated_independent_review_authority",
+                "repository_authorization": false
+            },
+            {
+                "decision": "accept_registry_or_key",
+                "owner": "independent_reviewer",
+                "repository_authorization": false
+            },
+            {
+                "decision": "admit_evaluation_evidence",
+                "owner": "independent_reviewer",
+                "repository_authorization": false
+            },
+            {
+                "decision": "release",
+                "owner": "release_authority",
+                "repository_authorization": false
+            },
+            {
+                "decision": "recognition",
+                "owner": "recognition_authority",
+                "repository_authorization": false
+            }
+        ]
+    },
+    "fail_closed": {
+        "unappointed_or_unattested_role": "blocked",
+        "role_conflict_or_insufficient_independence": "blocked",
+        "missing_deputy_or_handoff_record": "blocked",
+        "unclear_decision_owner_or_scope": "blocked",
+        "attempt_to_derive_authority_from_this_contract": "prohibited"
+    }
+}

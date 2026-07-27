@@ -4,6 +4,11 @@ This directory contains the versioned desired repository-governance state for
 Neural Brain. The normative contract is
 [`repository-policy.json`](repository-policy.json).
 
+[`relationship-memory-access-purpose-agent-scope-matrix-v1.md`](relationship-memory-access-purpose-agent-scope-matrix-v1.md)
+and [`relationship-memory-privacy-retention-correction-matrix-v1.md`](relationship-memory-privacy-retention-correction-matrix-v1.md)
+define preparation-only, fail-closed Relationship Memory future boundaries.
+They do not assign roles, authorize processing, or enable runtime access.
+
 The authoritative repository-facing inventory of implemented and target AI
 components, models, datasets, adapters, integrations, data flows, tools, and
 deployment boundaries is [`ai-component-inventory.md`](ai-component-inventory.md).
@@ -59,6 +64,61 @@ fail-closed documentation preparation for possible consent evidence. It does
 not validate an intake, perform qualified review, determine consent validity,
 lawfulness, authority, processing, deployment,
 release, or runtime behavior.
+
+[`privacy-notice-evidence-intake-v1.md`](privacy-notice-evidence-intake-v1.md)
+defines a fail-closed notice-evidence intake for direct and indirect collection.
+It neither creates a notice nor determines legal, processing, deployment,
+release, authority, or runtime behavior.
+
+[`data-subject-request-evidence-intake-v1.md`](data-subject-request-evidence-intake-v1.md)
+defines a fail-closed DSAR evidence intake and case-tracking template. It does
+not receive a real request, verify an identity, process data, or enable runtime,
+authority, or release.
+
+[`data-subject-access-export-evidence-intake-v1.md`](data-subject-access-export-evidence-intake-v1.md)
+defines a fail-closed, category-only evidence intake for separately governed
+review of possible subject-data discovery coverage and access-export readiness.
+It does not discover data, access a store, create or deliver an export, disclose
+data, process data, or enable legal, authority, runtime, or release outcomes.
+
+[`future-deployment-data-inventory-v1.md`](future-deployment-data-inventory-v1.md)
+defines a category-only future-deployment inventory and subject-export-readiness
+template. It records no real deployment facts and cannot discover, access,
+process, export, deliver, disclose, authorize, or release data.
+
+[`nb1-independent-evaluation-preparation-v1.md`](nb1-independent-evaluation-preparation-v1.md)
+defines EVAL-01 v4 preparation requirements for candidate freeze, external
+custody, registries, ledger, signatures, and review. It creates no candidate,
+hidden artifact, evaluation, release, recognition, runtime, or external effect.
+
+[`protected-control-kill-switch-v1.md`](protected-control-kill-switch-v1.md)
+defines an unaccepted, non-authorizing target contract for a future Protected
+Control Plane kill switch, credential revocation, and recovery capability. It
+does not implement or authorize any control-plane runtime behavior.
+
+[`nb1-independent-evaluation-organization-v1.md`](nb1-independent-evaluation-organization-v1.md)
+defines non-appointing independent-evaluation roles, separation, conflicts,
+delegation, handoff, and decision matrices; unknown or self-certified role facts
+fail closed and create no authority.
+
+[`nb1-candidate-freeze-lifecycle-v1.md`](nb1-candidate-freeze-lifecycle-v1.md)
+defines preparation-only candidate-freeze, registry, immutable-storage,
+verification, invalidation, and rollback governance; it creates no candidate or
+release.
+
+[`future-deployment-subject-export-review-checklist-v1.md`](future-deployment-subject-export-review-checklist-v1.md)
+defines a category-only review and audit checklist for future subject-export
+readiness; it does not review real data or authorize a discovery or export.
+
+[`dpia-evidence-intake-v1.md`](dpia-evidence-intake-v1.md) defines a
+fail-closed DPIA/risk evidence intake. It does not determine risk, approve a
+DPIA, require consultation, or authorize processing, runtime, authority, or
+release.
+
+[`processor-governance-evidence-intake-v1.md`](processor-governance-evidence-intake-v1.md)
+defines a fail-closed processor/subprocessor due-diligence evidence intake. It
+does not create terms, appoint a party, determine Article 28 sufficiency, or
+authorize processing, runtime, authority, or release.
 
 [`compliance-raci-assessment-v1.md`](compliance-raci-assessment-v1.md) defines
 a fail-closed input template for qualified deployment-specific responsibility,

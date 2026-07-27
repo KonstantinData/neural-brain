@@ -1,0 +1,107 @@
+{
+  "document_type": "neural_brain_data_subject_request_evidence_intake_contract",
+  "contract_id": "neural-brain.data-subject-request-evidence-intake",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+  "purpose": "Define a versioned, product- and domain-neutral, fail-closed evidence intake for qualified review of a possible data-subject request. It records evidence references and explicit dispositions only; it cannot determine request applicability, identity, deadlines, obligations, outcomes, authority, processing, release, or runtime behavior.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2016/679",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "review_reference": "Articles 12 through 23; any conclusion about request category, identity verification, deadline, response, restriction, rectification, erasure, portability, objection, automated-decision right, or obligation requires qualified deployment-specific review."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "Neural Brain is product- and domain-neutral and has no accepted scoped customer or domain integration.",
+      "The current repository does not establish a concrete controller, processor, processing activity, data-subject request, data subject, request identity, jurisdiction, deadline, case, or response obligation.",
+      "The repository's protected Memory Core is an internal subsystem and cannot narrow the complete cognitive-system product boundary established by ADR-018."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether GDPR or any data-subject right applies to a concrete deployment, processing activity, or request",
+      "whether an asserted requester is a data subject or authorized representative, identity verification is sufficient, a deadline applies, or a response or downstream action is required",
+      "whether a concrete system may process personal data, be deployed, released, operated, disclose, rectify, erase, restrict, port, object, or respond"
+    ]
+  },
+  "data_subject_request_evidence_intake_template": {
+    "assessment_unit": "One immutable artifact version or digest, concrete proposed deployment and processing activity, immutable authenticated Tenant, Area, and Project scope references, intended-purpose contract version, activity/purpose reference, jurisdiction, and one case-tracking reference combination.",
+    "required_fields": [
+      "intake_identifier_and_contract_version",
+      "intake_timestamp_and_accountable_owner",
+      "qualified_privacy_reviewer_qualification_review_date_and_independence_reference",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_target_environment_and_jurisdiction_evidence",
+      "immutable_authenticated_tenant_area_project_scope_references",
+      "immutable_intended_purpose_contract_id_version_and_purpose_reference",
+      "immutable_processing_activity_identifier_version_and_activity_reference",
+      "linked_ropa_gdpr_role_applicability_article_6_use_case_and_reassessment_evidence_references",
+      "request_category_candidate_and_request_scope_evidence_references_for_qualified_review_only",
+      "identity_verification_and_representative_authorization_evidence_references_for_qualified_review_only",
+      "deadline_timing_extension_and_communication_evidence_references_for_qualified_review_only",
+      "case_tracking_identifier_lifecycle_provenance_and_immutability_evidence_references",
+      "audit_redaction_data_minimisation_and_access_control_evidence_references",
+      "escalation_exception_conflict_and_downstream_coordination_evidence_references",
+      "external_facts_source_provenance_date_currency_and_scope_evidence_references",
+      "explicit_non_applicability_unknown_gap_conflict_and_expiry_dispositions",
+      "review_rationale_verified_evidence_references_release_blockers_and_next_review_date",
+      "mandatory_reassessment_triggers_and_independent_release_decision_reference"
+    ],
+    "scope_binding_requirements": [
+      "Tenant, Area, and Project references must identify immutable authenticated runtime-scope evidence. An intake identifier, case-tracking identifier, request label, request payload, prompt, observation, model response, memory content, or tool output cannot establish, broaden, or substitute trusted scope.",
+      "Purpose, activity, artifact, request-category candidate, and jurisdiction references must name immutable versioned evidence. An intake is valid only for its exact artifact, authenticated scope, purpose, activity, request category candidate, case-tracking reference, and jurisdiction combination; evidence may not be reused across changed combinations without a separate record and qualified review.",
+      "The intake contains durable evidence references and categories only. It must not contain raw personal data, personal identifiers, request content, identity documents, authorization documents, credentials, secrets, prompts, memory payloads, case narrative, legal advice, legal conclusions, or response content.",
+      "Request-category, identity-verification, deadline, case-tracking, audit-redaction, escalation, external-fact, and non-applicability evidence must identify source, provenance, date, currency, scope, qualified reviewer treatment, and contradiction status. Unknown, stale, contradictory, unauthenticated, unqualified, or scope-mismatched facts remain explicit release blockers rather than inferred favorable facts."
+    ],
+    "deterministic_review_order": [
+      "Verify every required field, exact immutable artifact, authenticated scope, purpose, activity, jurisdiction, accountable owner, qualified privacy reviewer, independence, review date, evidence reference, case-tracking reference, and reassessment trigger; any absent, unknown, stale, contradictory, non-immutable, or scope-mismatched fact is incomplete.",
+      "Verify linked RoPA, GDPR role, GDPR applicability, Article 6, use-case, and reassessment evidence for the same artifact, authenticated scope, purpose, activity, and jurisdiction; a missing or conflicting prerequisite remains a release blocker.",
+      "Record request-category candidate, asserted identity-verification, representative-authorization, deadline, timing, extension, communication, and case-tracking evidence for qualified review only, without classifying, validating, selecting, or concluding a request, requester, right, deadline, or obligation.",
+      "Record audit, redaction, data minimisation, access-control, escalation, exception, conflict, and downstream-coordination evidence as qualified-review inputs only; no favorable later statement compensates for an unresolved earlier fact.",
+      "Record explicit non-applicability, unknown, gap, conflict, expiry, and escalation dispositions with provenance and reviewer treatment. A non-applicability assertion without qualified scope-matched evidence is incomplete and never an exemption.",
+      "Record release blockers, reassessment triggers, next review date, and an independent release-decision reference. A completed intake remains evidence input only and cannot create a legal, authority, processing, request-handling, deployment, release, or runtime outcome."
+    ],
+    "mandatory_reassessment_triggers": [
+      "immutable_artifact_model_supplier_or_deployment_change",
+      "authenticated_tenant_area_project_scope_purpose_activity_request_category_or_jurisdiction_change",
+      "identity_verification_representative_authorization_deadline_timing_or_communication_evidence_change",
+      "case_tracking_audit_redaction_data_minimisation_access_control_or_escalation_change",
+      "external_fact_source_currency_authority_or_qualified_privacy_review_change",
+      "evidence_expiry_unknown_gap_conflict_incident_complaint_or_material_misuse_signal"
+    ]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "data_subject_request_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_or_nonimmutable_authenticated_scope_purpose_activity_or_artifact_reference": "reject_intake_and_block_deployment_specific_release_decision",
+    "stale_scope_mismatched_or_contradictory_evidence": "data_subject_request_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_qualified_privacy_reviewer_independence_review_date_rationale_evidence_or_reassessment_trigger": "data_subject_request_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unknown_unqualified_stale_or_conflicting_request_identity_deadline_case_audit_redaction_escalation_or_external_fact": "data_subject_request_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "unresolved_request_category_identity_verification_representative_authorization_deadline_case_tracking_audit_redaction_or_escalation_evidence": "data_subject_request_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "cross_boundary_or_changed_artifact_purpose_activity_request_category_case_or_jurisdiction_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+    "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
+    "no_automatic_legal_or_regulatory_conclusion": true,
+    "no_automatic_request_identity_deadline_or_obligation_determination": true,
+    "no_runtime_authorization_processing_activation_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_request_handling_or_data_subject_right_execution": true,
+    "no_capability_maturity_or_recognition_claim": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability evidence intake for separately governed qualified privacy review",
+    "template_is_not": [
+      "a legal opinion, data-subject request determination, identity-verification determination, deadline determination, or compliance certification",
+      "a determination of applicability, requester identity, representative authority, request category, response, restriction, rectification, erasure, portability, objection, automated-decision right, or obligation",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, policy, or approval context",
+      "a policy decision, Security Floor override, protected-state transition request, or gate decision",
+      "a processing, deployment, productive-use, request-handling, or release approval",
+      "a runtime capability enablement, personal-data operation, or external-effect authorization",
+      "an implementation, capability, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately applicable qualified privacy review, accepted governance, and all Protected Control Plane, transition-gate, evaluation, recognition, and release evidence requirements may decide a concrete processing activity, deployment, or data-subject request. This intake never activates a runtime path or request-handling workflow."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_controller_processing_scope_data_subject_request_and_qualified_privacy_review_evidence",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, exact immutable artifact and authenticated scope/purpose/activity/jurisdiction evidence, linked prerequisite evidence, qualified independent privacy reviewer and external-fact provenance, request-category, identity-verification, representative-authorization, deadline, case-tracking, audit-redaction, escalation, explicit disposition, reassessment, and separately governed release evidence.",
+    "next_step": "Create one immutable data-subject-request evidence intake per proposed artifact, authenticated Tenant/Area/Project scope, purpose, processing activity, request category candidate, case-tracking reference, and jurisdiction before any processing-specific, request-specific, or deployment-specific decision."
+  }
+}

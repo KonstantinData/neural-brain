@@ -1,0 +1,331 @@
+{
+    "document_type": "nb1_candidate_freeze_lifecycle_preparation_contract",
+    "format_version": 1,
+    "contract_id": "neural-brain.nb1.candidate-freeze-lifecycle",
+    "contract_version": "1.0.0",
+    "status": "preparation_only_no_candidate_or_release_authority",
+    "decisions": ["ADR-018"],
+    "applies_to": "EVAL-01.NB-1.safe-serial-cognition.v4 public-only candidate preparation",
+    "non_authorization": {
+        "creates_candidate": false,
+        "stores_candidate_artifact": false,
+        "creates_or_registers_key": false,
+        "signs_or_verifies_external_evidence": false,
+        "attaches_hidden_artifact": false,
+        "runs_evaluation": false,
+        "passes_gate_or_authorizes_release": false,
+        "enables_runtime_or_external_effect": false
+    },
+    "freeze_states": {
+        "draft": "Preparation record only; no candidate artifact is admissible.",
+        "submitted": "Public-only package submitted to independent reviewer; no hidden attachment or evaluation is allowed.",
+        "accepted": "Reviewer recomputed all receipt bindings; candidate admissibility only, never a gate or release result.",
+        "invalidated": "A binding, signature status, scope, or reproducibility condition is missing, changed, unknown, or rejected.",
+        "superseded": "A later accepted receipt explicitly replaces an earlier receipt; prior receipt remains immutable."
+    },
+    "transition_rules": [
+        {
+            "from": "draft",
+            "to": "submitted",
+            "requires": [
+                "clean_committed_source_tree",
+                "complete_public_only_bundle",
+                "all_required_manifest_fields",
+                "canonical_digest_map"
+            ],
+            "forbids": [
+                "hidden_artifact_attachment",
+                "hidden_seed_or_label_access",
+                "evaluation_execution",
+                "release_claim"
+            ]
+        },
+        {
+            "from": "submitted",
+            "to": "accepted",
+            "requires": [
+                "independent_reviewer_identity_and_separation_attestation",
+                "reviewer_recomputed_all_bindings",
+                "accepted_registry_reference",
+                "complete_verification_record"
+            ],
+            "forbids": [
+                "self_acceptance",
+                "signature_as_substitute_for_review",
+                "gate_or_release_claim"
+            ]
+        },
+        {
+            "from": ["draft", "submitted", "accepted"],
+            "to": "invalidated",
+            "requires_any": [
+                "binding_change",
+                "unknown_or_missing_field",
+                "digest_mismatch",
+                "manifest_drift",
+                "version_drift",
+                "incomplete_bundle",
+                "untrusted_or_invalid_signature",
+                "scope_or_custody_violation"
+            ],
+            "effect": "Hidden attachment, evaluation admissibility, and downstream handoff are blocked; the prior receipt remains immutable evidence."
+        },
+        {
+            "from": ["accepted", "invalidated"],
+            "to": "superseded",
+            "requires": [
+                "new_complete_receipt",
+                "explicit_prior_receipt_reference",
+                "new_independent_reviewer_acceptance"
+            ],
+            "effect": "No artifact is overwritten; the registry records the immutable supersession relation."
+        }
+    ],
+    "canonicalization_and_hashing": {
+        "profile_id": "nb1-eval-canonical-json-v1",
+        "profile_definition_source": "docs/architecture/contracts/nb1-independent-evaluation-artifact-manifests-v1.json#/canonicalization/byte_profile",
+        "artifact_kind_mapping_source": "docs/architecture/contracts/nb1-independent-evaluation-artifact-manifests-v1.json#/canonicalization/artifact_kind_byte_rules",
+        "canonical_text": "Use exactly the artifact-kind rule selected from artifact_kind_mapping_source; no local alternative or partial summary is permitted.",
+        "canonical_json": "Use exactly the canonical_json_object rule selected from artifact_kind_mapping_source; no local alternative or partial summary is permitted.",
+        "profile_requirements": [
+            "UTF-8 without byte-order mark",
+            "LF line endings",
+            "deterministic Unicode code-point ordering",
+            "sorted object keys",
+            "compact JSON separators",
+            "no NaN",
+            "no Infinity",
+            "v4-defined decimal values are strings"
+        ],
+        "digest_algorithm": "SHA-256",
+        "digest_encoding": "lowercase hexadecimal",
+        "hash_workflow": [
+            "Enumerate declared public-only artifacts deterministically by canonical relative path.",
+            "Classify every eligible artifact using nb1-eval-canonical-json-v1 artifact_kind_mapping_source and apply exactly its selected byte rule without altering source evidence.",
+            "Calculate individual SHA-256 digests.",
+            "Create and digest canonical JSON manifest mapping identifiers to digests and sizes.",
+            "Bind manifest digest and profile_id in the freeze receipt.",
+            "Independent reviewer recomputes the map with the same nb1-eval-canonical-json-v1 artifact-kind mapping source from the accepted public-only bundle."
+        ],
+        "prohibited_hash_inputs": [
+            "hidden_seed",
+            "hidden_examples",
+            "expected_labels",
+            "private_keys",
+            "signing_tokens",
+            "raw_per_sequence_outcomes"
+        ]
+    },
+    "required_receipt": {
+        "receipt_version": "1.0.0",
+        "required_fields": [
+            "receipt_id",
+            "candidate_semver",
+            "source_commit",
+            "source_tree_digest",
+            "candidate_artifact_digest",
+            "candidate_bundle_manifest_digest",
+            "model_manifest_digest",
+            "evaluation_manifest_digest",
+            "parameter_digest",
+            "training_artifact_digest",
+            "public_train_artifact_digest",
+            "public_development_artifact_digest",
+            "dataset_and_split_digests",
+            "training_code_digest",
+            "candidate_code_digest",
+            "evaluation_contract_digest",
+            "evaluation_spec_digest",
+            "generator_contract_digest",
+            "dependency_lock_digest",
+            "fixed_train_derived_majority_label",
+            "canonicalization_profile",
+            "artifact_registry_reference",
+            "prepared_at",
+            "claim_boundary"
+        ],
+        "claim_boundary": "Receipt acceptance proves only complete reviewer-recomputed public bundle bindings; it never proves a model claim, independence, hidden-data non-observation, evaluation, gate passage, release, recognition, runtime capability, or external-effect authority.",
+        "immutable_after_submission": true,
+        "receipt_signature_policy": "No signature is created by this repository task. If an external signature is required by a future accepted process, it must be detached Ed25519, registry-bound, independently verified, and rejected if unknown, expired, revoked, mismatched, self-signed, or invalid."
+    },
+    "required_manifests": {
+        "model_manifest": [
+            "manifest_version",
+            "candidate_semver",
+            "model_architecture_identifier",
+            "candidate_code_digest",
+            "parameter_digest",
+            "training_code_digest",
+            "training_artifact_digest",
+            "public_train_artifact_digest",
+            "public_development_artifact_digest",
+            "dataset_and_split_digests",
+            "evaluation_spec_digest",
+            "generator_contract_digest",
+            "dependency_lock_digest",
+            "resource_bound_declaration",
+            "provenance_and_licence_references"
+        ],
+        "evaluation_manifest": [
+            "manifest_version",
+            "evaluation_protocol_identifier_and_digest",
+            "evaluation_spec_digest",
+            "generator_contract_digest",
+            "candidate_bundle_digest",
+            "baseline_and_ablation_declarations",
+            "threshold_and_failure_criterion_declarations",
+            "confidence_interval_method_declaration",
+            "resource_budget_declaration",
+            "environment_digest",
+            "evaluation_executable_digest",
+            "hidden_input_exclusion_declaration"
+        ],
+        "manifest_policy": "Every field, digest, semantic-version, canonicalization profile, source, dependency, model, parameter, protocol, threshold, or generator change invalidates the receipt and requires a new receipt and reviewer acceptance."
+    },
+    "versioning_and_supersession": {
+        "candidate_version_scheme": "Semantic Versioning 2.0.0",
+        "receipt_version_scheme": "Semantic Versioning 2.0.0",
+        "allowed_candidate_version": "A declared immutable v4-bound public candidate version only.",
+        "prohibited": [
+            "silent_rebuild",
+            "mutable_tag",
+            "reusing_receipt_for_changed_artifact",
+            "backdating",
+            "overwriting_registry_entry",
+            "using_rejected_eval_v3"
+        ],
+        "supersession_requirements": [
+            "new_receipt_id",
+            "prior_receipt_id",
+            "reason_code",
+            "complete_new_digest_map",
+            "independent_reviewer_acceptance",
+            "immutable_prior_record"
+        ]
+    },
+    "registry_and_immutable_storage": {
+        "artifact_registry_owner": "independent_reviewer_or_designated_registry_custodian",
+        "required_registry_fields": [
+            "receipt_id",
+            "candidate_semver",
+            "candidate_bundle_digest",
+            "receipt_digest",
+            "state",
+            "supersedes_receipt_id_or_null",
+            "accepted_at_or_null",
+            "reviewer_acceptance_reference_or_null",
+            "revocation_or_invalidation_reference_or_null"
+        ],
+        "storage_requirement": "Accepted public-only bundles, manifests, receipts, digest maps, and verification records require immutable or write-once retention with access audit, retention policy, and retrieval integrity verification. This contract configures no storage.",
+        "registry_boundary": "The repository may define references only. It must not contain a hidden artifact, private key, signing token, real registry entry, or claimed acceptance.",
+        "unknown_registry_state": "not_admissible"
+    },
+    "verification_and_handoff": {
+        "reviewer_verification_steps": [
+            "Confirm scope is EVAL-01 v4 public-only preparation and v3 is not used.",
+            "Confirm clean source tree and complete receipt/manifest fields.",
+            "Obtain declared public-only bundle from immutable storage without hidden inputs.",
+            "Recompute canonical digests, manifest digests, and bundle digest independently.",
+            "Check SemVer, supersession, registry state, dependency lock, generator/specification bindings, and claim boundary.",
+            "Record accept, reject, or invalidate outcome externally without altering submitted bytes."
+        ],
+        "permitted_handoff_after_acceptance": [
+            "receipt_id",
+            "candidate_bundle_digest",
+            "accepted_registry_reference",
+            "public-only verification summary"
+        ],
+        "handoff_forbidden": [
+            "hidden_seed",
+            "hidden_examples",
+            "expected_labels",
+            "scores",
+            "per_sequence_correctness",
+            "private_key",
+            "signing_token",
+            "gate_or_release_decision"
+        ],
+        "downstream_boundary": "An accepted receipt may be presented to a separately governed hidden-attachment review only. It cannot itself attach hidden material or begin, pass, or report EVAL-01."
+    },
+    "invalidation_and_rollback": {
+        "invalidation_triggers": [
+            "post_freeze_source_change",
+            "artifact_digest_mismatch",
+            "manifest_or_version_drift",
+            "incomplete_or_ambiguous_receipt",
+            "untrusted_signature_status",
+            "registry_revocation",
+            "custody_or_scope_violation",
+            "canonicalization_not_reproducible"
+        ],
+        "rollback_semantics": "Rollback never mutates or deletes a receipt. It records invalidated status and reason, blocks hidden attachment and downstream use, and requires a new complete receipt for replacement.",
+        "recovery_semantics": "Unknown, missing, conflicting, unrecoverable, or partially verified records remain invalidated or not admissible. No inference, retry replacement, or later score repairs the receipt."
+    },
+    "preregistered_negative_tests": [
+        {
+            "id": "CF-N1",
+            "case": "Artifact bytes are tampered after digest computation.",
+            "expected": "Digest mismatch invalidates receipt and blocks handoff."
+        },
+        {
+            "id": "CF-N2",
+            "case": "Manifest contents or canonicalization profile changes.",
+            "expected": "Manifest drift invalidates receipt; new receipt required."
+        },
+        {
+            "id": "CF-N3",
+            "case": "Candidate, specification, generator, or receipt SemVer drifts.",
+            "expected": "Version drift is rejected unless a new immutable superseding receipt is accepted."
+        },
+        {
+            "id": "CF-N4",
+            "case": "Required receipt, model manifest, evaluation manifest, or bundle member is absent.",
+            "expected": "Incomplete bundle is not admissible."
+        },
+        {
+            "id": "CF-N5",
+            "case": "External process supplies no signature where its accepted policy requires one.",
+            "expected": "Unsigned evidence is rejected; this repository does not create a substitute signature."
+        },
+        {
+            "id": "CF-N6",
+            "case": "Signature is invalid, unknown, expired, revoked, mismatched, or self-signed.",
+            "expected": "Evidence is rejected and receipt cannot be accepted on that basis."
+        },
+        {
+            "id": "CF-N7",
+            "case": "Registry record is mutable, absent, or conflicts with submitted receipt.",
+            "expected": "Receipt is not admissible."
+        },
+        {
+            "id": "CF-N8",
+            "case": "Hidden material, keys, labels, or raw outcomes enter package or handoff.",
+            "expected": "Custody violation invalidates package and blocks all downstream activity."
+        }
+    ],
+    "external_blockers": [
+        {
+            "id": "CF-B1",
+            "description": "No actual public-only v4 candidate package or receipt exists.",
+            "cause": "This preparation task is deliberately contract-only.",
+            "owner": "implementation owner",
+            "required_evidence": "Clean committed public-only v4 bundle, immutable receipt, manifests, digest map, and hidden-input exclusion declaration.",
+            "required_approval": "Independent reviewer acceptance.",
+            "impact": "Hidden attachment and evaluation remain blocked.",
+            "unblocker": "Authorize a separate public-only candidate preparation task after prerequisites are met.",
+            "follow_on": "Independent receipt verification and registry entry."
+        },
+        {
+            "id": "CF-B2",
+            "description": "No independent registry, immutable storage, or reviewer identity is established.",
+            "cause": "Organizational custody and independence cannot be created by repository files.",
+            "owner": "designated independent-review authority",
+            "required_evidence": "Role, conflict, custody, immutable-storage, registry, key-status, and revocation attestations.",
+            "required_approval": "Independent-review authority designation and reviewer acceptance process approval.",
+            "impact": "No receipt can be accepted or safely handed off.",
+            "unblocker": "Appoint and externally attest reviewer/registry custody model and immutable retention process.",
+            "follow_on": "External registry setup and acceptance workflow."
+        }
+    ],
+    "fail_closed": "Any unknown, missing, changed, ambiguous, non-canonical, unreproducible, unreviewed, unsigned-when-required, invalidly-signed, revoked, scope-mismatched, custody-violating, or mutable record is not admissible and blocks hidden attachment, evaluation, release, recognition, runtime, and external effects."
+}

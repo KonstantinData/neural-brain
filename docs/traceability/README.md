@@ -5,6 +5,13 @@ approved task to versioned implementation and independently reviewable
 evidence. Notion is the coordination ledger; repository artifacts remain the
 durable technical source of truth.
 
+- [`governance-blocker-integration-evidence.md`](governance-blocker-integration-evidence.md):
+  controller-owned cross-package mapping for EVAL-01, S1-02.5, S1-14.9, reviews,
+  integrated commands, and external-only blockers.
+- [`REL-MEM-01-08-relationship-memory-preparation.md`](REL-MEM-01-08-relationship-memory-preparation.md):
+  ADR-018-aligned Relationship Memory preparation mapping for contracts,
+  matrices, planned negative tests, and a non-executing governance runbook.
+
 ## Evidence Chain
 
 Every completed main task and subtask must provide an unbroken chain:
@@ -182,6 +189,49 @@ when they are required by the acceptance criteria.
   and no instance validation, consent determination, qualified review,
   withdrawal, downstream stop, legal, authority, release, or runtime outcome
   exists.
+- [`S1-14.7-privacy-notice-evidence-intake.md`](S1-14.7-privacy-notice-evidence-intake.md):
+  immutable direct/indirect collection-notice evidence intake; required topics,
+  evidence, and qualified review fail closed and cannot create a real notice or
+  legal, authority, processing, release, or runtime outcome.
+- [`S1-14.8-data-subject-request-evidence-intake.md`](S1-14.8-data-subject-request-evidence-intake.md):
+  immutable DSAR evidence intake/case template; identity, deadline, audit,
+  redaction, and escalation evidence fail closed and cannot execute a request
+  or create legal, authority, processing, release, or runtime outcomes.
+- [`S1-14.9-data-subject-access-export-evidence-intake.md`](S1-14.9-data-subject-access-export-evidence-intake.md):
+  immutable, category-only discovery-coverage and access-export evidence intake;
+  inventory, third-party-rights, redaction, cache, derivative, export, retention,
+  and deletion-linkage evidence fail closed and cannot discover data, access a
+  store, create or deliver an export, disclose data, or create legal, authority,
+  processing, release, or runtime outcomes.
+- [`S1-14.9-future-deployment-export-readiness.md`](S1-14.9-future-deployment-export-readiness.md):
+  category-only inventory, eleven readiness matrices, review, and audit template
+  for future deployment evidence; it has no real data facts, discovery, access,
+  processing, export, disclosure, authority, runtime, or release outcome.
+- [`EVAL-01-independent-evaluation-preparation.md`](EVAL-01-independent-evaluation-preparation.md):
+  v4-only candidate-freeze, external custody, registry, ledger, signature, and
+  reviewer preparation; it does not create a candidate, hidden artifact,
+  evaluation result, gate pass, release, or recognition claim.
+- [`EVAL-01-artifact-manifests.md`](EVAL-01-artifact-manifests.md):
+  v4-only, non-instantiating freeze-receipt and manifest schema preparation;
+  it has no candidate, hidden data, key, signature, evaluation, or release.
+- [`EVAL-01-independent-evaluation-organization.md`](EVAL-01-independent-evaluation-organization.md):
+  non-appointing role, custody, RACI, approval, review, deputy, escalation, and
+  decision evidence preparation; it creates no authority or release.
+- [`EVAL-01-candidate-freeze-lifecycle.md`](EVAL-01-candidate-freeze-lifecycle.md):
+  preparation-only freeze, verification, registry, invalidation, and rollback
+  evidence; it creates no candidate, artifact, signature, evaluation, or release.
+- [`S1-02.5-protected-control-kill-switch.md`](S1-02.5-protected-control-kill-switch.md):
+  unaccepted Protected Control Plane kill-switch, credential-revocation, and
+  recovery target contract; it does not authorize a runtime, migration, writer,
+  executor, dispatch, revocation, or release.
+- [`S1-14.12-dpia-evidence-intake.md`](S1-14.12-dpia-evidence-intake.md):
+  immutable DPIA and risk-workflow evidence intake; unresolved risk and review
+  evidence fail closed and cannot determine risk, approval, consultation,
+  processing, release, or runtime outcomes.
+- [`S1-14.13-processor-governance-evidence-intake.md`](S1-14.13-processor-governance-evidence-intake.md):
+  immutable processor/subprocessor due-diligence evidence intake; relationship,
+  control, subprocessor, transfer, deletion, and termination evidence fail
+  closed and cannot create terms, appointment, processing, release, or runtime outcomes.
 - [`S1-11.1-data-object-catalogue-intake.md`](S1-11.1-data-object-catalogue-intake.md):
   category-only, fail-closed data-object catalogue intake requiring ownership,
   purpose, storage, lifecycle, retention, rights, deletion, and RoPA evidence;

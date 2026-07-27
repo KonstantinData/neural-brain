@@ -36,6 +36,15 @@ model output, tool output, and request payloads cannot create or change them.
 Unknown, missing, stale, conflicting, unverifiable, or scope-mismatched facts
 deny the future protected operation by default.
 
+### Proposed Relationship Memory boundary
+
+The NB-1 Planner may in future consider only approved, retrievable
+Relationship-Memory signals as untrusted, provenance-bound context information.
+It may derive from them neither truth, authority, a profile decision nor a
+memory mutation. This is a future contract boundary only: it neither enables a
+Planner runtime nor creates a retrieval surface, Memory Gate transition, or
+personal-data processing authority.
+
 ## Success and verification boundary
 
 Planner output, model confidence, executor output, HTTP status, or tool success

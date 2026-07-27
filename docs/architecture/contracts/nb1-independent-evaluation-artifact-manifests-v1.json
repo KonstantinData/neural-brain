@@ -1,0 +1,333 @@
+{
+    "document_type": "nb1_independent_evaluation_artifact_manifest_schema",
+    "format_version": 1,
+    "contract_id": "neural-brain.nb1.independent-evaluation.artifact-manifests",
+    "contract_version": "1.0.0",
+    "status": "preparation_only_non_instantiating",
+    "decision": "ADR-018",
+    "evaluation_spec": {
+        "id": "EVAL-01.NB-1.safe-serial-cognition.v4",
+        "required_status": "frozen_before_candidate_training_and_hidden_attachment",
+        "rejected_historical_spec": "EVAL-01.NB-1.safe-serial-cognition.v3"
+    },
+    "claim_boundary": {
+        "candidate_created": false,
+        "dataset_created_or_attached": false,
+        "hidden_seed_or_labels_present": false,
+        "key_created_or_registered": false,
+        "freeze_receipt_issued": false,
+        "attestation_issued": false,
+        "evaluation_performed": false,
+        "gate_or_release_authorized": false,
+        "recognition_claimed": false,
+        "runtime_or_external_effect_enabled": false
+    },
+    "canonicalization": {
+    "profile_id": "nb1-eval-canonical-json-v1",
+    "serialization": "nb1-eval-canonical-json-v1 only",
+    "byte_profile": {
+      "root_value": "object only",
+      "encoding": "UTF-8 without BOM",
+      "unicode_normalization": "NFC before serialization",
+      "object_member_order": "ascending Unicode scalar value order of normalized member names",
+      "whitespace": "no whitespace outside strings",
+      "string_escaping": "escape quotation-mark and reverse-solidus as short escapes; escape U+0000 through U+001F as lowercase six-character \\u00xx escapes; emit every other normalized Unicode scalar as UTF-8 without optional escapes",
+      "number_encoding": "only non-negative integers; encode zero as 0 and every other integer as shortest base-10 digits without leading zero, sign, decimal point, or exponent",
+      "literals": "true, false, and null in lowercase ASCII",
+      "trailing_bytes": "forbidden"
+    },
+    "artifact_kind_byte_rules": {
+      "canonical_json_object": {
+        "rule": "Use every byte-profile rule above; only a root JSON object is valid.",
+        "digest_input": "the resulting exact canonical UTF-8 byte sequence"
+      },
+      "utf8_text": {
+        "rule": "Digest the exact stored UTF-8-without-BOM byte sequence. Reject invalid UTF-8 or a BOM; do not normalize Unicode, line endings, whitespace, or final newlines.",
+        "digest_input": "the exact stored text bytes"
+      },
+      "binary": {
+        "rule": "Digest the exact stored byte sequence with no decoding, encoding, compression, decompression, normalization, or metadata transformation.",
+        "digest_input": "the exact stored binary bytes"
+      },
+      "deterministic_bundle_manifest": {
+        "rule": "Digest a canonical_json_object manifest containing only regular-file entries. Each entry must bind normalized-relative-path, artifact_kind, content_sha256, and executable_bit; entries sort by normalized-relative-path using the object-member ordering rule. Paths use NFC, forward slashes, no leading slash, no dot segment, no empty segment, and no traversal. Symlinks, device files, timestamps, ownership, archive metadata, and unspecified transformations are forbidden.",
+        "digest_input": "the exact canonical UTF-8 bytes of the bundle manifest, after independently verifying every listed regular-file content_sha256"
+      }
+    },
+    "undefined_artifact_kind_or_transformation": "reject",
+    "deterministic_test_vector_descriptors": [
+      {
+        "id": "NB1-EVAL-CJ-001",
+        "artifact_kind": "canonical_json_object",
+        "input_descriptor": "non-sensitive canonical object with NFC value café, a line-feed control character, and a non-negative integer",
+        "literal_canonical_utf8_hex": "7b22616c706861223a22636166c3a9222c22636f6e74726f6c223a225c7530303061222c227a223a377d",
+        "expected_sha256": "62a257eba51c19ef1b50f61766e2654d5af07cf618afe9b7cafef500b4a21dc6",
+        "expected_assertion": "the literal exact nb1-eval-canonical-json-v1 UTF-8 bytes hash to expected_sha256"
+      },
+      {
+        "id": "NB1-EVAL-CJ-002",
+        "artifact_kind": "utf8_text",
+        "input_descriptor": "non-sensitive UTF-8 text café followed by one line feed",
+        "literal_input_hex": "636166c3a90a",
+        "expected_sha256": "7b49b9e063bd91a4f9252b413261f5557b9c570aa61516989499f64a62dbcdd6",
+        "expected_assertion": "the exact stored bytes hash to expected_sha256 without normalization"
+      },
+      {
+        "id": "NB1-EVAL-CJ-003",
+        "artifact_kind": "binary",
+        "input_descriptor": "non-sensitive binary bytes containing zero and a non-text octet",
+        "literal_input_hex": "0001ff1041",
+        "expected_sha256": "6cd658934ceb1cbadf4ef29c8c80810f9cf25a145a5768650a5c4b10643da0d6",
+        "expected_assertion": "the raw bytes hash to expected_sha256 without decoding or transformation"
+      },
+      {
+        "id": "NB1-EVAL-CJ-004",
+        "artifact_kind": "deterministic_bundle_manifest",
+        "input_descriptor": "non-sensitive regular-file bundle containing Unicode path alpha-café.txt and nested binary path",
+        "literal_member_inputs": [
+          {
+            "normalized_relative_path": "alpha-café.txt",
+            "artifact_kind": "utf8_text",
+            "literal_input_hex": "636166c3a90a",
+            "expected_sha256": "7b49b9e063bd91a4f9252b413261f5557b9c570aa61516989499f64a62dbcdd6"
+          },
+          {
+            "normalized_relative_path": "nested/blob.bin",
+            "artifact_kind": "binary",
+            "literal_input_hex": "0001ff1041",
+            "expected_sha256": "6cd658934ceb1cbadf4ef29c8c80810f9cf25a145a5768650a5c4b10643da0d6"
+          }
+        ],
+        "literal_canonical_utf8_hex": "7b22656e7472696573223a5b7b2261727469666163745f6b696e64223a22757466385f74657874222c22636f6e74656e745f736861323536223a227368613235363a37623439623965303633626439316134663932353262343133323631663535353762396335373061613631353136393839343939663634613632646263646436222c2265786563757461626c655f626974223a66616c73652c226e6f726d616c697a65645f72656c61746976655f70617468223a22616c7068612d636166c3a92e747874227d2c7b2261727469666163745f6b696e64223a2262696e617279222c22636f6e74656e745f736861323536223a227368613235363a36636436353839333463656231636261646634656632396338633830383130663963663235613134356135373638363530613563346231303634336461306436222c2265786563757461626c655f626974223a66616c73652c226e6f726d616c697a65645f72656c61746976655f70617468223a226e65737465642f626c6f622e62696e227d5d7d",
+        "expected_sha256": "21eb5d0aef22f59934d49fdcc9b215b2b1a0ff001e5c625b3fc7d976ac8a5de7",
+        "expected_assertion": "member bytes and the literal canonical Unicode bundle manifest each hash to their declared SHA-256 values; symlink or traversal is rejected"
+      }
+    ],
+        "digest_algorithm": "SHA-256",
+        "digest_encoding": "lowercase hexadecimal",
+        "signature_algorithm": "Ed25519 detached signature",
+        "signature_scope": "canonical bytes of the manifest or ledger record named by its SHA-256 digest",
+        "unknown_or_noncanonical_encoding": "reject"
+    },
+    "artifact_reference_schema": {
+        "required_fields": [
+            "artifact_id",
+            "artifact_role",
+            "content_sha256",
+            "canonicalization_version",
+            "immutable_storage_locator_reference",
+            "created_at",
+            "producer_identity_reference"
+        ],
+        "forbidden_fields": [
+            "raw_hidden_seed",
+            "raw_hidden_examples",
+            "expected_labels",
+            "private_key",
+            "credential",
+            "authorization_decision",
+            "evaluation_score",
+            "gate_pass"
+        ],
+    "artifact_kind_required": true,
+    "allowed_artifact_kinds": [
+      "canonical_json_object",
+      "utf8_text",
+      "binary",
+      "deterministic_bundle_manifest"
+    ],
+    "digest_format": "sha256:<64 lowercase hexadecimal characters>",
+        "storage_rule": "The locator is an external immutable-storage reference, not a repository path or a claim that storage already exists."
+    },
+    "candidate_freeze_receipt_schema": {
+        "receipt_status": "template_only_reviewer_acceptance_required",
+        "required_fields": [
+            "receipt_id",
+            "receipt_version",
+            "evaluation_spec_reference",
+            "source_commit",
+            "source_tree_digest",
+            "candidate_artifact_reference",
+            "model_manifest_reference",
+            "parameter_artifact_reference",
+            "training_artifact_reference",
+            "public_train_dataset_manifest_reference",
+            "public_development_dataset_manifest_reference",
+            "evaluation_manifest_reference",
+            "generator_manifest_reference",
+            "dependency_lock_digest",
+            "freeze_timestamp",
+            "implementation_owner_attestation_reference",
+            "reviewer_recomputation_record_reference",
+            "receipt_signature_reference"
+        ],
+        "invalidation_events": [
+            "source_or_dependency_change",
+            "candidate_or_parameter_digest_change",
+            "manifest_digest_change",
+            "generator_or_split_definition_change",
+            "post_freeze_training_or_selection",
+            "missing_or_revoked_reviewer_attestation"
+        ],
+        "receipt_rule": "A receipt remains a proposed template until an independent reviewer recomputes every binding and accepts it in the external registry."
+    },
+    "model_manifest_schema": {
+        "required_fields": [
+            "model_identifier_and_version",
+            "architecture_identifier",
+            "candidate_code_digest",
+            "parameter_artifact_reference",
+            "training_code_digest",
+            "training_artifact_reference",
+            "public_train_dataset_manifest_reference",
+            "public_development_dataset_manifest_reference",
+            "selection_rule_digest",
+            "resource_bound_declaration",
+            "environment_digest",
+            "evaluation_spec_reference"
+        ],
+        "prohibitions": [
+            "hidden_dataset_reference",
+            "hidden_seed",
+            "expected_label",
+            "runtime_authority",
+            "promotion_or_release_status"
+        ]
+    },
+    "evaluation_manifest_schema": {
+        "required_fields": [
+            "protocol_identifier_and_digest",
+            "evaluation_spec_reference",
+            "candidate_freeze_receipt_reference",
+            "generator_manifest_reference",
+            "split_definition_reference",
+            "baseline_and_ablation_declarations",
+            "threshold_and_failure_criterion_declarations",
+            "confidence_interval_method_declaration",
+            "resource_budget_declaration",
+            "evaluator_executable_digest",
+            "environment_digest",
+            "network_isolation_declaration"
+        ],
+        "prohibitions": [
+            "hidden_seed",
+            "hidden_labels",
+            "per_sequence_result",
+            "gate_pass",
+            "release_authorization"
+        ]
+    },
+    "dataset_and_generator_manifest_schema": {
+        "public_dataset_required_fields": [
+            "dataset_role",
+            "artifact_reference",
+            "generator_identifier_and_version",
+            "generator_code_digest",
+            "split_definition_reference",
+            "sequence_count",
+            "public_reproducibility_declaration"
+        ],
+        "hidden_dataset_required_fields": [
+            "opaque_hidden_artifact_id",
+            "provider_commitment_digest",
+            "generator_identifier_and_version",
+            "generator_code_digest",
+            "split_definition_commitment_digest",
+            "custody_attestation_reference",
+            "non_disclosure_attestation_reference"
+        ],
+        "hidden_dataset_forbidden_fields": [
+            "seed_value",
+            "raw_examples",
+            "labels",
+            "latent_variables",
+            "per_sequence_correctness"
+        ],
+    "hidden_dataset_custodian": "independent_evaluator_only",
+    "separate_hidden_dataset_provider": "prohibited_pending_accepted_revalidation",
+    "seed_custody_rule": "Only the independent evaluator may hold a v4 hidden seed, hidden examples, labels, or latent variables. The repository, implementation owner, and any separate hidden-dataset provider may hold neither the material nor an encrypted or derived substitute until an accepted revalidation explicitly changes this rule."
+    },
+    "chain_of_custody_schema": {
+        "owner": "external_role_specific_custodians",
+        "required_event_fields": [
+            "event_id",
+            "previous_event_digest_or_genesis",
+            "event_digest",
+            "occurred_at",
+            "actor_identity_reference",
+            "actor_role",
+            "artifact_reference",
+            "custody_action",
+            "purpose",
+            "authorization_reference_or_null",
+            "signature_reference_or_null"
+        ],
+        "required_actions": [
+            "create_or_receive",
+            "seal_or_store",
+            "transfer_or_grant_read_only_access",
+            "verify_digest",
+            "revoke_or_quarantine",
+            "destroy_or_retire"
+        ],
+        "integrity_rule": "Unknown, missing, reordered, unsigned when required, stale, revoked, or digest-mismatched custody evidence is inadmissible."
+    },
+    "registry_and_attestation_schema": {
+        "reviewer_controlled_registry_required": true,
+        "registry_bindings": [
+            "evaluation_spec_digest",
+            "candidate_freeze_receipt_digest",
+            "model_manifest_digest",
+            "evaluation_manifest_digest",
+            "dataset_or_hidden_commitment_digest",
+            "role_identity_and_conflict_attestation_digest",
+            "ed25519_public_key_and_revocation_status",
+            "chain_of_custody_head_digest"
+        ],
+        "attestation_required_fields": [
+            "attestation_id",
+            "attestor_identity_reference",
+            "role",
+            "scope_and_purpose",
+            "conflict_disclosure",
+            "independence_statement",
+            "bound_digest",
+            "issued_at",
+            "expiry_or_review_point",
+            "detached_signature_reference"
+        ],
+        "self_attestation_limit": "Implementation-owner self-attestation cannot establish independence, custody acceptance, admissibility, a gate pass, or release."
+    },
+    "fail_closed": {
+        "missing_required_field": "reject_manifest_or_receipt",
+        "unsigned_or_untrusted_signature": "reject_evidence",
+        "revoked_or_unknown_key": "reject_evidence",
+        "digest_or_canonicalization_mismatch": "invalidate_freeze_and_reject_evidence",
+        "version_drift_or_post_freeze_change": "invalidate_freeze_and_require_new_review",
+        "hidden_material_in_repository_or_implementer_bundle": "stop_and_escalate_contamination_incident",
+        "unknown_custody_or_separation_state": "block_hidden_attachment_and_evaluation",
+        "attempted_runtime_release_or_recognition_claim": "prohibited"
+    },
+    "external_blockers": [
+        {
+            "id": "EVAL-01-AM-B1",
+            "description": "No independently reviewed v4 candidate freeze receipt or manifest bundle exists.",
+            "cause": "This contract is intentionally non-instantiating and creates no candidate, artifact, receipt, signature, or registry entry.",
+            "owner": "Implementation owner and independent reviewer",
+            "required_evidence": "Public-only v4 candidate bundle, complete manifests, canonical digest recomputation, and reviewer acceptance record.",
+            "required_approval": "Independent reviewer acceptance in the reviewer-controlled registry.",
+            "impact": "Hidden attachment and scoring remain blocked.",
+            "unblocker": "Perform a separately authorized public-only freeze exercise and independent receipt review."
+        },
+        {
+            "id": "EVAL-01-AM-B2",
+      "description": "No appointed independent evaluator, reviewer, registry custodian, or key custodian exists; a separate v4 hidden-dataset provider is prohibited pending accepted revalidation.",
+      "cause": "Organizational independence and custody are external facts that repository text cannot create, and current v4 custody is restricted to the independent evaluator.",
+            "owner": "Designated independent-review authority",
+      "required_evidence": "Evaluator sole-custody, role, conflict, qualification, key-revocation, and separation attestations; any proposed separate-provider model requires an accepted revalidation first.",
+            "required_approval": "Independent-review authority approval of the operating model.",
+            "impact": "No admissible hidden evaluation evidence can be produced.",
+      "unblocker": "Appoint and attest the independent evaluator as sole hidden-material custodian plus separated reviewer, registry, and key custody; do not appoint a separate provider without accepted revalidation."
+        }
+    ]
+}

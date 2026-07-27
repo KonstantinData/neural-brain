@@ -44,6 +44,14 @@ def test_catalogue_requires_every_acceptance_criterion_and_ropa_link() -> None:
     } <= required
     scope = _strings(template["scope_binding_requirements"])
     assert any("cannot establish or expand trusted scope" in item for item in scope)
+    assert (
+        "project_scope_applicability_and_immutable_authenticated_project_scope_lineage_evidence"
+        in required
+    )
+    assert any("immutable authenticated Project scope evidence" in item for item in scope)
+    assert any(
+        "cannot establish, infer, or expand Project scope or lineage" in item for item in scope
+    )
     assert any("does not create a processing register" in item for item in scope)
 
 
@@ -68,6 +76,13 @@ def test_missing_evidence_and_payloads_fail_closed_without_runtime_authority() -
     assert semantics["cross_tenant_or_cross_area_evidence_reuse"] == (
         "reject_intake_and_block_deployment_specific_release_decision"
     )
+    assert (
+        semantics["unknown_or_missing_project_scope_or_lineage_for_project_bound_object"]
+        == "reject_intake_and_block_deployment_specific_release_decision"
+    )
+    assert semantics["cross_tenant_or_cross_area_or_cross_project_evidence_reuse"] == (
+        "reject_intake_and_block_deployment_specific_release_decision"
+    )
     assert semantics["proposed_personal_data_or_secret_payload"] == (
         "reject_intake_and_record_data_minimization_blocker"
     )
@@ -82,7 +97,7 @@ def test_catalogue_cannot_make_legal_processing_or_release_decisions() -> None:
     prohibited = _strings(boundary["template_is_not"])
     assert {
         "a repository record containing real personal data, a production processing register, or an active data inventory",
-        "an authenticated Tenant, Area, Project, Session, principal, role, authority, or approval context",
+        "an authenticated Tenant, Area, Project, Session, principal, role, authority, or approval context, or Project lineage",
         "a processing, deployment, productive-use, or release approval",
         "a runtime capability enablement, protected-state write, or external-effect authorization",
     } <= prohibited

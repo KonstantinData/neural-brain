@@ -26,3 +26,15 @@ their accepted gates and may not be documented as model-controlled shortcuts.
 - [`relationship-memory-governance-preparation.md`](relationship-memory-governance-preparation.md)
   records only future service-managed request and non-use boundaries; it is not
   a runtime operating procedure.
+- [`nb1-independent-evaluation-preparation.md`](nb1-independent-evaluation-preparation.md)
+  defines preparation-only external EVAL-01 v4 custody, freeze, registry,
+  ledger, signing, and review steps; it authorizes no evaluation or release.
+- [`protected-control-kill-switch.md`](protected-control-kill-switch.md)
+  defines a proposed target review procedure for a future Protected Control
+  Plane kill switch; it is not an operational shutdown or recovery procedure.
+- [`future-deployment-subject-export-readiness.md`](future-deployment-subject-export-readiness.md)
+  defines category-only future deployment export-readiness review steps; it
+  does not discover, access, process, export, or disclose personal data.
+- [`nb1-candidate-freeze-lifecycle.md`](nb1-candidate-freeze-lifecycle.md)
+  defines preparation-only candidate-freeze submission, verification,
+  invalidation, and external handoff; it does not create a candidate or release.
