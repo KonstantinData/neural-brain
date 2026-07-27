@@ -31,6 +31,12 @@ special-category, automated-decision, and DPIA screening. It does not determine
 lawfulness, a GDPR obligation, DPIA necessity, or authorize processing,
 deployment, or release.
 
+[`article-6-legal-basis-evidence-intake-v1.md`](article-6-legal-basis-evidence-intake-v1.md)
+defines a fail-closed, qualified-review evidence intake for Article 6
+legal-basis candidates and necessity/proportionality facts. It does not select
+or validate a legal basis, determine lawfulness, grant authority, authorize
+processing, deployment, or release, or enable runtime behavior.
+
 [`compliance-raci-assessment-v1.md`](compliance-raci-assessment-v1.md) defines
 a fail-closed input template for qualified deployment-specific responsibility,
 approval-authority, independence, and escalation review. It does not assign a

@@ -39,6 +39,12 @@ ADR-017.
   automated-decision, and DPIA screening. It records article candidates, risk
   triggers, required assessments, evidence, and release blockers only; it
   never determines lawfulness or authorizes processing or release.
+- `article-6-legal-basis-evidence-intake-v1.json`: immutable,
+  scope/purpose/activity-bound Article 6 legal-basis, necessity, and
+  proportionality evidence intake for qualified review only. It records
+  external-fact and non-applicability handling, fails closed, and never selects
+  a legal basis, determines lawfulness, grants authority, or authorizes
+  processing, release, or runtime enablement.
 - `prohibited-unsupported-use-v1.json`: deterministic, fail-closed
   classification of immutable prohibited and currently unsupported uses. It has
   no allow, activation, or release outcome and never replaces the Security

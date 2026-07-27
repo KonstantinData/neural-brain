@@ -156,6 +156,11 @@ when they are required by the acceptance criteria.
   immutable scope, transfer-boundary, retention, safeguard, and provenance
   references; it fails closed and cannot disclose, transfer, process, or
   authorize data at runtime.
+- [`S1-14.3-article-6-legal-basis-evidence-intake.md`](S1-14.3-article-6-legal-basis-evidence-intake.md):
+  immutable scope/purpose/activity-bound Article 6 legal-basis, necessity, and
+  proportionality evidence intake for qualified review only; unknown,
+  non-applicability, conflict, and external facts fail closed and cannot create
+  legal, authority, processing, release, or runtime outcomes.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
