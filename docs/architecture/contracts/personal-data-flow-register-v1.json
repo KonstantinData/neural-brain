@@ -1,0 +1,82 @@
+{
+  "contract_id": "neural-brain.personal-data-flow-register",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_evidence_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+  "purpose": "Define the minimum, category-only evidence record for a single proposed end-to-end personal-data flow and recipient relationship. The template is product- and domain-neutral and fails closed; it does not establish a processing register, a runtime data path, a disclosure, a transfer, or a legal outcome.",
+  "scope": {
+    "included": [
+      "one proposed artifact and deployment reference",
+      "one immutable authenticated Tenant and Area scope reference pair",
+      "one proposed source-to-recipient personal-data flow described only by categories and evidence references",
+      "one linked RoPA evidence intake record"
+    ],
+    "excluded": [
+      "real personal data, identifiers, credentials, prompts, or Memory Core payloads",
+      "runtime routing, storage, disclosure, transfer, or external effects",
+      "a production processing register, legal determination, or compliance certification",
+      "authority, policy, approval, release, or capability activation"
+    ]
+  },
+  "personal_data_flow_record_template": {
+    "required_fields": [
+      "flow_record_identifier_and_immutable_version_or_digest",
+      "proposed_artifact_and_deployment_reference",
+      "immutable_authenticated_tenant_scope_reference",
+      "immutable_authenticated_area_scope_reference",
+      "linked_ropa_evidence_intake_reference",
+      "source_system_or_origin_category_and_evidence_reference",
+      "data_subject_category_and_personal_data_category_evidence",
+      "processing_purpose_and_activity_reference",
+      "immutable_scope_and_lineage_evidence_reference",
+      "recipient_or_subprocessor_category_and_evidence_reference",
+      "recipient_location_and_international_transfer_boundary_evidence",
+      "retention_deletion_legal_hold_and_recovery_evidence_reference",
+      "technical_and_organizational_safeguard_evidence_reference",
+      "flow_provenance_mapping_and_evidence_references",
+      "accountable_owner_qualified_reviewer_and_review_date",
+      "known_unknown_or_unverified_deployment_facts",
+      "release_stop_and_next_review_or_unblock_condition"
+    ],
+    "scope_binding_requirements": [
+      "Authenticated Tenant and Area scope references are immutable review evidence and cannot establish, expand, replace, or override trusted runtime context.",
+      "Every source, flow segment, recipient, subprocessor, location, transfer boundary, retention rule, and safeguard reference must bind to the same immutable authenticated Tenant and Area scope pair.",
+      "A record may not be reused across Tenant or Area boundaries; cross-boundary flow requires independently authenticated, scope-bound evidence for every participating boundary and separately governed qualified review.",
+      "The template stores only categories, identifiers, digests, and evidence references; it must not contain raw personal data, direct identifiers, credentials, secrets, prompts, or memory payloads.",
+      "A flow is incomplete unless every required source, category, purpose, immutable scope, recipient, transfer boundary, retention, safeguard, and evidence reference is present, immutable, current, internally consistent, and scope-matched.",
+      "Unknown, unverified, unavailable, or deployment-specific facts must remain explicit release stops with an accountable owner and an unblock condition; they must never be inferred or defaulted."
+    ],
+    "evidence_linking_requirements": [
+      "The record must link to one scope-matched RoPA evidence intake record and must not replace it.",
+      "Every claimed end-to-end flow segment must cite immutable source, lineage, recipient, location or transfer, retention, safeguard, and review evidence references.",
+      "The qualified reviewer and review date are review inputs only and do not create a legal, policy, authority, processing, disclosure, transfer, or release decision."
+    ]
+  },
+  "fail_closed_semantics": {
+    "immutable_authenticated_scope_references_required": true,
+    "one_record_per_artifact_scope_source_recipient_and_purpose": true,
+    "missing_unknown_stale_contradictory_or_scope_mismatched_evidence": "reject_record_and_block_deployment_specific_release_decision",
+    "missing_source_category_purpose_recipient_transfer_retention_safeguard_or_evidence_reference": "reject_record_and_block_deployment_specific_release_decision",
+    "cross_tenant_or_cross_area_flow_without_authenticated_scoped_evidence": "deny_flow_claim_and_block_deployment_specific_release_decision",
+    "cross_tenant_or_cross_area_evidence_reuse": "reject_record_and_block_deployment_specific_release_decision",
+    "proposed_personal_data_or_secret_payload": "reject_record_and_record_data_minimization_blocker",
+    "unknown_deployment_fact": "record_explicit_blocker_and_block_deployment_specific_release_decision",
+    "no_runtime_transfer_disclosure_or_processing": true,
+    "no_runtime_authorization_or_capability_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is_not": [
+      "a legal opinion, data-transfer determination, data-protection impact assessment, or compliance certification",
+      "a repository record containing real personal data or a production processing or recipient register",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, approval, policy, or runtime context",
+      "a runtime data-flow, processing, transfer, disclosure, storage, or deletion instruction",
+      "a processing, deployment, productive-use, or release approval",
+      "a runtime capability enablement or external-effect authorization"
+    ],
+    "protected_control_plane_boundary": "No content in this template can bypass or replace authenticated identity, immutable scope, policy, approvals, transition gates, fences, kill switches, sandboxing, independent verification, or atomic audit evidence.",
+    "release_boundary": "A complete record is review evidence only. It never activates a runtime path, authorizes a transfer or disclosure, establishes a processing fact, resolves a release stop, or changes the current Memory Core foundation maturity."
+  },
+  "unblock_condition": "A concrete proposed deployment supplies a complete immutable record for each claimed source-to-recipient flow, with authenticated scope-bound evidence references, linked RoPA intake, category-level facts, qualified review inputs, and separately governed decisions where required."
+}
