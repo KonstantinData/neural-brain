@@ -20,3 +20,6 @@ their accepted gates and may not be documented as model-controlled shortcuts.
   target ADR-019 operating contract for Tenant-bound database credentials,
   dedicated pools, provisioning, rotation, revocation, recovery, and migration
   without claiming production readiness.
+- [`protected-ledger-backup-recovery.md`](protected-ledger-backup-recovery.md)
+  defines target-only backup, WAL/PITR, retention, custody, and isolated
+  restore-test procedure; it does not prove a deployed recovery capability.

@@ -49,6 +49,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "model-inference-inventory-v1.json",
         "nb1-hidden-evaluation.json",
         "nb1-safe-serial-cognition.json",
+        "protected-ledger-backup-recovery-v1.json",
         "prohibited-unsupported-use-v1.json",
         "recognition-gates.json",
         "reassessment-trigger-intake-v1.json",

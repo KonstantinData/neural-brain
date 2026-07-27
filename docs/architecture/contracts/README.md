@@ -55,6 +55,10 @@ ADR-017.
   scope-matched qualified GDPR and EU AI Act findings or explicit qualified
   non-applicability bases, but it never signs, verifies, authorizes, enables,
   or releases a deployment.
+- `protected-ledger-backup-recovery-v1.json`: target-only, fail-closed
+  PostgreSQL protected-ledger backup, WAL/PITR, retention, key/access
+  separation, restore-test, and release-stop contract. It configures no backup
+  system and makes no recovery-readiness claim.
 
 ## Memory Core contracts
 
