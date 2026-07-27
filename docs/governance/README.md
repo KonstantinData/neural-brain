@@ -25,6 +25,11 @@ relationship-specific, fail-closed input template for a future qualified GDPR
 role assessment. It does not determine a role or authorize processing,
 deployment, or release.
 
+[`data-object-catalogue-intake-v1.md`](data-object-catalogue-intake-v1.md)
+defines a category-only, fail-closed data-object catalogue evidence intake for
+future deployment review. It does not create a processing register, determine
+lawfulness, write protected state, or enable processing, deployment, or release.
+
 [`gdpr-applicability-screening-v1.md`](gdpr-applicability-screening-v1.md)
 defines a fail-closed input template for qualified GDPR applicability,
 special-category, automated-decision, and DPIA screening. It does not determine

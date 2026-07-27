@@ -169,6 +169,10 @@ when they are required by the acceptance criteria.
   proportionality evidence intake for qualified review only; unknown,
   non-applicability, conflict, and external facts fail closed and cannot create
   legal, authority, processing, release, or runtime outcomes.
+- [`S1-11.1-data-object-catalogue-intake.md`](S1-11.1-data-object-catalogue-intake.md):
+  category-only, fail-closed data-object catalogue intake requiring ownership,
+  purpose, storage, lifecycle, retention, rights, deletion, and RoPA evidence;
+  it does not create an inventory, processing register, authority, or runtime path.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.

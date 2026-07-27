@@ -78,6 +78,10 @@ ADR-017.
   relationship. It requires immutable scope-bound source, recipient, transfer,
   retention, safeguard, and provenance evidence but never routes, discloses,
   transfers, processes, or authorizes data at runtime.
+- `data-object-catalogue-intake-v1.json`: category-only, fail-closed evidence
+  intake for a proposed stored data-object type. It requires ownership, role,
+  purpose, recipient, storage, transition, retention, rights, deletion, and
+  RoPA evidence but cannot create a processing register or runtime path.
 
 ## Memory Core contracts
 
