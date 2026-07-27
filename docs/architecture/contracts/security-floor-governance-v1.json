@@ -1,0 +1,31 @@
+{
+  "document_type": "neural_brain_security_floor_governance_contract",
+  "contract_id": "neural-brain.security-floor-governance",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance",
+  "governing_decisions": ["ADR-005", "ADR-018"],
+  "source_contracts": ["neural-brain.prohibited-unsupported-use@1.0.0", "neural-brain.ai-act-risk-classification-assessment@1.0.0"],
+  "purpose": "Map accepted prohibited-use constraints into non-overridable Security Floor governance rules and define the bounded human-review prerequisite for sensitive or high-risk candidate cases. This repository-governance contract does not classify a real deployment, create runtime authority, or enable a capability.",
+  "implementation_scope": {
+    "current_runtime_enforcement": "S1-02.1 enforces the implemented Memory Core Security Floor only for memory_ingest and memory_read with complete authenticated RuntimeContext.",
+    "target_governance_mapping": "The rules below preserve ADR-018 and Architecture Directive v4.0 constraints for future Protected Control Plane implementation; they do not assert that every target rule is currently implemented at runtime.",
+    "runtime_expansion": false
+  },
+  "non_overridable_security_floor_rules": [
+    {"id": "SFG-01", "source_prohibition_id": "PF-01", "rule": "No policy, approval, assessment, exception, or human review may override or weaken the Security Floor.", "violation_outcome": "prohibited_and_denied", "implementation_boundary": "No configuration or approval hook is introduced by this contract."},
+    {"id": "SFG-02", "source_prohibition_id": "PF-02", "rule": "Trusted identity, scope, authority, policy, approval, and kill-switch state originate only from authenticated runtime context.", "violation_outcome": "prohibited_and_denied", "implementation_boundary": "Governance evidence, prompts, observations, model output, memory content, and request payloads are untrusted inputs."},
+    {"id": "SFG-03", "source_prohibition_id": "PF-03", "rule": "Only the named Goal, Action, Memory, and Learning or Model Promotion Transition Gates may write their protected state.", "violation_outcome": "prohibited_and_denied", "implementation_boundary": "This contract does not add a Gate, protected-state write path, or transition authorization."},
+    {"id": "SFG-04", "source_prohibition_id": "PF-04", "rule": "An external effect requires all Action Gate preconditions, including committed intent, authenticated immutable scope, authority, policy, required approval, budget, resource claims, fence, kill switch, sandbox, and atomic audit evidence.", "violation_outcome": "prohibited_and_denied", "implementation_boundary": "No Action capability, effect dispatch, approval consumption, or release path is introduced."},
+    {"id": "SFG-05", "source_prohibition_id": "PF-05", "rule": "The active Brain may not mutate its productive model or its own authority, Security Floor, policy, evaluation definitions, kill switches, or promotion rules in place.", "violation_outcome": "prohibited_and_denied", "implementation_boundary": "This contract does not add learning, promotion, or model activation."},
+    {"id": "SFG-06", "source_prohibition_id": "PF-06", "rule": "Recognition, maturity, safety, or release claims require every applicable non-compensatory evidence gate; an unknown or failed gate is a release stop.", "violation_outcome": "prohibited_and_denied", "implementation_boundary": "This contract creates no recognition, maturity, safety, or release claim."}
+  ],
+  "sensitive_or_high_risk_candidate_review_boundary": {
+    "applies_to": ["sensitive_high_impact_or_high_risk_use", "high_risk_candidate", "prohibited_candidate", "not_assessed", "unknown_missing_stale_scope_mismatched_or_contradictory_evidence"],
+    "required_before_any_separately_governed_future_reassessment_or_release_evaluation": ["qualified_independent_human_review", "immutable_artifact_and_authenticated_scope_binding", "current_rationale_and_evidence_references", "identified_release_stops_and_reassessment_trigger"],
+    "fail_closed_outcome_when_absent": "unsupported_and_deployment_specific_release_blocked",
+    "human_review_is_not": ["a legal or regulatory classification", "a finding of lawfulness", "an authority grant or scope expansion", "a policy decision or Security Floor override", "a protected-state transition, gate decision, or runtime enablement", "a deployment, productive-use, or release approval"],
+    "non_override_rule": "Human review may identify evidence gaps, confirm that a separately governed assessment remains required, or escalate a candidate case. It may not convert prohibited or unsupported into allow, waive a Security Floor rule, or compensate for any missing gate."
+  },
+  "deterministic_governance_order": ["Map any accepted prohibited-use match to its non-overridable Security Floor rule and deny it before considering review evidence.", "Deny as unsupported when classification or evidence is unknown, missing, stale, contradictory, scope-mismatched, or unaccepted.", "For sensitive or high-risk candidate cases, require the bounded qualified independent human-review evidence before any separately governed future reassessment or release evaluation; its absence remains unsupported and blocked.", "Retain denial unless every separately governed future control is satisfied by its owning authority. This contract has no allow, authorization, activation, or release outcome."],
+  "invariants": ["Security Floor prohibitions are non-overridable.", "Approval and human review never create missing authority.", "Unknown inputs fail closed.", "The Memory Core remains a protected subsystem, not the product boundary.", "No productive model mutates itself in place.", "No recognition or maturity claim exists without all required non-compensatory evidence gates."]
+}
