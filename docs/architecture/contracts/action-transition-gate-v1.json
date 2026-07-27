@@ -1,0 +1,52 @@
+{
+  "document_type": "neural_brain_action_transition_gate_prerequisite_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.action-transition-gate",
+  "contract_version": "1.0.0",
+  "status": "nb5_prerequisite_contract_not_runtime_authorization",
+  "governing_decisions": ["ADR-018", "ADR-019"],
+  "historical_inputs_requiring_revalidation": ["ADR-006", "ADR-007", "ADR-008", "ADR-009", "ADR-011"],
+  "purpose": "Define the complete product-neutral prerequisite boundary for a future NB-5 Action Transition Gate. This contract neither creates an Action runtime, protected action table, migration, executor, tool integration, budget, resource claim, fence, approval, external effect, reconciliation worker, nor a maturity or recognition claim.",
+  "aggregate_boundary": {
+    "aggregate": "action_intent",
+    "binding": "session_and_goal_bound_protected_aggregate",
+    "sole_protected_state_writer": "Action Transition Gate",
+    "requesters": ["Cognitive Plane", "Planner", "Action Selection", "Goal Runtime"],
+    "trusted_context_source": "authenticated_runtime_context",
+    "untrusted_context_sources": ["prompt", "observation", "model_output", "memory_content", "tool_output", "request_payload"],
+    "default_on_unknown_or_missing": "deny_before_action_intent_commitment_or_effect"
+  },
+  "immutable_authenticated_scope_fields": ["tenant_id", "area_id", "project_id", "session_id", "goal_id"],
+  "required_precommit_evidence": ["committed_action_intent_with_immutable_purpose_and_provenance", "authenticated_principal_and_immutable_scope", "authority_snapshot", "policy_decision_bound_to_exact_operation", "required_approval_claims_with_separation_of_duties", "budget_reservation", "resource_claims", "valid_runtime_fence", "enabled_kill_switch_state", "sandbox_policy_and_exact_executor_binding", "atomic_audit_evidence"],
+  "independent_posteffect_requirements": ["post_action_observation_with_provenance_and_uncertainty", "independent_effect_verifier_decision", "independent_goal_verifier_decision_before_Achieved", "complete_evidence_and_quiescence_before_goal_completion", "authoritative_reconciliation_for_indeterminate_effect", "retained_budget_and_resource_claims_until_reconciliation"],
+  "noncompensable_invariants": [
+    "Only the Action Transition Gate may commit protected Action Intent state and its atomic audit evidence.",
+    "No cognitive component, model, planner, memory subsystem, request payload, tool output, or executor may create authority, commit an Action Intent, dispatch a tool, or mutate protected Action state directly.",
+    "Approval never creates missing authority; a policy result never overrides the Security Floor; unknown, stale, conflicting, revoked, expired, or scope-mismatched evidence denies before commitment or effect.",
+    "The committed Action Intent purpose, authenticated scope, principal binding, operation binding, authority snapshot, policy decision, approval evidence, budget reservation, resource claims, fence, executor binding, sandbox policy, and audit correlation are immutable for an execution attempt.",
+    "The executor may run only behind a valid, non-stale fence and enabled kill switch in the exact approved sandbox; executor or tool success is not effect or goal success.",
+    "An ambiguous or non-idempotent effect becomes indeterminate, is not blindly retried, and retains budget and resource claims until authoritative reconciliation determines effect_confirmed, no_effect_confirmed, or effect_compensated.",
+    "Only the independently revalidated Goal Transition Gate may write Achieved after independent verification, complete evidence, and quiescence.",
+    "A later delivery-stage result, learning result, policy result, approval, or self-report cannot compensate for a missing action-control prerequisite or failed safety evidence."
+  ],
+  "stage_boundary_map": [
+    {"stage": "NB-0", "allowed": ["versioned prerequisite contract", "contract and traceability tests", "architecture decision proposal"], "prohibited": ["Action runtime", "Action migration", "Action Transition Gate implementation", "executor", "tool dispatch", "budget or resource reservation", "external effect"]},
+    {"stage": "NB-1", "allowed": ["internal action proposals over recorded or synthetic input", "internal planning estimates without reservation or authority"], "prohibited": ["Action Intent commitment", "approval consumption", "budget reservation", "resource claim", "fence issuance", "executor", "external effect", "effect or goal verification runtime"]},
+    {"stage": "NB-4", "allowed": ["selective replay", "immutable learning candidates", "independent promotion canary and rollback", "offline training and evaluation under isolated controls"], "prohibited": ["Action Gate implementation", "action budgeting or resource claiming", "tool execution", "external effect", "using learning evidence to waive NB-5 authority or control prerequisites"]},
+    {"stage": "NB-5", "allowed_only_after_all_prior_stage_and_action_gate_evidence": ["single-goal bounded action in simulation", "controlled tool sandbox execution", "post-action observation", "independent effect and goal verification", "reconciliation of indeterminate effects"], "still_required": ["accepted complete-system Action Gate revalidation", "accepted complete-system Goal Gate revalidation", "all required_precommit_evidence", "all independent_posteffect_requirements", "closed-loop, recovery, authority, kill-switch, and independent evaluation evidence"], "prohibited": ["unbounded tools", "parallel goals", "distributed execution ownership", "blind retry", "claim release before reconciliation"]},
+    {"stage": "NB-8", "allowed_only_after_earlier_gates": ["fenced distributed ownership", "durable queues", "failover", "cross-area governed abstraction"], "prohibited": ["using NB-8 distribution to weaken NB-5 serial action, fence, audit, reconciliation, scope, or verification invariants"]}
+  ],
+  "legacy_task_disposition": [
+    {"legacy_task": "S1-07", "historical_scope": "Action Intent state machine and purpose/quiescence behavior", "disposition": "blocked_not_reactivated", "successor": "NB-5 Action Transition Gate state-machine package after accepted complete-system Action Gate and Goal Gate revalidations", "reason": "ADR-007 is historical; its prior state model cannot be reactivated before current identity, scope, authority, approval, fence, verification, reconciliation, and stage evidence are accepted."},
+    {"legacy_task": "S1-08", "historical_scope": "atomic action preparation, approval, budget reservation, and resource claims", "disposition": "blocked_not_reactivated", "successor": "NB-5 Action Gate admission and atomic-commit package after the required precommit evidence has an accepted contract and PostgreSQL authorization design", "reason": "ADR-008 is historical and does not define ADR-018 two-plane identity, sandbox, fence, audit, independent verification, or current stage evidence."},
+    {"legacy_task": "S1-09", "historical_scope": "serial dispatch journal, execution attempt, indeterminate effect, and reconciliation", "disposition": "split_blocked_successors", "successor": "NB-5 bounded serial executor, independent effect verification, and indeterminate reconciliation package; NB-8 separately owns distributed queues, ownership, failover, and scale", "reason": "ADR-009 is historical; its serial journal may inform NB-5 revalidation but cannot authorize dispatch. Its distributed exclusions remain an NB-8 boundary."}
+  ],
+  "implementation_blocker": {
+    "status": "blocked_pending_authorized_complete_system_action_and_goal_gate_revalidation",
+    "owner": "Protected Control Plane architecture owner",
+    "dependency": "FND-ENT-02 proposed Goal Gate revalidation must be accepted together with or before the Action Gate decision.",
+    "unblock_condition": "An authorized ADR decision accepts or replaces the proposed Goal and Action Gate boundary with complete state models, actor separation, authenticated identity and scope, authority and policy inputs, approval claims, budget and resource lifecycle, fences, sandbox and kill-switch control, atomic audit, independent verification, indeterminate reconciliation, recovery, concurrency, and NB-5 acceptance and evaluation tests.",
+    "next_step": "Create bounded NB-5 implementation packages only after the decision is accepted; do not add runtime, migration, executor, dispatch, budget, resource, fence, or effect code beforehand."
+  },
+  "explicit_exclusions": ["Action runtime, protected Action Intent table, migration, database writer, or executor", "tool or external-system invocation, dispatch, effect, retry, compensation, or reconciliation implementation", "authority, approval, budget, resource, fence, kill-switch, or sandbox issuance or consumption", "Goal runtime or Goal Transition Gate implementation", "implementation, activation, maturity, recognition, safety, legal, release, or production-autonomy claim"]
+}

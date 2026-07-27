@@ -160,6 +160,10 @@ when they are required by the acceptance criteria.
 - [`FND-ENT-02-goal-gate-adr-revalidation.md`](FND-ENT-02-goal-gate-adr-revalidation.md):
   historical Goal Gate ADR disposition and the proposed, fail-closed NB-1
   replacement boundary; it is not an accepted ADR or runtime authorization.
+- [`FND-ENT-03-nb45-action-prerequisites.md`](FND-ENT-03-nb45-action-prerequisites.md):
+  historical Action, preparation, dispatch, and reconciliation disposition plus
+  the blocked, fail-closed NB-4/NB-5 Action Gate prerequisite boundary; it is
+  not an accepted ADR or runtime authorization.
 
 ## Reconciliation Rules
 
