@@ -6,7 +6,9 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).parents[2]
-CONTRACT_PATH = ROOT / "docs" / "architecture" / "contracts" / "gpai-provider-obligation-applicability-v1.json"
+CONTRACT_PATH = (
+    ROOT / "docs" / "architecture" / "contracts" / "gpai-provider-obligation-applicability-v1.json"
+)
 
 
 def _contract() -> dict[str, object]:
@@ -23,7 +25,9 @@ def _strings(value: object) -> set[str]:
 
 def test_assessment_requires_immutable_distribution_and_change_evidence() -> None:
     contract = _contract()
-    assert contract["contract_id"] == "neural-brain.gpai-provider-obligation-applicability-assessment"
+    assert (
+        contract["contract_id"] == "neural-brain.gpai-provider-obligation-applicability-assessment"
+    )
     assert contract["contract_version"] == "1.0.0"
     assert contract["governing_decisions"] == [
         "ADR-018",
@@ -79,7 +83,10 @@ def test_unknown_or_changed_evidence_fails_closed_without_authority_or_runtime_e
         "stale_scope_mismatched_or_contradictory_evidence",
         "missing_qualified_review_or_linked_reassessment_work",
     ):
-        assert semantics[key] == "assessment_incomplete_and_affected_deployment_specific_release_blocked"
+        assert (
+            semantics[key]
+            == "assessment_incomplete_and_affected_deployment_specific_release_blocked"
+        )
     assert semantics["no_automatic_provider_status_or_obligation_conclusion"] is True
     assert semantics["no_automatic_legal_applicability_or_compliance_conclusion"] is True
     assert semantics["no_automatic_deployment_release_or_authority_outcome"] is True
@@ -101,7 +108,9 @@ def test_authority_boundary_prohibits_legal_provider_and_enablement_claims() -> 
         "a model activation or promotion",
         "a runtime capability enablement",
     } <= forbidden
-    docs = (ROOT / "docs" / "governance" / "gpai-provider-obligation-applicability-v1.md").read_text(encoding="utf-8")
+    docs = (
+        ROOT / "docs" / "governance" / "gpai-provider-obligation-applicability-v1.md"
+    ).read_text(encoding="utf-8")
     assert "not legal advice" in docs
     assert "does not assert their applicability or interpretation" in docs
     assert "has no allow state" in docs
