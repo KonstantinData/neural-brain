@@ -4,15 +4,17 @@
 - Notion controller: https://app.notion.com/3aa1c1ac5ec08178b06cc7694fe00fcf
 - Migrations and runtime implementation: none
 
-| Package | Repository evidence | Boundary |
-| --- | --- | --- |
-| REL-MEM-01 | ADR-018 revalidation proposal | downstream, non-authorizing context only |
-| REL-MEM-02 | signal schema and focused tests | contract only; no signal instance/runtime |
-| REL-MEM-03/04 | scope/purpose and privacy matrices | roles/privacy facts remain future qualified work |
-| REL-MEM-05 | NB-1 Planner revalidation references | future untrusted view only; no Planner runtime |
-| REL-MEM-06/07 | Dreaming boundary and threat/test plan | no Dreaming execution or security claim |
-| REL-MEM-08 | service-managed governance runbook | no operational procedure executed |
-| REL-MEM-16 | Position 3 future enforcement package | separate acceptance and independent verification required |
+| Package | Decision and contract evidence | Test evidence | Acceptance evidence and boundary |
+| --- | --- | --- | --- |
+| REL-MEM-01 | `docs/architecture/relationship-memory-adr-018-revalidation-proposal-v1.md` | `tests/architecture/test_relationship_memory_preparation.py::test_positions_remain_preparation_only_and_non_authorizing` | Position 1 is downstream, non-authorizing context only; the proposal remains not accepted and grants no runtime authority. |
+| REL-MEM-02 | `docs/architecture/contracts/relationship-memory-signal-contract-v1.json` | `tests/architecture/test_relationship_memory_preparation.py::test_signal_contract_is_fail_closed_and_non_runtime` | The schema is fail-closed and has no signal instance, migration, or runtime. |
+| REL-MEM-03 | `docs/governance/relationship-memory-access-purpose-agent-scope-matrix-v1.md`; `docs/adr/ADR-019-tenant-bound-runtime-database-identities-and-pools.md`; signal contract `access_policy` | `tests/architecture/test_relationship_memory_preparation.py::test_supporting_governance_boundaries_are_explicit`; `tests/architecture/test_relationship_memory_preparation.py::test_runbook_covers_adr_019_productive_tenant_anchor` | Actor, scope, and purpose paths remain default-deny; productive Tenant identity is database-anchored and subordinate lineage may only narrow it; no role or permission is granted. |
+| REL-MEM-04 | `docs/governance/relationship-memory-privacy-retention-correction-matrix-v1.md`; signal contract `retention`, `correction_supersession`, and `forbidden_fields` | `tests/architecture/test_relationship_memory_preparation.py::test_supporting_governance_boundaries_are_explicit` | Privacy, retention, correction, and prohibited-profile rules are preparation only; qualified deployment evidence remains required. |
+| REL-MEM-05 | `docs/architecture/nb1-planner-verification-adr-018-revalidation-proposal-v1.md`; `docs/architecture/contracts/nb1-planner-verification-revalidation-v1.json` | `tests/architecture/test_relationship_memory_preparation.py::test_position_three_and_runtime_boundaries_are_explicit` | Any future Planner view is minimized, approved, provenance-bound, and untrusted; no Planner runtime is enabled. |
+| REL-MEM-06 | `docs/architecture/relationship-memory-dreaming-boundary-v1.md`; ADR-017 | `tests/architecture/test_relationship_memory_preparation.py::test_supporting_governance_boundaries_are_explicit` | Dreaming remains Area-local, offline, inactive, non-retrievable, and non-authorizing; no Dreaming execution occurs. |
+| REL-MEM-07 | `docs/architecture/relationship-memory-threat-model-and-test-plan-v1.md` | `tests/architecture/test_relationship_memory_preparation.py::test_position_three_and_runtime_boundaries_are_explicit`; `tests/architecture/test_relationship_memory_preparation.py::test_supporting_governance_boundaries_are_explicit` | Required negative cases are defined; planned tests are not runtime-security or independent-evaluation evidence. |
+| REL-MEM-08 | `docs/runbooks/relationship-memory-governance-preparation.md`; this traceability record | `tests/architecture/test_relationship_memory_preparation.py::test_runbook_covers_candidate_review_and_lifecycle_handoffs`; `tests/architecture/test_relationship_memory_preparation.py::test_traceability_maps_every_preparation_package` | Candidate review, correction, expiry, deletion, escalation, and no-use are handoff procedures only; every protected disposition remains Gate-owned and downstream deletion reconciliation remains non-authorizing; no operational procedure is executed. |
+| REL-MEM-16 | `docs/architecture/relationship-memory-adr-018-revalidation-proposal-v1.md` Position 3; `docs/architecture/relationship-memory-threat-model-and-test-plan-v1.md` | `tests/architecture/test_relationship_memory_preparation.py::test_position_three_and_runtime_boundaries_are_explicit` | Position 3 is a future enforcement package requiring separate acceptance and independent verification. |
 
 Position 3 derives from Position 2 and must separately authorize schema and
 Memory Gate design, audit/deletion propagation, and negative Scope/Purpose
