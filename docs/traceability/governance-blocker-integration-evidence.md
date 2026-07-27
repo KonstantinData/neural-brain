@@ -4,7 +4,7 @@
 
 - Controller issue: https://app.notion.com/p/3a91c1ac5ec081ef91a4cd2fab4c04c7
 - Branch: `codex/backlog-controller-wave-1`
-- Commit: pending verified local commit
+- Commit: `5229db1 feat(governance): complete blocker preparation evidence`
 - Delivery boundary: repository-side preparation only; no Runtime component,
   real data access, hidden evaluation, role appointment, key, signature,
   release, or recognition claim.
