@@ -1,0 +1,86 @@
+{
+  "document_type": "neural_brain_ropa_evidence_intake_contract",
+  "contract_id": "neural-brain.ropa-evidence-intake",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-001", "ADR-005", "ADR-018", "ADR-019"],
+  "purpose": "Define a versioned, product- and domain-neutral record-of-processing-activities evidence intake for a proposed deployment. It collects deployment-specific review facts only; it cannot determine legal applicability or lawfulness, create trusted scope or authority, authorize processing or release, or enable a runtime operation.",
+  "scope": {
+    "current_repository_state": "No customer, production deployment, processing activity, controller, processor, data-subject population, or deployment-specific record is established by this repository.",
+    "product_boundary": "The Memory Core is a protected internal subsystem, not the product boundary.",
+    "assessment_unit": "One immutable proposed deployment artifact, authenticated Tenant and Area scope, and documented processing activity and purpose combination.",
+    "recording_boundary": "This contract describes an evidence intake. It does not store personal data, create a repository processing register, or replace an accountable party's separately governed record system."
+  },
+  "ropa_evidence_intake_template": {
+    "required_fields": [
+      "intake_identifier_and_contract_version",
+      "intake_timestamp_and_accountable_owner",
+      "immutable_artifact_version_or_digest",
+      "deployment_identifier_and_target_environment",
+      "immutable_authenticated_tenant_scope_reference",
+      "immutable_authenticated_area_scope_reference",
+      "intended_purpose_contract_id_and_version",
+      "processing_activity_identifier_and_description",
+      "processing_purpose_and_necessity_rationale",
+      "controller_processor_and_contact_evidence_references",
+      "data_subject_category_evidence",
+      "personal_data_category_evidence",
+      "recipient_and_subprocessor_evidence",
+      "international_transfer_and_location_evidence",
+      "retention_deletion_legal_hold_and_recovery_evidence",
+      "technical_and_organizational_safeguard_evidence",
+      "processing_operation_data_source_and_data_flow_evidence",
+      "applicable_law_and_qualified_review_reference",
+      "linked_gdpr_role_applicability_and_use_case_scope_evidence_references",
+      "identified_gaps_release_stops_evidence_expiry_and_next_review_date"
+    ],
+    "scope_binding_requirements": [
+      "The Tenant and Area references must identify immutable authenticated runtime scope evidence; an intake identifier, deployment label, request payload, prompt, observation, model response, memory content, or tool output cannot establish or expand trusted scope.",
+      "One record is required for each proposed artifact, authenticated Tenant and Area scope, processing activity, and purpose combination. Evidence may not be reused across Tenant or Area boundaries without a separate scope-bound record and qualified review.",
+      "The record must not contain raw personal data, personal identifiers, credentials, secrets, prompts, or memory payloads. Categories and durable evidence references are sufficient for this intake.",
+      "A record must identify only the proposed deployment facts it documents. It cannot assert that a processing activity exists, has been activated, or is permitted."
+    ],
+    "required_comparisons": [
+      "Compare the immutable artifact, authenticated Tenant and Area scope references, processing activity, and purpose against the exact intended-purpose and use-case-scope contract versions; an unaccepted domain-specific extension is rejected.",
+      "Compare data categories, subjects, recipients, transfers, retention, safeguards, and processing operations against the linked GDPR role and applicability evidence; absent, stale, contradictory, or scope-mismatched evidence remains a release stop.",
+      "Confirm that the proposed activity preserves authenticated scope, Tenant-bound database identity, Area isolation, protected transition-gate ownership, provenance, retention, legal hold, deletion propagation, quarantine, rollback, audit, and the independent Protected Control Plane.",
+      "Confirm that a completed intake does not substitute for qualified applicable-law review, data-processing agreements, authority, policy, approval, evaluation, recognition, or independently governed release evidence."
+    ]
+  },
+  "fail_closed_semantics": {
+    "intake_contract_version_must_match": true,
+    "immutable_authenticated_scope_references_required": true,
+    "one_record_per_artifact_scope_activity_and_purpose": true,
+    "unknown_or_missing_required_field": "ropa_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "missing_or_nonimmutable_authenticated_scope_reference": "reject_intake_and_block_deployment_specific_release_decision",
+    "stale_scope_mismatched_or_contradictory_evidence": "ropa_evidence_intake_incomplete_and_deployment_specific_release_blocked",
+    "cross_tenant_or_cross_area_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+    "unaccepted_domain_specific_extension": "reject_intake_and_block_deployment_specific_release_decision",
+    "unqualified_legal_or_regulatory_input": "deployment_specific_release_decision_blocked",
+    "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
+    "no_automatic_legal_or_compliance_conclusion": true,
+    "no_runtime_authorization_processing_activation_or_enablement": true,
+    "no_automatic_release_or_authority_outcome": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned deployment-specific governance and traceability evidence intake for separately governed review",
+    "template_is_not": [
+      "a legal opinion, record-of-processing legal determination, or compliance certification",
+      "a determination of lawfulness, controller or processor role, transfer mechanism, or retention legality",
+      "a repository record containing real personal data or a production processing register",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, or approval context",
+      "a policy decision, Security Floor override, protected-state transition request, or gate decision",
+      "a processing, deployment, productive-use, or release approval",
+      "a runtime capability enablement or external-effect authorization",
+      "an implementation, maturity, recognition, safety, or production-autonomy claim"
+    ],
+    "release_boundary": "Only separately applicable qualified review, accepted governance, and all Protected Control Plane, transition-gate, evaluation, recognition, and release evidence requirements may decide a concrete deployment. This intake never activates a runtime path."
+  },
+  "current_blocker": {
+    "status": "blocked_pending_concrete_deployment_scope_processing_facts_and_qualified_review",
+    "owner": "future deployment accountable owner",
+    "unblock_condition": "A concrete proposed deployment supplies every required field, immutable authenticated Tenant and Area scope evidence, category-level processing facts, linked assessment evidence, and qualified applicable review references for separately governed evaluation.",
+    "next_step": "Create one immutable evidence intake per proposed artifact, authenticated Tenant and Area scope, processing activity, and purpose before any deployment-specific release decision."
+  }
+}

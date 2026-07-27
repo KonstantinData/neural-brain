@@ -138,6 +138,11 @@ when they are required by the acceptance criteria.
   signed-evidence record template for a separately governed compliance-release
   decision; it requires current scope-matched GDPR and EU AI Act evidence or
   qualified non-applicability bases and cannot authorize runtime enablement.
+- [`S1-14.1-ropa-evidence-intake.md`](S1-14.1-ropa-evidence-intake.md):
+  deployment-specific record-of-processing-activities evidence intake with
+  immutable authenticated Tenant and Area scope references; it stores only
+  categories and references, fails closed, and cannot create processing,
+  authority, release, or runtime outcomes.
 - [`S1-06.5-approval-claims-blocker.md`](S1-06.5-approval-claims-blocker.md):
   current, Gate-owned approval-claim prerequisite and verification boundary;
   it records a blocker and does not implement approval consumption.
