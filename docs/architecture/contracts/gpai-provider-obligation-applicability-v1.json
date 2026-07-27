@@ -1,0 +1,79 @@
+{
+  "document_type": "neural_brain_gpai_provider_obligation_applicability_assessment_template",
+  "contract_id": "neural-brain.gpai-provider-obligation-applicability-assessment",
+  "contract_version": "1.0.0",
+  "status": "normative_foundation_governance_template",
+  "governing_decisions": ["ADR-018", "architecture-directive-v4.0", "neural-brain-recognition-standard"],
+  "purpose": "Define a versioned, product- and domain-neutral, fail-closed evidence input for qualified review of whether a concrete distribution, modification, branding, or fine-tuning fact pattern needs GPAI-provider-obligation assessment. It records evidence and reassessment work only; it does not determine provider status, legal applicability, an obligation, compliance, deployment authorization, release, authority, or runtime operation.",
+  "authoritative_external_reference": {
+    "instrument": "Regulation (EU) 2024/1689",
+    "official_url": "https://eur-lex.europa.eu/eli/reg/2024/1689/oj",
+    "review_references": "Article 3(63) and Article 53 are qualified-review references only; their applicability and interpretation depend on current, deployment-specific qualified review."
+  },
+  "architecture_boundary": {
+    "product_boundary": "Neural Brain is the complete protected cognitive system under ADR-018; the Memory Core is a protected internal subsystem.",
+    "control_plane": "Only separately governed Protected Control Plane and release processes may decide protected state, authority, deployment, or external effects.",
+    "stage_boundary": "This evidence template implements no NB-stage capability and cannot compensate for absent delivery, evaluation, recognition, safety, or control evidence."
+  },
+  "repository_facts_at_template_creation": {
+    "verified_facts": [
+      "The repository is product- and domain-neutral and records no accepted scoped customer or domain integration.",
+      "The repository has no approved productive model deployment or runtime inference adapter.",
+      "The model and inference inventory is evidence-only and cannot activate, deploy, promote, or authorize a model or inference provider.",
+      "No repository artifact currently establishes a concrete distribution, modification, branding, fine-tuning, market-placement, putting-into-service, or GPAI-provider fact pattern."
+    ],
+    "unknown_facts_not_inferred": [
+      "whether any entity is a GPAI provider for a concrete model or deployment",
+      "whether a concrete model is a GPAI model or is made available on the Union market",
+      "whether a concrete distribution, modification, branding, fine-tuning, or downstream release creates a legal obligation",
+      "the accountable legal entity, brand, terms, recipients, jurisdictions, and market or output nexus for a concrete artifact",
+      "whether any Article 53 obligation applies, is met, or is exempted",
+      "whether any deployment, release, model activation, authority, or external effect is authorized"
+    ]
+  },
+  "assessment_template": {
+    "record_semantics": "One immutable assessment record binds one model or GPAI-boundary artifact digest to one concrete distribution and operating context. It is an evidence intake and has no allow outcome.",
+    "required_fields": [
+      "assessment_identifier_and_timestamp",
+      "accountable_owner_and_qualified_reviewer",
+      "immutable_model_or_artifact_digest_and_model_inventory_reference",
+      "supplier_producer_and_downstream_actor_chain_evidence",
+      "concrete_distribution_availability_market_placement_or_putting_into_service_evidence",
+      "modification_fine_tuning_adapter_or_training_change_evidence",
+      "brand_trademark_and_entity_under_which_availability_is_claimed_evidence",
+      "licence_terms_model_card_and_documentation_evidence_references",
+      "intended_purpose_enabled_operations_and_authenticated_scope_reference",
+      "jurisdictions_union_market_or_output_nexus_and_recipient_evidence",
+      "model_capability_systemic_risk_and_downstream_integration_evidence_for_qualified_review",
+      "article_3_63_and_article_53_qualified_review_evidence",
+      "identified_gaps_release_stops_and_expiry",
+      "linked_reassessment_trigger_and_tracked_work_item_reference",
+      "independent_compliance_release_decision_reference"
+    ],
+    "required_comparisons": [
+      "Compare the immutable model or artifact digest with the linked model-inference inventory record; mutable tags, repository visibility, branch names, or self-description are insufficient.",
+      "Compare actual distribution, modification, fine-tuning, branding, entity, terms, and jurisdiction facts against the exact intended-purpose and AI Act role-assessment records.",
+      "Keep potential GPAI-provider-obligation review separate from operator-role, risk-classification, licence, security, privacy, authority, release, and runtime decisions.",
+      "Record every model, supplier, distribution, modification, fine-tuning, branding, purpose, jurisdiction, or legal-source change through the separately governed reassessment-trigger intake."
+    ],
+    "review_states_for_evidence_routing_only": ["not_assessed", "qualified_review_required", "evidence_incomplete_or_stale", "reassessment_open"],
+    "forbidden_states": ["provider_status_determined_by_template", "obligation_concluded_by_template", "compliant_by_template", "deployment_authorized_by_template", "runtime_enabled_by_template"]
+  },
+  "fail_closed_semantics": {
+    "unknown_or_missing_required_field": "assessment_incomplete_and_affected_deployment_specific_release_blocked",
+    "unverified_distribution_modification_branding_or_fine_tuning_fact": "assessment_incomplete_and_affected_deployment_specific_release_blocked",
+    "stale_scope_mismatched_or_contradictory_evidence": "assessment_incomplete_and_affected_deployment_specific_release_blocked",
+    "missing_qualified_review_or_linked_reassessment_work": "assessment_incomplete_and_affected_deployment_specific_release_blocked",
+    "no_automatic_provider_status_or_obligation_conclusion": true,
+    "no_automatic_legal_applicability_or_compliance_conclusion": true,
+    "no_automatic_deployment_release_or_authority_outcome": true,
+    "no_runtime_activation_or_protected_state_mutation": true,
+    "public_repository_or_branding_metadata_is_insufficient": true,
+    "no_allow_outcome": true
+  },
+  "authority_boundary": {
+    "template_is": "a versioned governance and traceability input for qualified, deployment-specific GPAI-provider-obligation review",
+    "template_is_not": ["legal advice", "a GPAI-provider status assignment", "an Article 53 applicability or obligation conclusion", "a compliance certification", "a licence interpretation", "a deployment or release approval", "an authority grant", "a policy decision", "a model activation or promotion", "a runtime capability enablement", "a maturity, recognition, safety, or production-autonomy claim"],
+    "release_boundary": "Only separately authorized release governance, qualified current review, and all applicable Protected Control Plane, Security Floor, delivery-stage, evaluation, and evidence requirements may decide a concrete deployment."
+  }
+}
