@@ -10,6 +10,11 @@ deployment boundaries is [`ai-component-inventory.md`](ai-component-inventory.md
 It is deliberately fail-closed: an inventory entry does not enable a capability,
 approve a deployment, or establish Neural Brain recognition.
 
+[`model-inference-inventory-v1.md`](model-inference-inventory-v1.md) defines
+the required immutable evidence record for a model or inference boundary. It is
+fail-closed and does not activate a model, inference provider, Ollama fallback,
+deployment, release, Model Promotion Gate, or authority.
+
 [`intended-purpose-assessment-v1.md`](intended-purpose-assessment-v1.md)
 defines the stable, product- and domain-neutral intended-purpose assessment
 input for future deployments. It is not a legal, regulatory, compliance, or

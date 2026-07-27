@@ -46,6 +46,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "memory-operation-approvals.json",
         "memory-release-stops.json",
         "memory-stage-capabilities.json",
+        "model-inference-inventory-v1.json",
         "nb1-hidden-evaluation.json",
         "nb1-safe-serial-cognition.json",
         "prohibited-unsupported-use-v1.json",

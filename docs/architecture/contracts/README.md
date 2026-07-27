@@ -70,6 +70,11 @@ ADR-017.
 - `ledger-invariants.json`: PostgreSQL, provenance, audit, isolation, and recovery.
 - `dreaming.json`: Area-local offline Dreaming and inactive candidates.
 - `inference-provider.json`: bounded local Ollama memory-processing boundary.
+- `model-inference-inventory-v1.json`: versioned, fail-closed evidence contract
+  for any model or inference boundary. It requires immutable ID/version/digest,
+  provenance, supplier, licence/model-card references, precision, context bound,
+  and evaluation status; it does not activate, deploy, promote, or authorize a
+  model or inference provider.
 
 Historical Goal, Action Intent, dispatch, intent-purpose, and quiescence
 contracts remain in Git history. ADR-018 does not reactivate them automatically;

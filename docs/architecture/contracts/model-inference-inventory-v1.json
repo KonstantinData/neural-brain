@@ -1,0 +1,120 @@
+{
+    "document_type": "neural_brain_model_and_inference_inventory_contract",
+    "contract_id": "neural-brain.model-inference-inventory",
+    "contract_version": "1.0.0",
+    "status": "normative_foundation_governance_contract",
+    "governing_decisions": [
+        "ADR-018",
+        "architecture-directive-v4.0",
+        "neural-brain-recognition-standard"
+    ],
+    "purpose": "Define a versioned, product- and domain-neutral, fail-closed inventory record for any model or inference boundary considered for Neural Brain. The contract records evidence; it does not deploy, activate, route, select, promote, or authorize a model or inference provider.",
+    "architecture_boundary": {
+        "product_boundary": "Neural Brain is the complete protected cognitive system under ADR-018.",
+        "memory_core": "The Memory Core is a protected internal subsystem and cannot narrow the product boundary or establish model authority.",
+        "control_plane": "Only the Protected Control Plane and its applicable transition gates may decide protected state, model promotion, deployment, or external effects."
+    },
+    "repository_facts_at_contract_creation": {
+        "verified_facts": [
+            "The repository has no approved production model deployment or runtime inference adapter.",
+            "The NB-1 development slice has a trusted fixed-version cognitive model bundle with repository-local provenance and evaluation evidence.",
+            "ADR-014 records local Ollama as a future untrusted bounded inference dependency; no Ollama adapter, activation, fallback, or deployment record is implemented or approved.",
+            "No model inventory record can establish a Neural Brain recognition, capability, authority, release, or deployment claim."
+        ],
+        "unknown_facts_not_inferred": [
+            "a productive model or inference deployment",
+            "a supplier-approved licence or model-card conclusion for a concrete model",
+            "a runtime endpoint, credential, budget, egress approval, fallback policy, or activation decision",
+            "a qualified legal, regulatory, security, safety, privacy, or release determination"
+        ]
+    },
+    "inventory_record": {
+        "record_semantics": "One immutable record binds exactly one model or inference-boundary artifact version/digest to its declared non-authorizing inventory status and evidence references.",
+        "required_fields": [
+            "inventory_record_identifier",
+            "record_timestamp_and_accountable_owner",
+            "asset_kind_and_lifecycle_status",
+            "model_identifier",
+            "model_version",
+            "immutable_model_or_artifact_digest",
+            "provenance_and_source_reference",
+            "supplier_or_producer_identity",
+            "licence_or_usage_terms_reference",
+            "model_card_or_equivalent_documentation_reference",
+            "quantisation_or_precision_configuration",
+            "context_window_or_input_bound",
+            "inference_boundary_and_deployment_status",
+            "authenticated_scope_and_intended_use_reference",
+            "training_data_and_adapter_provenance_reference",
+            "evaluation_status_and_evidence_references",
+            "security_safety_privacy_and_release_stop_references",
+            "reassessment_triggers_and_next_review_date"
+        ],
+        "allowed_asset_kinds": [
+            "cognitive_model",
+            "model_candidate",
+            "inference_provider_boundary",
+            "adapter",
+            "embedding_model",
+            "evaluation_model"
+        ],
+        "allowed_lifecycle_statuses": [
+            "target",
+            "not_deployed",
+            "development_only",
+            "candidate_inactive",
+            "implemented_evidence_only"
+        ],
+        "forbidden_lifecycle_statuses": [
+            "active_without_gate",
+            "approved_by_inventory",
+            "runtime_authorized",
+            "recognition_proven"
+        ],
+        "field_semantics": {
+            "model_identifier": "Stable supplier or repository identifier; request payloads, prompts, observations, and model output cannot select it.",
+            "immutable_model_or_artifact_digest": "Exact immutable digest for the model, bundle, adapter, or boundary artifact; mutable tags are insufficient.",
+            "provenance_and_source_reference": "Versioned source, build, training, and artifact lineage reference; unknown lineage is incomplete.",
+            "supplier_or_producer_identity": "Named producing or supplying organization or repository authority; unknown supplier is incomplete.",
+            "licence_or_usage_terms_reference": "Versioned licence or usage-terms evidence reference only; this contract makes no licence interpretation or compliance conclusion.",
+            "model_card_or_equivalent_documentation_reference": "Model card or equivalent versioned technical evidence reference; absence is incomplete.",
+            "quantisation_or_precision_configuration": "Exact precision, quantisation, or an explicit not-applicable value with rationale; unknown precision is incomplete.",
+            "context_window_or_input_bound": "Exact context window or bounded input limit with unit; unknown or unbounded context is incomplete.",
+            "evaluation_status_and_evidence_references": "Explicit status plus preregistered, held-out, ablation, safety, and other applicable evidence references; no evidence is not a pass.",
+            "inference_boundary_and_deployment_status": "Declared boundary and status only; an endpoint, deployment, fallback, activation, credential, egress path, or runtime provider must not be inferred."
+        }
+    },
+    "validation": {
+        "unknown_missing_stale_contradictory_or_scope_mismatched_field": "inventory_record_incomplete_and_model_or_inference_use_denied",
+        "unknown_inventory_entry": "inventory_record_incomplete_and_model_or_inference_use_denied",
+        "mutable_or_digest_mismatched_artifact": "inventory_record_incomplete_and_model_or_inference_use_denied",
+        "unknown_evaluation_status": "inventory_record_incomplete_and_capability_deployment_promotion_and_recognition_claim_denied",
+        "target_or_not_deployed_status": "no_runtime_activation_or_deployment_authorized",
+        "candidate_inactive_status": "no_promotion_or_productive_use_authorized",
+        "inventory_record_is_not_authority": true,
+        "inventory_record_is_not_release_approval": true,
+        "inventory_record_is_not_model_promotion": true,
+        "inventory_record_is_not_recognition_evidence": true
+    },
+    "prohibitions": [
+        "No productive model mutates itself, its inventory record, policy, evaluation definition, promotion rule, kill switch, or Security Floor.",
+        "No inventory record enables Ollama, a local or cloud inference provider, fallback policy, endpoint, credential, egress path, runtime inference, or deployment.",
+        "No model, planner, adapter, memory subsystem, or inventory record creates authority, writes protected state, invokes tools, or causes an external effect.",
+        "No model card, supplier statement, licence reference, evaluation label, tool success, or self-report is a legal, compliance, safety, deployment, goal-success, or recognition conclusion."
+    ],
+    "mandatory_reassessment_triggers": [
+        "model_identifier_version_digest_or_provenance_change",
+        "supplier_licence_model_card_or_usage_terms_change",
+        "quantisation_precision_context_or_adapter_change",
+        "training_data_or_evaluation_evidence_change",
+        "intended_use_scope_or_inference_boundary_change",
+        "security_safety_privacy_incident_or_release_stop_change",
+        "deployment_or_runtime_activation_proposal"
+    ],
+    "current_blocker": {
+        "status": "no_productive_model_or_inference_deployment_record",
+        "owner": "future authenticated deployment and Model Promotion Gate owners",
+        "unblock_condition": "A separately authorized, stage-eligible proposal supplies a complete immutable inventory record and all applicable Protected Control Plane, Model Promotion Gate, evaluation, approval, release, deployment, and independent-review evidence.",
+        "next_step": "Record any future model or inference-boundary candidate using this contract before separately governed evaluation or deployment review; keep absent or incomplete entries denied."
+    }
+}
