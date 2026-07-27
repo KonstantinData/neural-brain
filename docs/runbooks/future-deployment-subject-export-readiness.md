@@ -24,9 +24,12 @@ fact.
 1. Create one category-only inventory row per proposed data class and lifecycle
    surface. Include explicit non-applicability only with qualified review.
 2. Complete the coverage, redaction, third-party-rights, legal-basis,
-   controller, processor, and Tenant-scope matrices using references only.
+   controller, processor, Tenant-scope, retention, archive, backup, and
+   recovery matrices using references only. Every row records the identical
+   immutable scope, lifecycle-specific evidence, explicit gap/disposition, and
+   qualified-review reference.
 3. Record source ownership, boundary, lineage, retention, legal hold, backup,
-   archive, recovery, deletion propagation, audit, currency, and gaps as
+   archive, recovery, snapshots, deletion propagation, audit, currency, and gaps as
    references or release stops.
 4. Obtain qualified independent privacy-review input for the exact immutable
    scope. The input is evidence only; it cannot authorize a runtime operation.

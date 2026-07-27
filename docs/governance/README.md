@@ -91,6 +91,20 @@ defines an unaccepted, non-authorizing target contract for a future Protected
 Control Plane kill switch, credential revocation, and recovery capability. It
 does not implement or authorize any control-plane runtime behavior.
 
+[`nb1-independent-evaluation-organization-v1.md`](nb1-independent-evaluation-organization-v1.md)
+defines non-appointing independent-evaluation roles, separation, conflicts,
+delegation, handoff, and decision matrices; unknown or self-certified role facts
+fail closed and create no authority.
+
+[`nb1-candidate-freeze-lifecycle-v1.md`](nb1-candidate-freeze-lifecycle-v1.md)
+defines preparation-only candidate-freeze, registry, immutable-storage,
+verification, invalidation, and rollback governance; it creates no candidate or
+release.
+
+[`future-deployment-subject-export-review-checklist-v1.md`](future-deployment-subject-export-review-checklist-v1.md)
+defines a category-only review and audit checklist for future subject-export
+readiness; it does not review real data or authorize a discovery or export.
+
 [`dpia-evidence-intake-v1.md`](dpia-evidence-intake-v1.md) defines a
 fail-closed DPIA/risk evidence intake. It does not determine risk, approve a
 DPIA, require consultation, or authorize processing, runtime, authority, or

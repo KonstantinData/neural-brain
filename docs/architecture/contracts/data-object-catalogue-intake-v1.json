@@ -8,7 +8,7 @@
   "scope": {
     "current_repository_state": "No customer, production deployment, processing activity, personal-data inventory, or deployment-specific data-object catalogue record is established by this repository.",
     "product_boundary": "The Memory Core is a protected internal subsystem, not the product boundary.",
-    "assessment_unit": "One immutable proposed artifact version, authenticated Tenant and Area scope evidence, proposed stored data-object type, processing activity, and purpose combination.",
+    "assessment_unit": "One immutable proposed artifact version, authenticated Tenant and Area scope evidence, immutable authenticated Project scope and parent-lineage evidence when the proposed object is project-bound, proposed stored data-object type, processing activity, and purpose combination.",
     "recording_boundary": "This contract describes an evidence intake. It stores only categories and durable evidence references; it does not contain raw personal data, prompts, memory payloads, credentials, secrets, or a production processing register."
   },
   "data_object_catalogue_intake_template": {
@@ -19,6 +19,7 @@
       "deployment_identifier_and_target_environment",
       "immutable_authenticated_tenant_scope_reference",
       "immutable_authenticated_area_scope_reference",
+      "project_scope_applicability_and_immutable_authenticated_project_scope_lineage_evidence",
       "data_object_type_identifier_and_category_description",
       "technical_owner_and_accountable_governance_owner_evidence",
       "controller_processor_role_evidence_reference",
@@ -35,7 +36,9 @@
     ],
     "scope_binding_requirements": [
       "Tenant and Area references must identify immutable authenticated runtime scope evidence; a catalogue identifier, owner label, data-object label, request payload, prompt, observation, model response, memory content, or tool output cannot establish or expand trusted scope.",
-      "One record is required for each proposed artifact, authenticated Tenant and Area scope, data-object type, processing activity, and purpose combination. Evidence may not be reused across Tenant or Area boundaries without a separate scope-bound record and qualified review.",
+      "For a project-bound proposed object, the project-scope field must identify immutable authenticated Project scope evidence and immutable parent Tenant and Area lineage. A catalogue identifier, owner label, data-object label, request payload, prompt, observation, model response, memory content, or tool output cannot establish, infer, or expand Project scope or lineage.",
+      "One record is required for each proposed artifact, authenticated Tenant and Area scope, authenticated Project scope when project-bound, data-object type, processing activity, and purpose combination. Evidence may not be reused across Tenant, Area, or Project boundaries without a separate scope-bound record and qualified review.",
+      "A proposed object may be recorded as not project-bound only with category-level evidence that states the applicable scope rule; an unknown, missing, stale, contradictory, or non-immutable Project scope or lineage for a project-bound object blocks the deployment-specific release decision.",
       "The record must not contain raw personal data, personal identifiers, credentials, secrets, prompts, or memory payloads. Categories and durable evidence references are sufficient for this intake.",
       "The processing-register reference must identify the corresponding immutable RoPA evidence intake record or explicitly record its absence as a release stop; this contract does not create a processing register."
     ],
@@ -46,7 +49,7 @@
       "Unknown, stale, contradictory, scope-mismatched, non-immutable, or unqualified lifecycle evidence remains a release stop and cannot be compensated by a later favorable item."
     ],
     "required_comparisons": [
-      "Compare the immutable artifact, authenticated Tenant and Area scope references, data-object type, processing activity, and purpose against the exact intended-purpose, use-case scope, GDPR role, GDPR applicability, and RoPA evidence contract versions.",
+      "Compare the immutable artifact, authenticated Tenant and Area scope references, immutable authenticated Project scope and parent lineage when project-bound, data-object type, processing activity, and purpose against the exact intended-purpose, use-case scope, GDPR role, GDPR applicability, and RoPA evidence contract versions.",
       "Compare storage, transitions, retention, legal hold, deletion responsibility, rights, recipients, transfers, and safeguards against the linked processing-register evidence; absent, stale, contradictory, or scope-mismatched evidence remains a release stop.",
       "Confirm that the proposed object preserves Tenant-bound identity, Area isolation, provenance, data minimization, retention, legal hold, deletion propagation, quarantine, rollback, atomic audit, Protected Control Plane ownership, and applicable transition-gate ownership.",
       "Confirm that a completed intake does not substitute for qualified applicable-law review, authority, policy, approval, evaluation, recognition, or independently governed release evidence."
@@ -55,13 +58,16 @@
   "fail_closed_semantics": {
     "intake_contract_version_must_match": true,
     "immutable_authenticated_scope_references_required": true,
+    "immutable_authenticated_project_scope_lineage_or_not_applicable_evidence_required": true,
     "one_record_per_artifact_scope_data_object_activity_and_purpose": true,
     "processing_register_reference_required": true,
     "unknown_or_missing_required_field": "data_object_catalogue_intake_incomplete_and_deployment_specific_release_blocked",
     "missing_or_nonimmutable_authenticated_scope_reference": "reject_intake_and_block_deployment_specific_release_decision",
+    "unknown_or_missing_project_scope_or_lineage_for_project_bound_object": "reject_intake_and_block_deployment_specific_release_decision",
     "missing_processing_register_reference": "reject_intake_and_block_deployment_specific_release_decision",
     "stale_scope_mismatched_or_contradictory_evidence": "data_object_catalogue_intake_incomplete_and_deployment_specific_release_blocked",
     "cross_tenant_or_cross_area_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
+    "cross_tenant_or_cross_area_or_cross_project_evidence_reuse": "reject_intake_and_block_deployment_specific_release_decision",
     "proposed_personal_data_or_secret_payload": "reject_intake_and_record_data_minimization_blocker",
     "no_automatic_legal_or_compliance_conclusion": true,
     "no_runtime_authorization_processing_activation_or_enablement": true,
@@ -74,7 +80,7 @@
       "a legal opinion, data-protection determination, or compliance certification",
       "a determination of lawfulness, controller or processor role, transfer mechanism, retention legality, or data-subject-rights outcome",
       "a repository record containing real personal data, a production processing register, or an active data inventory",
-      "an authenticated Tenant, Area, Project, Session, principal, role, authority, or approval context",
+      "an authenticated Tenant, Area, Project, Session, principal, role, authority, or approval context, or Project lineage",
       "a policy decision, Security Floor override, protected-state transition request, or gate decision",
       "a processing, deployment, productive-use, or release approval",
       "a runtime capability enablement, protected-state write, or external-effect authorization",
@@ -85,7 +91,7 @@
   "current_blocker": {
     "status": "blocked_pending_concrete_deployment_scope_data_object_processing_facts_and_qualified_review",
     "owner": "future deployment accountable owner",
-    "unblock_condition": "A concrete proposed deployment supplies every required field, immutable authenticated Tenant and Area scope evidence, category-level data-object and processing facts, linked RoPA evidence, and qualified applicable review references for separately governed evaluation.",
-    "next_step": "Create one immutable catalogue intake per proposed artifact, authenticated Tenant and Area scope, data-object type, processing activity, and purpose before any deployment-specific release decision."
+    "unblock_condition": "A concrete proposed deployment supplies every required field, immutable authenticated Tenant and Area scope evidence, immutable authenticated Project scope and parent-lineage evidence when the object is project-bound, category-level data-object and processing facts, linked RoPA evidence, and qualified applicable review references for separately governed evaluation.",
+    "next_step": "Create one immutable catalogue intake per proposed artifact, authenticated Tenant and Area scope, authenticated Project scope and parent lineage when project-bound, data-object type, processing activity, and purpose before any deployment-specific release decision."
   }
 }

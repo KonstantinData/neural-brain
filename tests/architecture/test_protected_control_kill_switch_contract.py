@@ -80,6 +80,7 @@ def test_authenticated_scope_and_separation_of_duties_are_required() -> None:
     )
     assert boundary["default_on_unknown"] == "deny_or_stop_and_escalate"
     assert _strings(contract["immutable_scope"]) == {
+        "brain_id",
         "tenant_id",
         "area_id",
         "project_id",
@@ -87,6 +88,18 @@ def test_authenticated_scope_and_separation_of_duties_are_required() -> None:
         "operation_class",
         "control_scope_id",
     }
+    lineage = contract["immutable_scope_lineage"]
+    assert isinstance(lineage, dict)
+    assert lineage["hierarchy"] == [
+        "brain_id",
+        "tenant_id",
+        "area_id",
+        "project_id",
+        "session_id",
+    ]
+    assert lineage["source"] == "authenticated_protected_control_plane_runtime_context"
+    assert lineage["default_on_unknown_or_mismatch"] == "deny_or_stop_and_escalate"
+    assert "cannot establish, alter, infer, or repair lineage" in lineage["exclusion"]
     roles = contract["roles_and_separation_of_duties"]
     assert isinstance(roles, list)
     assert all(isinstance(role, dict) for role in roles)
@@ -121,6 +134,12 @@ def test_concurrency_failure_and_recovery_evidence_is_preregistered() -> None:
     assert _strings(persisted["required_fields"]) == {
         "control_scope_id",
         "immutable_scope",
+        "brain_id",
+        "tenant_id",
+        "area_id",
+        "project_id",
+        "session_id",
+        "scope_lineage_hash",
         "state",
         "revision",
         "issued_at",
@@ -138,9 +157,11 @@ def test_concurrency_failure_and_recovery_evidence_is_preregistered() -> None:
         "audit_hash",
         "previous_audit_hash",
     }
-    assert {"monotonic revision", "compare-and-swap precondition"} <= _strings(
-        persisted["integrity"]
-    )
+    assert {
+        "monotonic revision",
+        "compare-and-swap precondition",
+        "lineage binding checked against authenticated runtime context before persistence and every future enforcement boundary",
+    } <= _strings(persisted["integrity"])
     failure_behavior = _strings(contract["enforcement_and_failure_behavior"])
     assert len(failure_behavior) == 7
     assert any("network partition" in item for item in failure_behavior)

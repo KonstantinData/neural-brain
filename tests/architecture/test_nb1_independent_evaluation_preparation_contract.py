@@ -46,6 +46,11 @@ def test_candidate_freeze_requires_all_v4_bindings_and_reproducibility() -> None
     assert freeze["candidate_must_be_v4_bound"] is True
     assert freeze["clean_committed_source_tree_required"] is True
     assert freeze["hash_algorithm"] == "SHA-256"
+    assert freeze["canonicalization_profile_id"] == "nb1-eval-canonical-json-v1"
+    assert (
+        freeze["canonicalization_artifact_kind_mapping_source"]
+        == "docs/architecture/contracts/nb1-independent-evaluation-artifact-manifests-v1.json#/canonicalization/artifact_kind_byte_rules"
+    )
     assert set(freeze["required_freeze_receipt_bindings"]) == {
         "source_commit",
         "source_tree_digest",
@@ -99,7 +104,8 @@ def test_candidate_freeze_requires_all_v4_bindings_and_reproducibility() -> None
 def test_custody_and_separation_prohibit_hidden_disclosure_and_self_certification() -> None:
     custody = _load()["custody_and_separation"]
     hidden = custody["hidden_dataset_and_seed"]
-    assert hidden["custodian"] == "independent_hidden_artifact_provider"
+    assert hidden["custodian"] == "independent_evaluator_only"
+    assert "separate provider/evaluator organization is prohibited" in hidden["v4_custody_binding"]
     assert {
         "hidden_seed",
         "hidden_examples",
@@ -118,6 +124,7 @@ def test_custody_and_separation_prohibit_hidden_disclosure_and_self_certificatio
     assert "subagent" in rules.lower()
     assert "cannot hold the hidden seed" in rules
     assert "may not modify the frozen candidate" in rules
+    assert "separate provider/evaluator identity is rejected" in rules
 
 
 def test_registry_ledger_and_signatures_are_reviewer_and_evaluator_owned() -> None:

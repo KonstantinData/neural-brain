@@ -19,11 +19,14 @@ and qualified independent privacy-review reference. It records only categories
 and durable evidence references. The required category taxonomy covers primary
 data; memory including working, episodic, semantic, and procedural memory;
 evidence; logs; cache; embeddings; attachments; artefacts; backups; archives;
-derivatives; indexes; recovery; and retention.
+derivatives; indexes; recovery; retention; and snapshots.
 
 Every applicable row must be represented in the export-coverage, redaction,
-third-party-rights, legal-basis, controller, processor, and Tenant-scope
-matrices. A category being absent from an actual deployment must be recorded as
+third-party-rights, legal-basis, controller, processor, Tenant-scope,
+retention, archive, backup, and recovery matrices. Each matrix row binds the
+same immutable scope, category-only lifecycle evidence, gap or disposition,
+and qualified review reference. A category being absent from an actual
+deployment must be recorded as
 an explicit, scope-bound non-applicability disposition after qualified review;
 it must never be assumed absent from this repository template.
 
@@ -33,10 +36,10 @@ it must never be assumed absent from this repository template.
    jurisdiction, accountable owner, and qualified independent reviewer.
 2. Record category-only lifecycle and source-boundary evidence. Do not access,
    enumerate, copy, discover, or process a store.
-3. Complete all matrices with immutable evidence references and explicit
+3. Complete all eleven matrices with immutable evidence references and explicit
    unknown, conflict, gap, expiry, or unavailable-source dispositions.
-4. Record retention, legal hold, backups, archives, recovery, deletion
-   propagation, review, and audit references without deciding an export,
+4. Record retention, legal hold, backups, archives, recovery, snapshots,
+   deletion propagation, review, and audit references without deciding an export,
    disclosure, right, or legal outcome.
 5. Retain all blockers for separately governed review and reassess upon any
    scope, lifecycle, matrix, reviewer, provenance, incident, or material-use

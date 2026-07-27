@@ -33,6 +33,13 @@ distinct.
   records the proposed, non-authorizing replacement boundary for historical
   Kill-Switch ADR-006. It remains blocked pending an authorized Protected
   Control Plane decision and does not authorize runtime implementation.
+- [`nb1-independent-evaluation-adr-018-revalidation-proposal-v1.md`](nb1-independent-evaluation-adr-018-revalidation-proposal-v1.md)
+  records a proposed, non-authorizing EVAL-01 v4 artifact, custody, and
+  evidence boundary. It remains blocked pending external independent roles and
+  evidence and cannot authorize an evaluation, release, or recognition claim.
+- [`protected-control-kill-switch-scope-resolution-decision-v1.md`](protected-control-kill-switch-scope-resolution-decision-v1.md)
+  records unaccepted scope-resolution options for the future Kill-Switch
+  successor. It selects no policy and has no runtime authority.
 - [`ledger-conventions-v1.md`](ledger-conventions-v1.md) fixes PostgreSQL
   representation conventions for protected keys, scope, time, exact amounts,
   naming, and structured payloads.

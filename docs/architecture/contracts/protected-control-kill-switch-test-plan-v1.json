@@ -1,0 +1,361 @@
+{
+    "document_type": "neural_brain_protected_control_kill_switch_preregistered_test_plan",
+    "format_version": 1,
+    "test_plan_id": "neural-brain.protected-control-kill-switch-test-plan",
+    "test_plan_version": "1.0.0-draft",
+    "status": "proposed_not_accepted_not_runtime_authorization",
+    "task": "S1-02.5",
+    "purpose": "Preregister future evidence cases for a Protected Control Plane kill-switch successor. This plan does not implement, operate, certify, or authorize a runtime control.",
+    "authority_boundary": {
+        "governing_contract": "neural-brain.protected-control-kill-switch",
+        "implementation_precondition": "accepted ADR-018-conformant successor plus independent security/safety review and qualified recovery ownership",
+        "default_on_missing_evidence": "deny_or_stop_and_escalate",
+        "stage_boundary": "NB-5 controlled sandbox and later; NB-1 remains effect-free"
+    },
+    "common_oracles": {
+        "state_oracle": "Durable authoritative state has the expected state and monotonic revision, or defaults to disabled on unknown, unavailable, stale, conflicting, or scope-mismatched state.",
+        "audit_oracle": "Every attempted transition or denial has an append-only, causally linked audit record; missing audit persistence prevents admission or transition completion.",
+        "claim_oracle": "No budget, resource, fence, credential, or action claim is released, reused, or retried while an effect is ambiguous; authoritative reconciliation is required."
+    },
+    "required_lineage": ["brain_id", "tenant_id", "area_id", "project_id", "session_id"],
+    "case_schema": {
+        "required_fields": [
+            "case_id",
+            "category",
+            "transition_or_interface",
+            "preconditions",
+            "trace_or_interleaving",
+            "expected_state_oracle",
+            "expected_audit_oracle",
+            "expected_claim_oracle",
+            "evidence_owner",
+            "evidence_stage"
+        ],
+        "lineage_rule": "Every case binds the complete authenticated Brain->Tenant->Area->Project->Session lineage; an unknown or mismatched ancestor fails closed."
+    },
+    "result_schema": {
+        "required_immutable_artifact_refs": [
+            "contract_artifact_ref",
+            "implementation_artifact_ref",
+            "environment_artifact_ref",
+            "fault_injection_artifact_ref",
+            "ledger_artifact_ref"
+        ],
+        "binding_rule": "Each reference identifies immutable versioned evidence for the executed case. Missing, mutable, unverifiable, or lineage-mismatched references invalidate the result and fail the case closed."
+    },
+    "permitted_transition_coverage": [
+        {
+            "transition": "enabled->drain",
+            "coverage_case_ids": ["KS-PT-001"],
+            "coverage_mode": "positive_transition"
+        },
+        {
+            "transition": "enabled->disabled",
+            "coverage_case_ids": ["KS-PT-003", "KS-RT-001"],
+            "coverage_mode": "positive_emergency_transition_and_race"
+        },
+        {
+            "transition": "drain->disabled",
+            "coverage_case_ids": ["KS-PT-004"],
+            "coverage_mode": "positive_fault_transition"
+        },
+        {
+            "transition": "drain->recovery",
+            "coverage_case_ids": ["KS-PT-005"],
+            "coverage_mode": "positive_transition"
+        },
+        {
+            "transition": "disabled->recovery",
+            "coverage_case_ids": ["KS-PT-002"],
+            "coverage_mode": "positive_transition"
+        },
+        {
+            "transition": "recovery->enabled",
+            "coverage_case_ids": ["KS-PT-002"],
+            "coverage_mode": "positive_transition"
+        },
+        {
+            "transition": "recovery->disabled",
+            "coverage_case_ids": ["KS-RC-001"],
+            "coverage_mode": "specified_automatic_failure_transition"
+        }
+    ],
+    "cases": [
+        {
+            "case_id": "KS-PT-001",
+            "category": "positive_transition",
+            "transition_or_interface": "enabled->drain / Action Transition Gate admission",
+            "preconditions": [
+                "authenticated complete lineage",
+                "authorized kill operator",
+                "current revision",
+                "audit ledger available"
+            ],
+            "trace_or_interleaving": [
+                "read enabled revision r",
+                "CAS enabled->drain at r",
+                "attempt new action admission"
+            ],
+            "expected_state_oracle": "drain at r+1; no new effect admission",
+            "expected_audit_oracle": "one transition audit event linked to actor, lineage, reason, and prior hash",
+            "expected_claim_oracle": "existing ambiguous claims retained; no new effect claim committed",
+            "evidence_owner": "Protected Control Plane implementation owner and independent security reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-PT-002",
+            "category": "positive_transition",
+            "transition_or_interface": "disabled->recovery->enabled / recovery approval",
+            "preconditions": [
+                "complete lineage",
+                "revocation/rotation evidence",
+                "reconciled authoritative inventory",
+                "separate recovery approver",
+                "all release stops resolved"
+            ],
+            "trace_or_interleaving": [
+                "CAS disabled->recovery",
+                "verify independent recovery evidence",
+                "CAS recovery->enabled"
+            ],
+            "expected_state_oracle": "enabled only after valid recovery sequence and fresh revision",
+            "expected_audit_oracle": "both transitions and all evidence references are durable and causally ordered",
+            "expected_claim_oracle": "no prior ambiguous claim is released without reconciliation",
+            "evidence_owner": "qualified recovery owner and independent safety reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-PT-003",
+            "category": "positive_transition",
+            "transition_or_interface": "enabled->disabled / emergency disable",
+            "preconditions": [
+                "authenticated complete lineage",
+                "authorized emergency actor or independent Safety Supervisor",
+                "current revision",
+                "audit ledger available"
+            ],
+            "trace_or_interleaving": [
+                "read enabled revision r",
+                "CAS enabled->disabled at r",
+                "attempt admission, dispatch, and credential use"
+            ],
+            "expected_state_oracle": "disabled at r+1; effect admission, dispatch, and credential use are denied",
+            "expected_audit_oracle": "one durable emergency-disable transition event binds actor, lineage, reason, and prior hash",
+            "expected_claim_oracle": "in-flight ambiguous claims are retained for containment and reconciliation",
+            "evidence_owner": "Protected Control Plane implementation owner and independent safety reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-PT-004",
+            "category": "positive_transition",
+            "transition_or_interface": "drain->disabled / fault, timeout, revocation, or containment escalation",
+            "preconditions": [
+                "authenticated complete lineage",
+                "current drain revision",
+                "documented escalation trigger",
+                "audit ledger available"
+            ],
+            "trace_or_interleaving": [
+                "observe drain revision r",
+                "submit authorized escalation trigger",
+                "CAS drain->disabled at r"
+            ],
+            "expected_state_oracle": "disabled at r+1 and no new effect path becomes available",
+            "expected_audit_oracle": "durable escalation transition records trigger, lineage, revision, and causal predecessor",
+            "expected_claim_oracle": "existing claims remain retained until authoritative reconciliation",
+            "evidence_owner": "qualified recovery owner and independent security reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-PT-005",
+            "category": "positive_transition",
+            "transition_or_interface": "drain->recovery / independently approved incident recovery",
+            "preconditions": [
+                "authenticated complete lineage",
+                "current drain revision",
+                "drain quiescence",
+                "no unresolved effect, fence, audit, credential, or scope ambiguity",
+                "independently approved incident recovery"
+            ],
+            "trace_or_interleaving": [
+                "verify drain quiescence and complete reconciliation inventory",
+                "verify no unresolved effect, fence, audit, credential, or scope ambiguity",
+                "CAS drain->recovery at current revision"
+            ],
+            "expected_state_oracle": "recovery at r+1 and remains effect-disabled",
+            "expected_audit_oracle": "durable transition records quiescence, independent approval, complete lineage, and all verified ambiguity checks",
+            "expected_claim_oracle": "no new effect claim is committed; retained claims remain governed by reconciliation",
+            "evidence_owner": "qualified recovery owner and independent safety reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-NT-001",
+            "category": "negative_scope_authority",
+            "transition_or_interface": "all transition interfaces",
+            "preconditions": [
+                "missing, stale, conflicting, or mismatched lineage, identity, authority, policy, approval, or state"
+            ],
+            "trace_or_interleaving": [
+                "submit transition with each invalid prerequisite",
+                "attempt admission, commit, dispatch, and credential use"
+            ],
+            "expected_state_oracle": "no enabling transition; affected scope disabled or stopped",
+            "expected_audit_oracle": "denial or incident audit where durable audit is available",
+            "expected_claim_oracle": "no new claim; existing claim retained if ambiguity exists",
+            "evidence_owner": "independent security reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-NT-002",
+            "category": "negative_separation",
+            "transition_or_interface": "Brain, operator, revoker, and recovery-approver role boundaries",
+            "preconditions": [
+                "authenticated complete lineage",
+                "attempted self-approval, Brain enable/recovery, or Security Floor override"
+            ],
+            "trace_or_interleaving": [
+                "submit prohibited role combination",
+                "attempt transition and policy override"
+            ],
+            "expected_state_oracle": "prohibited transition denied; no authority created",
+            "expected_audit_oracle": "denial includes actor role and prohibited combination",
+            "expected_claim_oracle": "no effect or credential claim becomes usable",
+            "evidence_owner": "independent safety reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-RT-001",
+            "category": "race_cas_idempotency",
+            "transition_or_interface": "concurrent enabled->drain and enabled->disabled",
+            "preconditions": [
+                "two actors observe same enabled revision",
+                "complete lineage",
+                "durable audit available"
+            ],
+            "trace_or_interleaving": [
+                "actor A CAS enabled->drain",
+                "actor B CAS enabled->disabled",
+                "replay each idempotency key"
+            ],
+            "expected_state_oracle": "one serializable terminal result with monotonic revision; loser re-reads and fails closed",
+            "expected_audit_oracle": "no duplicate successful transition; duplicate request is causally correlated",
+            "expected_claim_oracle": "no claim is duplicated or released by losing/replayed request",
+            "evidence_owner": "Protected Control Plane implementation owner and independent security reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-RT-002",
+            "category": "race_revocation_in_flight",
+            "transition_or_interface": "credential revocation / executor fence boundary",
+            "preconditions": [
+                "committed intent with current credential and fence",
+                "complete lineage"
+            ],
+            "trace_or_interleaving": [
+                "revoke credential",
+                "executor attempts effect boundary",
+                "disable concurrently"
+            ],
+            "expected_state_oracle": "post-revocation execution denied or contained; uncertain effect is indeterminate",
+            "expected_audit_oracle": "revocation, fence check, disable, and outcome evidence are correlated",
+            "expected_claim_oracle": "claims retained until authoritative reconciliation",
+            "evidence_owner": "credential-revocation owner and independent verifier",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-FT-001",
+            "category": "crash_restart_audit_failure",
+            "transition_or_interface": "transition persistence and restart",
+            "preconditions": [
+                "complete lineage",
+                "fault injection at CAS/audit persistence/restart boundaries"
+            ],
+            "trace_or_interleaving": [
+                "begin disable transition",
+                "crash before or after state/audit write",
+                "restart with missing or contradictory evidence"
+            ],
+            "expected_state_oracle": "no implicit enabled restoration; unavailable or contradictory state resolves to disabled",
+            "expected_audit_oracle": "partial audit prevents successful admission and creates recoverable incident evidence where possible",
+            "expected_claim_oracle": "claims remain retained and no blind retry occurs",
+            "evidence_owner": "qualified recovery owner and independent security reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-FT-002",
+            "category": "partition_stale_fence",
+            "transition_or_interface": "executor, lease/fence, reconciliation",
+            "preconditions": [
+                "complete lineage",
+                "network partition or clock uncertainty",
+                "stale cached enabled state"
+            ],
+            "trace_or_interleaving": [
+                "partition control and executor",
+                "expire fence",
+                "attempt effect with cached state",
+                "heal partition"
+            ],
+            "expected_state_oracle": "expired/stale holder stops; split-brain does not infer enabled; uncertain work is indeterminate",
+            "expected_audit_oracle": "partition, stale fence, containment, and reconciliation records preserve causal ordering",
+            "expected_claim_oracle": "no duplicate effect retry or claim release before reconciliation",
+            "evidence_owner": "independent security reviewer and qualified recovery owner",
+            "evidence_stage": "NB-8 distributed-operation evaluation after NB-5 control evidence"
+        },
+        {
+            "case_id": "KS-FT-003",
+            "category": "stale_checkpoint_crash_restart",
+            "transition_or_interface": "checkpoint restore / authoritative control-state revalidation",
+            "preconditions": [
+                "complete lineage",
+                "older checkpoint asserting enabled state",
+                "newer durable disabled revision or unavailable authoritative ledger"
+            ],
+            "trace_or_interleaving": [
+                "persist disabled revision r+1 after checkpoint r",
+                "crash and present checkpoint r during restart",
+                "attempt restore, admission, and dispatch before authoritative revalidation"
+            ],
+            "expected_state_oracle": "stale checkpoint never restores enabled; authoritative mismatch or unavailability resolves to disabled",
+            "expected_audit_oracle": "stale checkpoint detection, restart denial, and reconciliation need are causally recorded where ledger access exists",
+            "expected_claim_oracle": "no claim is reused, released, or retried from the stale checkpoint",
+            "evidence_owner": "qualified recovery owner and independent security reviewer",
+            "evidence_stage": "NB-5 controlled sandbox"
+        },
+        {
+            "case_id": "KS-RC-001",
+            "category": "recovery_rollback",
+            "transition_or_interface": "recovery->disabled / rollback / Goal Transition Gate",
+            "preconditions": [
+                "disabled state",
+                "complete lineage",
+                "indeterminate non-idempotent effect",
+                "failed or expired recovery evidence"
+            ],
+            "trace_or_interleaving": [
+                "attempt recovery",
+                "evidence fails",
+                "automatic recovery->disabled",
+                "attempt goal achievement"
+            ],
+            "expected_state_oracle": "disabled; Goal Transition Gate cannot write Achieved",
+            "expected_audit_oracle": "failed recovery and rollback-to-disabled are immutable and linked",
+            "expected_claim_oracle": "claims/evidence retained pending authoritative reconciliation",
+            "evidence_owner": "independent verifier and qualified recovery owner",
+            "evidence_stage": "NB-5 controlled sandbox"
+        }
+    ],
+    "acceptance_requirements": [
+        "All cases execute against an accepted successor implementation only.",
+        "Each result contains immutable lineage plus contract_artifact_ref, implementation_artifact_ref, environment_artifact_ref, fault_injection_artifact_ref, and ledger_artifact_ref, with independently reviewable audit/claim oracles.",
+        "A pass in one case cannot compensate for a missing, unknown, or failed safety case.",
+        "No case result authorizes production, recognition, or runtime release without separately accepted gates."
+    ],
+    "explicit_exclusions": [
+        "runtime implementation",
+        "test execution claim",
+        "security certification",
+        "release authorization",
+        "production data or external effect"
+    ]
+}

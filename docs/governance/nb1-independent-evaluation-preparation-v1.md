@@ -11,7 +11,7 @@ The machine-readable authority for this preparation is [`../architecture/contrac
 ## Non-negotiable boundaries
 
 - Only a clean, committed, public-only, v4-bound candidate package with the complete freeze receipt may be submitted for review. The receipt binds the public train and development artifacts, their dataset/split digests, and the generator-contract digest separately from the training artifact. Its model manifest must identify model version/architecture, code, parameters, training, public splits, specification, generator, and resource bounds; its evaluation manifest must bind protocol/specification, candidate, baselines/ablations, thresholds/failure criteria, confidence method, budgets, environment, and evaluator executable. A changed source tree, dependency lock, parameter, model manifest, generator, protocol, threshold, or candidate code invalidates the freeze.
-- The hidden seed, examples, labels, latent metadata, provider implementation details, and per-sequence correctness stay outside the implementation trust domain. They must not enter this repository, a candidate process, logs, bundles, or reports returned to the implementation owner.
+- The hidden seed, examples, labels, latent metadata, provider implementation details, and per-sequence correctness stay outside the implementation trust domain. Frozen EVAL-01 v4 binds the Hidden Dataset Provider duty to `independent_evaluator_only`; a separate provider/evaluator organization is prohibited until an accepted v4 revalidation. These materials must not enter this repository, a candidate process, logs, bundles, or reports returned to the implementation owner.
 - Candidate code receives only permitted opaque identifiers and unlabeled observations; it cannot receive scores, thresholds, baselines, ablations, correctness, gate decisions, or recognition decisions.
 - The candidate process is fresh, read-only, network-disabled, bounded, and effect-free. Scoring, baseline and ablation execution, attempt accounting, and aggregate reporting belong to the independent evaluator.
 - A subagent, branch, worktree, repository permission, process label, or `independent:*` identifier does not establish organizational separation.
@@ -22,8 +22,8 @@ The machine-readable authority for this preparation is [`../architecture/contrac
 | Role | Owns | Must be independent from | Evidence required before use |
 | --- | --- | --- | --- |
 | Implementation owner | Public source and candidate preparation | Provider, evaluator, reviewer registry decisions | Named responsibility and conflict disclosure |
-| Hidden artifact provider | Hidden seed, artifact, labels, pre-run commitment | Implementation owner | Identity, organization, custody, separation, and commitment attestations |
-| Independent evaluator | Scoring executable, baselines, ablations, append-only ledger, aggregate report, signing-key custody | Implementation owner and hidden-artifact selection control | Identity, organization, process isolation, key custody, and separation attestations |
+| Hidden artifact provider | Logical duty: hidden seed, artifact, labels, pre-run commitment | Separate provider organization is prohibited by frozen v4 | Independent evaluator custody and commitment attestations |
+| Independent evaluator | Scoring executable, baselines, ablations, append-only ledger, aggregate report, signing-key custody, and frozen-v4 provider duty | Implementation owner and reviewer | Identity, organization, process isolation, custody, key custody, and separation attestations |
 | Independent reviewer | Candidate admissibility, registry custody, identity/key acceptance, evidence admissibility recommendation | Implementation owner, provider, evaluator | Identity, qualification, registry custody, conflict, and separation attestations |
 
 The designated independent-review authority must approve the identities, organizational separation, qualifications, conflicts, registry custodian, and admissibility workflow outside this repository. This governance text does not appoint those persons or organizations.
@@ -40,7 +40,7 @@ All signed aggregate evidence uses canonical JSON, SHA-256, and detached Ed25519
 
 1. The independent reviewer accepts the v4 preregistration, protocol digest, role evidence, separation evidence, and external registry custody.
 2. The implementation owner submits the public-only v4 candidate freeze package. The reviewer recomputes its declared digests and rejects any incomplete or changed binding.
-3. The independent provider records a pre-run commitment; the reviewer checks commitment completeness and split-isolation/search-space attestations without receiving or exposing the hidden artifact.
+3. The independent evaluator performing the frozen-v4 provider duty records a pre-run commitment; the reviewer checks commitment completeness and split-isolation/search-space attestations without receiving or exposing the hidden artifact.
 4. The evaluator runs the accepted frozen bundle and evaluator-owned comparison modes in fresh network-disabled processes, finalizing each attempt in the ledger.
 5. The evaluator returns only permitted aggregate evidence and detached signature. The reviewer performs the admissibility review.
 6. A separately authorized evaluation-gate reviewer may assess the admissible evidence. No prior step passes a gate automatically.

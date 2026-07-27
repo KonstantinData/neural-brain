@@ -30,10 +30,24 @@ ADR-017.
   fail-closed EVAL-01 v4 candidate-freeze, custody, registry, key, ledger,
   signature, and review handoff. It creates no candidate, hidden artifact,
   evaluation, release, recognition, runtime, or external effect.
+- `nb1-independent-evaluation-artifact-manifests-v1.json`: v4-only,
+  non-instantiating schemas for a future freeze receipt and model, evaluation,
+  dataset, and generator manifests. It creates no candidate, data, key,
+  signature, evaluation, release, or recognition result.
+- `nb1-independent-evaluation-organization-v1.json`: preparation-only
+  role, RACI, approval, review, deputy, escalation, and decision matrices for
+  independent evaluation. It appoints no person and creates no authority.
+- `nb1-candidate-freeze-lifecycle-v1.json`: preparation-only lifecycle for a
+  future candidate freeze, immutable external storage, registry handoff,
+  verification, invalidation, and rollback. It creates no artifact or release.
 - `protected-control-kill-switch-v1.json`: proposed, non-authorizing Protected
   Control Plane target contract for a future kill switch, credential revocation,
   and safe recovery. It has no runtime, schema, migration, writer, executor,
   dispatch, credential, deployment, or release authority.
+- `protected-control-kill-switch-test-plan-v1.json`: non-executing,
+  preregistered state, authority, race, failure, and recovery test definitions
+  for the unaccepted Kill-Switch target contract. It does not test or operate a
+  runtime.
 - `stage-capabilities.json`: cumulative NB-0 through NB-8 delivery contract.
 - `recognition-gates.json`: all-required recognition criteria.
 - `evaluation-gates.json`: ordered, non-compensatory G0 through G8 evidence.

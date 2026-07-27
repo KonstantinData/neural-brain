@@ -28,7 +28,10 @@
     "required_before_hidden_attachment": true,
     "candidate_must_be_v4_bound": true,
     "clean_committed_source_tree_required": true,
-    "canonicalization": "UTF-8 normalized LF text; canonical JSON uses sorted keys, compact separators, and decimal strings where specified by the v4 generator",
+    "canonicalization_profile_id": "nb1-eval-canonical-json-v1",
+    "canonicalization_profile_source": "docs/architecture/contracts/nb1-independent-evaluation-artifact-manifests-v1.json#/canonicalization/byte_profile",
+    "canonicalization_artifact_kind_mapping_source": "docs/architecture/contracts/nb1-independent-evaluation-artifact-manifests-v1.json#/canonicalization/artifact_kind_byte_rules",
+    "canonicalization": "Use exactly the normative nb1-eval-canonical-json-v1 byte_profile for JSON objects and its artifact_kind_mapping for UTF-8 text, binary, and directory/bundle artifacts; no local alternative, reviewer-selected equivalent, or partial summary is permitted.",
     "hash_algorithm": "SHA-256",
     "required_freeze_receipt_bindings": [
       "source_commit",
@@ -82,7 +85,8 @@
   },
   "custody_and_separation": {
     "hidden_dataset_and_seed": {
-      "custodian": "independent_hidden_artifact_provider",
+      "custodian": "independent_evaluator_only",
+      "v4_custody_binding": "The requested hidden_dataset_provider duty is logically distinct but must be performed by independent_evaluator_only under frozen EVAL-01 v4. A separate provider/evaluator organization is prohibited until a separately accepted v4 revalidation.",
       "required_pre_run_commitment_fields": [
         "commitment_id",
         "provider_id",
@@ -107,13 +111,13 @@
     },
     "required_roles": {
       "implementation_owner": "owns public source and candidate preparation; cannot self-attest independence, custody, or gate passage",
-      "hidden_artifact_provider": "owns hidden seed, hidden artifact, labels, and pre-run commitment",
+      "hidden_artifact_provider": "logical hidden-dataset custody duty performed by independent_evaluator_only under frozen v4; it does not authorize a separate provider organization",
       "independent_evaluator": "owns fresh network-disabled scoring, baselines, ablations, complete attempt ledger, aggregate report, and signer custody",
       "independent_reviewer": "owns admissibility review, accepted registries, identity attestations, key acceptance, and gate-review recommendation"
     },
     "separation_rules": [
-      "Provider, evaluator, reviewer, and implementation owner identities, organizations, reporting lines, and conflicting financial or operational interests require external attestation.",
-      "No actor may self-certify a required separation or substitute a subagent, branch, worktree, repository role, or identifier prefix for organizational independence.",
+      "Implementation owner, independent evaluator, and independent reviewer identities, organizations, reporting lines, and conflicting financial or operational interests require external attestation. Frozen v4 requires the hidden_dataset_provider duty to be performed by independent_evaluator_only.",
+      "No actor may self-certify a required separation or substitute a subagent, branch, worktree, repository role, or identifier prefix for organizational independence. A separate provider/evaluator identity is rejected under frozen v4.",
       "The implementation owner cannot hold the hidden seed or labels, operate scoring, choose omitted attempts, approve its own evidence, or control the accepted public-key or attestation registries.",
       "The evaluator may not modify the frozen candidate, evaluation thresholds, generator contract, or accepted registries after hidden commitment."
     ]
@@ -176,7 +180,7 @@
   "review_workflow": [
     "Independent reviewer accepts the frozen v4 specification, protocol digest, role identities, separation attestations, and registry custody before candidate freeze review.",
     "Implementation owner submits a v4-bound freeze receipt and public-only candidate bundle; reviewer independently recomputes bindings and accepts or rejects it.",
-    "Hidden artifact provider records a pre-run hidden commitment outside the repository; reviewer verifies commitment completeness without disclosing hidden content.",
+    "Independent evaluator performing the frozen-v4 hidden_dataset_provider duty records a pre-run hidden commitment outside the repository; reviewer verifies commitment completeness without disclosing hidden content.",
     "Evaluator runs the frozen candidate and independently owned baselines and ablations in fresh network-disabled, read-only processes and finalizes every attempt in the append-only ledger.",
     "Evaluator releases only permitted aggregate evidence and detached signature; reviewer verifies registries, attestation freshness, signature, ledger completeness, contamination controls, and claim boundary.",
     "A separately authorized evaluation-gate review may assess admissibility. Neither preparation nor intake automatically passes G0, G1, another gate, a stage exit, release, or recognition."
@@ -191,7 +195,7 @@
     ],
     "external_independent_tests": [
       "reviewer recomputes freeze and evidence digests from accepted artifacts",
-      "provider demonstrates pre-run commitment and split-isolation/search-space-floor evidence without disclosure",
+      "independent evaluator demonstrates the frozen-v4 hidden_dataset_provider duty, pre-run commitment, and split-isolation/search-space-floor evidence without disclosure",
       "evaluator demonstrates fresh network-disabled process isolation, full-ledger finalization, and aggregate-only output",
       "reviewer exercises unknown, revoked, expired, mismatched, self-signed, incomplete, repeated, and post-freeze evidence rejection",
       "independent security and scientific review validate organizational separation, custody, reproducibility, contamination controls, baseline/ablation execution, and gate admissibility"
@@ -218,17 +222,17 @@
     },
     {
       "id": "EVAL-01-B2",
-      "cause": "No externally attested provider, evaluator, reviewer, custody model, or accepted public-key and attestation registries are established.",
+      "cause": "No externally attested independent evaluator (including frozen-v4 hidden_dataset_provider duty), reviewer, custody model, or accepted public-key and attestation registries are established.",
       "owner": "designated independent-review authority",
       "required_evidence": "Identity, organizational-separation, conflict, role, custody, registry-custodian, key-custody, and revocation attestations from outside the implementation trust domain.",
       "required_approval": "Independent-review authority approval of identities, separation, registry custody, and admissibility process.",
       "impact": "Repository-only work cannot establish evaluator independence or trusted signature verification.",
-      "unblocker": "Appoint and externally attest qualified independent provider, evaluator, reviewer, and registry custodian before hidden commitment."
+      "unblocker": "Appoint and externally attest a qualified independent evaluator performing the frozen-v4 provider duty, an independent reviewer, and registry custodian before hidden commitment."
     },
     {
       "id": "EVAL-01-B3",
       "cause": "No hidden artifact, seed custody, pre-run commitment, independent run, or signed aggregate evidence exists.",
-      "owner": "independent hidden-artifact provider and independent evaluator",
+      "owner": "independent evaluator performing the frozen-v4 hidden-artifact-provider duty",
       "required_evidence": "Pre-run commitment, custody attestation, append-only ledger, aggregate baseline/ablation and confidence evidence, contamination and hard-failure reports, and detached signature verified against the accepted registry.",
       "required_approval": "Independent reviewer admissibility review and separately authorized evaluation-gate review.",
       "impact": "EVAL-01 is not performed; no gate, stage, release, or recognition result may be claimed.",

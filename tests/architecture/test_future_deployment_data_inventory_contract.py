@@ -48,6 +48,7 @@ def test_inventory_requires_all_category_only_data_classes_and_scope_review() ->
         "indexes",
         "recovery",
         "retention",
+        "snapshots",
     }
     required = _strings(template["required_fields"])
     assert required == {
@@ -59,12 +60,12 @@ def test_inventory_requires_all_category_only_data_classes_and_scope_review() ->
         "linked_ropa_data_object_catalogue_data_flow_data_subject_request_and_export_evidence_intake_references",
         "data_class_category_lifecycle_surface_and_category_only_description",
         "primary_data_memory_working_memory_episodic_memory_semantic_memory_and_procedural_memory_classification_evidence",
-        "evidence_logs_cache_embeddings_attachments_artefacts_backups_archives_derivatives_indexes_recovery_and_retention_classification_evidence",
+        "evidence_logs_cache_embeddings_attachments_artefacts_backups_archives_derivatives_indexes_recovery_retention_and_snapshots_classification_evidence",
         "category_only_source_owner_location_store_boundary_and_lineage_evidence",
         "export_coverage_matrix_row_and_coverage_gap_evidence",
         "redaction_and_third_party_rights_matrix_row_and_qualified_review_evidence",
         "legal_basis_controller_processor_and_tenant_scope_matrix_rows_and_evidence",
-        "retention_legal_hold_backup_archive_recovery_and_deletion_propagation_evidence",
+        "retention_archive_backup_recovery_legal_hold_deletion_propagation_and_snapshot_lifecycle_evidence",
         "export_readiness_checklist_review_workflow_audit_workflow_and_reassessment_evidence",
         "explicit_unknown_non_applicability_conflict_expiry_unavailable_source_and_release_stop_dispositions",
     }
@@ -89,16 +90,114 @@ def test_all_readiness_matrices_have_required_evidence_fields() -> None:
         "controller_matrix",
         "processor_matrix",
         "tenant_scope_matrix",
+        "retention_matrix",
+        "archive_matrix",
+        "backup_matrix",
+        "recovery_matrix",
     }
-    assert "gap_or_unavailable_source_disposition" in _strings(matrices["export_coverage_matrix"])
-    assert "qualified_review_reference" in _strings(matrices["redaction_matrix"])
-    assert "unresolved_disposition" in _strings(matrices["third_party_rights_matrix"])
-    assert "legal_basis_evidence_intake_reference" in _strings(matrices["legal_basis_matrix"])
-    assert "controller_role_evidence_reference" in _strings(matrices["controller_matrix"])
-    assert "processor_or_subprocessor_evidence_reference" in _strings(matrices["processor_matrix"])
-    assert "immutable_authenticated_tenant_area_project_scope_references" in _strings(
-        matrices["tenant_scope_matrix"]
-    )
+    expected_fields = {
+        "export_coverage_matrix": {
+            "data_class_category",
+            "scope_reference",
+            "candidate_source_boundary",
+            "coverage_status",
+            "inclusion_or_exclusion_rationale_reference",
+            "gap_or_unavailable_source_disposition",
+            "qualified_review_reference",
+            "lifecycle_specific_evidence_reference",
+        },
+        "redaction_matrix": {
+            "data_class_category",
+            "candidate_content_category",
+            "redaction_candidate",
+            "third_party_rights_candidate",
+            "minimisation_evidence_reference",
+            "qualified_review_reference",
+            "unresolved_disposition",
+            "scope_reference",
+            "lifecycle_specific_evidence_reference",
+        },
+        "third_party_rights_matrix": {
+            "data_class_category",
+            "rights_risk_candidate",
+            "candidate_affected_party_category",
+            "segregation_or_redaction_evidence_reference",
+            "qualified_review_reference",
+            "unresolved_disposition",
+            "scope_reference",
+            "lifecycle_specific_evidence_reference",
+        },
+        "legal_basis_matrix": {
+            "data_class_category",
+            "processing_activity_reference",
+            "legal_basis_evidence_intake_reference",
+            "applicability_or_unknown_disposition",
+            "qualified_review_reference",
+            "scope_reference",
+            "lifecycle_specific_evidence_reference",
+        },
+        "controller_matrix": {
+            "data_class_category",
+            "controller_role_evidence_reference",
+            "accountable_owner_reference",
+            "qualified_review_reference",
+            "unknown_or_conflict_disposition",
+            "scope_reference",
+            "lifecycle_specific_evidence_reference",
+        },
+        "processor_matrix": {
+            "data_class_category",
+            "processor_or_subprocessor_evidence_reference",
+            "recipient_or_transfer_evidence_reference",
+            "qualified_review_reference",
+            "unknown_or_conflict_disposition",
+            "scope_reference",
+            "lifecycle_specific_evidence_reference",
+        },
+        "tenant_scope_matrix": {
+            "data_class_category",
+            "immutable_authenticated_tenant_area_project_scope_references",
+            "cross_boundary_evidence_reference",
+            "scope_match_disposition",
+            "qualified_review_reference",
+            "lifecycle_specific_evidence_reference",
+        },
+        "retention_matrix": {
+            "data_class_category",
+            "scope_reference",
+            "retention_and_legal_hold_evidence_reference",
+            "lifecycle_specific_evidence_reference",
+            "retention_gap_or_unknown_disposition",
+            "qualified_review_reference",
+        },
+        "archive_matrix": {
+            "data_class_category",
+            "scope_reference",
+            "archive_boundary_and_lifecycle_evidence_reference",
+            "lifecycle_specific_evidence_reference",
+            "archive_gap_or_unknown_disposition",
+            "qualified_review_reference",
+        },
+        "backup_matrix": {
+            "data_class_category",
+            "scope_reference",
+            "backup_boundary_and_lifecycle_evidence_reference",
+            "lifecycle_specific_evidence_reference",
+            "backup_gap_or_unknown_disposition",
+            "qualified_review_reference",
+        },
+        "recovery_matrix": {
+            "data_class_category",
+            "scope_reference",
+            "recovery_boundary_and_lifecycle_evidence_reference",
+            "lifecycle_specific_evidence_reference",
+            "recovery_gap_or_unknown_disposition",
+            "qualified_review_reference",
+        },
+    }
+    assert {
+        matrix_name: _strings(fields) for matrix_name, fields in matrices.items()
+    } == expected_fields
 
 
 def test_inventory_is_fail_closed_and_creates_no_operational_path() -> None:

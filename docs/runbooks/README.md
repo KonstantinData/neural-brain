@@ -35,3 +35,6 @@ their accepted gates and may not be documented as model-controlled shortcuts.
 - [`future-deployment-subject-export-readiness.md`](future-deployment-subject-export-readiness.md)
   defines category-only future deployment export-readiness review steps; it
   does not discover, access, process, export, or disclose personal data.
+- [`nb1-candidate-freeze-lifecycle.md`](nb1-candidate-freeze-lifecycle.md)
+  defines preparation-only candidate-freeze submission, verification,
+  invalidation, and external handoff; it does not create a candidate or release.
