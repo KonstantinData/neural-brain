@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neural-brain.invalid/contracts/privacy-approval-record-v1.schema.json",
+  "title": "Resolved privacy approval record",
+  "description": "Strict approval metadata resolved behind a digested approval reference. Schema validity does not create authority.",
+  "x-neural-brain-preparation-boundary": {
+    "runtime_enabled": false,
+    "allow_authorized": false,
+    "composition_required": true,
+    "statement": "A structurally DECIDED approval record is not authority or permission without authenticated scope, qualified role, independence, and the separately accepted active runtime composition."
+  },
+  "type": "object",
+  "required": [
+    "contract_version",
+    "approval_schema_version",
+    "approval_id",
+    "approval_type",
+    "approval_digest",
+    "policy_digest",
+    "evidence_manifest_digest",
+    "actor_id",
+    "authority_snapshot_digest",
+    "qualified_role_binding",
+    "scope",
+    "decision_status",
+    "rationale_and_constraint_refs",
+    "approved_at",
+    "valid_until",
+    "revalidation_trigger_refs",
+    "independence_evidence_ref"
+  ],
+  "properties": {
+    "contract_version": {"const": "privacy-approval-record-v1"},
+    "approval_schema_version": {"const": "1.0.0"},
+    "approval_id": {"$ref": "#/$defs/OpaqueId"},
+    "approval_type": {
+      "enum": ["accountable_owner", "privacy_reviewer", "legal_reviewer", "independent_reviewer"]
+    },
+    "approval_digest": {"$ref": "#/$defs/Digest"},
+    "policy_digest": {"$ref": "#/$defs/Digest"},
+    "evidence_manifest_digest": {"$ref": "#/$defs/Digest"},
+    "actor_id": {"$ref": "#/$defs/OpaqueId"},
+    "authority_snapshot_digest": {"$ref": "#/$defs/Digest"},
+    "qualified_role_binding": {"$ref": "#/$defs/DigestedRef"},
+    "scope": {"$ref": "#/$defs/ProjectScope"},
+    "decision_status": {
+      "enum": ["DECIDED", "PENDING_OWNER", "PENDING_PRIVACY_REVIEW", "PENDING_LEGAL_REVIEW", "REJECTED", "OUT_OF_SCOPE"]
+    },
+    "rationale_and_constraint_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/DigestedRef"}
+    },
+    "approved_at": {"$ref": "#/$defs/Timestamp"},
+    "valid_until": {"$ref": "#/$defs/Timestamp"},
+    "revalidation_trigger_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/DigestedRef"}
+    },
+    "independence_evidence_ref": {"$ref": "#/$defs/DigestedRef"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "OpaqueId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "Digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "ProjectScope": {
+      "type": "object",
+      "required": ["tenant_id", "area_id", "project_id"],
+      "properties": {
+        "tenant_id": {"$ref": "#/$defs/OpaqueId"},
+        "area_id": {"$ref": "#/$defs/OpaqueId"},
+        "project_id": {"$ref": "#/$defs/OpaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "DigestedRef": {
+      "type": "object",
+      "required": ["reference_id", "reference_version", "reference_digest"],
+      "properties": {
+        "reference_id": {"$ref": "#/$defs/OpaqueId"},
+        "reference_version": {"type": "integer", "minimum": 1},
+        "reference_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

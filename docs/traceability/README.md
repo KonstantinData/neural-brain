@@ -11,6 +11,11 @@ durable technical source of truth.
 - [`REL-MEM-01-08-relationship-memory-preparation.md`](REL-MEM-01-08-relationship-memory-preparation.md):
   ADR-018-aligned Relationship Memory preparation mapping for contracts,
   matrices, planned negative tests, and a non-executing governance runbook.
+- [`S1-14.4-S1-11.2-runtime-privacy-reconciliation.md`](S1-14.4-S1-11.2-runtime-privacy-reconciliation.md)
+  and [`S1-14.4-S1-11.2-runtime-privacy-enforcement.md`](S1-14.4-S1-11.2-runtime-privacy-enforcement.md):
+  preparation-only reconciliation and five-dimensional evidence status for
+  privacy enforcement and controlled storage. Authorization, implementation,
+  full verification, merge, legal approval, and runtime `ALLOW` remain absent.
 
 ## Evidence Chain
 

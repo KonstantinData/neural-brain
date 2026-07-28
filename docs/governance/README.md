@@ -54,6 +54,13 @@ perform qualified review, or
 determine applicability, lawfulness, a condition, authority, processing,
 deployment, release, or runtime behavior.
 
+[`s1-14-4-runtime-enforcement-decision-package-v1.md`](s1-14-4-runtime-enforcement-decision-package-v1.md)
+and [`s1-14-4-privacy-engineering-requirements-v1.md`](s1-14-4-privacy-engineering-requirements-v1.md)
+prepare owner, qualified-review, scope, restriction, revalidation, minimization,
+purpose, retention, deletion, access, redaction, and provenance decisions for
+S1-14.4/S1-11.2. Pending decisions remain blockers; these records provide no
+legal approval, runtime authorization, active policy, or production claim.
+
 [`legitimate-interest-assessment-evidence-intake-v1.md`](legitimate-interest-assessment-evidence-intake-v1.md)
 defines fail-closed documentation preparation for a possible Article 6(1)(f)
 assessment. It does not validate an intake, perform qualified review, conclude a legitimate interest, balancing,

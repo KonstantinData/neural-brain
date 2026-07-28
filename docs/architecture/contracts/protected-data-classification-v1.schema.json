@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neural-brain.invalid/contracts/protected-data-classification-v1.schema.json",
+  "title": "Protected data classification version",
+  "description": "Strict category-only classification evidence. It contains references and digests, never protected values.",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "classification_schema_version",
+    "classification_id",
+    "classification_version",
+    "subject_kind",
+    "subject_digest",
+    "scope",
+    "personal_data_status",
+    "special_category_status",
+    "article_9_category_ids",
+    "article_10_status",
+    "minor_data_status",
+    "classification_evidence_refs",
+    "source_and_provenance_refs",
+    "automated_classifier",
+    "qualified_reviewer_binding",
+    "reviewed_at",
+    "contradiction_status",
+    "evidence_manifest_digest",
+    "classification_digest",
+    "valid_from",
+    "valid_until",
+    "recorded_at"
+  ],
+  "properties": {
+    "contract_version": {"const": "protected-data-classification-v1"},
+    "classification_schema_version": {"const": "1.0.0"},
+    "classification_id": {"$ref": "#/$defs/OpaqueId"},
+    "classification_version": {"type": "integer", "minimum": 1},
+    "subject_kind": {"$ref": "#/$defs/OpaqueId"},
+    "subject_digest": {"$ref": "#/$defs/Digest"},
+    "scope": {"$ref": "#/$defs/ProjectScope"},
+    "personal_data_status": {
+      "enum": ["NON_PERSONAL", "PERSONAL", "PSEUDONYMIZED_PERSONAL", "ANONYMIZED_VERIFIED", "UNKNOWN"]
+    },
+    "special_category_status": {"enum": ["NOT_APPLICABLE", "ARTICLE_9", "UNKNOWN"]},
+    "article_9_category_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/OpaqueId"}
+    },
+    "article_10_status": {"enum": ["NOT_APPLICABLE", "ARTICLE_10", "UNKNOWN"]},
+    "minor_data_status": {"enum": ["NO", "YES", "UNKNOWN"]},
+    "classification_evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/EvidenceRef"}
+    },
+    "source_and_provenance_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/EvidenceRef"}
+    },
+    "automated_classifier": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["status"],
+          "properties": {"status": {"const": "not_used"}},
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["status", "classifier_id", "classifier_version"],
+          "properties": {
+            "status": {"const": "used_for_proposal_only"},
+            "classifier_id": {"$ref": "#/$defs/OpaqueId"},
+            "classifier_version": {"type": "integer", "minimum": 1}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "qualified_reviewer_binding": {"$ref": "#/$defs/DigestedRef"},
+    "reviewed_at": {"$ref": "#/$defs/Timestamp"},
+    "contradiction_status": {"enum": ["none", "conflict", "unknown"]},
+    "evidence_manifest_digest": {"$ref": "#/$defs/Digest"},
+    "classification_digest": {"$ref": "#/$defs/Digest"},
+    "anonymisation_verification_evidence_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/EvidenceRef"}
+    },
+    "valid_from": {"$ref": "#/$defs/Timestamp"},
+    "valid_until": {"$ref": "#/$defs/Timestamp"},
+    "recorded_at": {"$ref": "#/$defs/Timestamp"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"special_category_status": {"const": "ARTICLE_9"}}, "required": ["special_category_status"]},
+      "then": {"properties": {"article_9_category_ids": {"minItems": 1}}},
+      "else": {"properties": {"article_9_category_ids": {"maxItems": 0}}}
+    },
+    {
+      "if": {
+        "properties": {
+          "personal_data_status": {"enum": ["NON_PERSONAL", "ANONYMIZED_VERIFIED"]}
+        },
+        "required": ["personal_data_status"]
+      },
+      "then": {
+        "properties": {
+          "special_category_status": {"const": "NOT_APPLICABLE"},
+          "article_10_status": {"const": "NOT_APPLICABLE"},
+          "minor_data_status": {"const": "NO"}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"personal_data_status": {"const": "ANONYMIZED_VERIFIED"}}, "required": ["personal_data_status"]},
+      "then": {"required": ["anonymisation_verification_evidence_refs"]},
+      "else": {"not": {"required": ["anonymisation_verification_evidence_refs"]}}
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "OpaqueId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "Digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "ProjectScope": {
+      "type": "object",
+      "required": ["tenant_id", "area_id", "project_id"],
+      "properties": {
+        "tenant_id": {"$ref": "#/$defs/OpaqueId"},
+        "area_id": {"$ref": "#/$defs/OpaqueId"},
+        "project_id": {"$ref": "#/$defs/OpaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "required": ["record_contract", "evidence_id", "evidence_version", "evidence_digest"],
+      "properties": {
+        "record_contract": {"const": "privacy-evidence-record-v1"},
+        "evidence_id": {"$ref": "#/$defs/OpaqueId"},
+        "evidence_version": {"type": "integer", "minimum": 1},
+        "evidence_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    },
+    "DigestedRef": {
+      "type": "object",
+      "required": ["reference_id", "reference_version", "reference_digest"],
+      "properties": {
+        "reference_id": {"$ref": "#/$defs/OpaqueId"},
+        "reference_version": {"type": "integer", "minimum": 1},
+        "reference_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

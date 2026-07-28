@@ -23,6 +23,12 @@ their accepted gates and may not be documented as model-controlled shortcuts.
 - [`protected-ledger-backup-recovery.md`](protected-ledger-backup-recovery.md)
   defines target-only backup, WAL/PITR, retention, custody, and isolated
   restore-test procedure; it does not prove a deployed recovery capability.
+- [`special-category-data-runtime-enforcement.md`](special-category-data-runtime-enforcement.md)
+  defines preparation and future operating steps for S1-14.4/S1-11.2 while
+  stopping before any unauthorized activation or protected write.
+- [`special-category-data-incident-revocation-and-recovery.md`](special-category-data-incident-revocation-and-recovery.md)
+  defines a preparation-only incident, suspension, revocation, reconciliation,
+  and restore overlay; it neither operates a runtime nor proves recovery.
 - [`relationship-memory-governance-preparation.md`](relationship-memory-governance-preparation.md)
   records only future service-managed request and non-use boundaries; it is not
   a runtime operating procedure.

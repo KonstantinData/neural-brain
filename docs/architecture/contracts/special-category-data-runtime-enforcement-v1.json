@@ -1,0 +1,107 @@
+{
+  "document_type": "neural_brain_special_category_data_runtime_enforcement_contract",
+  "contract_id": "neural-brain.special-category-data-runtime-enforcement",
+  "contract_version": "1.0.0",
+  "status": "proposed_non_authorizing_preparation",
+  "governing_decisions": ["ADR-001", "ADR-003", "ADR-005", "ADR-012", "ADR-018", "ADR-019"],
+  "historical_inputs_requiring_revalidation": ["ADR-004"],
+  "preparation_boundary": {
+    "runtime_enabled": false,
+    "allow_authorized": false,
+    "executable_migration_present": false,
+    "legal_or_privacy_approval_created": false,
+    "non_claim": "This preparation contract defines machine-checkable shapes and fail-closed invariants only. It does not determine lawfulness, approve a purpose or legal basis, activate processing, authorize storage, or create a production release outcome."
+  },
+  "purpose": "Prepare a deterministic Protected Control Plane contract for future qualified-review-bound enforcement of special-category and otherwise protected data processing without treating governance intake evidence as runtime authority.",
+  "machine_readable_artifacts": {
+    "classification_schema": "protected-data-classification-v1.schema.json",
+    "evidence_record_schema": "privacy-evidence-record-v1.schema.json",
+    "approval_record_schema": "privacy-approval-record-v1.schema.json",
+    "processing_policy_schema": "special-category-processing-policy-v1.schema.json",
+    "protected_storage_metadata_schema": "protected-storage-metadata-v1.schema.json",
+    "policy_state_machine": "special-category-policy-state-machine-v1.json",
+    "decision_record_schema": "special-category-decision-record-v1.schema.json"
+  },
+  "reference_resolution_rules": [
+    "Every EvidenceRef resolves by evidence_id and evidence_version to privacy-evidence-record-v1 and must match evidence_digest and authenticated scope.",
+    "Every ApprovalEvidenceRef resolves by approval_id to privacy-approval-record-v1 and must match approval_digest, policy_digest, evidence manifest, authenticated scope, qualified role, validity, decision status, and independence evidence.",
+    "Missing, stale, cross-scope, digest-mismatched, unqualified, non-independent, pending, revoked, expired, or conflicting resolved records block target ALLOW."
+  ],
+  "existing_contracts_reused_by_reference": [
+    "article-6-legal-basis-evidence-intake-v1.json",
+    "article-9-special-category-evidence-intake-v1.json",
+    "consent-evidence-intake-v1.json",
+    "data-object-catalogue-intake-v1.json",
+    "personal-data-flow-register-v1.json",
+    "ropa-evidence-intake-v1.json"
+  ],
+  "authoritative_writer": "Protected Control Plane privacy transition gate",
+  "runtime_decision_outcomes": [
+    "ALLOW",
+    "DENY",
+    "REQUIRE_HUMAN_REVIEW",
+    "REQUIRE_ADDITIONAL_EVIDENCE",
+    "EXPIRED",
+    "REVOKED",
+    "CONFLICT",
+    "UNKNOWN"
+  ],
+  "authorization_rule": "Only ALLOW may be consumed by a protected mutation, but this preparation version cannot produce or authorize ALLOW because runtime_enabled and allow_authorized are false.",
+  "non_compensatory_gates": [
+    "authenticated_scope_complete_and_exact",
+    "supported_data_class_version",
+    "immutable_purpose_and_processing_activity_versions",
+    "qualified_general_basis_evidence",
+    "qualified_special_condition_evidence_when_required",
+    "explicit_article_10_disposition_when_required",
+    "approved_retention_policy_version",
+    "approved_protection_profile_version",
+    "complete_owner_and_qualified_review_evidence",
+    "current_non_revoked_non_expired_policy_version",
+    "immutable_evidence_set_digest",
+    "atomic_decision_mutation_and_audit",
+    "audit_redaction_contract_available"
+  ],
+  "evaluation_order": [
+    "resolve authenticated actor and Tenant Area Project Session scope",
+    "validate protected storage metadata and immutable references",
+    "load the exact active policy and rule-set versions",
+    "validate data-class, purpose, activity, jurisdiction, retention, and protection bindings",
+    "validate every required evidence or qualified-not-applicable resolution",
+    "validate owner, privacy, legal when required, and independent review evidence",
+    "evaluate expiry, suspension, revocation, supersession, and conflicts",
+    "record the immutable decision and reason codes",
+    "commit protected mutation, metadata binding, receipt, and redacted audit atomically"
+  ],
+  "fail_closed_semantics": {
+    "missing_or_unknown_field": "DENY",
+    "unsupported_value_or_version": "UNKNOWN",
+    "missing_required_evidence": "REQUIRE_ADDITIONAL_EVIDENCE",
+    "missing_required_review": "REQUIRE_HUMAN_REVIEW",
+    "expired_policy_or_evidence": "EXPIRED",
+    "revoked_policy_or_evidence": "REVOKED",
+    "scope_digest_or_version_conflict": "CONFLICT",
+    "policy_service_or_audit_failure": "DENY",
+    "non_allow_mutation": "forbidden",
+    "unknown_as_not_applicable": "forbidden",
+    "cross_scope_evidence_reuse": "forbidden",
+    "direct_database_write_bypass": "forbidden"
+  },
+  "data_minimization": {
+    "raw_personal_data_in_policy_ledger": false,
+    "raw_special_category_values_in_policy_ledger": false,
+    "raw_criminal_offence_data_in_policy_ledger": false,
+    "consent_text_in_policy_ledger": false,
+    "allowed_evidence_material": "opaque identifiers, immutable versions, digests, category labels, provenance references, validity facts, review facts, and reason codes only"
+  },
+  "authorization_dependencies": [
+    "accepted deployment-specific runtime contract",
+    "named accountable owner",
+    "qualified privacy review",
+    "qualified legal review where required by the accepted rule set",
+    "independent security and architecture review",
+    "accepted jurisdiction and purpose scope",
+    "closed Critical and High findings",
+    "approved migration and rollback plan"
+  ]
+}
