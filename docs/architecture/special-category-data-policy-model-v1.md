@@ -20,7 +20,7 @@ validator.
    request.
 3. Classification is multi-axis and versioned; a generic sensitivity label is
    insufficient.
-4. Legal- and privacy-relevant facts are references to separately approved
+4. Legal- and privacy-relevant facts are references to separately qualified-review-bound
    evidence, never runtime legal inference.
 5. General basis and additional special condition are independent fields and
    non-compensatory gates.
@@ -76,7 +76,7 @@ UNKNOWN
 ### Article 9 category set
 
 The set is defined only by an accepted, qualified-review contract. The runtime
-schema stores approved category identifiers or the explicit terminal value
+schema stores contract-bound category identifiers or the explicit terminal value
 `UNKNOWN`; it does not invent category labels.
 
 ### Article 10 status

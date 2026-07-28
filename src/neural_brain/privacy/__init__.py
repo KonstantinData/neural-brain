@@ -10,8 +10,11 @@ from neural_brain.privacy.evaluator import PreparationPrivacyEvaluator
 from neural_brain.privacy.models import (
     Article10Status,
     DecisionPointStatus,
+    EvidenceContradictionStatus,
     EvidenceReference,
+    EvidenceReviewerTreatment,
     GovernanceApprovalReference,
+    GovernanceDigestedReference,
     GovernanceEvidenceReference,
     GovernanceScope,
     MinorDataStatus,
@@ -36,8 +39,11 @@ from neural_brain.privacy.state_machine import PreparationPolicyStateMachine
 __all__ = [
     "Article10Status",
     "DecisionPointStatus",
+    "EvidenceContradictionStatus",
     "EvidenceReference",
+    "EvidenceReviewerTreatment",
     "GovernanceApprovalReference",
+    "GovernanceDigestedReference",
     "GovernanceEvidenceReference",
     "GovernanceScope",
     "InvalidPolicyTransitionError",

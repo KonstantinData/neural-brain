@@ -35,6 +35,23 @@ class DecisionPointStatus(StrEnum):
     OUT_OF_SCOPE = "OUT_OF_SCOPE"
 
 
+class EvidenceReviewerTreatment(StrEnum):
+    """Qualified disposition of a resolved evidence record."""
+
+    QUALIFIED_ACCEPTED = "qualified_accepted"
+    QUALIFIED_NOT_APPLICABLE = "qualified_not_applicable"
+    REJECTED = "rejected"
+    PENDING_REVIEW = "pending_review"
+
+
+class EvidenceContradictionStatus(StrEnum):
+    """Whether qualified evidence reconciliation found a contradiction."""
+
+    NONE = "none"
+    CONFLICT = "conflict"
+    UNKNOWN = "unknown"
+
+
 class PolicyState(StrEnum):
     """Proposed policy lifecycle vocabulary."""
 
@@ -132,6 +149,14 @@ class GovernanceEvidenceReference(StrictPrivacyModel):
     evidence_digest: Sha256Digest
 
 
+class GovernanceDigestedReference(StrictPrivacyModel):
+    """Compact immutable reference used for trusted approval bindings."""
+
+    reference_id: PrivacyOpaqueId
+    reference_version: PrivacyVersion
+    reference_digest: Sha256Digest
+
+
 class ResolvedEvidenceBinding(StrictPrivacyModel):
     """Fields required to compare one resolved evidence record fail closed."""
 
@@ -139,6 +164,22 @@ class ResolvedEvidenceBinding(StrictPrivacyModel):
     evidence_version: PrivacyVersion
     evidence_digest: Sha256Digest
     scope: GovernanceScope
+    reviewer_treatment: EvidenceReviewerTreatment
+    contradiction_status: EvidenceContradictionStatus
+    valid_from: datetime
+    valid_until: datetime
+
+    @model_validator(mode="after")
+    def validity_window_is_timezone_aware(self) -> Self:
+        """Reject ambiguous or inverted evidence validity windows."""
+        if any(
+            timestamp.tzinfo is None or timestamp.utcoffset() is None
+            for timestamp in (self.valid_from, self.valid_until)
+        ):
+            raise ValueError("evidence validity window must include timezone offsets")
+        if self.valid_from >= self.valid_until:
+            raise ValueError("evidence valid_from must be before valid_until")
+        return self
 
 
 class GovernanceApprovalReference(StrictPrivacyModel):
@@ -151,6 +192,7 @@ class GovernanceApprovalReference(StrictPrivacyModel):
     reviewer_id: PrivacyOpaqueId
     approval_id: PrivacyOpaqueId
     approval_digest: Sha256Digest
+    qualified_role_binding: GovernanceDigestedReference
 
 
 class ResolvedApprovalBinding(StrictPrivacyModel):
@@ -164,16 +206,24 @@ class ResolvedApprovalBinding(StrictPrivacyModel):
     policy_digest: Sha256Digest
     evidence_manifest_digest: Sha256Digest
     actor_id: PrivacyOpaqueId
+    authority_snapshot_digest: Sha256Digest
+    qualified_role_binding: GovernanceDigestedReference
     scope: GovernanceScope
     decision_status: DecisionPointStatus
+    approved_at: datetime
     valid_until: datetime
-    independence_evidence_digest: Sha256Digest
+    independence_evidence_ref: GovernanceDigestedReference
 
     @model_validator(mode="after")
-    def valid_until_is_timezone_aware(self) -> Self:
-        """Reject process-local approval timestamps."""
-        if self.valid_until.tzinfo is None or self.valid_until.utcoffset() is None:
-            raise ValueError("valid_until must include a timezone offset")
+    def validity_window_is_timezone_aware(self) -> Self:
+        """Reject ambiguous or inverted approval validity windows."""
+        if any(
+            timestamp.tzinfo is None or timestamp.utcoffset() is None
+            for timestamp in (self.approved_at, self.valid_until)
+        ):
+            raise ValueError("approval validity window must include timezone offsets")
+        if self.approved_at >= self.valid_until:
+            raise ValueError("approval approved_at must be before valid_until")
         return self
 
 
@@ -183,6 +233,8 @@ class PolicyResolutionContext(StrictPrivacyModel):
     scope: GovernanceScope
     policy_digest: Sha256Digest
     evidence_manifest_digest: Sha256Digest
+    authority_snapshot_digest: Sha256Digest
+    required_independence_evidence_ref: GovernanceDigestedReference
 
 
 class ProtectedDataClassification(StrictPrivacyModel):

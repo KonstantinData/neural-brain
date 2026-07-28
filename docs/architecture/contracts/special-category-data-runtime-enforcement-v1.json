@@ -23,8 +23,10 @@
     "decision_record_schema": "special-category-decision-record-v1.schema.json"
   },
   "reference_resolution_rules": [
-    "Every EvidenceRef resolves by evidence_id and evidence_version to privacy-evidence-record-v1 and must match evidence_digest and authenticated scope.",
-    "Every ApprovalEvidenceRef resolves by approval_id to privacy-approval-record-v1 and must match approval_digest, policy_digest, evidence manifest, authenticated scope, qualified role, validity, decision status, and independence evidence.",
+    "Every EvidenceRef resolves by evidence_id and evidence_version to privacy-evidence-record-v1 and must match evidence_digest, authenticated scope, qualified reviewer treatment, contradiction status, and validity.",
+    "Only qualified_accepted evidence with contradiction_status none and a current validity window may bind this resolver; rejected, pending_review, qualified_not_applicable, conflicting, unknown, future-dated, or expired evidence blocks target ALLOW.",
+    "Every ApprovalEvidenceRef resolves by approval_id to privacy-approval-record-v1 and must exactly match approval_digest, policy_digest, evidence manifest, authenticated scope, authority snapshot, qualified role binding, validity, DECIDED decision status, and independence evidence reference.",
+    "REJECTED always blocks. OUT_OF_SCOPE is never an approval binding or a favorable default; it is admissible only in a separately implemented qualified, evidence-backed not-applicable branch and never substitutes for DECIDED.",
     "Missing, stale, cross-scope, digest-mismatched, unqualified, non-independent, pending, revoked, expired, or conflicting resolved records block target ALLOW."
   ],
   "existing_contracts_reused_by_reference": [
