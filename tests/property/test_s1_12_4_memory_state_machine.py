@@ -1,4 +1,4 @@
-"""Generated state-machine evidence for the implemented MS-1 Memory Core.
+"""Generated model evidence for the implemented working-memory foundation.
 
 Goal, Action, tool, and dispatch runtimes are absent. Their only assertion in
 this module is the current fail-closed N/A contract boundary.
@@ -52,6 +52,9 @@ _MEMORY_STAGES = json.loads(
         encoding="utf-8"
     )
 )
+_AUTHORITY_CONTRACT = json.loads(
+    (_ROOT / "docs/architecture/contracts/memory-authority-grants.json").read_text(encoding="utf-8")
+)
 _SYSTEM_BOUNDARY = json.loads(
     (_ROOT / "docs/architecture/contracts/system-boundary.json").read_text(encoding="utf-8")
 )
@@ -67,14 +70,15 @@ class TraceOperation(StrEnum):
     ROLLBACK_WRITE = "rollback_write"
     RETRY_ROLLED_BACK = "retry_rolled_back"
     CROSS_SCOPE_READ = "cross_scope_read"
-    INCOMPLETE_AUTHORITY = "incomplete_authority"
+    INCOMPLETE_SCOPE = "incomplete_scope"
+    AUTHORITY_NA = "authority_na"
     DREAMING_DENIED = "dreaming_denied"
     RECONCILIATION_REQUIRED = "reconciliation_required"
     DISPATCH_NA = "dispatch_na"
 
 
-class RequestTerminalState(StrEnum):
-    """Absorbing outcome of one modeled request attempt."""
+class ModelOperationOutcome(StrEnum):
+    """Observed outcome classification for one modeled operation or boundary."""
 
     COMMITTED = "committed"
     REPLAYED = "replayed"
@@ -83,7 +87,8 @@ class RequestTerminalState(StrEnum):
     NOT_APPLICABLE = "not_applicable"
 
 
-TERMINAL_STATES = frozenset(RequestTerminalState)
+MODEL_OPERATION_OUTCOMES = frozenset(ModelOperationOutcome)
+_SCOPE_DIMENSIONS = ("tenant_id", "area_id", "project_id", "session_id")
 
 
 @dataclass(slots=True)
@@ -115,26 +120,30 @@ class MemoryTraceModel:
     committed_version: int = 0
     last_committed: tuple[MemoryCycleInputs, MemoryCycleResult] | None = None
     pending_retry: MemoryCycleInputs | None = None
-    terminal_history: list[RequestTerminalState] = field(default_factory=list)
+    outcome_history: list[ModelOperationOutcome] = field(default_factory=list)
 
-    def terminate(self, state: RequestTerminalState) -> None:
-        """Append an absorbing request outcome without rewriting prior outcomes."""
-        before = tuple(self.terminal_history)
-        assert state in TERMINAL_STATES
-        self.terminal_history.append(state)
-        assert tuple(self.terminal_history[: len(before)]) == before
+    def record_outcome(self, outcome: ModelOperationOutcome) -> None:
+        """Record a classification after an observed result, denial, or N/A check."""
+        before = tuple(self.outcome_history)
+        assert outcome in MODEL_OPERATION_OUTCOMES
+        self.outcome_history.append(outcome)
+        assert tuple(self.outcome_history[: len(before)]) == before
 
 
-def _context(seed: int, *, foreign: bool = False) -> RuntimeContext:
+def _context(seed: int) -> RuntimeContext:
     suffix = f"{seed:x}"
-    realm = "foreign" if foreign else "primary"
     return RuntimeContext(
-        actor_id=f"actor-{realm}-{suffix}",
-        tenant_id=f"tenant-{realm}-{suffix}",
-        area_id=f"area-{realm}-{suffix}",
-        project_id=f"project-{realm}-{suffix}",
-        session_id=f"session-{realm}-{suffix}",
+        actor_id=f"actor-primary-{suffix}",
+        tenant_id=f"tenant-primary-{suffix}",
+        area_id=f"area-primary-{suffix}",
+        project_id=f"project-primary-{suffix}",
+        session_id=f"session-primary-{suffix}",
     )
+
+
+def _foreign_scope_context(seed: int, dimension: str) -> RuntimeContext:
+    assert dimension in _SCOPE_DIMENSIONS
+    return _context(seed).model_copy(update={dimension: f"{dimension}-foreign-{seed:x}"})
 
 
 def _factory(seed: int) -> MemoryCycleFactory:
@@ -194,7 +203,7 @@ def _assert_repository_model(
     assert len(repository.audit_ids) == committed
     assert len(set(repository.audit_ids)) == committed
     assert len(repository.working_memories) == (1 if committed else 0)
-    assert all(outcome in TERMINAL_STATES for outcome in model.terminal_history)
+    assert all(outcome in MODEL_OPERATION_OUTCOMES for outcome in model.outcome_history)
 
     if not committed:
         return
@@ -222,7 +231,7 @@ def _advance(service: MemoryService, factory: MemoryCycleFactory, model: MemoryT
     model.committed_version += 1
     assert result.working_memory.version == model.committed_version
     model.last_committed = (inputs, result)
-    model.terminate(RequestTerminalState.COMMITTED)
+    model.record_outcome(ModelOperationOutcome.COMMITTED)
 
 
 def _run_operation(
@@ -237,7 +246,7 @@ def _run_operation(
 ) -> None:
     before = _snapshot(repository)
     pending_before = model.pending_retry
-    history_before = tuple(model.terminal_history)
+    history_before = tuple(model.outcome_history)
     event(f"operation={operation.value}")
 
     if operation is TraceOperation.ADVANCE:
@@ -246,7 +255,7 @@ def _run_operation(
         assert model.last_committed is not None
         inputs, expected = model.last_committed
         assert _commit(service, inputs) == expected
-        model.terminate(RequestTerminalState.REPLAYED)
+        model.record_outcome(ModelOperationOutcome.REPLAYED)
         _assert_quiescent(repository, before, pending_before=pending_before, model=model)
     elif operation is TraceOperation.CONFLICTING_REPLAY:
         assert model.last_committed is not None
@@ -259,25 +268,29 @@ def _run_operation(
         )
         with pytest.raises(AtomicPersistenceError, match="idempotency key reused"):
             _commit(service, conflict)
-        model.terminate(RequestTerminalState.DENIED)
+        model.record_outcome(ModelOperationOutcome.DENIED)
         _assert_quiescent(repository, before, pending_before=pending_before, model=model)
     elif operation is TraceOperation.STALE_WRITE:
         with pytest.raises(StaleWorkingMemoryVersionError):
             _commit(service, factory.build(expected_version=max(0, model.committed_version - 1)))
-        model.terminate(RequestTerminalState.DENIED)
+        model.record_outcome(ModelOperationOutcome.DENIED)
         _assert_quiescent(repository, before, pending_before=pending_before, model=model)
     elif operation is TraceOperation.ROLLBACK_WRITE:
-        retry = factory.build(expected_version=model.committed_version)
-        repository.inject(MemoryFailpoint.BEFORE_COMMIT)
-        with pytest.raises(AtomicPersistenceError, match="before atomic commit"):
-            _commit(service, retry)
-        assert repository._failpoint is None
-        model.pending_retry = retry
-        model.terminate(RequestTerminalState.ROLLED_BACK)
-        assert _snapshot(repository) == before
+        if model.pending_retry is not None:
+            model.record_outcome(ModelOperationOutcome.NOT_APPLICABLE)
+            _assert_quiescent(repository, before, pending_before=pending_before, model=model)
+        else:
+            retry = factory.build(expected_version=model.committed_version)
+            repository.inject(MemoryFailpoint.BEFORE_COMMIT)
+            with pytest.raises(AtomicPersistenceError, match="before atomic commit"):
+                _commit(service, retry)
+            assert repository._failpoint is None
+            model.pending_retry = retry
+            model.record_outcome(ModelOperationOutcome.ROLLED_BACK)
+            assert _snapshot(repository) == before
     elif operation is TraceOperation.RETRY_ROLLED_BACK:
         if model.pending_retry is None:
-            model.terminate(RequestTerminalState.NOT_APPLICABLE)
+            model.record_outcome(ModelOperationOutcome.NOT_APPLICABLE)
             _assert_quiescent(repository, before, pending_before=None, model=model)
         else:
             retry = model.pending_retry
@@ -286,35 +299,45 @@ def _run_operation(
                 result = _commit(service, retry)
                 model.committed_version += 1
                 model.last_committed = (retry, result)
-                model.terminate(RequestTerminalState.COMMITTED)
+                model.record_outcome(ModelOperationOutcome.COMMITTED)
             else:
                 with pytest.raises(StaleWorkingMemoryVersionError):
                     _commit(service, retry)
-                model.terminate(RequestTerminalState.DENIED)
+                model.record_outcome(ModelOperationOutcome.DENIED)
                 assert _snapshot(repository) == before
     elif operation is TraceOperation.CROSS_SCOPE_READ:
         assert model.last_committed is not None
         inputs, _ = model.last_committed
-        provider.context = _context(seed, foreign=True)
-        with pytest.raises(CheckpointUnavailableError):
-            service.read_checkpoint(inputs.checkpoint)
-        with pytest.raises(CheckpointUnavailableError):
-            service.read_observation(inputs.observation.observation_id)
-        with pytest.raises(CheckpointUnavailableError):
-            service.read_working_memory(WORKING_MEMORY_ID)
+        for dimension in _SCOPE_DIMENSIONS:
+            event(f"foreign_scope_dimension={dimension}")
+            provider.context = _foreign_scope_context(seed, dimension)
+            with pytest.raises(CheckpointUnavailableError):
+                service.read_checkpoint(inputs.checkpoint)
+            model.record_outcome(ModelOperationOutcome.DENIED)
+            with pytest.raises(CheckpointUnavailableError):
+                service.read_observation(inputs.observation.observation_id)
+            model.record_outcome(ModelOperationOutcome.DENIED)
+            with pytest.raises(CheckpointUnavailableError):
+                service.read_working_memory(WORKING_MEMORY_ID)
+            model.record_outcome(ModelOperationOutcome.DENIED)
         provider.context = _context(seed)
-        model.terminate(RequestTerminalState.DENIED)
         _assert_quiescent(repository, before, pending_before=pending_before, model=model)
-    elif operation is TraceOperation.INCOMPLETE_AUTHORITY:
-        provider.context = RuntimeContext(
-            actor_id=f"actor-{seed:x}",
-            tenant_id=f"tenant-{seed:x}",
-            area_id=f"area-{seed:x}",
-        )
-        with pytest.raises(ScopeIsolationError):
-            _commit(service, factory.build(expected_version=model.committed_version))
+    elif operation is TraceOperation.INCOMPLETE_SCOPE:
+        for dimension in ("project_id", "session_id"):
+            event(f"missing_scope_dimension={dimension}")
+            provider.context = _context(seed).model_copy(update={dimension: None})
+            with pytest.raises(ScopeIsolationError):
+                _commit(service, factory.build(expected_version=model.committed_version))
+            model.record_outcome(ModelOperationOutcome.DENIED)
         provider.context = _context(seed)
-        model.terminate(RequestTerminalState.DENIED)
+        _assert_quiescent(repository, before, pending_before=pending_before, model=model)
+    elif operation is TraceOperation.AUTHORITY_NA:
+        assert _AUTHORITY_CONTRACT["current_operation_boundary"][
+            "implemented_security_floor_operations"
+        ] == ["intake"]
+        assert not hasattr(service, "authority_resolver")
+        assert not hasattr(service, "authority_snapshot")
+        model.record_outcome(ModelOperationOutcome.NOT_APPLICABLE)
         _assert_quiescent(repository, before, pending_before=pending_before, model=model)
     elif operation is TraceOperation.DREAMING_DENIED:
         with pytest.raises(DreamingUnavailableError):
@@ -324,13 +347,13 @@ def _run_operation(
                     requested_reason="generated MS-1 negative path",
                 )
             )
-        model.terminate(RequestTerminalState.DENIED)
+        model.record_outcome(ModelOperationOutcome.DENIED)
         _assert_quiescent(repository, before, pending_before=pending_before, model=model)
     elif operation is TraceOperation.RECONCILIATION_REQUIRED:
         assert _MEMORY_LIFECYCLE["reconciliation"]["ready_default"] is False
         assert "Do not retry" in _MEMORY_LIFECYCLE["reconciliation"]["unknown_commit_outcome"]
         assert not hasattr(service, "reconcile_unknown_commit")
-        model.terminate(RequestTerminalState.NOT_APPLICABLE)
+        model.record_outcome(ModelOperationOutcome.NOT_APPLICABLE)
         _assert_quiescent(repository, before, pending_before=pending_before, model=model)
     else:
         assert operation is TraceOperation.DISPATCH_NA
@@ -340,20 +363,18 @@ def _run_operation(
         assert _SYSTEM_BOUNDARY["cognitive_plane"]["may_directly_execute_external_effects"] is False
         assert not hasattr(service, "dispatch")
         assert not hasattr(repository, "dispatch")
-        model.terminate(RequestTerminalState.NOT_APPLICABLE)
+        model.record_outcome(ModelOperationOutcome.NOT_APPLICABLE)
         _assert_quiescent(repository, before, pending_before=pending_before, model=model)
 
-    assert tuple(model.terminal_history[: len(history_before)]) == history_before
+    assert tuple(model.outcome_history[: len(history_before)]) == history_before
 
 
-_TAIL_OPERATIONS = st.lists(st.sampled_from(tuple(TraceOperation)), min_size=3, max_size=3).map(
+_TAIL_OPERATIONS = st.lists(st.sampled_from(tuple(TraceOperation)), min_size=5, max_size=5).map(
     tuple
 )
 _TRACE_SEQUENCES = _TAIL_OPERATIONS.map(
     lambda tail: (
         TraceOperation.ADVANCE,
-        TraceOperation.ROLLBACK_WRITE,
-        TraceOperation.RETRY_ROLLED_BACK,
         *tail,
     )
 )
@@ -396,8 +417,8 @@ def test_generated_sequences_preserve_memory_state_machine_invariants(
         assert provider.context == primary_context
         _assert_repository_model(repository, model, primary_context)
 
-    assert len(model.terminal_history) >= TRACE_STEPS
-    assert all(state in TERMINAL_STATES for state in model.terminal_history)
+    assert len(model.outcome_history) >= TRACE_STEPS
+    assert all(outcome in MODEL_OPERATION_OUTCOMES for outcome in model.outcome_history)
 
 
 def test_trace_volume_and_negative_runtime_boundary_are_explicit() -> None:
