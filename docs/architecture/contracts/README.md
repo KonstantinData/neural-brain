@@ -74,6 +74,30 @@ ADR-017.
   preparation for future scope-bound Article 9 and Article 10 evidence review.
   It defines candidate-evidence XOR qualified-N/A requirements but provides no
   instance validator, qualified review, authorization, enforcement, or release.
+- `special-category-data-runtime-enforcement-v1.json`: preparation-only
+  S1-14.4 composition and fail-closed decision vocabulary; this complete
+  preparation composition has runtime disabled and cannot authorize `ALLOW`.
+- `protected-data-classification-v1.schema.json`: strict classification
+  vocabulary that rejects unknown, contradictory, and unreviewed inputs.
+- `privacy-evidence-record-v1.schema.json`: strict resolved evidence metadata
+  with source, provenance, scope, purpose/activity, jurisdiction, review,
+  contradiction, validity, reassessment, retention/deletion, and digest binding;
+  its machine boundary makes schema validity explicitly non-authorizing.
+- `privacy-approval-record-v1.schema.json`: strict resolved approval metadata
+  with policy/evidence digests, authenticated actor/authority, qualified role,
+  scope, decision, constraints, validity, revalidation, and independence binding;
+  even structural `DECIDED` remains non-authorizing in preparation.
+- `special-category-processing-policy-v1.schema.json`: strict proposed policy
+  shape for immutable scope, purpose, basis, additional condition, safeguards,
+  retention, review, evidence, validity, and version bindings.
+- `protected-storage-metadata-v1.schema.json`: strict S1-11.2 metadata shape;
+  schema validity never creates lawfulness, authority, or storage permission.
+- `special-category-policy-state-machine-v1.json`: proposed lifecycle and
+  transition rules with `ACTIVE` unreachable before authoritative approval.
+- `special-category-decision-record-v1.schema.json`: proposed immutable
+  decision/audit target shape. Its machine-readable preparation boundary makes
+  structural `ALLOW` validity non-authorizing and requires a separately
+  accepted active composition before any runtime consumer may use it.
 - `legitimate-interest-assessment-evidence-intake-v1.json`: immutable,
   documentation-only preparation for future scope-bound Article 6(1)(f)
   evidence review, including public-authority, vulnerability, objection, and

@@ -1,0 +1,118 @@
+{
+  "document_type": "neural_brain_special_category_policy_state_machine",
+  "contract_id": "neural-brain.special-category-policy-state-machine",
+  "contract_version": "1.0.0",
+  "status": "proposed_non_authorizing_preparation",
+  "authoritative_writer": "Protected Control Plane privacy transition gate",
+  "runtime_enabled": false,
+  "states": [
+    "DRAFT",
+    "PENDING_REVIEW",
+    "APPROVED",
+    "ACTIVE",
+    "SUSPENDED",
+    "REVOKED",
+    "EXPIRED",
+    "REJECTED",
+    "SUPERSEDED"
+  ],
+  "initial_state": "DRAFT",
+  "terminal_states": ["REVOKED", "EXPIRED", "REJECTED", "SUPERSEDED"],
+  "transitions": [
+    {
+      "from": "DRAFT",
+      "to": "PENDING_REVIEW",
+      "actor_role": "policy_author",
+      "required_evidence": ["complete_policy_package_digest", "complete_decision_point_register", "no_unknown_operational_field"]
+    },
+    {
+      "from": "DRAFT",
+      "to": "REJECTED",
+      "actor_role": "accountable_owner",
+      "required_evidence": ["rejection_reason_codes"]
+    },
+    {
+      "from": "PENDING_REVIEW",
+      "to": "APPROVED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["accountable_owner_approval", "qualified_privacy_review", "qualified_legal_review_when_required", "independent_review", "review_validity_window"]
+    },
+    {
+      "from": "PENDING_REVIEW",
+      "to": "REJECTED",
+      "actor_role": "qualified_reviewer",
+      "required_evidence": ["rejection_reason_codes", "review_evidence_digest"]
+    },
+    {
+      "from": "APPROVED",
+      "to": "ACTIVE",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["exact_policy_digest", "current_approval_set_digest", "passed_regression_evidence", "no_active_scope_conflict", "activation_audit_available"]
+    },
+    {
+      "from": "APPROVED",
+      "to": "SUPERSEDED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["successor_policy_reference", "supersession_reason_codes"]
+    },
+    {
+      "from": "ACTIVE",
+      "to": "SUSPENDED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["suspension_reason_codes", "downstream_stop_and_reconciliation_reference"]
+    },
+    {
+      "from": "ACTIVE",
+      "to": "REVOKED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["revocation_reason_codes", "revocation_effective_at", "downstream_stop_and_reconciliation_reference"]
+    },
+    {
+      "from": "ACTIVE",
+      "to": "EXPIRED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["authoritative_clock_evidence", "expiry_reconciliation_reference"]
+    },
+    {
+      "from": "ACTIVE",
+      "to": "SUPERSEDED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["active_successor_policy_reference", "atomic_pointer_change", "supersession_audit"]
+    },
+    {
+      "from": "SUSPENDED",
+      "to": "ACTIVE",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["fresh_qualified_review", "current_approval_set_digest", "passed_regression_evidence", "resolved_suspension_findings"]
+    },
+    {
+      "from": "SUSPENDED",
+      "to": "REVOKED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["revocation_reason_codes", "downstream_reconciliation_reference"]
+    },
+    {
+      "from": "SUSPENDED",
+      "to": "EXPIRED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["authoritative_clock_evidence", "expiry_reconciliation_reference"]
+    },
+    {
+      "from": "SUSPENDED",
+      "to": "SUPERSEDED",
+      "actor_role": "privacy_transition_gate",
+      "required_evidence": ["successor_policy_reference", "supersession_audit"]
+    }
+  ],
+  "transition_invariants": [
+    "Every transition is append-only and binds the exact prior state, policy version, policy digest, actor, scope, effective time, recorded time, evidence set, and reason codes.",
+    "APPROVED or ACTIVE cannot be backdated to authorize an earlier operation.",
+    "Suspension, revocation, or expiry blocks new ALLOW decisions immediately after the fact is recorded and starts scoped reconciliation.",
+    "A terminal version never returns to ACTIVE; re-entry requires a new immutable policy version.",
+    "Unknown states, transitions, actors, evidence, scope, time, or versions are denied and audited.",
+    "A request payload, model output, prompt, memory value, or tool output cannot select or change policy state."
+  ],
+  "unknown_transition_outcome": "DENY",
+  "restore_rule": "Startup and restore remain not ready until the event history, active pointer, validity windows, revocations, audit continuity, and governed-record bindings reconcile exactly.",
+  "claim_boundary": "This state-machine preparation does not approve a policy, activate a state, authorize ALLOW, or implement a runtime transition gate."
+}

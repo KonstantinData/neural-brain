@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neural-brain.invalid/contracts/privacy-evidence-record-v1.schema.json",
+  "title": "Resolved privacy evidence record",
+  "description": "Strict metadata-only record resolved behind a digested evidence reference. It contains no raw protected evidence value.",
+  "x-neural-brain-preparation-boundary": {
+    "runtime_enabled": false,
+    "allow_authorized": false,
+    "composition_required": true,
+    "statement": "Schema-valid evidence metadata is not qualified acceptance, authority, or permission without the separately accepted and active runtime composition."
+  },
+  "type": "object",
+  "required": [
+    "contract_version",
+    "evidence_schema_version",
+    "evidence_id",
+    "evidence_version",
+    "evidence_digest",
+    "evidence_type",
+    "source_reference",
+    "source_provenance_refs",
+    "source_date",
+    "retrieved_or_verified_at",
+    "scope",
+    "purpose",
+    "processing_activity",
+    "jurisdiction_binding",
+    "reviewer_treatment",
+    "contradiction_status",
+    "valid_from",
+    "valid_until",
+    "reassessment_trigger_refs",
+    "retention_and_deletion_class",
+    "canonical_record_digest"
+  ],
+  "properties": {
+    "contract_version": {"const": "privacy-evidence-record-v1"},
+    "evidence_schema_version": {"const": "1.0.0"},
+    "evidence_id": {"$ref": "#/$defs/OpaqueId"},
+    "evidence_version": {"type": "integer", "minimum": 1},
+    "evidence_digest": {"$ref": "#/$defs/Digest"},
+    "evidence_type": {"$ref": "#/$defs/OpaqueId"},
+    "source_reference": {"$ref": "#/$defs/DigestedRef"},
+    "source_provenance_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/DigestedRef"}
+    },
+    "source_date": {"$ref": "#/$defs/Timestamp"},
+    "retrieved_or_verified_at": {"$ref": "#/$defs/Timestamp"},
+    "scope": {"$ref": "#/$defs/ProjectScope"},
+    "purpose": {"$ref": "#/$defs/DigestedRef"},
+    "processing_activity": {"$ref": "#/$defs/DigestedRef"},
+    "jurisdiction_binding": {"$ref": "#/$defs/DigestedRef"},
+    "reviewer_treatment": {
+      "enum": ["qualified_accepted", "qualified_not_applicable", "rejected", "pending_review"]
+    },
+    "contradiction_status": {"enum": ["none", "conflict", "unknown"]},
+    "valid_from": {"$ref": "#/$defs/Timestamp"},
+    "valid_until": {"$ref": "#/$defs/Timestamp"},
+    "reassessment_trigger_refs": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/DigestedRef"}
+    },
+    "retention_and_deletion_class": {"$ref": "#/$defs/DigestedRef"},
+    "canonical_record_digest": {"$ref": "#/$defs/Digest"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "OpaqueId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "Digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "ProjectScope": {
+      "type": "object",
+      "required": ["tenant_id", "area_id", "project_id"],
+      "properties": {
+        "tenant_id": {"$ref": "#/$defs/OpaqueId"},
+        "area_id": {"$ref": "#/$defs/OpaqueId"},
+        "project_id": {"$ref": "#/$defs/OpaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "DigestedRef": {
+      "type": "object",
+      "required": ["reference_id", "reference_version", "reference_digest"],
+      "properties": {
+        "reference_id": {"$ref": "#/$defs/OpaqueId"},
+        "reference_version": {"type": "integer", "minimum": 1},
+        "reference_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

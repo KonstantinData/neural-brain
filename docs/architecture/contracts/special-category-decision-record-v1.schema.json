@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neural-brain.invalid/contracts/special-category-decision-record-v1.schema.json",
+  "title": "Special-category processing decision record",
+  "description": "An immutable, non-reusable decision bound to one exact operation and protected policy input set.",
+  "x-neural-brain-preparation-boundary": {
+    "runtime_enabled": false,
+    "allow_authorized": false,
+    "composition_required": true,
+    "statement": "This schema validates a future decision-record shape only. Structural ALLOW validity is not authority and may not be consumed without the separately accepted and active runtime composition."
+  },
+  "type": "object",
+  "required": [
+    "contract_version",
+    "decision_schema_version",
+    "decision_id",
+    "decision_digest",
+    "transition_request_id",
+    "actor",
+    "scope",
+    "operation_id",
+    "protected_record_reference",
+    "subject_kind",
+    "subject_digest",
+    "data_classification",
+    "purpose",
+    "processing_activity",
+    "general_basis_evidence_digest",
+    "additional_condition_binding",
+    "safeguard_and_retention_manifest_digest",
+    "processing_policy",
+    "policy_activation_event_id",
+    "rule_set",
+    "database_identity_generation",
+    "authority_snapshot_digest",
+    "approval_set_digest",
+    "approval_manifest_digest",
+    "evidence_set_digest",
+    "input_parameter_digest",
+    "policy_state",
+    "outcome",
+    "reason_codes",
+    "obligations",
+    "required_review_roles",
+    "non_compensatory_gates_passed",
+    "evaluator",
+    "decided_at",
+    "valid_until",
+    "reusable",
+    "downstream_action",
+    "mutation_and_audit_correlation"
+  ],
+  "properties": {
+    "contract_version": {"const": "special-category-decision-record-v1"},
+    "decision_schema_version": {"const": "1.0.0"},
+    "decision_id": {"$ref": "#/$defs/OpaqueId"},
+    "decision_digest": {"$ref": "#/$defs/Digest"},
+    "transition_request_id": {"$ref": "#/$defs/OpaqueId"},
+    "actor": {
+      "type": "object",
+      "required": ["principal_id", "runtime_component_id"],
+      "properties": {
+        "principal_id": {"$ref": "#/$defs/OpaqueId"},
+        "runtime_component_id": {"$ref": "#/$defs/OpaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "scope": {"$ref": "#/$defs/SessionScope"},
+    "operation_id": {"$ref": "#/$defs/OpaqueId"},
+    "protected_record_reference": {
+      "type": "object",
+      "required": ["record_kind", "record_id", "record_digest"],
+      "properties": {
+        "record_kind": {"enum": ["observation", "working_context_version", "checkpoint", "memory_candidate", "cognitive_transition_evidence"]},
+        "record_id": {"$ref": "#/$defs/OpaqueId"},
+        "record_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    },
+    "subject_kind": {"$ref": "#/$defs/OpaqueId"},
+    "subject_digest": {"$ref": "#/$defs/Digest"},
+    "data_classification": {"$ref": "#/$defs/DigestedRef"},
+    "purpose": {"$ref": "#/$defs/DigestedRef"},
+    "processing_activity": {"$ref": "#/$defs/DigestedRef"},
+    "general_basis_evidence_digest": {"$ref": "#/$defs/Digest"},
+    "additional_condition_binding": {
+      "type": "object",
+      "required": ["disposition", "binding_digest"],
+      "properties": {
+        "disposition": {"enum": ["evidence", "qualified_not_applicable"]},
+        "binding_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    },
+    "safeguard_and_retention_manifest_digest": {"$ref": "#/$defs/Digest"},
+    "processing_policy": {"$ref": "#/$defs/DigestedRef"},
+    "policy_activation_event_id": {"$ref": "#/$defs/OpaqueId"},
+    "rule_set": {"$ref": "#/$defs/DigestedRef"},
+    "database_identity_generation": {"type": "integer", "minimum": 1},
+    "authority_snapshot_digest": {"$ref": "#/$defs/Digest"},
+    "approval_set_digest": {"$ref": "#/$defs/Digest"},
+    "approval_manifest_digest": {"$ref": "#/$defs/Digest"},
+    "evidence_set_digest": {"$ref": "#/$defs/Digest"},
+    "input_parameter_digest": {"$ref": "#/$defs/Digest"},
+    "policy_state": {"enum": ["DRAFT", "PENDING_REVIEW", "APPROVED", "ACTIVE", "SUSPENDED", "REVOKED", "EXPIRED", "REJECTED", "SUPERSEDED"]},
+    "outcome": {"enum": ["ALLOW", "DENY", "REQUIRE_HUMAN_REVIEW", "REQUIRE_ADDITIONAL_EVIDENCE", "EXPIRED", "REVOKED", "CONFLICT", "UNKNOWN"]},
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/OpaqueId"}
+    },
+    "obligations": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/OpaqueId"}
+    },
+    "required_review_roles": {
+      "type": "array",
+      "minItems": 4,
+      "uniqueItems": true,
+      "items": {"enum": ["accountable_owner", "privacy_reviewer", "legal_reviewer", "independent_reviewer"]},
+      "allOf": [
+        {"contains": {"const": "accountable_owner"}},
+        {"contains": {"const": "privacy_reviewer"}},
+        {"contains": {"const": "legal_reviewer"}},
+        {"contains": {"const": "independent_reviewer"}}
+      ]
+    },
+    "non_compensatory_gates_passed": {"type": "boolean"},
+    "evaluator": {
+      "type": "object",
+      "required": ["component_id", "code_version", "model_version"],
+      "properties": {
+        "component_id": {"$ref": "#/$defs/OpaqueId"},
+        "code_version": {"$ref": "#/$defs/OpaqueId"},
+        "model_version": {"$ref": "#/$defs/OpaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "decided_at": {"$ref": "#/$defs/Timestamp"},
+    "valid_until": {"$ref": "#/$defs/Timestamp"},
+    "reusable": {"const": false},
+    "downstream_action": {"enum": ["protected_mutation", "block", "human_review", "evidence_collection", "reconciliation"]},
+    "mutation_and_audit_correlation": {
+      "type": "object",
+      "required": ["transaction_correlation_id", "decision_event_id", "audit_event_id", "mutation_id"],
+      "properties": {
+        "transaction_correlation_id": {"$ref": "#/$defs/OpaqueId"},
+        "decision_event_id": {"$ref": "#/$defs/OpaqueId"},
+        "audit_event_id": {"$ref": "#/$defs/OpaqueId"},
+        "mutation_id": {"oneOf": [{"$ref": "#/$defs/OpaqueId"}, {"type": "null"}]}
+      },
+      "additionalProperties": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"outcome": {"const": "ALLOW"}}, "required": ["outcome"]},
+      "then": {
+        "properties": {
+          "policy_state": {"const": "ACTIVE"},
+          "non_compensatory_gates_passed": {"const": true},
+          "downstream_action": {"const": "protected_mutation"},
+          "mutation_and_audit_correlation": {
+            "properties": {"mutation_id": {"$ref": "#/$defs/OpaqueId"}}
+          }
+        }
+      },
+      "else": {
+        "not": {
+          "properties": {"downstream_action": {"const": "protected_mutation"}},
+          "required": ["downstream_action"]
+        }
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "OpaqueId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "Digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "SessionScope": {
+      "type": "object",
+      "required": ["tenant_id", "area_id", "project_id", "session_id"],
+      "properties": {
+        "tenant_id": {"$ref": "#/$defs/OpaqueId"},
+        "area_id": {"$ref": "#/$defs/OpaqueId"},
+        "project_id": {"$ref": "#/$defs/OpaqueId"},
+        "session_id": {"$ref": "#/$defs/OpaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "VersionedRef": {
+      "type": "object",
+      "required": ["reference_id", "reference_version"],
+      "properties": {
+        "reference_id": {"$ref": "#/$defs/OpaqueId"},
+        "reference_version": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "DigestedRef": {
+      "type": "object",
+      "required": ["reference_id", "reference_version", "reference_digest"],
+      "properties": {
+        "reference_id": {"$ref": "#/$defs/OpaqueId"},
+        "reference_version": {"type": "integer", "minimum": 1},
+        "reference_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -29,6 +29,12 @@ distinct.
 - [`relationship-memory-adr-018-revalidation-proposal-v1.md`](relationship-memory-adr-018-revalidation-proposal-v1.md)
   records preparation-only Positions 1–3; it authorizes neither runtime nor
   retrieval, Planner, or Dreaming use.
+- [`s1-14-4-runtime-privacy-enforcement-adr-proposal-v1.md`](s1-14-4-runtime-privacy-enforcement-adr-proposal-v1.md),
+  [`special-category-data-runtime-enforcement-v1.md`](special-category-data-runtime-enforcement-v1.md),
+  and [`special-category-data-policy-model-v1.md`](special-category-data-policy-model-v1.md)
+  define preparation-only S1-14.4/S1-11.2 decision, enforcement, and policy
+  boundaries. They are not accepted authority and enable no migration, active
+  policy, runtime `ALLOW`, protected storage, or release.
 - [`protected-control-kill-switch-adr-018-revalidation-proposal-v1.md`](protected-control-kill-switch-adr-018-revalidation-proposal-v1.md)
   records the proposed, non-authorizing replacement boundary for historical
   Kill-Switch ADR-006. It remains blocked pending an authorized Protected
@@ -81,3 +87,10 @@ contracts must be added by their owning delivery tasks before implementation.
 [`threat-model.md`](threat-model.md) defines the Foundation threat model.
 Deployment-specific legal classification, DPIA, fundamental-rights assessment,
 and production authorization remain separate evidence.
+
+[`special-category-data-runtime-threat-and-privacy-assessment-v1.md`](special-category-data-runtime-threat-and-privacy-assessment-v1.md),
+[`s1-14-4-privacy-ledger-migration-plan-v1.md`](s1-14-4-privacy-ledger-migration-plan-v1.md),
+[`s1-11-2-controlled-storage-integration-v1.md`](s1-11-2-controlled-storage-integration-v1.md),
+and [`s1-14-4-s1-11-2-runtime-enforcement-test-strategy-v1.md`](s1-14-4-s1-11-2-runtime-enforcement-test-strategy-v1.md)
+record focused preparation and future verification requirements only; no
+runtime implementation or production readiness is claimed.

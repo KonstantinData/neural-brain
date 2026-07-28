@@ -1,0 +1,459 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://neural-brain.invalid/contracts/special-category-processing-policy-v1.schema.json",
+  "title": "Special-category processing policy version",
+  "description": "An immutable, scope-bound policy package prepared for qualified review. Schema validity is not runtime authorization.",
+  "type": "object",
+  "required": [
+    "contract_version",
+    "policy_schema_version",
+    "policy_id",
+    "policy_version",
+    "predecessor_policy_digest",
+    "policy_digest",
+    "policy_author_id",
+    "created_at",
+    "initial_state",
+    "scope",
+    "deployment",
+    "supported_system_ids",
+    "controller_role_evidence_ref",
+    "processor_role_evidence_refs",
+    "session_scope_rule",
+    "jurisdiction_profile",
+    "jurisdiction_ids",
+    "artifact",
+    "purpose",
+    "processing_activity",
+    "supported_operation_ids",
+    "excluded_operation_ids",
+    "supported_classification_predicates",
+    "data_classification",
+    "general_basis_evidence_binding",
+    "additional_condition_evidence_binding",
+    "article_10_disposition_binding",
+    "consent_and_withdrawal_binding",
+    "safeguard_manifest_binding",
+    "minimization_rule_binding",
+    "access_rule_binding",
+    "rights_process_binding",
+    "rule_set",
+    "retention_policy",
+    "deletion_and_derivative_rule_binding",
+    "legal_hold_rule_binding",
+    "recipient_processor_location_bindings",
+    "transfer_rule_binding",
+    "incident_and_reassessment_bindings",
+    "protection_profile",
+    "accountable_owner_id",
+    "requirement_resolutions",
+    "approval_evidence_refs",
+    "valid_from",
+    "valid_until",
+    "next_review_at",
+    "unsupported_cases",
+    "evidence_manifest_digest",
+    "approval_manifest_digest",
+    "recorded_at"
+  ],
+  "properties": {
+    "contract_version": {"const": "special-category-processing-policy-v1"},
+    "policy_schema_version": {"const": "1.0.0"},
+    "policy_id": {"$ref": "#/$defs/OpaqueId"},
+    "policy_version": {"type": "integer", "minimum": 1},
+    "predecessor_policy_digest": {
+      "oneOf": [{"$ref": "#/$defs/Digest"}, {"type": "null"}]
+    },
+    "policy_digest": {"$ref": "#/$defs/Digest"},
+    "policy_author_id": {"$ref": "#/$defs/OpaqueId"},
+    "created_at": {"$ref": "#/$defs/Timestamp"},
+    "initial_state": {"const": "DRAFT"},
+    "scope": {"$ref": "#/$defs/ProjectScope"},
+    "deployment": {
+      "type": "object",
+      "required": ["deployment_id", "environment_id"],
+      "properties": {
+        "deployment_id": {"$ref": "#/$defs/OpaqueId"},
+        "environment_id": {"$ref": "#/$defs/OpaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "supported_system_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/OpaqueId"}
+    },
+    "controller_role_evidence_ref": {"$ref": "#/$defs/EvidenceRef"},
+    "processor_role_evidence_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/EvidenceRef"}
+    },
+    "session_scope_rule": {"$ref": "#/$defs/DigestedRef"},
+    "jurisdiction_profile": {"$ref": "#/$defs/VersionedRef"},
+    "jurisdiction_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/OpaqueId"}
+    },
+    "artifact": {"$ref": "#/$defs/DigestedRef"},
+    "purpose": {"$ref": "#/$defs/DigestedRef"},
+    "processing_activity": {"$ref": "#/$defs/DigestedRef"},
+    "supported_operation_ids": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/OpaqueId"}
+    },
+    "excluded_operation_ids": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/OpaqueId"}
+    },
+    "supported_classification_predicates": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/DigestedRef"}
+    },
+    "data_classification": {"$ref": "#/$defs/DigestedRef"},
+    "general_basis_evidence_binding": {"$ref": "#/$defs/DigestedRef"},
+    "additional_condition_evidence_binding": {"$ref": "#/$defs/DigestedRef"},
+    "article_10_disposition_binding": {"$ref": "#/$defs/DigestedRef"},
+    "consent_and_withdrawal_binding": {"$ref": "#/$defs/DigestedRef"},
+    "safeguard_manifest_binding": {"$ref": "#/$defs/DigestedRef"},
+    "minimization_rule_binding": {"$ref": "#/$defs/DigestedRef"},
+    "access_rule_binding": {"$ref": "#/$defs/DigestedRef"},
+    "rights_process_binding": {"$ref": "#/$defs/DigestedRef"},
+    "rule_set": {"$ref": "#/$defs/DigestedRef"},
+    "retention_policy": {"$ref": "#/$defs/DigestedRef"},
+    "deletion_and_derivative_rule_binding": {"$ref": "#/$defs/DigestedRef"},
+    "legal_hold_rule_binding": {"$ref": "#/$defs/DigestedRef"},
+    "recipient_processor_location_bindings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/DigestedRef"}
+    },
+    "transfer_rule_binding": {"$ref": "#/$defs/DigestedRef"},
+    "incident_and_reassessment_bindings": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/DigestedRef"}
+    },
+    "protection_profile": {"$ref": "#/$defs/DigestedRef"},
+    "accountable_owner_id": {"$ref": "#/$defs/OpaqueId"},
+    "requirement_resolutions": {
+      "type": "array",
+      "minItems": 4,
+      "items": {"$ref": "#/$defs/RequirementResolution"}
+    },
+    "approval_evidence_refs": {
+      "type": "array",
+      "minItems": 4,
+      "items": {"$ref": "#/$defs/ApprovalEvidenceRef"}
+    },
+    "valid_from": {"$ref": "#/$defs/Timestamp"},
+    "valid_until": {"$ref": "#/$defs/Timestamp"},
+    "next_review_at": {"$ref": "#/$defs/Timestamp"},
+    "unsupported_cases": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"$ref": "#/$defs/OpaqueId"}
+    },
+    "evidence_manifest_digest": {"$ref": "#/$defs/Digest"},
+    "approval_manifest_digest": {"$ref": "#/$defs/Digest"},
+    "recorded_at": {"$ref": "#/$defs/Timestamp"}
+  },
+  "allOf": [
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "requirement_family": {"const": "article_6_basis"},
+              "resolution": {"const": "candidate_evidence"}
+            },
+            "required": ["requirement_family", "resolution"]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {"requirement_family": {"const": "article_9_condition"}},
+            "required": ["requirement_family"]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "requirement_family": {"const": "retention"},
+              "resolution": {"const": "candidate_evidence"}
+            },
+            "required": ["requirement_family", "resolution"]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {"requirement_family": {"const": "retention"}},
+            "required": ["requirement_family"]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {
+              "requirement_family": {"const": "safeguard"},
+              "resolution": {"const": "candidate_evidence"}
+            },
+            "required": ["requirement_family", "resolution"]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {"requirement_family": {"const": "safeguard"}},
+            "required": ["requirement_family"]
+          },
+          "minContains": 1,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {"requirement_family": {"const": "article_10_control"}},
+            "required": ["requirement_family"]
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {"requirement_family": {"const": "consent"}},
+            "required": ["requirement_family"]
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "requirement_resolutions": {
+          "contains": {
+            "type": "object",
+            "properties": {"requirement_family": {"const": "auditability"}},
+            "required": ["requirement_family"]
+          },
+          "minContains": 0,
+          "maxContains": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "approval_evidence_refs": {
+          "allOf": [
+            {
+              "contains": {
+                "type": "object",
+                "properties": {"review_role": {"const": "accountable_owner"}},
+                "required": ["review_role"]
+              },
+              "minContains": 1,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {"review_role": {"const": "privacy_reviewer"}},
+                "required": ["review_role"]
+              },
+              "minContains": 1,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {"review_role": {"const": "legal_reviewer"}},
+                "required": ["review_role"]
+              },
+              "minContains": 1,
+              "maxContains": 1
+            },
+            {
+              "contains": {
+                "type": "object",
+                "properties": {"review_role": {"const": "independent_reviewer"}},
+                "required": ["review_role"]
+              },
+              "minContains": 1,
+              "maxContains": 1
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "OpaqueId": {"type": "string", "minLength": 1, "maxLength": 128},
+    "Digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "Timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?(Z|[+-][0-9]{2}:[0-9]{2})$"
+    },
+    "ProjectScope": {
+      "type": "object",
+      "required": ["tenant_id", "area_id", "project_id"],
+      "properties": {
+        "tenant_id": {"$ref": "#/$defs/OpaqueId"},
+        "area_id": {"$ref": "#/$defs/OpaqueId"},
+        "project_id": {"$ref": "#/$defs/OpaqueId"}
+      },
+      "additionalProperties": false
+    },
+    "VersionedRef": {
+      "type": "object",
+      "required": ["reference_id", "reference_version"],
+      "properties": {
+        "reference_id": {"$ref": "#/$defs/OpaqueId"},
+        "reference_version": {"type": "integer", "minimum": 1}
+      },
+      "additionalProperties": false
+    },
+    "DigestedRef": {
+      "type": "object",
+      "required": ["reference_id", "reference_version", "reference_digest"],
+      "properties": {
+        "reference_id": {"$ref": "#/$defs/OpaqueId"},
+        "reference_version": {"type": "integer", "minimum": 1},
+        "reference_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    },
+    "EvidenceRef": {
+      "type": "object",
+      "required": ["record_contract", "evidence_id", "evidence_version", "evidence_digest"],
+      "properties": {
+        "record_contract": {"const": "privacy-evidence-record-v1"},
+        "evidence_id": {"$ref": "#/$defs/OpaqueId"},
+        "evidence_version": {"type": "integer", "minimum": 1},
+        "evidence_digest": {"$ref": "#/$defs/Digest"}
+      },
+      "additionalProperties": false
+    },
+    "QualifiedNotApplicable": {
+      "type": "object",
+      "required": ["reviewer_id", "reviewed_at", "rationale_evidence_refs", "next_review_at"],
+      "properties": {
+        "reviewer_id": {"$ref": "#/$defs/OpaqueId"},
+        "reviewed_at": {"$ref": "#/$defs/Timestamp"},
+        "rationale_evidence_refs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"$ref": "#/$defs/EvidenceRef"}
+        },
+        "next_review_at": {"$ref": "#/$defs/Timestamp"}
+      },
+      "additionalProperties": false
+    },
+    "RequirementResolution": {
+      "oneOf": [
+        {
+          "type": "object",
+          "required": ["requirement_family", "requirement_code", "resolution", "evidence_refs"],
+          "properties": {
+            "requirement_family": {
+              "enum": ["article_6_basis", "article_9_condition", "article_10_control", "consent", "safeguard", "retention", "auditability"]
+            },
+            "requirement_code": {"$ref": "#/$defs/OpaqueId"},
+            "resolution": {"const": "candidate_evidence"},
+            "evidence_refs": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {"$ref": "#/$defs/EvidenceRef"}
+            }
+          },
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "required": ["requirement_family", "requirement_code", "resolution", "qualified_not_applicable"],
+          "properties": {
+            "requirement_family": {
+              "enum": ["article_9_condition", "article_10_control", "consent", "safeguard", "retention", "auditability"]
+            },
+            "requirement_code": {"$ref": "#/$defs/OpaqueId"},
+            "resolution": {"const": "qualified_not_applicable"},
+            "qualified_not_applicable": {"$ref": "#/$defs/QualifiedNotApplicable"}
+          },
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ApprovalEvidenceRef": {
+      "type": "object",
+      "required": ["record_contract", "review_role", "reviewer_id", "approval_id", "approval_digest", "approved_at", "valid_until"],
+      "properties": {
+        "record_contract": {"const": "privacy-approval-record-v1"},
+        "review_role": {"enum": ["accountable_owner", "privacy_reviewer", "legal_reviewer", "independent_reviewer"]},
+        "reviewer_id": {"$ref": "#/$defs/OpaqueId"},
+        "approval_id": {"$ref": "#/$defs/OpaqueId"},
+        "approval_digest": {"$ref": "#/$defs/Digest"},
+        "approved_at": {"$ref": "#/$defs/Timestamp"},
+        "valid_until": {"$ref": "#/$defs/Timestamp"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

@@ -25,6 +25,7 @@ product.
 | Product maturity | NB-0 Foundation artifacts and a first effect-free NB-1 implementation slice are present; NB-1 is not released |
 | Memory maturity | Early MS-1 subset with scoped Working Memory; MS-1 is not complete |
 | Runtime | Python library and protected PostgreSQL memory kernel; no stable service API or deployment |
+| Privacy enforcement | S1-14.4/S1-11.2 contracts, strict preparation types, and a disabled fail-closed evaluator are present for review; no accepted ADR, legal approval, migration, active policy, runtime `ALLOW`, or controlled-storage implementation exists |
 | Dreaming | Reserved schema and contracts; all supported execution paths are disabled fail closed |
 | Inference | Normative local-only boundary; no inference adapter or ready deployment exists |
 | Autonomy | Internal goal, plan, and metacognitive proposals only; no action execution, external effects, or autonomous operation |
@@ -116,6 +117,10 @@ The current implementation includes early, reusable prerequisites:
 - normative provenance, default-deny, privacy, retention, deletion, and
   model-output trust contracts; their complete runtime enforcement is not yet
   implemented;
+- preparation-only S1-14.4/S1-11.2 privacy contracts, strict schemas, disabled
+  policy-state validation, and a non-authorizing evaluator that cannot emit
+  `ALLOW`; authoritative approval, protected-ledger migration, runtime
+  enforcement, controlled storage, and independent review remain blocked;
 - normative target, recognition, evaluation, delivery, and release-stop
   contracts for the complete system.
 
@@ -331,6 +336,9 @@ evidence; it is not executable truth.
   and [architecture evolution register](docs/governance/architecture-evolution-register.md)
 - [Operational runbooks](docs/runbooks/README.md) and
   [release evidence](docs/runbooks/release-artifacts.md)
+- [S1-14.4/S1-11.2 runtime privacy enforcement traceability](docs/traceability/S1-14.4-S1-11.2-runtime-privacy-enforcement.md),
+  which records preparation-only evidence and the remaining authorization,
+  implementation, verification, and merge blockers
 
 ## Quick Start
 
