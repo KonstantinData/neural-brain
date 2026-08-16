@@ -52,6 +52,10 @@ ADR-017.
 - `nb1-independent-evaluation-organization-v1.json`: preparation-only
   role, RACI, approval, review, deputy, escalation, and decision matrices for
   independent evaluation. It appoints no person and creates no authority.
+- `nb1-eval01-v4-external-operating-package-proposal-v1.json`: proposed-only
+  external owner/action workflow for EVAL-01 v4. It preserves evaluator-sole
+  hidden custody and treats inherited separate-provider surfaces as blocked
+  pending an accepted ADR-018/v4 clarification.
 - `nb1-candidate-freeze-lifecycle-v1.json`: preparation-only lifecycle for a
   future candidate freeze, immutable external storage, registry handoff,
   verification, invalidation, and rollback. It creates no artifact or release.

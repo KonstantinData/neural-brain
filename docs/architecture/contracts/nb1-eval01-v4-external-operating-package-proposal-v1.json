@@ -1,0 +1,155 @@
+{
+  "document_type": "nb1_eval01_v4_external_operating_package_proposal",
+  "format_version": 1,
+  "proposal_id": "neural-brain.nb1.eval01-v4-external-operating-package",
+  "proposal_version": "1.0.0",
+  "status": "proposed_pending_accepted_architecture_clarification",
+  "authority": "non_authorizing",
+  "governing_sources": [
+    "ADR-018",
+    "docs/architecture/architecture-directive-v4.0.md",
+    "docs/architecture/evaluations/nb1-safe-serial-cognition-v4.json",
+    "docs/architecture/contracts/nb1-independent-evaluation-preparation-v1.json"
+  ],
+  "claim_boundary": {
+    "role_appointment_or_attestation_issued": false,
+    "candidate_created_or_accepted": false,
+    "hidden_artifact_created_or_attached": false,
+    "registry_or_signing_key_created": false,
+    "evaluation_executed": false,
+    "evidence_admissible": false,
+    "evaluation_gates_passed": [],
+    "recognition_gates_passed": [],
+    "stage_release_authorized": false,
+    "neural_brain_candidate_claimed": false,
+    "nb2_activated": false,
+    "runtime_or_external_effect_enabled": false
+  },
+  "blocking_preconditions": [
+    {
+      "id": "OP-B1",
+      "owner": "architecture_decision_owner",
+      "action": "Accept, reject, or otherwise dispose of the unresolved public-artifact-generation, baseline-definition, and inherited separate-provider questions through an ADR-018/v4 clarification. This proposal does not define their evaluation criteria or values.",
+      "evidence": "Accepted decision reference that identifies the successor-contract scope or an explicit continued block.",
+      "failure_outcome": "no_v4_candidate_freeze_hidden_attachment_or_external_operation"
+    },
+    {
+      "id": "OP-B2",
+      "owner": "designated_independent_review_authority",
+      "action": "Externally appoint and attest the evaluator, reviewer, registry custodian, key custodian, audit owner, release authority, and recognition authority, including identity, organization, reporting line, qualifications, mandate, conflict disclosure, validity, and handoff/deputy process.",
+      "evidence": "External appointment and organizational-separation attestations; no repository identity, subagent, branch, worktree, or process label qualifies.",
+      "failure_outcome": "independent_evaluation_blocked"
+    },
+    {
+      "id": "OP-B3",
+      "owner": "implementation_owner_and_independent_reviewer",
+      "action": "Prepare, recompute, and accept a clean committed public-only v4 candidate-freeze receipt with every required canonical digest before any hidden attachment.",
+      "evidence": "Reviewer recomputation record for the complete freeze receipt and public-only bundle.",
+      "failure_outcome": "candidate_not_admissible_and_hidden_attachment_blocked"
+    }
+  ],
+  "v4_custody_reconciliation_proposal": {
+    "current_v4_model": "hidden_dataset_provider is a logical custody duty performed by independent_evaluator_only.",
+    "legacy_surface_treatment": "Inherited separate-provider/provider_id organization, attestation, registry, and handoff surfaces are a proposed replacement only; they are not admissible for EVAL-01 v4 until an accepted ADR-018/v4 clarification changes the binding.",
+    "prohibited_until_acceptance": [
+      "separate_provider_appointment",
+      "separate_provider_organization_or_transfer",
+      "v4_execution_through_inherited_provider_evaluator_schema",
+      "retroactive_edit_of_frozen_v4_specification"
+    ],
+    "failure_outcome": "hidden_attachment_scoring_evidence_intake_gate_review_release_recognition_runtime_and_nb2_activation_blocked"
+  },
+  "inherited_separate_provider_surface_inventory": [
+    {
+      "path": "docs/architecture/evaluations/nb1-serial-context-generator-v4.json",
+      "observed_surface": "independent_provider_only seed visibility, provider_id, and separate provider commitment",
+      "v4_status": "conflicting_inherited_surface_blocked_pending_accepted_revalidation"
+    },
+    {
+      "path": "docs/runbooks/nb1-hidden-evaluation.md",
+      "observed_surface": "separate artifact provider and evaluator operating procedure",
+      "v4_status": "conflicting_inherited_surface_blocked_pending_accepted_revalidation"
+    },
+    {
+      "path": "src/neural_brain/cognition/hidden_evidence.py",
+      "observed_surface": "separate provider identity and evaluator/provider/implementation organization validation",
+      "v4_status": "conflicting_inherited_surface_blocked_pending_accepted_revalidation"
+    },
+    {
+      "path": "tests/unit/test_nb1_hidden_evidence.py",
+      "observed_surface": "test fixture and assertion for separate provider and evaluator organizations",
+      "v4_status": "conflicting_inherited_surface_blocked_pending_accepted_revalidation"
+    }
+  ],
+  "ordered_external_workflow": [
+    {
+      "id": "OP-01",
+      "owner": "architecture_decision_owner",
+      "action": "Resolve OP-B1 through an accepted architecture clarification or record a rejected disposition.",
+      "admission_rule": "No subsequent workflow step is admissible while OP-B1 is unresolved.",
+      "output": "Accepted decision reference or explicit continued block."
+    },
+    {
+      "id": "OP-02",
+      "owner": "designated_independent_review_authority",
+      "action": "Resolve OP-B2 and approve external organizational separation and admissibility governance.",
+      "admission_rule": "The implementation owner cannot self-attest or control acceptance of any required separation, custody, registry, or key record.",
+      "output": "Externally attested appointments and separation evidence."
+    },
+    {
+      "id": "OP-03",
+      "owner": "independent_reviewer_and_registry_custodian",
+      "action": "Accept the frozen v4 specification and protocol digest, role attestations, reviewer-controlled registry, trusted Ed25519 public-key entries, validity intervals, and revocation process.",
+      "admission_rule": "Unknown, expired, revoked, self-supplied, mismatched, or unverifiable registry or key evidence is rejected.",
+      "output": "Accepted external registry references without private keys or hidden material."
+    },
+    {
+      "id": "OP-04",
+      "owner": "implementation_owner_and_independent_reviewer",
+      "action": "Submit and independently recompute the clean, committed, public-only v4 candidate, complete freeze receipt, manifests, and canonical digest bindings.",
+      "admission_rule": "Any post-freeze source, dependency, model, parameter, protocol, threshold, generator, or candidate change invalidates the receipt.",
+      "output": "Reviewer acceptance or rejection of the freeze receipt."
+    },
+    {
+      "id": "OP-05",
+      "owner": "independent_evaluator",
+      "action": "As the sole v4 hidden-material custodian and logical hidden_dataset_provider duty holder, create the sealed artifact outside the repository and record its pre-run commitment.",
+      "admission_rule": "Seed, examples, labels, latent variables, private implementation details, and per-sequence correctness never enter the implementation trust domain.",
+      "output": "Non-disclosing commitment reference and sole-custody attestation for reviewer completeness review."
+    },
+    {
+      "id": "OP-06",
+      "owner": "independent_evaluator",
+      "action": "Execute the accepted frozen candidate and evaluator-owned baselines and ablations in fresh, read-only, network-disabled, bounded, effect-free processes.",
+      "admission_rule": "Every completed, failed, aborted, crashed, duplicate, and missing-output attempt is finalised in the append-only ledger; no silent retry or replacement is permitted.",
+      "output": "Complete external attempt-ledger commitment and aggregate results only."
+    },
+    {
+      "id": "OP-07",
+      "owner": "independent_evaluator_and_key_custodian",
+      "action": "Release permitted aggregate evidence in canonical JSON with SHA-256 bindings and a detached Ed25519 signature from a trusted non-revoked key.",
+      "admission_rule": "Private keys, signing tokens, raw hidden material, and raw per-sequence outcomes are excluded.",
+      "output": "Aggregate signed evidence package and key-status reference."
+    },
+    {
+      "id": "OP-08",
+      "owner": "independent_reviewer",
+      "action": "Verify registry and attestation freshness, signature and key status, receipt bindings, ledger completeness, contamination, hard failures, resource results, and claim boundary.",
+      "admission_rule": "Any unknown, missing, stale, contradictory, contaminated, unsigned, revoked, or incomplete evidence is inadmissible.",
+      "output": "External admissibility recommendation; no gate result."
+    },
+    {
+      "id": "OP-09",
+      "owner": "separately_authorized_evaluation_gate_reviewer",
+      "action": "Assess admissible evidence only under the accepted evaluation-gate process.",
+      "admission_rule": "Preparation, signature, aggregate score, or admissibility recommendation never automatically passes G0, G1, a stage exit, release, recognition, runtime activation, or NB-2 activation.",
+      "output": "Separate gate-review disposition or continued block."
+    }
+  ],
+  "repository_follow_up_tests": [
+    "Reject use of inherited separate-provider execution surfaces as EVAL-01 v4 evidence before an accepted clarification.",
+    "Require the proposed v4 successor to bind hidden_custody_duty.custodian_evaluator_id to evaluator.evaluator_id and prohibit an independent provider identity or organization.",
+    "Preserve rejection of unknown, revoked, expired, mismatched, self-signed, incomplete, repeated, post-freeze, leaked, contaminated, or non-append-only evidence.",
+    "Preserve aggregate-only output, no hidden-material repository state, no gate/release/recognition claim, and no NB-2 activation."
+  ]
+}

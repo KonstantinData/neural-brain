@@ -35,6 +35,10 @@ their accepted gates and may not be documented as model-controlled shortcuts.
 - [`nb1-independent-evaluation-preparation.md`](nb1-independent-evaluation-preparation.md)
   defines preparation-only external EVAL-01 v4 custody, freeze, registry,
   ledger, signing, and review steps; it authorizes no evaluation or release.
+- [`nb1-eval01-v4-external-operating-package-proposal.md`](nb1-eval01-v4-external-operating-package-proposal.md)
+  makes the proposed-only external owner/action sequence explicit and blocks
+  inherited separate-provider execution until an ADR-018/v4 clarification is
+  accepted.
 - [`protected-control-kill-switch.md`](protected-control-kill-switch.md)
   defines a proposed target review procedure for a future Protected Control
   Plane kill switch; it is not an operational shutdown or recovery procedure.

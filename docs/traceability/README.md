@@ -229,6 +229,10 @@ when they are required by the acceptance criteria.
 - [`EVAL-01-independent-evaluation-organization.md`](EVAL-01-independent-evaluation-organization.md):
   non-appointing role, custody, RACI, approval, review, deputy, escalation, and
   decision evidence preparation; it creates no authority or release.
+- [`EVAL-01-external-operating-package-proposal.md`](EVAL-01-external-operating-package-proposal.md):
+  proposed-only owner/action and fail-closed test mapping for external EVAL-01
+  v4 operation; external appointments and an accepted clarification remain
+  prerequisites.
 - [`EVAL-01-candidate-freeze-lifecycle.md`](EVAL-01-candidate-freeze-lifecycle.md):
   preparation-only freeze, verification, registry, invalidation, and rollback
   evidence; it creates no candidate, artifact, signature, evaluation, or release.
