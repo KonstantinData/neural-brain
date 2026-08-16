@@ -22,6 +22,11 @@ distinct.
   records the proposed, non-authorizing NB-4/NB-5 boundary for historical
   Action Gate, preparation, dispatch, and reconciliation ADRs. It remains
   blocked pending authorized acceptance together with the Goal Gate boundary.
+- [`nb8-distributed-operation-adr-018-revalidation-proposal-v1.md`](nb8-distributed-operation-adr-018-revalidation-proposal-v1.md)
+  records the proposed, non-authorizing NB-8 boundary for future fenced
+  ownership, durable queues, leases, failover, reconciliation, disaster
+  recovery, and governed cross-Area abstraction. It remains blocked pending
+  NB-7 exit evidence and an accepted current contract.
 - [`nb1-planner-verification-adr-018-revalidation-proposal-v1.md`](nb1-planner-verification-adr-018-revalidation-proposal-v1.md)
   records the proposed, non-authorizing prerequisite boundary for the NB-1
   S1-10 planner, verification, and serial-loop packages. It remains blocked

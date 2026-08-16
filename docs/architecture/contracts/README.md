@@ -28,6 +28,13 @@ ADR-017.
   NB-5 Action Transition Gate. It separates NB-4 learning/consolidation from
   NB-5 action and does not authorize a runtime, migration, executor, dispatch,
   budget, resource, fence, sandbox, or external effect.
+- `nb8-distributed-operation-preparation-v1.json`: proposed, non-authorizing
+  state, actor, scope, ownership, recovery, and governed cross-Area boundary
+  for a future NB-8 distributed capability. It creates no worker, queue,
+  lease, failover, restore, cross-Area sharing, runtime, or release authority.
+- `nb8-distributed-operation-test-plan-v1.json`: preregistered, non-executing
+  partition, split-brain, duplicate-effect, restore, semantic-equivalence, and
+  isolation evidence plan for the unaccepted NB-8 target contract.
 - `nb1-hidden-evaluation.json`: label-free candidate boundary, candidate freeze
   receipt, external evaluator custody, and signed evidence intake for EVAL-01 v4.
 - `nb1-independent-evaluation-preparation-v1.json`: preparation-only,

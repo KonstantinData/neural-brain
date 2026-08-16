@@ -20,6 +20,9 @@ durable technical source of truth.
   preparation-only reconciliation and five-dimensional evidence status for
   privacy enforcement and controlled storage. Authorization, implementation,
   full verification, merge, legal approval, and runtime `ALLOW` remain absent.
+- [`NB-8-distributed-operation-preparation.md`](NB-8-distributed-operation-preparation.md):
+  target-only NB-8 distributed-control contract and preregistered verification
+  package. It does not implement a distributed runtime or claim NB-8 evidence.
 
 ## Evidence Chain
 

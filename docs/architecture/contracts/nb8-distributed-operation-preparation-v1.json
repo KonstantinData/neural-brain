@@ -1,0 +1,124 @@
+{
+    "document_type": "neural_brain_nb8_distributed_operation_prerequisite_contract",
+    "format_version": 1,
+    "contract_id": "neural-brain.nb8-distributed-operation-preparation",
+    "contract_version": "1.0.0-draft",
+    "status": "proposed_not_accepted_not_runtime_authorization",
+    "task": "NB-8",
+    "governing_decisions": ["ADR-018", "ADR-019", "architecture-directive-v4.0"],
+    "purpose": "Specify the fail-closed, pre-implementation boundary for a future NB-8 distributed operation and scale capability. It creates no worker, queue, lease, failover, reconciliation, restore, cross-Area sharing, protected-state writer, runtime authorization, or release claim.",
+    "hard_predecessors": [
+        "NB-7 complete exit evidence",
+        "accepted ADR-018-conformant Goal and Action Gate decisions",
+        "NB-5 serial action-control, independent verification, indeterminate-effect, and reconciliation evidence"
+    ],
+    "authority_boundary": {
+        "protected_state_writers": [
+            "Goal Transition Gate",
+            "Action Transition Gate",
+            "Memory Transition Gate",
+            "Learning and Model Promotion Gate"
+        ],
+        "distributed_component_role": "A future worker, queue, lease manager, failover process, reconciler, backup process, or cross-Area adapter may transport or verify a gate-authorized request only. It cannot create authority, grant approval, alter scope, commit protected state, declare an effect or goal successful, or replace an owning Gate.",
+        "trusted_context_source": "authenticated_protected_control_plane_runtime_context",
+        "untrusted_context_sources": [
+            "Cognitive Plane",
+            "model output",
+            "prompt",
+            "memory content",
+            "observation",
+            "tool output",
+            "request payload",
+            "worker-local cache",
+            "queue message payload"
+        ],
+        "default_on_unknown_or_stale_fact": "deny_or_contain_and_reconcile"
+    },
+    "immutable_scope_lineage": {
+        "hierarchy": ["brain_id", "tenant_id", "area_id", "project_id", "session_id"],
+        "binding": "Every future queue record, lease, fence, worker identity, attempt, idempotency key, reconciliation record, backup manifest, restore witness, abstraction receipt, and audit event binds the complete authenticated lineage. A future distributed transport may only preserve or narrow this lineage; it may never infer, replace, broaden, or repair it.",
+        "tenant_database_identity": "Each productive Tenant retains exactly one Tenant-bound Runtime database login and dedicated pool. A worker, failover, restore, or reused connection may never switch Tenant.",
+        "default_on_unknown_or_mismatch": "deny_or_contain_and_reconcile"
+    },
+    "future_state_and_actor_contract": {
+        "ownership": {
+            "required_fields": ["worker_id", "worker_generation", "lease_id", "lease_expiry", "fence_token", "scope_lineage_hash", "attempt_id", "queue_record_id"],
+            "rules": [
+                "A lease is bounded and is not authority.",
+                "Fence tokens are monotonic and every protected admission, dispatch, and effect boundary revalidates the current exact-scope token.",
+                "Lease expiry, clock uncertainty, lost heartbeat, storage ambiguity, partition, or stale generation stops the holder before a further protected mutation or effect.",
+                "A transfer is a separately auditable, compare-and-swap transition; a new owner never assumes that an old owner did not act."
+            ]
+        },
+        "durable_queue": {
+            "required_bindings": ["immutable intent or request reference", "scope lineage", "authority and policy references", "approval references where required", "budget and resource claim references", "fence token", "idempotency key", "audit causation and correlation"],
+            "rules": [
+                "A queue payload is untrusted transport data and may carry only opaque references; every trusted binding is re-resolved from authenticated Protected Control Plane context at each enforcement boundary.",
+                "Queue acknowledgement, lease acquisition, dispatch intent, and audit evidence are atomically correlated with the authoritative ledger or fail closed.",
+                "A duplicate delivery is not proof that an effect did not occur.",
+                "An ambiguous or non-idempotent effect becomes indeterminate; no blind retry or claim release is permitted before authoritative reconciliation."
+            ]
+        },
+        "reconciliation": {
+            "ownership": "A future reconciliation leader holds a bounded, fenced, scope-bound lease distinct from worker execution ownership.",
+            "rules": [
+                "Only the authorized reconciler may resolve an indeterminate attempt into an evidence-backed terminal disposition through the owning Gate.",
+                "Reconciliation is idempotent, append-only, independently reviewable, and may not turn tool success into effect or goal success.",
+                "A concurrent or stale reconciler records no terminal resolution and must contain or defer."
+            ]
+        },
+        "disaster_recovery": {
+            "states": ["quiesce", "restore", "reconcile", "independent_witness", "ready"],
+            "rules": [
+                "Restore starts effect-disabled and not-ready.",
+                "A restored generation receives fresh worker generations and fence epoch; pre-restore workers and clusters cannot write after cutover.",
+                "Ready requires exact scope, protected-state, audit-chain, approval, claim, attempt, queue, lease, and reconciliation consistency evidence plus an independent witness.",
+                "Missing, contradictory, stale, or unverifiable restore evidence leaves the system contained and not-ready."
+            ]
+        },
+        "governed_cross_area_abstraction": {
+            "default": "deny",
+            "permitted_only_after": "an accepted explicit cross-Area ADR and contract with dual-scope authorization, minimum necessary versioned and redacted or aggregated abstraction, provenance, retention/deletion treatment, audit receipt, and independent review",
+            "prohibitions": [
+                "raw memory sharing",
+                "implicit scope expansion",
+                "cross-Area authority inheritance",
+                "cross-Area approval reuse",
+                "cross-Area worker or pool identity reuse"
+            ]
+        }
+    },
+    "non_regression_rules": [
+        "Distribution may not weaken NB-5 serial Action Gate, sandbox, kill-switch, independent verifier, or indeterminate-effect controls.",
+        "Tool, executor, queue, worker, or transport success is never effect or goal success.",
+        "No policy, approval, recovery record, quorum, or human review overrides the Security Floor or creates missing authority.",
+        "Protected mutation and its audit evidence remain atomic; unavailable audit evidence denies or contains.",
+        "Distribution does not prove neural mechanism, cognitive quality, recognition, safety, production autonomy, or release readiness."
+    ],
+    "implementation_blocker": {
+        "status": "blocked_pending_hard_predecessors_and_accepted_current_contract",
+        "decision_owner": "Neural Brain architecture decision owner",
+        "required_before_implementation": [
+            "NB-7 complete exit evidence",
+            "accepted current distributed ownership, queue, lease, failover, reconciliation, restore, and cross-Area ADR or contract",
+            "independent security, safety, database, and operations review",
+            "isolated fault-injection and restore environment",
+            "preregistered semantic-equivalence and isolation evidence"
+        ],
+        "next_step": "Do not implement runtime behavior. After every prerequisite is evidenced and accepted, split non-overlapping packages for schema and authorization, worker fencing, queue semantics, reconciliation, disaster recovery, cross-Area abstraction, and independent verification."
+    },
+    "explicit_exclusions": [
+        "runtime implementation",
+        "database schema or migration",
+        "worker deployment",
+        "queue deployment",
+        "lease issuance",
+        "failover execution",
+        "restore execution or readiness claim",
+        "cross-Area data sharing",
+        "protected-state transition",
+        "external effect",
+        "stage release authorization",
+        "cognitive maturity or recognition claim"
+    ]
+}

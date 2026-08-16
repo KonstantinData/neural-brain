@@ -1,0 +1,110 @@
+{
+    "document_type": "neural_brain_nb8_distributed_operation_preregistered_test_plan",
+    "format_version": 1,
+    "test_plan_id": "neural-brain.nb8-distributed-operation-test-plan",
+    "test_plan_version": "1.0.0-draft",
+    "status": "proposed_not_accepted_not_runtime_authorization",
+    "task": "NB-8",
+    "purpose": "Preregister the future fault, equivalence, and isolation evidence for NB-8. This plan does not implement, execute, certify, authorize, or release a distributed runtime.",
+    "authority_boundary": {
+        "governing_contract": "neural-brain.nb8-distributed-operation-preparation",
+        "implementation_precondition": "NB-7 exit evidence plus accepted current distributed and Action/Goal Gate contracts",
+        "default_on_missing_evidence": "deny_or_contain_and_reconcile",
+        "stage_boundary": "NB-8 only; preparation artifacts do not enable NB-5, NB-6, NB-7, or NB-8 runtime behavior"
+    },
+    "required_lineage": ["brain_id", "tenant_id", "area_id", "project_id", "session_id"],
+    "common_oracles": {
+        "ownership_oracle": "At most one current fence holder may pass a future exact-scope admission or dispatch boundary; stale, partitioned, expired, or unknown holders cannot mutate protected state or cause an effect.",
+        "ledger_oracle": "The authoritative ledger and append-only audit contain one causally linked disposition per attempt. Missing audit evidence prevents admission or terminal resolution.",
+        "effect_oracle": "Duplicate delivery, worker loss, or failover never creates an unauthorized duplicate effect. Ambiguous effects remain indeterminate and retain claims until authoritative reconciliation.",
+        "restore_oracle": "A restored system remains not-ready and effect-disabled until scope, protected state, audit continuity, queue, lease, attempt, approval, claim, and reconciliation evidence are independently reconciled.",
+        "semantic_equivalence_oracle": "A preregistered serial reference and distributed execution reach the same scope lineage, protected terminal state, Gate receipt, authority/policy/fence versions, independent-verification disposition, claims, and audit causal relations including hash-chain continuity, excluding explicitly allowed operational metadata.",
+        "isolation_oracle": "No worker, queue, retry, lease, failover, restore, pool, or abstraction path crosses Tenant or Area boundaries; cross-Area exchange is denied absent its separately accepted dual-scope contract."
+    },
+    "result_schema": {
+        "required_immutable_artifact_refs": [
+            "contract_artifact_ref",
+            "implementation_artifact_ref",
+            "environment_artifact_ref",
+            "fault_injection_artifact_ref",
+            "serial_reference_artifact_ref",
+            "ledger_and_audit_artifact_ref",
+            "independent_witness_artifact_ref"
+        ],
+        "binding_rule": "Each result binds the exact immutable implementation, environment, fault schedule, authenticated lineage, clock assumptions, ledger/audit snapshot, and independent witness. Missing, mutable, unverifiable, or scope-mismatched evidence invalidates the case and fails closed."
+    },
+    "cases": [
+        {
+            "case_id": "NB8-PT-001",
+            "category": "partition_and_lease_expiry",
+            "scenario": "Partition an active worker from the authoritative lease and ledger until its bounded lease expires.",
+            "expected_oracles": ["ownership_oracle", "ledger_oracle", "effect_oracle"],
+            "required_future_test_location": "tests/distributed/test_nb8_ownership_failover.py",
+            "evidence_stage": "NB-8"
+        },
+        {
+            "case_id": "NB8-PT-002",
+            "category": "split_brain_and_stale_fence",
+            "scenario": "Present two worker generations with the same logical attempt and a stale fence after failover.",
+            "expected_oracles": ["ownership_oracle", "ledger_oracle", "effect_oracle"],
+            "required_future_test_location": "tests/distributed/test_nb8_ownership_failover.py",
+            "evidence_stage": "NB-8"
+        },
+        {
+            "case_id": "NB8-PT-003",
+            "category": "duplicate_delivery_and_effect",
+            "scenario": "Replay one durable queue record to concurrent consumers before and after a lost acknowledgement.",
+            "expected_oracles": ["ledger_oracle", "effect_oracle", "ownership_oracle"],
+            "required_future_test_location": "tests/database/test_nb8_queue_effects.py",
+            "evidence_stage": "NB-8"
+        },
+        {
+            "case_id": "NB8-PT-004",
+            "category": "reconciliation_leadership",
+            "scenario": "Race two reconcilers after an indeterminate non-idempotent effect and inject an audit failure into one terminal-resolution attempt.",
+            "expected_oracles": ["ownership_oracle", "ledger_oracle", "effect_oracle"],
+            "required_future_test_location": "tests/property/test_nb8_reconciliation_state_machine.py",
+            "evidence_stage": "NB-8"
+        },
+        {
+            "case_id": "NB8-PT-005",
+            "category": "restore_and_generation_fencing",
+            "scenario": "Restore an isolated ledger snapshot, attempt pre-restore worker writes, and require independently witnessed reconciliation before readiness.",
+            "expected_oracles": ["restore_oracle", "ownership_oracle", "ledger_oracle", "isolation_oracle"],
+            "required_future_test_location": "tests/database/test_nb8_restore_equivalence.py",
+            "evidence_stage": "NB-8"
+        },
+        {
+            "case_id": "NB8-PT-006",
+            "category": "semantic_equivalence",
+            "scenario": "Compare a preregistered serial reference trace with schedules containing worker loss, duplicate delivery, failover, and reconciliation.",
+            "expected_oracles": ["semantic_equivalence_oracle", "ledger_oracle", "effect_oracle"],
+            "required_future_test_location": "tests/property/test_nb8_semantic_equivalence.py",
+            "evidence_stage": "NB-8"
+        },
+        {
+            "case_id": "NB8-PT-007",
+            "category": "tenant_area_and_cross_area_isolation",
+            "scenario": "Attempt Tenant or Area substitution through worker reuse, queue replay, retry, pool reuse, failover, restore, and an unapproved abstraction request.",
+            "expected_oracles": ["isolation_oracle", "ledger_oracle", "ownership_oracle"],
+            "required_future_test_location": "tests/database/test_nb8_distributed_scope_isolation.py",
+            "evidence_stage": "NB-8"
+        }
+    ],
+    "failure_criteria": [
+        "Any stale or partitioned owner passes a protected boundary.",
+        "Any duplicate effect, blind retry, or early claim release occurs.",
+        "Any restore becomes ready without independent reconciliation evidence.",
+        "Any distributed trace changes the protected terminal semantics from its serial reference.",
+        "Any Tenant or Area boundary is crossed, or raw cross-Area memory is shared implicitly.",
+        "Any result lacks the required immutable evidence binding."
+    ],
+    "explicit_exclusions": [
+        "runtime implementation",
+        "test execution claim",
+        "partition or disaster-recovery readiness claim",
+        "cross-Area authorization",
+        "stage release authorization",
+        "cognitive quality, recognition, or production-autonomy claim"
+    ]
+}
