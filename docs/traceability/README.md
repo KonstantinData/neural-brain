@@ -8,6 +8,10 @@ durable technical source of truth.
 - [`governance-blocker-integration-evidence.md`](governance-blocker-integration-evidence.md):
   controller-owned cross-package mapping for EVAL-01, S1-02.5, S1-14.9, reviews,
   integrated commands, and external-only blockers.
+- [`NB1-EVAL01-independent-architecture-review-20260816.md`](NB1-EVAL01-independent-architecture-review-20260816.md):
+  independent, non-authorizing decision recommendations for EVAL-01 v4.1 and
+  the NB-1 metacognition and model-manifest revalidations; it records required
+  owner decisions, non-compensatory gates, and successor-package ordering.
 - [`REL-MEM-01-08-relationship-memory-preparation.md`](REL-MEM-01-08-relationship-memory-preparation.md):
   ADR-018-aligned Relationship Memory preparation mapping for contracts,
   matrices, planned negative tests, and a non-executing governance runbook.
