@@ -12,6 +12,9 @@ durable technical source of truth.
   independent, non-authorizing decision recommendations for EVAL-01 v4.1 and
   the NB-1 metacognition and model-manifest revalidations; it records required
   owner decisions, non-compensatory gates, and successor-package ordering.
+- [`NB1-EVIDENCE-20260816-public-gap-boundary.md`](NB1-EVIDENCE-20260816-public-gap-boundary.md):
+  bounded NB-1 scope, crash, bypass, metacognition, reproducibility, and
+  ablation evidence mapping; it preserves all external EVAL-01 blockers.
 - [`REL-MEM-01-08-relationship-memory-preparation.md`](REL-MEM-01-08-relationship-memory-preparation.md):
   ADR-018-aligned Relationship Memory preparation mapping for contracts,
   matrices, planned negative tests, and a non-executing governance runbook.

@@ -31,6 +31,10 @@ distinct.
   records the proposed, non-authorizing prerequisite boundary for the NB-1
   S1-10 planner, verification, and serial-loop packages. It remains blocked
   pending an authorized current contract.
+- [`nb1-metacognition-adr-018-revalidation-proposal-v1.md`](nb1-metacognition-adr-018-revalidation-proposal-v1.md)
+  records the proposed, non-authorizing decision boundary for NB-1 `defer` and
+  `stop` proposals. It preserves the uncalibrated NB-1 heuristic and requires
+  an accepted contract plus separately preregistered calibration evidence.
 - [`relationship-memory-adr-018-revalidation-proposal-v1.md`](relationship-memory-adr-018-revalidation-proposal-v1.md)
   records preparation-only Positions 1–3; it authorizes neither runtime nor
   retrieval, Planner, or Dreaming use.

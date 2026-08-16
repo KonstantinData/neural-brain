@@ -152,20 +152,28 @@ def test_trusted_training_provenance_must_match_active_model_before_connect() ->
         )
 
 
-def test_commit_replay_restart_and_recovery_are_exact(
+def _lose_client_result_after_durable_commit(
+    repository: PostgresCognitiveRepository,
+    suffix: str,
+) -> None:
+    """Model a process loss after the transaction has committed, before acknowledgement."""
+    _commit(repository, suffix)
+    raise ConnectionAbortedError("simulated client loss after durable cognitive commit")
+
+
+def test_crash_after_durable_commit_replays_and_recovers_exactly(
     database_dsn: str,
     tenant_pool_resolver: TenantPoolResolver,
 ) -> None:
-    """An exact replay is idempotent and a new adapter recovers the durable state."""
+    """Lost client acknowledgement reconciles from the durable gate ledger."""
     repository = _repository(tenant_pool_resolver)
-    _commit(repository, "recover")
-    first = repository.load_checkpoint(context=_context(), checkpoint_id="nb1:cycle-recover")
+    with pytest.raises(ConnectionAbortedError, match="after durable cognitive commit"):
+        _lose_client_result_after_durable_commit(repository, "recover")
 
-    _commit(repository, "recover")
     restarted = _repository(tenant_pool_resolver)
     recovered = restarted.load_checkpoint(context=_context(), checkpoint_id="nb1:cycle-recover")
+    _commit(restarted, "recover")
 
-    assert recovered == first
     assert recovered.version == 1
     assert recovered.hidden_state == (0.125,)
     assert _counts(database_dsn) == (1, 1, 1, 2)

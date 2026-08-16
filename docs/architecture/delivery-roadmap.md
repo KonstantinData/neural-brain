@@ -38,12 +38,12 @@ updates. Exit requires neural, attention, and working-memory ablations plus
 scope, crash, recovery, and gate-bypass tests.
 
 The first ordered slice is specified in
-[`nb1-work-packages.md`](nb1-work-packages.md). Its active frozen evaluation is
-`EVAL-01.NB-1.safe-serial-cognition.v4`. Versions 1 through 3 are retained as
-rejected historical preregistration evidence; v3 was rejected before hidden
-attachment because its generator exposed an enumerable six-pattern hidden space.
-Completing the current slice does not by itself complete NB-1 or authorize
-later-stage capabilities.
+[`nb1-work-packages.md`](nb1-work-packages.md). Its active frozen
+preregistration is `EVAL-01.NB-1.safe-serial-cognition.v4`; versions 1 through
+3 are retained as rejected historical preregistration evidence. The frozen v4
+specification has no passed evaluation gate, accepted candidate, hidden run, or
+stage-release authorization. Completing the current slice does not by itself
+complete NB-1 or authorize later-stage capabilities.
 
 ### NB-2 — Perception, Attention, and World Model
 
