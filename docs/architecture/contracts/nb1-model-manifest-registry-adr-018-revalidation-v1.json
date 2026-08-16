@@ -1,0 +1,104 @@
+{
+    "document_type": "neural_brain_nb1_model_manifest_registry_adr_018_revalidation_proposal",
+    "contract_id": "neural-brain.nb1-model-manifest-registry-adr-018-revalidation",
+    "contract_version": "1.0.0",
+    "status": "proposed_prerequisite_not_accepted_not_runtime_authorization",
+    "governing_decisions": [
+        "ADR-003",
+        "ADR-005",
+        "ADR-016",
+        "ADR-018",
+        "ADR-019",
+        "architecture-directive-v4.0"
+    ],
+    "current_gap": {
+        "trusted_by_postgresql_cognitive_gate": ["training_artifact_digest"],
+        "caller_supplied_active_model_provenance": [
+            "model_version",
+            "parameter_digest",
+            "training_code_digest",
+            "contract_digest",
+            "evaluation_spec_digest"
+        ],
+        "required_remediation": "database_authoritative_immutable_manifest_and_scope_bound_runtime_binding"
+    },
+    "proposed_registry_boundary": {
+        "sole_protected_writer": "Learning and Model Promotion Gate",
+        "registration_activates_or_promotes": false,
+        "manifest_required_bindings": [
+            "model_version",
+            "parameter_digest",
+            "training_artifact_digest",
+            "training_code_digest",
+            "contract_digest",
+            "evaluation_spec_digest",
+            "canonical_profile_version",
+            "immutable_artifact_and_lineage_references"
+        ],
+        "runtime_binding_required_bindings": [
+            "authenticated_tenant_id",
+            "authenticated_area_id",
+            "project_and_session_when_narrower",
+            "manifest_identity_and_digest",
+            "monotonic_binding_fence_epoch"
+        ],
+        "unknown_stale_revoked_expired_scope_incompatible_or_mismatched": "deny",
+        "caller_envelope_may_supply_trusted_provenance": false,
+        "events": "append_only",
+        "revocation_blocks_new_cognitive_commits": true,
+        "recovery_retargets_checkpoint": false
+    },
+    "authority_separation": {
+        "cognitive_gate": "resolve_and_lock_database_authoritative_binding_then_validate_only",
+        "cognitive_runtime_and_caller": "may_not_register_bind_activate_suspend_revoke_promote_or_mutate",
+        "general_application_roles": "direct_dml_denied",
+        "evaluation_roles": "no_runtime_registry_write_or_runtime_authority",
+        "emergency_withdrawal": "request_through_protected_gate_only"
+    },
+    "candidate_evaluation_custody_boundary": {
+        "is_eval01_candidate_freeze_or_reviewer_registry": false,
+        "forbidden_fields": [
+            "hidden_seed",
+            "hidden_examples",
+            "hidden_labels",
+            "scores",
+            "thresholds",
+            "evaluator_keys",
+            "evaluator_identity",
+            "independence_assertions",
+            "custody_attestations",
+            "evaluation_acceptance",
+            "promotion_approval",
+            "release_outcome"
+        ],
+        "opaque_external_evidence_reference_interprets_or_authorizes": false,
+        "runtime_registry_substitutes_for_independent_evaluation": false
+    },
+    "successor_packages_after_accepted_adr": [
+        "A_schema_and_authority",
+        "B_gate_integration",
+        "C_runtime_adapter",
+        "D_operations_and_recovery",
+        "E_independent_verification_evidence"
+    ],
+    "required_test_evidence_after_acceptance": [
+        "individual_provenance_field_tamper_manifest_swap_unknown_and_collision_denials",
+        "role_and_direct_dml_denials",
+        "registration_is_not_activation_or_promotion_and_audit_is_database_derived",
+        "audit_failure_revocation_suspension_and_recovery_fail_closed",
+        "backup_restore_registry_binding_revocation_and_audit_reconciliation",
+        "atomic_fenced_serializable_checkpoint_bind_revoke_concurrency"
+    ],
+    "acceptance": {
+        "required_before_successor_implementation": true,
+        "migration_authorized": false,
+        "runtime_enabled": false,
+        "candidate_evaluation_created": false,
+        "hidden_data_accessed": false,
+        "independent_party_claimed": false,
+        "model_activation_or_promotion_authorized": false,
+        "nb2_enabled": false,
+        "nb1_stage_exit_authorized": false,
+        "release_or_recognition_authorized": false
+    }
+}

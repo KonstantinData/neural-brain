@@ -65,6 +65,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "nb1-independent-evaluation-artifact-manifests-v1.json",
         "nb1-independent-evaluation-preparation-v1.json",
         "nb1-independent-evaluation-organization-v1.json",
+        "nb1-model-manifest-registry-adr-018-revalidation-v1.json",
         "nb1-planner-verification-revalidation-v1.json",
         "nb1-safe-serial-cognition.json",
         "nb2-perception-world-model-prerequisites-v1.json",
