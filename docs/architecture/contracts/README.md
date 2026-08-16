@@ -13,6 +13,10 @@ ADR-017.
   recorded or synthetic observations, bounded learned attention, a fixed-version
   recurrent workspace, internal proposals, deterministic checkpoints, and no
   external effects.
+- `nb3-differentiated-memory-readiness-v1.json`: preparation-only contract for
+  differentiated-memory truth and lifecycle semantics, scope-safe retrieval,
+  deletion, restore, and preregistered NB-3 evidence. It creates no retrieval
+  runtime, memory authority, privacy approval, or productive activation.
 - `goal-transition-gate-v1.json`: bounded prerequisite contract for a future
   Goal Transition Gate. It binds a session-scoped aggregate, immutable
   authenticated scope and lineage, evidence references, and stage boundaries;

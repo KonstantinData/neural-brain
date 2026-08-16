@@ -1,0 +1,153 @@
+{
+  "document_type": "nb3_differentiated_memory_readiness_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.nb3.differentiated-memory-readiness",
+  "contract_version": "1.0.0",
+  "status": "preparation_only_not_activated",
+  "decisions": ["ADR-015", "ADR-018", "ADR-019"],
+  "stage": "NB-3",
+  "scope": "Differentiated Memory and Retrieval",
+  "current_boundary": {
+    "implemented_memory_core_stage": "ms_1",
+    "nb1_exit_evidence_complete": false,
+    "nb3_runtime_enabled": false,
+    "retrieval_runtime_enabled": false,
+    "productive_activation_allowed": false,
+    "claim": "This contract defines readiness and test requirements only. It creates no memory store, schema, migration, retrieval surface, policy decision, authority, runtime ALLOW, or stage release."
+  },
+  "entry_prerequisites": [
+    "NB-1 exit evidence is accepted independently.",
+    "NB-2 coordination is limited to an accepted versioned interface with non-overlapping implementation ownership.",
+    "Authenticated Tenant-bound runtime identity, Area isolation, principal, purpose, classification, and Memory Transition Gate enforcement are implemented and independently verified for the proposed operation.",
+    "Scope-specific privacy and retention architecture is accepted, authorized, implemented, and verified; preparation artifacts or schema validity do not satisfy this prerequisite.",
+    "The proposed data-object type has a complete provenance, retention, legal-hold, deletion-responsibility, and derivative inventory."
+  ],
+  "nb2_coordination_boundary": {
+    "integration_mode": "versioned_contract_only",
+    "ownership": {
+      "nb2": ["perception", "attention", "world_model"],
+      "nb3": ["memory_evidence_attachment", "retrieval_readiness"],
+      "shared_mutable_state": "prohibited"
+    },
+    "nb2_to_nb3_input": [
+      "typed_signal_or_observation_or_inference_or_belief_or_prediction",
+      "source_provenance",
+      "observed_time",
+      "uncertainty",
+      "authenticated_scope_binding"
+    ],
+    "nb3_to_nb2_output": [
+      "non_authorizing_memory_evidence",
+      "provenance_and_freshness_bound_context",
+      "uncertainty_and_contradiction_state",
+      "retrieval_denial_or_abstention"
+    ],
+    "prohibited": [
+      "memory_evidence_redefining_observation_or_prediction_truth",
+      "NB-2_or_NB-3_writing_the_other_stages_protected_state",
+      "memory_content_or_retrieval_output_expanding_scope_authority_or_policy"
+    ]
+  },
+  "memory_kinds": [
+    {
+      "id": "working",
+      "truth_semantics": "bounded session-local cognitive state; not a durable fact or authority source",
+      "lifecycle_semantics": "versioned checkpoint with expiry, scope binding, and reset or replacement through the Memory Transition Gate"
+    },
+    {
+      "id": "episodic",
+      "truth_semantics": "provenance-bearing record of an event or observation; recall does not prove the event true",
+      "lifecycle_semantics": "append or correction lineage, freshness assessment, retention, legal hold, deletion propagation, and quarantine"
+    },
+    {
+      "id": "semantic",
+      "truth_semantics": "versioned claim linked to supporting and contradicting evidence, uncertainty, freshness, and assessment state",
+      "lifecycle_semantics": "claim and evidence separation, correction or supersession lineage, retention, legal hold, deletion propagation, and quarantine"
+    },
+    {
+      "id": "procedural",
+      "truth_semantics": "governed information about a candidate procedure, limitation, or preference; it never creates execution authority",
+      "lifecycle_semantics": "inactive or assessed candidate until separately authorized promotion, with provenance, independent assessment, quarantine, and rollback target"
+    }
+  ],
+  "retrieval_contract": {
+    "default": "deny",
+    "admission_requires": [
+      "authenticated immutable Tenant, Area, Project, and Session scope",
+      "authenticated principal, authorized purpose, and classification access",
+      "Memory Transition Gate-owned protected records and authoritative audit availability",
+      "freshness, retention, legal-hold, deletion, quarantine, and contradiction evaluation",
+      "complete provenance and uncertainty metadata"
+    ],
+    "result_must_bind": [
+      "memory_kind",
+      "record_and_version_lineage",
+      "source_provenance",
+      "observed_and_assessed_time",
+      "freshness_state",
+      "uncertainty",
+      "contradiction_state",
+      "retention_and_legal_hold_state",
+      "scope_and_purpose_binding",
+      "derivative_and_deletion_reconciliation_state"
+    ],
+    "normal_cognition_excludes": [
+      "unknown, stale, expired, deleted, anonymized, quarantined, out-of-scope, or purpose-mismatched content",
+      "unresolved contradictory claim presented as current fact",
+      "procedural content as action, tool, policy, approval, or authority"
+    ]
+  },
+  "deletion_and_restore": {
+    "deletion_requires": [
+      "authenticated authorized request or due retention rule",
+      "legal-hold evaluation before destructive work",
+      "dependency inventory for primary records, derivatives, indexes, embeddings, caches, projections, replicas, artifacts, and backups",
+      "atomic protected transition and privacy-preserving audit through the Memory Transition Gate"
+    ],
+    "derivative_deletion_oracle": "No derivative may remain retrievable or influence normal cognition after deletion or anonymization unless a documented legal hold governs it.",
+    "restore_default": "quarantined_and_not_ready",
+    "restore_release_requires": [
+      "authoritative ledger, audit, scope, retention, legal-hold, deletion, and derivative reconciliation",
+      "proof that deleted or corrected material cannot reappear through a restored dependency",
+      "independent verification of the restore evidence"
+    ]
+  },
+  "preregistered_evaluation": {
+    "required_before_any_nb3_claim": true,
+    "baselines": ["no_memory", "naive_rag", "strongest_practical_non_memory_baseline"],
+    "required_families": [
+      "held_out_retrieval_lift_with_meaningful_threshold_and_confidence_interval",
+      "memory_kind_ablation",
+      "interference_and_false_memory",
+      "provenance_truth_freshness_uncertainty_and_contradiction_calibration",
+      "Tenant_Area_Project_Session_Principal_Purpose_and_classification_isolation",
+      "retention_legal_hold_and_deletion_propagation",
+      "derivative_deletion_and_restore_non_reappearance",
+      "quarantine_and_unknown_state_denial"
+    ],
+    "preregistration_must_freeze": [
+      "falsifiable hypothesis and primary metric",
+      "held_out split and contamination controls",
+      "strongest baseline and meaningful effect threshold",
+      "component ablations, resource budget, and failure criteria",
+      "independent evaluator and reproduction requirements"
+    ],
+    "pass_semantics": "Every required family must pass. Missing, failed, unknown, or non-independent evidence is a release stop and cannot be averaged away."
+  },
+  "release_stops": [
+    "NB-1 exit evidence is incomplete, unknown, or unaccepted.",
+    "A preparation artifact, policy schema, model output, retrieval result, or memory content creates authority, approval, or runtime enablement.",
+    "Any memory kind loses its declared truth or lifecycle semantics.",
+    "Retrieval bypasses immutable scope, principal, purpose, classification, freshness, retention, deletion, quarantine, contradiction, provenance, or uncertainty checks.",
+    "A deleted, anonymized, quarantined, stale, unknown, out-of-scope, or purpose-mismatched record or derivative is returned to normal cognition.",
+    "A restore reports ready before deletion and derivative reconciliation completes.",
+    "No-Memory, naive-RAG, interference, false-memory, derivative-deletion, restore, isolation, or independent evidence is missing, failed, or unknown."
+  ],
+  "activation": {
+    "requires_all_entry_prerequisites": true,
+    "requires_all_preregistered_evaluation_families": true,
+    "requires_independent_review": true,
+    "requires_separate_accepted_runtime_change": true,
+    "current_result": "denied"
+  }
+}
