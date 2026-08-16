@@ -10,6 +10,8 @@ from pydantic import TypeAdapter
 ROOT = Path(__file__).resolve().parents[2]
 CONTRACT_PATH = ROOT / "docs/architecture/contracts/nb1-safe-serial-cognition.json"
 SPEC_PATH = ROOT / "docs/architecture/evaluations/nb1-safe-serial-cognition-v4.json"
+ROADMAP_PATH = ROOT / "docs/architecture/delivery-roadmap.md"
+TRACEABILITY_PATH = ROOT / "docs/traceability/neural-brain-capability-matrix.md"
 JSON_OBJECT = TypeAdapter(dict[str, Any])
 
 
@@ -62,3 +64,16 @@ def test_nb1_v4_evaluation_specification_is_frozen_and_self_consistent() -> None
         >= 128
     )
     assert len(specification["baselines"]) >= 6
+
+
+def test_nb1_active_evaluation_references_do_not_reactivate_rejected_v3() -> None:
+    roadmap = ROADMAP_PATH.read_text(encoding="utf-8")
+    traceability = TRACEABILITY_PATH.read_text(encoding="utf-8")
+
+    assert "Its active frozen evaluation is\n`EVAL-01.NB-1.safe-serial-cognition.v4`" in roadmap
+    assert (
+        "Versions 1 through 3 are retained as\nrejected historical preregistration evidence"
+        in roadmap
+    )
+    assert "The active frozen EVAL-01 v4 specification" in traceability
+    assert "v3 is\nretained only as rejected historical evidence" in traceability

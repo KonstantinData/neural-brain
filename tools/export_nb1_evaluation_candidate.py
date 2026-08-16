@@ -1,5 +1,7 @@
 """Build an NB-1 freeze receipt; reject export of historical invalid candidates."""
 
+from __future__ import annotations
+
 import argparse
 import hashlib
 import json
