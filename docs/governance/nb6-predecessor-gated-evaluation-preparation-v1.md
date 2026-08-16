@@ -35,6 +35,17 @@ structures, detailed scoring, evaluator code, or signing keys. The independent
 evaluator owns sealed hidden execution and an all-attempt ledger; an
 independent reviewer judges custody and admissibility; a separately authorized
 recognition authority can decide only after every required gate is admissible.
+The registry custodian independently controls accepted protocol, signer status,
+revocation, and attestation references, but cannot score hidden tasks or make a
+recognition decision.
+
+Runtime scope, principal, role, authority, policy, approval, budget, fence,
+sandbox, kill-switch, and protected state originate only from authenticated
+runtime context. Evaluator records can attest evidence metadata only; they
+cannot repair or widen that runtime context. Before submissions, the evaluator
+commits the candidate freeze, allowed submissions, attempt budget, and feedback
+granularity. The implementation owner receives no per-attempt score or tunable
+feedback, and the hidden set is retired or replaced after the fixed budget.
 
 G8 requires reproduction from the frozen release artifact in two declared
 runtime environments, including baselines, ablations, negative controls and

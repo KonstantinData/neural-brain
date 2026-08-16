@@ -46,8 +46,20 @@ def test_contract_is_preparation_only_and_predecessor_blocked() -> None:
         "candidate_id",
         "evaluation_spec_digest",
     }
-    assert "Authenticated runtime" in scope["trusted_source"]
+    assert scope["runtime_trusted_source"] == "Authenticated runtime context only."
+    assert (
+        "cannot define, repair, widen, or override runtime scope"
+        in scope["evaluation_attestation_source"]
+    )
     assert "model output" in scope["untrusted_sources"]
+    assert set(scope["required_attestation_binding"]) == {
+        "authenticated principal identity",
+        "role and mandate identity",
+        "independence and conflict attestation identity",
+        "validity interval",
+        "evaluation-policy and specification digests",
+        "scope-bound trust-registry reference and signature reference",
+    }
     assert "denied" in scope["rule"]
 
 
@@ -75,7 +87,10 @@ def test_transfer_causal_calibration_and_response_families_are_complete() -> Non
         families["NB6-F1"]["required_conditions"]
     )
     assert {"R8", "R9"} <= set(families["NB6-F2"]["claims"])
-    assert "shuffled-action" in " ".join(families["NB6-F2"]["required_conditions"])
+    causal_conditions = " ".join(families["NB6-F2"]["required_conditions"])
+    assert "shuffled-action" in causal_conditions
+    assert "evaluator-custodied sealed simulation or sandbox" in causal_conditions
+    assert "cannot write protected state" in causal_conditions
     assert {"NC-15", "NC-16", "R9"} <= set(families["NB6-F3"]["claims"])
     assert "actual correctness and actual outcomes" in " ".join(
         families["NB6-F3"]["required_conditions"]
@@ -94,7 +109,8 @@ def test_transfer_causal_calibration_and_response_families_are_complete() -> Non
         assert response in response_requirements
     assert "never creates authority" in response_requirements
     assert "strict no-effect semantics" in response_requirements
-    assert "preapproved safe mode" in response_requirements
+    assert "non-authorizing safe_mode_id" in response_requirements
+    assert "Protected Control Plane resolves it" in response_requirements
     assert "zero-tolerance failure" in families["NB6-F4"]["failure"]
 
 
@@ -117,6 +133,7 @@ def test_hidden_custody_and_g8_reproduction_are_independent_and_non_compensatory
     assert "must not access hidden artifacts" in " ".join(separation["implementation_owner"])
     assert "must be independent" in " ".join(separation["independent_evaluator"])
     assert "cannot be the implementation owner" in " ".join(separation["recognition_authority"])
+    assert "owns the trusted registry" in " ".join(separation["registry_custodian"])
     assert "inadmissible" in custody["fail_closed"]
     custody_order = custody["admissibility"][0]
     assert "candidate freeze before" in custody_order
@@ -124,6 +141,13 @@ def test_hidden_custody_and_g8_reproduction_are_independent_and_non_compensatory
     assert not custody_order.startswith(
         "Hidden commitments are timestamped before candidate freeze"
     )
+    allocation = custody["admissibility"][1]
+    assert "maximum attempts" in allocation
+    assert "complete allowed-submission set" in allocation
+    assert "undeclared attempts or candidates" in allocation
+    feedback = custody["admissibility"][3]
+    assert "No per-attempt score" in feedback
+    assert "retired or replaced" in feedback
 
     g8 = contract["g8_independent_reproduction"]
     assert any("G0 through G7" in item for item in g8["required"])

@@ -28,6 +28,7 @@ without implementing, activating, or claiming an NB-6 capability.
 | Intervention-aware causal reasoning | Contract NB6-F2 | Architecture contract test | Hidden interventions, controls, ablations, causal results |
 | Calibrated uncertainty and corrigible proposals | Contract NB6-F3 and NB6-F4 | Architecture contract test | Shift evidence, actual-outcome evaluation, supervisor evidence |
 | Hidden custody and G8 reproduction | Custody and reproduction contract sections | Architecture contract test | Appointed independent roles, sealed ledger, signatures, two-environment reproduction |
+| Runtime authority and anti-tuning separation | Contract scope binding and custody admissibility | Architecture contract test | Authenticated runtime context, evaluator attestations, fixed attempts, bounded feedback, hidden-set retirement |
 | No premature claim or activation | Contract scope and acceptance package | Architecture contract test | Separate stage-release and recognition decisions |
 
 ## Acceptance criteria
