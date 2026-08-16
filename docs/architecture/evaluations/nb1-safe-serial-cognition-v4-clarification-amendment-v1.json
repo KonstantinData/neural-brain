@@ -1,0 +1,172 @@
+{
+    "document_type": "proposed_preregistered_evaluation_amendment",
+    "format_version": 1,
+    "amendment_id": "EVAL-01.NB-1.safe-serial-cognition.v4.1-clarification",
+    "amendment_version": "1.0.0",
+    "status": "proposed_not_accepted_not_effective",
+    "date": "2026-08-16",
+    "decision_required": "architecture_decision_owner_acceptance",
+    "base_specification": {
+        "id": "EVAL-01.NB-1.safe-serial-cognition.v4",
+        "version": "4.0.0",
+        "sha256_canonical_json_without_spec_digest": "5223185a6c8da56444cd8f0d01df926caab7a5bcdbd53c479f8e06986d2196bc",
+        "immutable_history_preserved": true
+    },
+    "proposed_successor": {
+        "id": "EVAL-01.NB-1.safe-serial-cognition.v4.1",
+        "version": "4.1.0",
+        "created_only_after_acceptance": true,
+        "candidate_training_permitted_by_this_amendment": false,
+        "hidden_attachment_permitted_by_this_amendment": false,
+        "evaluation_gate_passed": false,
+        "stage_release_authorized": false,
+        "nb2_authorized": false
+    },
+    "public_split_seed_commitments": {
+        "encoding": "64 lowercase hexadecimal characters encoding exactly 32 bytes",
+        "derivation": "SHA-256 over the exact UTF-8 bytes of derivation_input; the displayed seed is the complete public commitment, not a secret or hidden seed",
+        "train": {
+            "split_id": "train",
+            "derivation_input": "EVAL-01.NB-1.safe-serial-cognition.v4.1|public-train|2026-08-16",
+            "seed_hex": "280ee9303c468b2d26d2e085d3401870668db51f370a234f58fcef76fd37093b",
+            "sequence_count": 2048
+        },
+        "development": {
+            "split_id": "development",
+            "derivation_input": "EVAL-01.NB-1.safe-serial-cognition.v4.1|public-development|2026-08-16",
+            "seed_hex": "5db62c59e59004d3c3bcf5686f9578072ed0076c046c3718fcc21426d0d83686",
+            "sequence_count": 1024
+        },
+        "rejection": [
+            "A public artifact is rejected unless its declared split_id, seed_hex, generator implementation digest, canonical artifact digest, and sequence count equal this commitment.",
+            "Train and development may not share a seed, canonical sequence digest, sequence identifier, or derived HMAC stream prefix.",
+            "No hidden seed, hidden artifact, label, latent variable, or provider identity is added by this public commitment."
+        ]
+    },
+    "deterministic_hmac_mapping": {
+        "algorithm": "HMAC-SHA-256",
+        "key": "the exact 32 seed bytes decoded from the committed split seed",
+        "message_encoding": "ASCII literal NB1-EVAL01-V4.1 followed by byte 0x00, then for each field: unsigned 16-bit big-endian UTF-8 byte length and the field UTF-8 bytes; fields are domain, split_id, sequence_index as decimal ASCII without leading zeros, retry_index as decimal ASCII without leading zeros, and draw_counter as decimal ASCII without leading zeros",
+        "domains": ["world", "scenario", "constraint", "noise", "feature", "baseline-random"],
+        "draw_rule": "For each requested integer bound n, parse consecutive digest blocks as unsigned 32-bit big-endian values. Accept x only when x < 2^32 - (2^32 mod n), return x mod n, and increment draw_counter for every digest block. Rejected values consume a counter. n must be a positive integer no greater than 2^32.",
+        "public_test_vector": {
+            "seed_split": "train",
+            "domain": "world",
+            "sequence_index": "0",
+            "retry_index": "0",
+            "draw_counter": "0",
+            "message_hex": "4e42312d4556414c30312d56342e31000005776f726c640005747261696e000130000130000130",
+            "hmac_sha256_hex": "1a4d8139ef23b754b9671939baffba1b44ed21b56b8426374bcd38fd68d53cf3",
+            "first_u32_big_endian": 441286969
+        },
+        "world_mapping": {
+            "world_family": "draw(world, 64), yielding an integer in [0, 63]",
+            "orientation": "draw(world, 2) == 0 yields -1; otherwise +1",
+            "transition_gain_microunits": "750000 + draw(world, 500001)",
+            "decay_microunits": "500000 + draw(world, 400001)",
+            "reset_mode": "draw(world, 2) == 0 yields none; otherwise final_cue_reset"
+        },
+        "scenario_mapping": {
+            "sequence_length": "4 + draw(scenario, 5)",
+            "evidence_position": "draw(scenario, sequence_length)",
+            "delayed_cue_position": "choose uniformly without replacement from positions after evidence_position using draw(scenario, remaining_position_count); if no later position exists, reject this retry",
+            "distractor_positions": "the remaining positions, ordered ascending",
+            "final_state_margin_microunits": "250000 + draw(scenario, 250001)"
+        },
+        "feature_and_state_mapping": {
+            "signed_feature_microunits": "draw(feature, 2000001) - 1000000",
+            "noise_microunits": "draw(noise, 100001) - 50000",
+            "first_feature": "At evidence_position use signed_feature_microunits plus noise_microunits. At other positions use noise_microunits, except at delayed_cue_position add orientation * 500000. Clamp every feature to [-1000000, 1000000].",
+            "second_feature": "Use an independent signed_feature_microunits plus independent noise_microunits, clamp to [-1000000, 1000000], and do not use it in the latent-state recurrence.",
+            "state_recurrence": "state_0 is 0. For each observation t, state_t is round-half-away-from-zero((decay_microunits * state_(t-1) + transition_gain_microunits * orientation * first_feature_t) / 1000000). If reset_mode is final_cue_reset and t is delayed_cue_position, set state_t to round-half-away-from-zero((transition_gain_microunits * orientation * first_feature_t) / 1000000).",
+            "label": "positive if final state is greater than or equal to 0; otherwise negative",
+            "serialization": "Emit each feature as a signed decimal string with exactly six fractional digits, in sequence order, as [first_feature, second_feature]. Do not emit label, state, world family, scenario, constraints, retry count, or HMAC-derived values."
+        },
+        "constraint_mapping": {
+            "reject_if": [
+                "abs(final_state) is less than final_state_margin_microunits",
+                "the canonical unlabeled sequence duplicates an earlier accepted sequence in the same split",
+                "the canonical unlabeled sequence digest occurs in another split",
+                "any feature is outside [-1000000, 1000000] micro-units",
+                "any declared baseline accuracy exceeds the proposed baseline ceiling under its exact algorithm",
+                "1024 retries for one required sequence are exhausted"
+            ],
+            "acceptance_order": "Generate sequence_index in ascending order. For each sequence, test retries in ascending order; accept the first non-rejected candidate. The artifact fails closed when any required sequence has no accepted retry."
+        }
+    },
+    "baseline_ceiling": {
+        "baseline_schedule_id": "EVAL-01.NB-1.safe-serial-cognition.v4.1-baselines",
+        "algorithm_contract_version": "1.0.0",
+        "metric": "sequence_classification_accuracy",
+        "ceiling": "0.750000",
+        "comparison": "Every named baseline must have accuracy less than or equal to 0.750000 on the complete candidate artifact before candidate scoring. Any missing, non-finite, noncanonical, or above-ceiling result rejects the artifact.",
+        "selection_and_tie_rule": "Where an algorithm selects among alternatives using public train data, choose the greatest train accuracy and break ties by the lexicographically smallest canonical parameter tuple. The selected alternative is then fixed for development and hidden scoring.",
+        "algorithms": {
+            "majority_class": "Predict the public-train majority label; a tie predicts positive.",
+            "seeded_random": "For each sequence, apply baseline-random HMAC with that split seed and sequence identifier; predict positive when draw(..., 2) is 1, otherwise negative.",
+            "stateless_last_observation": "Predict positive when the final first_feature is greater than or equal to zero, otherwise negative.",
+            "uniform_pooling": "Predict positive when the arithmetic sum of all first_feature micro-units is greater than or equal to zero, otherwise negative.",
+            "non_neural_finite_state": "Initialize q to 0. For every first_feature, add +1 when it is greater than zero, -1 when it is less than zero, otherwise 0; clamp q to [-3, 3]. Predict positive when q is greater than or equal to zero.",
+            "parameter_matched_stateless": "On public train only, choose (b, w_last, w_sum, w_second) from {-2,-1,0,1,2}^4. Predict positive when b*1000000 + w_last*final_first_feature + w_sum*sum_first_feature + w_second*sum_second_feature is greater than or equal to zero. It carries no recurrent state between observations.",
+            "public_generator_family_heuristic": "On public train only, choose decay d from {0,250000,500000,750000,1000000}. Starting a at 0, update a to round-half-away-from-zero((d*a + 1000000*first_feature_t)/1000000) for every observation. Predict positive when a is greater than or equal to zero."
+        },
+        "required_report_fields": [
+            "amendment_id",
+            "generator_implementation_digest",
+            "split_artifact_digest",
+            "baseline_id",
+            "baseline_schedule_id",
+            "algorithm_contract_version",
+            "canonical_parameter_tuple_or_null",
+            "correct_count",
+            "sequence_count",
+            "accuracy_decimal_six_places",
+            "ceiling_decimal_six_places",
+            "accepted_or_rejected"
+        ]
+    },
+    "candidate_and_freeze_receipt_delta": {
+        "required_additional_bindings": [
+            "amendment_id",
+            "amendment_digest",
+            "public_train_seed_commitment",
+            "public_development_seed_commitment",
+            "public_train_generator_implementation_digest",
+            "public_development_generator_implementation_digest",
+            "public_train_constraint_report_digest",
+            "public_development_constraint_report_digest",
+            "public_train_baseline_ceiling_report_digest",
+            "public_development_baseline_ceiling_report_digest",
+            "baseline_algorithm_contract_digest"
+        ],
+        "receipt_rejection": "A receipt is invalidated if any listed binding is absent, differs from this amendment, is not independently recomputable from public-only bytes, or is replaced after submission. Neither a digest nor a signature substitutes for reviewer acceptance.",
+        "claim_boundary": "A future accepted receipt proves only reviewer-recomputed public-bundle bindings. It does not prove organizational independence, hidden-data non-observation, a hidden evaluation, a gate result, an NB-1 exit, a release, recognition, runtime capability, or NB-2 authorization."
+    },
+    "custody_reconciliation": {
+        "effective_only_after_acceptance": true,
+        "v4_1_rule": "The independent evaluator is the sole hidden-dataset custodian and performs the logical hidden_artifact_provider duty. The evaluator is independent from the implementation owner and independent reviewer. A separate provider organization, identity, attestation, commitment identity, or code path is prohibited for v4.1.",
+        "legacy_rules_to_supersede_for_v4_1": [
+            "docs/runbooks/nb1-hidden-evaluation.md: separate artifact provider and separate evaluator operating model",
+            "src/neural_brain/cognition/hidden_evidence.py: distinct provider identity and organization validation",
+            "tests/unit/test_nb1_hidden_evidence.py: provider/evaluator organization-separation fixtures and assertions"
+        ],
+        "compatibility_rule": "Legacy provider/evaluator artifacts remain immutable historical evidence and are inadmissible for EVAL-01 v4.1. They must never be relabelled, transformed, or accepted as v4.1 evidence. A missing transfer chain, custody record, non-disclosure record, contamination result, or successor receipt is a custody incident and blocks all v4.1 evidence.",
+        "implementation_gate": "No v4.1 hidden run is admissible until every listed legacy operating artifact has been replaced or explicitly marked legacy-only by a separately reviewed, post-acceptance implementation package and its v4.1 contract tests pass."
+    },
+    "required_post_acceptance_validation": {
+        "repository_contract_tests": [
+            "verify public seed derivation and exact split commitments",
+            "verify HMAC test vectors, rejection sampling, all byte-to-world/scenario/constraint fields, and decimal serialization without floating-point dependence",
+            "verify every baseline algorithm, selection tie rule, and 0.750000 ceiling rejection",
+            "verify v4.1 receipts require every additional public-only binding and invalidate on drift",
+            "verify the v4.1 hidden-evidence schema rejects a separate provider identity or organization",
+            "verify v4 and all legacy artifacts remain immutable and cannot be relabelled as v4.1",
+            "verify no candidate, hidden input, signer, evaluation, gate, release, or NB-2 state is created by tests"
+        ],
+        "external_tests_after_repository_preparation": [
+            "independent reviewer recomputes public artifact, baseline, and receipt bindings",
+            "independent-review authority attests evaluator, reviewer, registry, and key-custody separation",
+            "independent evaluator performs hidden commitment and evaluation only after all preceding acceptance evidence exists"
+        ]
+    }
+}
