@@ -13,6 +13,10 @@ ADR-017.
   recorded or synthetic observations, bounded learned attention, a fixed-version
   recurrent workspace, internal proposals, deterministic checkpoints, and no
   external effects.
+- `nb2-perception-world-model-prerequisites-v1.json`: blocked, non-activating
+  NB-2 contract for future temporal perception, non-language input, multimodal
+  binding, bounded attention, and a simulation-only action-conditioned world
+  model. It creates no runtime, activation, or stage-release claim.
 - `nb3-differentiated-memory-readiness-v1.json`: preparation-only contract for
   differentiated-memory truth and lifecycle semantics, scope-safe retrieval,
   deletion, restore, and preregistered NB-3 evidence. It creates no retrieval

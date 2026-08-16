@@ -68,6 +68,11 @@ personal-data processing, Dreaming, Planner, or protected-state runtime.
 
 - `system-boundary.json`: complete-system and two-plane boundary.
 - `cognitive-cycle.json`: protected serial perception-to-learning cycle.
+- `nb2-perception-world-model-prerequisites-v1.json`: blocked, non-activating
+  NB-2 contract for future provenance-preserving temporal perception,
+  non-language input, bounded attention, multimodal binding, and a
+  simulation-only action-conditioned world model. It creates no runtime or
+  stage-release claim before an independently accepted NB-1 exit.
 - `action-transition-gate-v1.json`: bounded prerequisite contract for a future
   NB-5 Action Transition Gate; it neither authorizes nor implements action,
   dispatch, budget, resource, fence, sandbox, or external-effect behavior.

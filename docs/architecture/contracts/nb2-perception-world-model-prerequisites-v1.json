@@ -1,0 +1,65 @@
+{
+  "document_type": "nb2_perception_world_model_prerequisite_contract",
+  "format_version": 1,
+  "contract_id": "neural-brain.nb2.perception-world-model-prerequisites",
+  "contract_version": "1.0.0",
+  "status": "blocked_on_independently_accepted_nb1_exit",
+  "decision": "ADR-018",
+  "stage": "NB-2",
+  "activation": {
+    "runtime_enabled": false,
+    "stage_release_authorized": false,
+    "required_precondition": "NB-1 independently accepted exit with all stage evidence and gates complete"
+  },
+  "record_separation": {
+    "ordered_kinds": ["raw_signal", "observation", "inferred_feature", "belief", "prediction"],
+    "invariants": [
+      "A prediction is never an observation, verified fact, or authority input.",
+      "An observation is never promoted from raw signal without an explicit acquisition and inference record.",
+      "Missing, conflicting, spoofed, delayed, replayed, and model-generated inputs remain representable and distinguishable."
+    ]
+  },
+  "admission_requirements": [
+    "source_identity",
+    "modality",
+    "acquisition_path",
+    "occurred_at",
+    "observed_at",
+    "immutable_authenticated_scope_reference",
+    "uncertainty",
+    "replay_identity",
+    "integrity_or_provenance_reference"
+  ],
+  "modalities": {
+    "minimum_future_configuration": "language plus one temporal non-language stream, or at least two non-language modalities",
+    "temporal_non_language_stream_required": true,
+    "binding_requirements": ["source", "timing", "scope", "uncertainty", "missingness", "conflict_state"]
+  },
+  "attention": {
+    "bounded": true,
+    "calibration_required": true,
+    "competition_inputs": ["goal_relevance", "novelty", "prediction_error", "uncertainty", "risk", "expected_value"],
+    "non_suppressible_channels": ["safety", "contradiction", "shutdown", "supervisor"],
+    "may_change_authority_or_policy": false
+  },
+  "world_model": {
+    "environment": "simulation_only",
+    "required_representation": ["latent_state", "temporal_dynamics", "action_conditioning", "uncertainty", "constraints", "predicted_outcomes"],
+    "output_boundary": "imagined rollouts and predictions remain non-authorizing Cognitive Plane records"
+  },
+  "future_evidence": {
+    "aggregation": "all_required_non_compensatory",
+    "unknown_result": "fail_and_release_stop",
+    "required_baselines": ["model_free_planner", "action_blind_predictor", "shuffled_action_predictor", "strongest_preregistered_non_neural_baseline"],
+    "required_ablations": ["temporal_stream_removed", "binding_removed", "attention_removed_or_uniform", "action_conditioning_removed"],
+    "required_tests": ["held_out_multi_step_prediction", "uncertainty_calibration_under_dynamics_shift", "attention_calibration_under_distribution_shift", "ood_robustness", "contradiction_visibility", "spoofing_latency_and_replay", "missing_modality", "simulated_planning_lift"],
+    "required_evidence_fields": ["preregistered_spec_digest", "dataset_and_split_digests", "environment_and_code_digests", "baseline_and_ablation_results", "confidence_bounds", "resource_usage", "failure_results", "independent_review_reference"]
+  },
+  "prohibited_surfaces": ["external_effect", "tool_call", "executor", "action_intent_commitment", "goal_or_action_gate_write", "protected_memory_write", "online_training", "active_model_mutation", "runtime_activation"],
+  "invariants": [
+    "Only authenticated runtime context may supply trusted scope; admitted content cannot define or expand it.",
+    "Attention remains capacity-bounded and cannot suppress safety, contradiction, shutdown, or supervisor channels.",
+    "World-model action tokens are simulation inputs and never execution authority.",
+    "This contract creates no runtime, model, data artifact, protected-state writer, external effect, or NB-2 implementation claim."
+  ]
+}
