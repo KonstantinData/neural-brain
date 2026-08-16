@@ -66,6 +66,7 @@ def test_contract_inventory_covers_the_complete_cognitive_system() -> None:
         "nb1-independent-evaluation-organization-v1.json",
         "nb1-planner-verification-revalidation-v1.json",
         "nb1-safe-serial-cognition.json",
+        "nb6-predecessor-gated-evaluation-v1.json",
         "nb8-distributed-operation-preparation-v1.json",
         "nb8-distributed-operation-test-plan-v1.json",
         "personal-data-flow-register-v1.json",

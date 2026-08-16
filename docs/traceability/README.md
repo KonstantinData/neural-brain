@@ -232,6 +232,10 @@ when they are required by the acceptance criteria.
 - [`EVAL-01-candidate-freeze-lifecycle.md`](EVAL-01-candidate-freeze-lifecycle.md):
   preparation-only freeze, verification, registry, invalidation, and rollback
   evidence; it creates no candidate, artifact, signature, evaluation, or release.
+- [`NB6-predecessor-gated-evaluation-preparation.md`](NB6-predecessor-gated-evaluation-preparation.md):
+  future held-out transfer, causal intervention, calibrated metacognition, and
+  G8 custody/reproduction preparation. It is predecessor-blocked and does not
+  implement, activate, evaluate, release, or recognize NB-6.
 - [`S1-02.5-protected-control-kill-switch.md`](S1-02.5-protected-control-kill-switch.md):
   unaccepted Protected Control Plane kill-switch, credential-revocation, and
   recovery target contract; it does not authorize a runtime, migration, writer,

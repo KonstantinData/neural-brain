@@ -51,6 +51,11 @@ ADR-017.
 - `nb1-candidate-freeze-lifecycle-v1.json`: preparation-only lifecycle for a
   future candidate freeze, immutable external storage, registry handoff,
   verification, invalidation, and rollback. It creates no artifact or release.
+- `nb6-predecessor-gated-evaluation-v1.json`: preparation-only NB-6
+  experiment, scope binding, hidden-evidence custody, and G8-reproduction
+  boundary. It remains blocked until predecessor evidence and independently
+  attested roles exist, and creates no runtime, candidate, gate pass, release,
+  recognition, authority, or external effect.
 - `protected-control-kill-switch-v1.json`: proposed, non-authorizing Protected
   Control Plane target contract for a future kill switch, credential revocation,
   and safe recovery. It has no runtime, schema, migration, writer, executor,

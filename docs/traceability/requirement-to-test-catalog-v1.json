@@ -141,6 +141,18 @@
       "audit_event": "N/A — independent G8 validation has not been claimed.",
       "failure_code": "RECOGNITION_PROHIBITED",
       "evidence_state": "N/A_target_not_implemented"
+    },
+    {
+      "mapping_id": "TARGET-NB6-PREPARATION",
+      "source": "docs/architecture/contracts/nb6-predecessor-gated-evaluation-v1.json",
+      "requirement_ids": ["TARGET-NB6-PREPARATION-001"],
+      "requirement": "NB-6 transfer, causal, calibration, custody, and G8 requirements remain preparation-only, predecessor-gated, scope-bound, and non-authorizing.",
+      "test_ids": ["tests/architecture/test_nb6_predecessor_gated_evaluation_contract.py::test_contract_is_preparation_only_and_predecessor_blocked", "tests/architecture/test_nb6_predecessor_gated_evaluation_contract.py::test_hidden_custody_and_g8_reproduction_are_independent_and_non_compensatory", "tests/architecture/test_nb6_predecessor_gated_evaluation_contract.py::test_acceptance_package_does_not_complete_nb6_or_grant_recognition"],
+      "expected_state": "N/A — preparation contract only; NB-6 implementation, evaluation execution, G5/G6/G8 passage, and recognition remain blocked.",
+      "ledger_effect": "N/A — no NB-6 protected transition, candidate, or evaluation ledger is implemented by this contract.",
+      "audit_event": "N/A — future external evaluator and independent reviewer records are required before admissible evidence exists.",
+      "failure_code": "EVALUATION_UNKNOWN_RELEASE_STOP|RECOGNITION_PROHIBITED",
+      "evidence_state": "N/A_target_not_implemented"
     }
   ]
 }

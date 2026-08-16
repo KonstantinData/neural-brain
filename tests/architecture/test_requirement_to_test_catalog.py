@@ -82,6 +82,7 @@ def test_requirement_catalog_has_complete_scoped_release_stop_and_transition_cov
         "TARGET-GOAL-GATE-PREREQUISITE",
         "TARGET-EVALUATION",
         "TARGET-RECOGNITION",
+        "TARGET-NB6-PREPARATION",
     }
     assert set(by_mapping_id["NBRS"]["requirement_ids"]) == _ids("release-stops.json", "criteria")
     assert set(by_mapping_id["MRS"]["requirement_ids"]) == _ids(
