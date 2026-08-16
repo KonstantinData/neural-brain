@@ -1,0 +1,80 @@
+{
+  "document_type": "proposed_public_baseline_ceiling_decision_rule",
+  "format_version": 1,
+  "rule_id": "EVAL-01.NB-1.safe-serial-cognition.v4.1-baseline-ceiling-public-evidence",
+  "status": "proposed_not_accepted_not_effective",
+  "date": "2026-08-16",
+  "decision_required": "architecture_decision_owner_acceptance",
+  "applies_to_proposal": "EVAL-01.NB-1.safe-serial-cognition.v4.1-clarification",
+  "current_disposition": {
+    "proposed_ceiling": "0.750000",
+    "decision": "rejected_as_unsupported",
+    "reason": "No public v4.1 artifacts, baseline reports, seed-panel sensitivity analysis, or feasibility evidence exist. The equality 0.750000 + 0.050000 = 0.800000 supplies no confidence-bound margin."
+  },
+  "scope_and_non_authorization": {
+    "public_train_and_development_only": true,
+    "candidate_training_runs": 0,
+    "candidate_freezes": 0,
+    "hidden_artifacts": 0,
+    "evaluation_gates_passed": [],
+    "stage_release_authorized": false,
+    "nb2_authorized": false
+  },
+  "prerequisites_before_calibration": [
+    "An accepted successor must replace the per-sequence baseline-conditioned rejection with one complete-artifact check after deterministic generation.",
+    "Every calibration seed pair must be fixed before generation by a public IID randomness procedure and published with its source record; convenient SHA-256 literal strings alone are reproducible but not an IID sample.",
+    "The v4.1 generator, constraints, baseline implementations, canonical artifact format, and report schema must be versioned and digest-bound before the first pair is generated.",
+    "A failed artifact, baseline result, retry, crash, or missing report is disclosed and fails the calibration; it never causes resampling or replacement of a seed."
+  ],
+  "public_calibration": {
+    "seed_pairs": 132,
+    "seed_pair_independence": "IID uniform 256-bit public seeds, independently committed for train and development before generation",
+    "train_sequences_per_pair": 2048,
+    "development_sequences_per_pair": 1024,
+    "candidate_runs": 0,
+    "metric": "sequence_classification_accuracy = correct_count / sequence_count as an exact rational; display rounding to six decimal places is non-decisive",
+    "selection": "Only train labels may select a parameterized baseline. The selected canonical parameter tuple is immutable before its paired development score.",
+    "development_score_reports": 1056,
+    "aggregation": {
+      "per_baseline": "report the exact development accuracy for each seed pair plus median, IQR, and maximum",
+      "ceiling_statistic": "C_panel = max over all required baselines and all 132 paired-development accuracies",
+      "coverage": "For eight required baselines and IID seed pairs, the observed maximum covers each baseline's 95th generator quantile simultaneously with at least 1 - 8*(0.95^132) = 0.9908 design-based coverage. This is a tolerance guarantee, not a hidden-evaluation result."
+    }
+  },
+  "required_baselines": {
+    "majority_class": "Predict the public-train majority label; a tie predicts positive.",
+    "seeded_random": "For each sequence, use the committed baseline-random HMAC stream and predict positive exactly when draw(..., 2) equals 1.",
+    "stateless_last_observation": "Predict positive exactly when the final first feature is non-negative.",
+    "uniform_pooling": "Predict positive exactly when the arithmetic sum of all first-feature micro-units is non-negative.",
+    "non_neural_finite_state": "Start q at 0; add +1, -1, or 0 for each first-feature sign; clamp q to [-3, 3]; predict positive when q is non-negative.",
+    "parameter_matched_stateless": "Select only on paired public train from canonical tuples (b, w_last, w_sum, w_second) in {-2,-1,0,1,2}^4; predict positive when b*1000000 + w_last*final_first_feature + w_sum*sum_first_feature + w_second*sum_second_feature is non-negative. It has no recurrent state.",
+    "public_generator_family_heuristic": "Select only on paired public train a decay d in {0,250000,500000,750000,1000000}. Start a at 0 and update a to round-half-away-from-zero((d*a + 1000000*first_feature_t)/1000000) at each step; predict positive when a is non-negative. It has no access to latent state, labels, seed, or generator internals.",
+    "parameter_matched_recurrent_non_neural": "Select only on paired public train from canonical tuples (b, w_first, w_second, r) in {-2,-1,0,1,2}^4. Start h at 0; at each step set h to clamp(r*h + b*1000000 + w_first*first_feature + w_second*second_feature, -8000000, 8000000); predict positive when h is non-negative. It has no trainable feature gate, neural activation, or access to latent fields."
+  },
+  "ceiling_decision_rule": {
+    "operational_ceiling_not_set_by_this_package": true,
+    "maximum_admissible_ceiling": "0.700000",
+    "adopt_only_if": [
+      "C_panel is less than or equal to 0.700000 and every seed pair has complete public artifact, constraint, baseline, and attempt-ledger digests.",
+      "The eight-baseline panel is complete; no development result was used for selection; no seed, artifact, or failed attempt was replaced.",
+      "A preregistered public paired-bootstrap sensitivity analysis at hidden minimum n=2048 demonstrates one-sided family-wise 95% lower-bound power of at least 0.90 for a full-model accuracy of 0.800000 against each allowed ceiling across all declared discordance/correlation bands.",
+      "The analysis resamples sequences with a digest-derived counter RNG, fixes the quantile convention and at least 10000 replicates, and reselects the strongest baseline within each replicate."
+    ],
+    "otherwise": "Reject the v4.1 generator/constraint policy and preregister a successor. Do not raise the ceiling, tune against development, or infer feasibility from this package.",
+    "sensitivity_bands": [
+      {"ceiling": "0.650000", "nominal_gap_at_full_accuracy_0.800000": "0.150000", "assessment": "only admissible if the fixed-seed panel supports it; do not force it by rejection sampling"},
+      {"ceiling": "0.675000", "nominal_gap_at_full_accuracy_0.800000": "0.125000", "assessment": "requires the same complete panel and power evidence"},
+      {"ceiling": "0.700000", "nominal_gap_at_full_accuracy_0.800000": "0.100000", "assessment": "largest proposed admissible ceiling; leaves twice the inherited 0.050000 lift threshold before confidence uncertainty"},
+      {"ceiling": "0.725000", "nominal_gap_at_full_accuracy_0.800000": "0.075000", "assessment": "not admissible without stronger replacement evidence; family-wise confidence margin can consume the remaining lift"},
+      {"ceiling": "0.750000", "nominal_gap_at_full_accuracy_0.800000": "0.050000", "assessment": "rejected: it equals the inherited lower-confidence-bound lift and leaves no uncertainty margin"}
+    ]
+  },
+  "future_hidden_scoring_precision": {
+    "unit": "sequence",
+    "comparators": "full minus each required baseline and full minus each declared ablation",
+    "family_wise_method": "one-sided 95% lower confidence bound for the minimum comparator lift, using a digest-derived counter RNG and at least 10000 paired nonparametric bootstrap replicates",
+    "strongest_baseline_control": "reselect the maximum baseline score inside every bootstrap replicate",
+    "failure_rule": "Any missing, non-finite, malformed, out-of-band, post-commitment, overlapped, retried, unsigned, or incompletely disclosed result fails closed."
+  },
+  "claim_boundary": "This rule rejects an unsupported number and defines only conditions for a later public calibration. It does not prove the recurrent candidate can attain 0.800000, create a candidate, pass a gate, or authorize NB-2. The power requirement prevents the ceiling itself from making the inherited threshold statistically incoherent; candidate feasibility remains unknown until a separately authorized public-only package supplies it."
+}
