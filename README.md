@@ -6,6 +6,10 @@ perception, attention, differentiated memory, world/self/value models,
 executive control, planning, action selection, real outcome feedback,
 continual learning, and metacognition.
 
+**New to the project?** Read the concise [external project overview](docs/project-overview.md)
+first. It explains the implemented Tenant-isolation kernel, the current
+technical boundary, and the kinds of integration work this repository supports.
+
 The repository is in **Foundation / early Memory Core and NB-1 development**.
 It includes the first effect-free NB-1 implementation slice, but does not claim
 that NB-1 or any complete Neural Brain stage is released. It also does not claim
@@ -23,6 +27,17 @@ operation, a service Runtime, and operational evidence remain separate work.
 ADR-018 supersedes the former memory-only product boundary. The governed memory
 system remains a protected `Memory Core` subsystem rather than the whole
 product.
+
+## In One Minute
+
+- **What is implemented:** a protected PostgreSQL Memory Core with Tenant-specific
+  Runtime identities, Tenant-bound pools, OIDC-scoped access, audit evidence,
+  and a local runnable demonstration.
+- **What it demonstrates:** how to build a fail-closed Memory Core where an
+  application cannot switch Tenant scope through request data or shared
+  database credentials.
+- **What it is not:** a hosted product, a customer-ready deployment, or a claim
+  that the full Neural Brain target is complete.
 
 ## Status at a Glance
 
