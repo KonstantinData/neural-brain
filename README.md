@@ -13,6 +13,13 @@ a stable production API, production deployment, autonomous operation,
 consciousness, sentience, human-level intelligence, or neurophysiological
 fidelity.
 
+Within that early Memory Core, the Tenant-isolation kernel is implemented: it
+provisions a distinct PostgreSQL Runtime identity per Tenant, resolves
+Tenant-bound connection pools without a shared fallback, and binds OIDC-
+authenticated Memory Gate operations to the resulting scope. This is not yet a
+deployed Tenant service: production secret custody, external OIDC/JWKS
+operation, a service Runtime, and operational evidence remain separate work.
+
 ADR-018 supersedes the former memory-only product boundary. The governed memory
 system remains a protected `Memory Core` subsystem rather than the whole
 product.
@@ -25,6 +32,7 @@ product.
 | Product maturity | NB-0 Foundation artifacts and a first effect-free NB-1 implementation slice are present; NB-1 is not released |
 | Memory maturity | Early MS-1 subset with scoped Working Memory; MS-1 is not complete |
 | Runtime | Python library and protected PostgreSQL memory kernel; no stable service API or deployment |
+| Tenant core | Implemented Tenant provisioning, Tenant-specific PostgreSQL Runtime identities, bound connection pools, and OIDC-scoped Memory Gate access; no production Secret Store, hosted Runtime, or customer Tenant integration |
 | Privacy enforcement | S1-14.4/S1-11.2 contracts, strict preparation types, and a disabled fail-closed evaluator are present for review; no accepted ADR, legal approval, migration, active policy, runtime `ALLOW`, or controlled-storage implementation exists |
 | Dreaming | Reserved schema and contracts; all supported execution paths are disabled fail closed |
 | Inference | Normative local-only boundary; no inference adapter or ready deployment exists |

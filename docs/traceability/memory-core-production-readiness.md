@@ -7,6 +7,12 @@ the first production-usable milestone. A green local demonstration does not
 make the service, authentication model, operations, or complete Memory Core
 production-ready.
 
+The repository already implements the Tenant-isolation kernel: per-Tenant
+PostgreSQL Runtime identities, controlled provisioning, Tenant-bound pool
+resolution, and OIDC-scoped Memory Gate access. The open work is the operating
+integration around that kernel, not a missing Tenant data model or a shared
+Tenant access path.
+
 Active coordination record:
 [`Ship first production-usable authenticated Memory Core slice`](https://www.notion.so/3a71c1ac5ec081c98f09ca72dcbcd838).
 Isolation evidence record:
