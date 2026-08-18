@@ -6,6 +6,10 @@ perception, attention, differentiated memory, world/self/value models,
 executive control, planning, action selection, real outcome feedback,
 continual learning, and metacognition.
 
+**New to the project?** Read the concise [external project overview](docs/project-overview.md)
+first. It explains the implemented Tenant-isolation kernel, the current
+technical boundary, and the kinds of integration work this repository supports.
+
 The repository is in **Foundation / early Memory Core and NB-1 development**.
 It includes the first effect-free NB-1 implementation slice, but does not claim
 that NB-1 or any complete Neural Brain stage is released. It also does not claim
@@ -13,9 +17,27 @@ a stable production API, production deployment, autonomous operation,
 consciousness, sentience, human-level intelligence, or neurophysiological
 fidelity.
 
+Within that early Memory Core, the Tenant-isolation kernel is implemented: it
+provisions a distinct PostgreSQL Runtime identity per Tenant, resolves
+Tenant-bound connection pools without a shared fallback, and binds OIDC-
+authenticated Memory Gate operations to the resulting scope. This is not yet a
+deployed Tenant service: production secret custody, external OIDC/JWKS
+operation, a service Runtime, and operational evidence remain separate work.
+
 ADR-018 supersedes the former memory-only product boundary. The governed memory
 system remains a protected `Memory Core` subsystem rather than the whole
 product.
+
+## In One Minute
+
+- **What is implemented:** a protected PostgreSQL Memory Core with Tenant-specific
+  Runtime identities, Tenant-bound pools, OIDC-scoped access, audit evidence,
+  and a local runnable demonstration.
+- **What it demonstrates:** how to build a fail-closed Memory Core where an
+  application cannot switch Tenant scope through request data or shared
+  database credentials.
+- **What it is not:** a hosted product, a customer-ready deployment, or a claim
+  that the full Neural Brain target is complete.
 
 ## Status at a Glance
 
@@ -25,6 +47,7 @@ product.
 | Product maturity | NB-0 Foundation artifacts and a first effect-free NB-1 implementation slice are present; NB-1 is not released |
 | Memory maturity | Early MS-1 subset with scoped Working Memory; MS-1 is not complete |
 | Runtime | Python library and protected PostgreSQL memory kernel; no stable service API or deployment |
+| Tenant core | Implemented Tenant provisioning, Tenant-specific PostgreSQL Runtime identities, bound connection pools, and OIDC-scoped Memory Gate access; no production Secret Store, hosted Runtime, or customer Tenant integration |
 | Privacy enforcement | S1-14.4/S1-11.2 contracts, strict preparation types, and a disabled fail-closed evaluator are present for review; no accepted ADR, legal approval, migration, active policy, runtime `ALLOW`, or controlled-storage implementation exists |
 | Dreaming | Reserved schema and contracts; all supported execution paths are disabled fail closed |
 | Inference | Normative local-only boundary; no inference adapter or ready deployment exists |
