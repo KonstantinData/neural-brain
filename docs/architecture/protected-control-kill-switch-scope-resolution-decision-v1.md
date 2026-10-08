@@ -36,6 +36,10 @@ or repair scope.
 
 ## Required decision record
 
+PostgreSQL remains the authoritative protected ledger. The alternative-ledger
+option in the matrix is not available under the current governing decisions;
+it would require a separately accepted amendment, not this preparation record.
+
 An accepted ADR-018-conformant successor must select or replace every matrix
 row, name the accountable owners, define interfaces and persistence, and
 preregister positive, negative, concurrency, crash, partition, revocation,

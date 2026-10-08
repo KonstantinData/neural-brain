@@ -9,7 +9,8 @@ from typing import Protocol
 import pytest
 
 ROOT = Path(__file__).parents[2]
-PROPOSAL = ROOT / "docs/architecture/relationship-memory-adr-018-revalidation-proposal-v1.md"
+RELATIONSHIP_ARCHIVE = ROOT / "docs/architecture/archive/deferred/relationship-memory"
+PROPOSAL = RELATIONSHIP_ARCHIVE / "relationship-memory-adr-018-revalidation-proposal-v1.md"
 CONTRACT = ROOT / "docs/architecture/contracts/relationship-memory-signal-contract-v1.json"
 RUNBOOK = ROOT / "docs/runbooks/relationship-memory-governance-preparation.md"
 TRACEABILITY = ROOT / "docs/traceability/REL-MEM-01-08-relationship-memory-preparation.md"
@@ -64,7 +65,7 @@ def test_signal_contract_is_fail_closed_and_non_runtime() -> None:
 def test_position_three_and_runtime_boundaries_are_explicit() -> None:
     proposal = _text(PROPOSAL)
     threat_plan = _text(
-        ROOT / "docs/architecture/relationship-memory-threat-model-and-test-plan-v1.md"
+        RELATIONSHIP_ARCHIVE / "relationship-memory-threat-model-and-test-plan-v1.md"
     )
     runbook = _text(ROOT / "docs/runbooks/relationship-memory-governance-preparation.md")
     planner = _text(
@@ -102,9 +103,9 @@ def test_supporting_governance_boundaries_are_explicit() -> None:
     privacy_matrix = _text(
         ROOT / "docs/governance/relationship-memory-privacy-retention-correction-matrix-v1.md"
     )
-    dreaming = _text(ROOT / "docs/architecture/relationship-memory-dreaming-boundary-v1.md")
+    dreaming = _text(RELATIONSHIP_ARCHIVE / "relationship-memory-dreaming-boundary-v1.md")
     threat_plan = _text(
-        ROOT / "docs/architecture/relationship-memory-threat-model-and-test-plan-v1.md"
+        RELATIONSHIP_ARCHIVE / "relationship-memory-threat-model-and-test-plan-v1.md"
     )
 
     for term in ("Reader", "Candidate proposer", "Reviewer", "Dreaming worker", "NB-1 Planner"):

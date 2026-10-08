@@ -4,9 +4,10 @@ import pytest
 
 REPOSITORY_ROOT = Path(__file__).parents[2]
 CURRENT_DIRECTIVE = REPOSITORY_ROOT / "docs" / "architecture" / "architecture-directive-v4.0.md"
-V3_DIRECTIVE = REPOSITORY_ROOT / "docs" / "architecture" / "architecture-directive-v3.0.md"
-V2_DIRECTIVE = REPOSITORY_ROOT / "docs" / "architecture" / "architecture-directive-v2.0.md"
-V1_DIRECTIVE = REPOSITORY_ROOT / "docs" / "architecture" / "architecture-directive-v1.1.md"
+DIRECTIVE_ARCHIVE = REPOSITORY_ROOT / "docs" / "architecture" / "archive" / "directives"
+V3_DIRECTIVE = DIRECTIVE_ARCHIVE / "architecture-directive-v3.0.md"
+V2_DIRECTIVE = DIRECTIVE_ARCHIVE / "architecture-directive-v2.0.md"
+V1_DIRECTIVE = DIRECTIVE_ARCHIVE / "architecture-directive-v1.1.md"
 
 
 @pytest.fixture(scope="module")

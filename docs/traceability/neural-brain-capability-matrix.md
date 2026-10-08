@@ -30,6 +30,7 @@
 
 `Current implementation` is updated only with objective code and test evidence.
 A target document, schema field, backlog entry, or model response is never
-implementation evidence. The frozen EVAL-01 v3 specification preregisters the
-first slice's baselines and ablations; it is not a passing evaluation result and
-does not complete NB-1.
+implementation evidence. The active frozen EVAL-01 v4 specification
+preregisters the replacement first slice's baselines and ablations; v3 is
+retained only as rejected historical evidence. Neither is a passing evaluation
+result or completes NB-1.
