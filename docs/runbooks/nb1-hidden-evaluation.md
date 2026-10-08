@@ -1,11 +1,21 @@
 # NB-1 Independent Hidden Evaluation Runbook
 
-- Status: evaluator handoff and evidence-intake procedure
+- Status: Historical v3 procedure; v4 execution remains blocked
 - Scope: NB-1 mechanism evidence only
 - Prohibited claim: this runbook cannot grant an evaluation, recognition, stage,
   release, production, or Neural Brain Candidate status
 
 ## Trust boundary
+
+The provider/evaluator procedure below describes the historical v3 mechanism;
+it is not an executable v4 handoff. Frozen v4 preparation requires the hidden
+provider duty to be performed by the independent evaluator, while the current
+intake still requires separate organizations and historical v3 resource and
+baseline fields. An accepted operating protocol, compatible v4 implementation,
+and independently accepted candidate and custody evidence are required before any
+v4 attachment, run, or evidence admission. Changing the frozen evaluator-owned
+custody rule requires a separately accepted revalidation. See
+`docs/architecture/contracts/nb1-independent-evaluation-preparation-v1.json`.
 
 The implementer owns source code, public train/development data, and the frozen
 candidate export. A separate artifact provider owns the hidden generator seed,
@@ -37,7 +47,11 @@ Unknown or missing preconditions stop the run.
 ## Candidate export stop
 
 There is currently no exportable v4 candidate. The checked-in model is bound
-to rejected EVAL-01 v3. The export command fails closed for that digest and
+to rejected EVAL-01 v3. Direct bundle construction, the export command, and
+candidate prediction reject the immutable EVAL-01 v1, v2, and v3 digests before
+dataset generation or workspace inference. Historical artifacts remain readable
+for checksum and development evidence. This quarantine grants no other
+specification, candidate, or caller authority. Export
 may only become operational after a v4 public train/development artifact,
 training artifact, model manifest, parameters, and candidate freeze receipt
 have been generated and accepted.

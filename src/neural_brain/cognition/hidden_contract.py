@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 from datetime import UTC, datetime
-from typing import Annotated, Literal, Self
+from typing import Annotated, Final, Literal, Self
 
 from pydantic import Field, model_validator
 
@@ -26,6 +26,21 @@ type ContextLabel = Literal["positive", "negative"]
 
 _EVALUATION_TIME = datetime(2000, 1, 1, tzinfo=UTC)
 _EVALUATION_PROVENANCE = "external-hidden-evaluator-unlabeled-input"
+REJECTED_EVALUATION_SPECS: Final = (
+    ("9db2fcf2eaf7e5718b574b4e54d1585b21929eabff6e7a9ae36746539cf8215a", "v1"),
+    ("0dd87fb28a17534ea08c4f681e8c8fc19d559faf171a23b7c14f396ad05c26d9", "v2"),
+    ("3ac6d895d3f33b5d63c462471ca335d6d538cc379ae8eb3ad0611c81271b3fc8", "v3"),
+)
+
+
+def reject_historical_evaluation_spec(spec_digest: Sha256Digest) -> None:
+    """Quarantine rejected preregistrations without granting other specifications authority."""
+    for rejected_digest, version in REJECTED_EVALUATION_SPECS:
+        if spec_digest == rejected_digest:
+            raise ValueError(
+                f"candidate uses rejected EVAL-01 {version}; freeze a replacement specification "
+                "and versioned training artifact before export or prediction"
+            )
 
 
 def _canonical_digest(value: object) -> str:
@@ -266,6 +281,7 @@ def predict_full_mechanism(
     """Run only the frozen full neural mechanism over ordered label-free input."""
     if type(active_model) is not ActiveCognitiveModel:
         raise TypeError("hidden prediction requires an ActiveCognitiveModel")
+    reject_historical_evaluation_spec(candidate.model_manifest.evaluation_spec_digest)
     if model_manifest_digest(active_model.manifest) != candidate.model_manifest_digest:
         raise ValueError("active model manifest does not match the frozen candidate")
     if active_model.manifest != candidate.model_manifest:

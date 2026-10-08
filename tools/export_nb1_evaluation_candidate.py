@@ -23,9 +23,6 @@ TRAINING_ARTIFACT: Final = (
     / "nb1-v1-offline-training-bundle.json"
 )
 CANDIDATE_EXPORT_PATH: Final = "tools/export_nb1_evaluation_candidate.py"
-REJECTED_EVALUATION_SPEC_DIGESTS: Final = frozenset(
-    {"3ac6d895d3f33b5d63c462471ca335d6d538cc379ae8eb3ad0611c81271b3fc8"}
-)
 
 
 def _canonical_bytes(value: object) -> bytes:
@@ -76,6 +73,7 @@ def build_candidate_bundle(
     from neural_brain.cognition.hidden_contract import (
         CandidateEvaluationBundle,
         candidate_evaluation_bundle_digest,
+        reject_historical_evaluation_spec,
     )
     from neural_brain.cognition.training import (
         OfflineTrainingBundle,
@@ -92,6 +90,7 @@ def build_candidate_bundle(
         json.dumps(document["bundle"], separators=(",", ":"))
     )
     manifest = training_bundle.model_manifest
+    reject_historical_evaluation_spec(manifest.evaluation_spec_digest)
     parameters = training_bundle.parameter_artifact.parameters
     manifest_digest = model_manifest_digest(manifest)
     majority_counts = Counter(
@@ -170,11 +169,6 @@ def main(argv: list[str] | None = None) -> int:
             source_tree_digest=source_tree_digest,
             frozen_at=arguments.frozen_at,
         )
-        if bundle.model_manifest.evaluation_spec_digest in REJECTED_EVALUATION_SPEC_DIGESTS:
-            raise ValueError(
-                "candidate uses rejected EVAL-01 v3; freeze a replacement specification and "
-                "versioned training artifact before export"
-            )
         payload = (
             json.dumps(
                 bundle.model_dump(mode="json"),

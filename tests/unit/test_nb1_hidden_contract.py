@@ -1,7 +1,9 @@
 """Unit evidence for the label-free NB-1 hidden-evaluation candidate boundary."""
 
+import json
 from datetime import UTC, datetime
-from typing import Any
+from pathlib import Path
+from typing import Any, NoReturn
 
 import pytest
 from pydantic import ValidationError
@@ -27,7 +29,7 @@ from neural_brain.cognition.models import ActiveCognitiveModelManifest, NeuralWo
 from neural_brain.cognition.workspace import NeuralWorkspace
 
 
-def _active_model() -> ActiveCognitiveModel:
+def _active_model(*, evaluation_spec_digest: str = "d" * 64) -> ActiveCognitiveModel:
     parameters = NeuralWorkspaceParameters(
         model_version="hidden-contract-model-v1",
         training_provenance_ref="a" * 64,
@@ -42,7 +44,7 @@ def _active_model() -> ActiveCognitiveModel:
         training_artifact_digest=parameters.training_provenance_ref,
         code_digest="b" * 64,
         contract_digest="c" * 64,
-        evaluation_spec_digest="d" * 64,
+        evaluation_spec_digest=evaluation_spec_digest,
     )
     return ActiveCognitiveModel(workspace=workspace, manifest=manifest)
 
@@ -257,6 +259,28 @@ def test_candidate_tamper_or_active_model_mismatch_fails_closed() -> None:
             candidate=candidate,
             batch=_batch(),
         )
+
+
+@pytest.mark.parametrize("version", ("v1", "v2", "v3"))
+def test_rejected_candidate_cannot_reach_workspace_inference(
+    monkeypatch: pytest.MonkeyPatch, version: str
+) -> None:
+    specification_path = (
+        Path(__file__).resolve().parents[2]
+        / "docs/architecture/evaluations"
+        / f"nb1-safe-serial-cognition-{version}.json"
+    )
+    specification = json.loads(specification_path.read_text(encoding="utf-8"))
+    active_model = _active_model(evaluation_spec_digest=specification["spec_digest"])
+    candidate = _candidate(active_model)
+
+    def unexpected_step(*_args: object, **_kwargs: object) -> NoReturn:
+        pytest.fail("rejected candidate must not reach workspace inference")
+
+    monkeypatch.setattr(NeuralWorkspace, "step", unexpected_step)
+
+    with pytest.raises(ValueError, match=f"candidate uses rejected EVAL-01 {version}"):
+        predict_full_mechanism(active_model=active_model, candidate=candidate, batch=_batch())
 
 
 @pytest.mark.parametrize(
