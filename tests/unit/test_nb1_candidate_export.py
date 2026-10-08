@@ -5,37 +5,28 @@ from pathlib import Path
 
 import pytest
 
-from neural_brain.cognition.hidden_contract import CandidateEvaluationBundle
+from neural_brain.cognition import training
 from tools import export_nb1_evaluation_candidate as candidate_export
 from tools.export_nb1_evaluation_candidate import build_candidate_bundle, candidate_code_digest
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def test_candidate_export_is_deterministic_and_binds_the_complete_surface() -> None:
-    frozen_at = datetime(2026, 7, 17, 10, 0, tzinfo=UTC)
-    first = build_candidate_bundle(
-        root=ROOT,
-        source_commit="1" * 40,
-        source_tree_digest="2" * 64,
-        frozen_at=frozen_at,
-    )
-    second = build_candidate_bundle(
-        root=ROOT,
-        source_commit="1" * 40,
-        source_tree_digest="2" * 64,
-        frozen_at=frozen_at,
-    )
+def test_direct_builder_rejects_historical_candidate_before_dataset_generation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unexpected_generation() -> training.TrainingDataset:
+        pytest.fail("rejected candidate must not reach public dataset generation")
 
-    assert isinstance(first, CandidateEvaluationBundle)
-    assert first == second
-    assert first.source_commit == "1" * 40
-    assert first.candidate_code_digest == candidate_code_digest(ROOT)
-    assert first.training_code_digest == first.model_manifest.code_digest
-    assert first.fixed_train_majority_label == "negative"
-    assert first.model_manifest.training_artifact_digest == (
-        first.parameters.training_provenance_ref
-    )
+    monkeypatch.setattr(training, "generate_training_dataset", unexpected_generation)
+
+    with pytest.raises(ValueError, match="candidate uses rejected EVAL-01 v3"):
+        build_candidate_bundle(
+            root=ROOT,
+            source_commit="1" * 40,
+            source_tree_digest="2" * 64,
+            frozen_at=datetime(2026, 7, 17, 10, 0, tzinfo=UTC),
+        )
 
 
 def test_candidate_code_digest_changes_when_any_surface_digest_changes() -> None:

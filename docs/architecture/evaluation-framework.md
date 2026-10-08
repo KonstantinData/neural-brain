@@ -52,17 +52,25 @@ public generator was shown to contain only six distinct feature/label patterns.
 Version 3 is therefore retained unchanged but rejected: its hidden examples are
 enumerable by the implementer and its contamination control cannot pass.
 
-The v4 generator contract replaces the six-pattern public generator with a
-modular world/scenario/constraint/noise/serialization pipeline, 256-bit hidden
-seed custody, explicit split-isolation checks, and an accepted hidden-artifact
-search-space floor of at least 128 bits. The replacement boundary exposes only
-unlabeled observations to the candidate, binds source, model, training,
-contract, lockfile, and fixed training-baseline evidence in a candidate freeze
-receipt, and accepts aggregate external evidence only with an Ed25519 signature
-from a reviewer-supplied trusted registry. Hidden seeds, labels, latent
-metadata, detailed correctness, scoring, evaluator code, and signing keys
-remain outside this repository. The intake validates evidence structure and
-authenticity but never grants G0, G1, G8, stage release, or recognition.
+The preregistered v4 generator contract requires a modular
+world/scenario/constraint/noise/serialization pipeline, 256-bit hidden seed
+custody, explicit split-isolation checks, and independently accepted evidence
+of a hidden-artifact search-space floor of at least 128 bits. Its target
+boundary permits only unlabeled observations as candidate input. A future
+v4-bound freeze receipt must bind source, model, training, contract, lockfile,
+and fixed training-baseline evidence; aggregate external evidence requires an
+Ed25519 signature from a reviewer-supplied trusted registry. Hidden seeds,
+labels, latent metadata, detailed correctness, scoring, evaluator code, and
+signing keys remain outside this repository.
+
+These are v4 requirements, not an implemented v4 pipeline. The merged trainer,
+candidate and signed-intake mechanisms remain bound to rejected v3, including
+its old sequence counts, baseline set, and separate provider/evaluator custody
+rule. An executable v4 generator, v4-bound candidate, complete freeze receipt,
+and compatible evidence intake remain outstanding. The frozen v4 recipe also
+requires an accepted clarification of its deterministic mapping and baseline
+ceiling before conforming artifact generation. Historical v3 mechanisms never
+grant G0, G1, G8, stage release, or recognition.
 
 ## Gate chain
 
