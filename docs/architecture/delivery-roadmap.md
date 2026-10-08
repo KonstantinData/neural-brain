@@ -38,10 +38,12 @@ updates. Exit requires neural, attention, and working-memory ablations plus
 scope, crash, recovery, and gate-bypass tests.
 
 The first ordered slice is specified in
-[`nb1-work-packages.md`](nb1-work-packages.md). Its frozen evaluation is
-`EVAL-01.NB-1.safe-serial-cognition.v3`. Versions 1 and 2 are retained as
-rejected historical preregistration evidence. Completing the current slice does not by
-itself complete NB-1 or authorize later-stage capabilities.
+[`nb1-work-packages.md`](nb1-work-packages.md). Its active frozen evaluation is
+`EVAL-01.NB-1.safe-serial-cognition.v4`. Versions 1 through 3 are retained as
+rejected historical preregistration evidence; v3 was rejected before hidden
+attachment because its generator exposed an enumerable six-pattern hidden space.
+Completing the current slice does not by itself complete NB-1 or authorize
+later-stage capabilities.
 
 ### NB-2 — Perception, Attention, and World Model
 
@@ -98,10 +100,12 @@ cognitive quality.
 ## Current repository mapping
 
 - Foundation governance, PostgreSQL, scope, audit, Memory Gate, Working Memory,
-  observations, checkpoints, inactive candidates, and Dreaming are reusable.
+  observations, checkpoints, and inactive-candidate structures are reusable.
+  Dreaming schema and contracts are reserved; execution remains disabled.
 - Merged PR #6 provides the current NB-0 and early incomplete MS-1 baseline.
 - NB-1 contracts and its first preregistered implementation slice are in
-  progress; no NB-1 runtime evidence has been accepted yet.
+  progress; NB-1.3 checkpoint evidence was merged in PR #8, but no complete
+  NB-1 stage-exit or independent release evidence has been accepted.
 - No NB-1 through NB-8 stage currently has complete exit evidence.
 - Historical Goal, Action, dispatch, kill-switch, and verification designs are
   inputs for revalidation, not automatically active contracts.
