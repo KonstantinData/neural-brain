@@ -94,6 +94,9 @@ when they are required by the acceptance criteria.
 
 ## Versioned Evidence Records
 
+- [`NB-PROD-01-public-safety-evidence.md`](NB-PROD-01-public-safety-evidence.md):
+  selectively recovered NB-1 scope/bypass and lost-acknowledgement evidence,
+  verified against isolated PostgreSQL 18 with explicit simulation limits.
 - [`../architecture/ledger-conventions-v1.md`](../architecture/ledger-conventions-v1.md):
   S1-03.1 normative representation conventions with architecture-test evidence.
 - [`FND-01-foundation-baseline.md`](FND-01-foundation-baseline.md): historical
