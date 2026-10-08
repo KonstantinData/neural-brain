@@ -122,9 +122,9 @@ The current implementation includes early, reusable prerequisites:
   with six baselines, three mechanism ablations, dataset digests, and confidence
   intervals, plus a deterministic train-only offline grid search and
   self-verifying non-promoted model/provenance bundle;
-- a label-free candidate interface, complete candidate freeze receipt, and
-  Ed25519-signed external-evidence intake that keep hidden labels, scoring, and
-  evaluator key custody outside this repository and never grant a gate;
+- a historical v3 label-free candidate interface, freeze-receipt structure,
+  and Ed25519-signed external-evidence intake that keep hidden labels, scoring,
+  and evaluator key custody outside this repository and never grant a gate;
 - the preregistered `EVAL-01.NB-1.safe-serial-cognition.v4` replacement
   specification plus `nb1-serial-context-generator-v4`, which replace the
   rejected enumerable v3 hidden space before any v4 candidate or hidden

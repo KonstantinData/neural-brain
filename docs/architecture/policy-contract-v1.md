@@ -3,8 +3,9 @@
 ## Status
 
 S1-02.3 implements a strict, canonical, expiry-bound policy document and
-compiler. It is deliberately narrower than the future policy decision and
-activation system.
+compiler. Separate decision-record and activation-evidence validators are
+implemented; protected policy activation remains a future runtime capability.
+Compilation alone grants no authority and does not activate a policy.
 
 ## Document contract
 
@@ -16,11 +17,13 @@ policy.
 
 ## Non-overridable boundary
 
-The compiler rejects an expired policy and any operation other than the only
-currently released operation, gated Memory Core intake. A policy may later
-narrow admission further, but cannot turn the Security Floor's denial of
-retrieval, disclosure, promotion, correction, retention, deletion, action, or
-model promotion into an allow.
+The compiler rejects an expired policy and any operation other than gated
+Memory Core intake, the only operation admitted by this v1 policy compiler.
+The runtime Security Floor separately admits scoped `memory_ingest` and
+`memory_read`; this compiler does not broaden that boundary or authorize
+semantic retrieval. A policy may narrow admission further, but cannot turn a
+Security Floor denial into an allow or enable disclosure, promotion,
+correction, retention, deletion, action, or model promotion.
 
 ## Traceability
 
