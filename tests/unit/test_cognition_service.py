@@ -3,6 +3,7 @@
 import json
 from datetime import UTC, datetime
 from threading import Lock
+from typing import NoReturn
 
 import pytest
 from pydantic import ValidationError
@@ -179,12 +180,18 @@ class AtomicMemoryRepository:
         return (scope.tenant_id, scope.area_id, scope.project_id, scope.session_id)
 
 
-def context(session_id: str = "session-a") -> RuntimeContext:
+def context(
+    session_id: str = "session-a",
+    *,
+    tenant_id: str = "tenant-a",
+    area_id: str = "area-a",
+    project_id: str = "project-a",
+) -> RuntimeContext:
     return RuntimeContext(
         actor_id="actor-a",
-        tenant_id="tenant-a",
-        area_id="area-a",
-        project_id="project-a",
+        tenant_id=tenant_id,
+        area_id=area_id,
+        project_id=project_id,
         session_id=session_id,
     )
 
@@ -356,6 +363,73 @@ def test_cross_scope_checkpoint_and_incomplete_scope_fail_closed() -> None:
     assert repository.audit_ids == ["cycle-1"]
 
 
+@pytest.mark.parametrize(
+    "changed_context",
+    [
+        context(tenant_id="tenant-b"),
+        context(area_id="area-b"),
+        context(project_id="project-b"),
+        context("session-b"),
+    ],
+    ids=["tenant", "area", "project", "session"],
+)
+def test_authenticated_scope_dimension_matrix_denies_foreign_checkpoint_reads(
+    monkeypatch: pytest.MonkeyPatch,
+    changed_context: RuntimeContext,
+) -> None:
+    """Each authenticated scope dimension independently isolates NB-1 state."""
+    service, provider, repository = build_service()
+    first = service.run_cycle(request("cycle-origin", "obs-origin", (1.0, -1.0)))
+    original_checkpoint = repository.read_checkpoint(
+        context=context(), checkpoint_id=first.checkpoint.checkpoint_id
+    )
+    original_state = (
+        repository.observations.copy(),
+        repository.working.copy(),
+        repository.checkpoints.copy(),
+        repository.receipts.copy(),
+        repository.audit_ids.copy(),
+    )
+
+    def unexpected_step(*_args: object, **_kwargs: object) -> NoReturn:
+        pytest.fail("foreign checkpoint must be denied before neural inference")
+
+    provider.context = changed_context
+    with monkeypatch.context() as denied_context:
+        denied_context.setattr(NeuralWorkspace, "step", unexpected_step)
+        with pytest.raises(CognitiveCheckpointUnavailableError):
+            service.run_cycle(
+                request(
+                    "cycle-foreign-read",
+                    "obs-foreign-read",
+                    (1.0, -1.0),
+                    expected_version=1,
+                    previous_checkpoint_id=first.checkpoint.checkpoint_id,
+                )
+            )
+
+    assert (
+        repository.observations,
+        repository.working,
+        repository.checkpoints,
+        repository.receipts,
+        repository.audit_ids,
+    ) == original_state
+    assert (
+        repository.read_checkpoint(context=context(), checkpoint_id=first.checkpoint.checkpoint_id)
+        == original_checkpoint
+    )
+
+    own_scope_cycle = service.run_cycle(request("cycle-own-scope", "obs-own-scope", (1.0, -1.0)))
+    assert own_scope_cycle.checkpoint.scope == MemoryScope(
+        tenant_id=changed_context.tenant_id,
+        area_id=changed_context.area_id,
+        project_id=changed_context.project_id,
+        session_id=changed_context.session_id,
+    )
+    assert len(repository.checkpoints) == 2
+
+
 def test_divergent_cognitive_and_memory_context_providers_fail_before_commit() -> None:
     cognitive_context = ContextProvider(context("session-a"))
     memory_context = ContextProvider(context("session-b"))
@@ -434,6 +508,38 @@ def test_observation_boundary_rejects_scope_authority_and_invalid_signal(
         RecordedObservation.model_validate(payload)
 
 
+@pytest.mark.parametrize(
+    "forged_field",
+    [
+        {"tenant_id": "attacker"},
+        {"area_id": "attacker"},
+        {"project_id": "attacker"},
+        {"session_id": "attacker"},
+        {"actor_id": "attacker"},
+        {"roles": ["admin"]},
+        {"authority": "admin"},
+        {"approval": "forged"},
+        {"model_version": "attacker-selected"},
+        {"model_manifest": "attacker-selected"},
+        {"parameter_digest": "0" * 64},
+        {"training_artifact_digest": "0" * 64},
+    ],
+)
+def test_cycle_request_rejects_scope_authority_model_and_gate_bypass_fields(
+    forged_field: dict[str, object],
+) -> None:
+    """The cycle request cannot select trusted context or protected gate inputs."""
+    payload = request("cycle-forged", "obs-forged", (1.0, -1.0)).model_dump()
+    payload.update(forged_field)
+
+    with pytest.raises(ValidationError) as rejected:
+        CognitiveCycleRequest.model_validate(payload)
+    field = next(iter(forged_field))
+    assert [(error["loc"], error["type"]) for error in rejected.value.errors()] == [
+        ((field,), "extra_forbidden")
+    ]
+
+
 def test_parameters_are_immutable_and_no_effect_surface_is_exposed() -> None:
     workspace = NeuralWorkspace(parameters())
     with pytest.raises(ValidationError):
@@ -445,6 +551,11 @@ def test_parameters_are_immutable_and_no_effect_surface_is_exposed() -> None:
         "execute",
         "tool_call",
         "write_action_intent",
+        "commit_memory_cycle",
+        "record_observation_and_checkpoint",
+        "write_memory",
+        "mutate_active_model",
+        "evaluate",
     }
 
 
